@@ -117,7 +117,7 @@
     "percentageOfUsers": "{value}% de los usuarios rastreados",
     "rarityScore": "Puntuación de rareza",
     "aboutRarity": "Sobre el índice de rareza",
-    "rarityFormula": "El Twitch Badge Rarity Index (TBRI) se calcula a partir de cuatro señales: escasez de propietarios (escala logarítmica, 45 %), cuántos propietarios siguen mostrando la insignia (15 %), disponibilidad de la ventana de obtención (25 %) y antigüedad de la insignia (10 %). El resultado es una puntuación de 0–100 asignada a seis niveles.",
+    "rarityFormula": "El TBRI v2 combina seis señales: escasez de propietarios (40%), tasa de uso (10%), obtenibilidad (20%), antigüedad (10%), impulso de 24h de potat.app (10%) y brevedad de la ventana (10%) — una puntuación de 0–100 en seis niveles.",
     "ownerTrend": "Tendencia de propietarios",
     "ownerTrendSubtitle": "Datos en vivo de potat.app, consultados cada 15 minutos",
     "noStats": "Aún no hay estadísticas registradas para esta insignia.",
@@ -126,7 +126,8 @@
     "notFound": "Esta insignia no existe.",
     "channelBadge": "Insignia de canal",
     "setId": "ID de conjunto",
-    "version": "Versión"
+    "version": "Versión",
+    "liveCount": "Activos ahora (en vivo)"
   },
   "countdown": {
     "expiresIn": "Expira en",
@@ -201,7 +202,11 @@
     "notFoundTitle": "Aún no hay perfil para \"{username}\"",
     "notFoundBody": "Este usuario aún no ha iniciado sesión aquí. Puedes ver sus insignias en la herramienta de comparación.",
     "inventoryHidden": "Este coleccionista mantiene su inventario privado.",
-    "claim": "¿Eres tú? Inicia sesión con Twitch para reclamar este perfil."
+    "claim": "¿Eres tú? Inicia sesión con Twitch para reclamar este perfil.",
+    "potatLevel": "Nivel de Potat",
+    "potatoes": "Potatoes",
+    "potatSince": "En potat.app desde",
+    "connections": "Cuentas conectadas"
   },
   "inventory": {
     "title": "Mis insignias",

@@ -1,17 +1,23 @@
 import type { BadgeStatus } from "./twitch/types";
 
 /**
- * TBRI — Twitch Badge Rarity Index (proprietary).
+ * TBRI v2 — Twitch Badge Rarity Index (proprietary).
  *
- * score = 100 × (0.45·scarcity + 0.15·wear + 0.25·window + 0.10·age) / 0.95
+ * score = 100 × (0.40·scarcity + 0.10·wear + 0.20·obtainability
+ *                + 0.10·age + 0.10·momentum + 0.10·brevity)
  *
- *  scarcity  log-scaled inverse of lifetime owner count (1 owner → 1.0,
- *            ~30M owners → 0.0; unknown data → 0.35 neutral)
- *  wear      share of owners still displaying the badge (active/owners) —
- *            a badge people proudly keep equipped is worth more
- *  window    obtainability: expired → 1.0, closing <30d → 0.85,
- *            limited → 0.7, upcoming → 0.6, permanent → 0.35
- *  age       time since first detection, saturating at 3 years
+ *  scarcity       log-scaled inverse of lifetime owner count from potat.app
+ *                 (1 owner → 1.0, ~30M owners → 0.0; unknown → 0.35)
+ *  wear           share of owners still displaying the badge (active/owners)
+ *  obtainability  expired → 1.0, closing <30d → 0.85, limited → 0.7,
+ *                 upcoming → 0.6, permanent/active → 0.35
+ *  age            time since first detection, saturating at 3 years
+ *  momentum       24h active-user growth from the potat time series
+ *                 (badge_stats via badge_momentum) — hot claim waves push
+ *                 this toward 1.0; unknown history → 0.5 neutral
+ *  brevity        length of the claim window (start→end): a 1-day drop is
+ *                 maximally brief (1.0), a year-long campaign → 0.0,
+ *                 windowless badges → 0.0
  */
 
 export type RarityTier =
@@ -29,6 +35,8 @@ export interface RarityInput {
   startDate: string | null;
   endDate: string | null;
   firstSeenAt: string | null;
+  /** Absolute active-user growth over the last ~24h (potat time series). */
+  growth24h?: number | null;
 }
 
 export interface RarityResult {
@@ -37,9 +45,15 @@ export interface RarityResult {
 }
 
 const OWNERS_MAX = 3.0e7;
-const WEIGHTS = { scarcity: 0.45, wear: 0.15, window: 0.25, age: 0.1 };
-const WEIGHT_SUM =
-  WEIGHTS.scarcity + WEIGHTS.wear + WEIGHTS.window + WEIGHTS.age;
+const WEIGHTS = {
+  scarcity: 0.4,
+  wear: 0.1,
+  obtainability: 0.2,
+  age: 0.1,
+  momentum: 0.1,
+  brevity: 0.1,
+};
+const WEIGHT_SUM = Object.values(WEIGHTS).reduce((a, b) => a + b, 0);
 
 function clamp01(value: number): number {
   return Math.min(1, Math.max(0, value));
@@ -64,7 +78,7 @@ function wearOf(totalOwners: number | null, activeUsers: number | null): number 
   return clamp01(activeUsers / totalOwners);
 }
 
-function windowOf(input: RarityInput, now: Date): number {
+function obtainabilityOf(input: RarityInput, now: Date): number {
   if (input.status === "removed") return 1;
   if (input.status === "expired") return 1;
   if (input.status === "upcoming") return 0.6;
@@ -85,6 +99,31 @@ function ageOf(firstSeenAt: string | null, now: Date): number {
   return clamp01(days / 1095);
 }
 
+function momentumOf(input: RarityInput): number {
+  if (input.status === "expired" || input.status === "removed") return 0;
+  if (
+    input.growth24h === null ||
+    input.growth24h === undefined ||
+    !Number.isFinite(input.growth24h) ||
+    !input.activeUsers ||
+    input.activeUsers <= 0
+  ) {
+    return 0.5; // no history yet — neutral
+  }
+  // +5% active growth in a day is a hot claim wave → 1.0
+  const ratio = input.growth24h / input.activeUsers;
+  return clamp01(ratio * 20);
+}
+
+function brevityOf(input: RarityInput): number {
+  if (!input.startDate || !input.endDate) return 0;
+  const days =
+    (new Date(input.endDate).getTime() - new Date(input.startDate).getTime()) /
+    86_400_000;
+  if (!Number.isFinite(days) || days <= 0) return 0;
+  return clamp01(1 - Math.log10(Math.max(days, 0.25)) / Math.log10(365));
+}
+
 export function computeRarity(
   input: RarityInput,
   now: Date = new Date(),
@@ -92,8 +131,10 @@ export function computeRarity(
   const raw =
     WEIGHTS.scarcity * scarcityOf(input.totalOwners) +
     WEIGHTS.wear * wearOf(input.totalOwners, input.activeUsers) +
-    WEIGHTS.window * windowOf(input, now) +
-    WEIGHTS.age * ageOf(input.firstSeenAt, now);
+    WEIGHTS.obtainability * obtainabilityOf(input, now) +
+    WEIGHTS.age * ageOf(input.firstSeenAt, now) +
+    WEIGHTS.momentum * momentumOf(input) +
+    WEIGHTS.brevity * brevityOf(input);
 
   const score = Math.round((100 * raw) / WEIGHT_SUM);
   return { score, tier: tierOf(score) };

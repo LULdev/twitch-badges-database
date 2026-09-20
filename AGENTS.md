@@ -11,8 +11,12 @@ Read `README.md` for data sources and setup; read this file before editing.
 - `src/lib/twitch/` — external data services (helix, ivr, badgebase, potat, perfil).
   Status/role badges (moderator, VIP, partner, …) are EXCLUDED from the
   catalog (`isStatusSetId` in types.ts; global sync deletes any that exist).
-  badgebase sync reads the curated `/active` + `/upcoming/` listing pages and
-  scrapes each detail page for the end date (`data-reset`) and HowTo JSON-LD.
+  badgebase sync is the AUTHORITATIVE activity source: badges on /active get
+  `is_confirmed_active` + status 'active'; everything else without a live
+  window is demoted to 'expired' (sweep in runBadgebaseSync). Detail pages
+  provide end date (`data-reset`) and HowTo JSON-LD. potat: /users/{login}
+  enriches profiles after login; /twitch/badges?badge={id} feeds the live
+  count on badge pages; the badge_momentum view feeds rarity momentum.
 - `src/lib/syncs/` — sync engines shared by `scripts/*.ts` AND `/api/cron/*`
 - `src/lib/` — queries.ts (DB reads via server client), rarity.ts (TBRI),
   changelog.ts, inventory.ts, push.ts, markdown.ts, seo.ts
@@ -22,7 +26,7 @@ Read `README.md` for data sources and setup; read this file before editing.
 
 ```
 npm run dev | build | lint | typecheck
-npm run db:apply        # apply supabase/migrations/0001_init.sql (needs SUPABASE_DB_URL)
+npm run db:apply        # apply pending migrations once (supabase_migrations ledger)
 npm run sync:global | sync:badgebase | sync:potat
 npm run send:push -- "Title" "Body" "/en/badges/slug"
 ```

@@ -16,6 +16,7 @@ import OwnersChart from "@/components/charts/OwnersChart";
 import ShareButtons from "@/components/ShareButtons";
 import LiveRefresher from "@/components/LiveRefresher";
 import { localeAlternates } from "@/lib/seo";
+import { fetchBadgeLiveStats } from "@/lib/twitch/potat";
 
 export const revalidate = 120;
 
@@ -69,9 +70,10 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   const badge = await getBadgeBySlug(slug).catch(() => null);
   if (!badge) notFound();
 
-  const [history, related] = await Promise.all([
+  const [history, related, live] = await Promise.all([
     getBadgeStatsHistory(badge.id).catch(() => []),
     listBadges({ category: badge.category, perPage: 7 }).catch(() => null),
+    fetchBadgeLiveStats(badge.set_id).catch(() => null),
   ]);
 
   const chartData = history.map((point) => ({
@@ -221,6 +223,20 @@ export default async function BadgeDetailPage({ params }: PageProps) {
                   : "—"}
               </dd>
             </div>
+            {live?.userCount !== null && live?.userCount !== undefined && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted">
+                  <span className="me-1.5 inline-block size-1.5 animate-pulse rounded-full bg-success" aria-hidden />
+                  {t("liveCount")}
+                </dt>
+                <dd className="font-semibold tabular-nums text-success">
+                  {new Intl.NumberFormat(locale).format(live.userCount)}
+                  {live.percentage !== null
+                    ? ` (${Number(live.percentage).toFixed(2)}%)`
+                    : ""}
+                </dd>
+              </div>
+            )}
             {badge.percentage !== null && (
               <div className="flex justify-between gap-4">
                 <dt className="text-muted">%</dt>

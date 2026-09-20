@@ -2,9 +2,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { fetchGlobalBadgeCatalog } from "@/lib/twitch/catalog";
 import {
   badgeSlug,
-  badgeStatus,
   guessCategory,
   isStatusSetId,
+  resolveStatus,
   type BadgeVersionSource,
 } from "@/lib/twitch/types";
 import { logChange } from "@/lib/changelog";
@@ -99,7 +99,9 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     const ex = existing.get(key);
 
     if (!ex) {
-      const status = "active"; // refined below by dates, and by badgebase sync
+      // Dateless catalog additions start as 'expired' until the badgebase
+    // listing sync confirms them as currently redeemable.
+    const status = resolveStatus({ is_confirmed_active: false });
       const slug = badgeSlug(v.setId, v.version);
       upserts.push({
         set_id: v.setId,
@@ -141,12 +143,14 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
       updated += 1;
     }
 
-    const nextStatus = ex.removed_at
-      ? "active" // reappeared: restock
-      : badgeStatus(
-          { start_date: ex.start_date, end_date: ex.end_date },
-          now,
-        );
+    const nextStatus = resolveStatus(
+      {
+        start_date: ex.start_date,
+        end_date: ex.end_date,
+        is_confirmed_active: (ex.is_confirmed_active as boolean | null) ?? false,
+      },
+      now,
+    );
     if (ex.removed_at || ex.status !== nextStatus) {
       patch.status = nextStatus;
       patch.removed_at = null;

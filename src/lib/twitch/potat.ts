@@ -151,3 +151,105 @@ export async function fetchBadgesBlogRanking(
     rank_position: Number(row.rank_position ?? 0),
   }));
 }
+
+/** Normalized potat.app user profile (GET /users/{username}). */
+export interface PotatUserProfile {
+  potatId: number | null;
+  username: string;
+  displayName: string | null;
+  level: number | null;
+  potatoes: number | null;
+  firstSeen: string | null;
+  color: string | null;
+  twitchId: string | null;
+  connections: Array<{ platform: string; id: string }>;
+}
+
+/** Live per-badge stats (GET /twitch/badges?badge={name}). */
+export interface PotatBadgeLive {
+  userCount: number | null;
+  percentage: number | null;
+}
+
+/**
+ * Fetch a user's potat.app profile: level, potatoes, first-seen, account
+ * color and cross-platform connections (7TV, BTTV, Twitch).
+ */
+export async function fetchPotatUser(
+  login: string,
+  revalidate = 3600,
+): Promise<PotatUserProfile | null> {
+  const clean = login.trim().toLowerCase();
+  if (!/^[a-z0-9_]{3,25}$/.test(clean)) return null;
+  const res = await fetch(`${envOrNull("POTAT_API_URL") ?? DEFAULT_API}/users/${clean}`, {
+    headers: { accept: "application/json" },
+    next: { revalidate },
+  });
+  if (!res.ok) return null; // 404 = unknown to potat — not an error
+
+  const json = (await res.json()) as {
+    data?: Array<{
+      user?: {
+        user_id?: number;
+        username?: string;
+        display?: string;
+        level?: number;
+        first_seen?: string;
+        connections?: Array<{
+          platform?: string;
+          id?: string;
+          meta?: { color?: string };
+        }>;
+      };
+      potatoes?: { count?: number } | number | null;
+    }>;
+  };
+  const entry = json.data?.[0];
+  const user = entry?.user;
+  if (!user) return null;
+
+  const potatoes =
+    typeof entry?.potatoes === "number"
+      ? entry.potatoes
+      : (entry?.potatoes?.count ?? null);
+
+  const twitchConnection = user.connections?.find(
+    (c) => c.platform === "TWITCH",
+  );
+
+  return {
+    potatId: user.user_id ?? null,
+    username: user.username ?? clean,
+    displayName: user.display ?? null,
+    level: user.level ?? null,
+    potatoes,
+    firstSeen: user.first_seen ?? null,
+    color: twitchConnection?.meta?.color ?? null,
+    twitchId: twitchConnection?.id ?? null,
+    connections: (user.connections ?? [])
+      .filter((c) => c.platform && c.id)
+      .map((c) => ({ platform: String(c.platform), id: String(c.id) })),
+  };
+}
+
+/** Live user_count/percentage for a single badge (set_id). */
+export async function fetchBadgeLiveStats(
+  badgeName: string,
+  revalidate = 300,
+): Promise<PotatBadgeLive | null> {
+  const base = envOrNull("POTAT_API_URL") ?? DEFAULT_API;
+  const res = await fetch(
+    `${base}/twitch/badges?badge=${encodeURIComponent(badgeName)}`,
+    { headers: { accept: "application/json" }, next: { revalidate } },
+  );
+  if (!res.ok) return null;
+  const json = (await res.json()) as {
+    data?: Array<{ user_count?: number; percentage?: number }>;
+  };
+  const row = json.data?.[0];
+  if (!row) return null;
+  return {
+    userCount: row.user_count ?? null,
+    percentage: row.percentage ?? null,
+  };
+}

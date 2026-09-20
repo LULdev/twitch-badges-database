@@ -117,7 +117,7 @@
     "percentageOfUsers": "{value}% degli utenti tracciati",
     "rarityScore": "Punteggio di rarità",
     "aboutRarity": "Informazioni sull'indice di rarità",
-    "rarityFormula": "Il Twitch Badge Rarity Index (TBRI) si calcola da quattro segnali: scarsità dei possessori (scala logaritmica, 45%), quota di possessori che indossa ancora il badge (15%), accessibilità della finestra di ottenimento (25%) ed età del badge (10%). Il risultato è un punteggio da 0 a 100 suddiviso in sei livelli.",
+    "rarityFormula": "Il TBRI v2 combina sei segnali: scarsità dei possessori (40%), tasso di indosso (10%), ottenebilità (20%), età (10%), slancio 24h da potat.app (10%) e brevità della finestra (10%) — un punteggio 0–100 su sei livelli.",
     "ownerTrend": "Andamento dei possessori",
     "ownerTrendSubtitle": "Dati live da potat.app, aggiornati ogni 15 minuti",
     "noStats": "Nessuna statistica registrata per questo badge.",
@@ -126,7 +126,8 @@
     "notFound": "Questo badge non esiste.",
     "channelBadge": "Badge del canale",
     "setId": "ID set",
-    "version": "Versione"
+    "version": "Versione",
+    "liveCount": "Attivi ora (live)"
   },
   "countdown": {
     "expiresIn": "Scade tra",
@@ -201,7 +202,11 @@
     "notFoundTitle": "Nessun profilo per \"{username}\"",
     "notFoundBody": "Questo utente non ha ancora effettuato l'accesso qui. Puoi comunque vedere i suoi badge nello strumento di confronto.",
     "inventoryHidden": "Questo collezionista mantiene l'inventario privato.",
-    "claim": "Sei tu? Accedi con Twitch per reclamare questo profilo."
+    "claim": "Sei tu? Accedi con Twitch per reclamare questo profilo.",
+    "potatLevel": "Livello Potat",
+    "potatoes": "Patate",
+    "potatSince": "Su potat.app dal",
+    "connections": "Account collegati"
   },
   "inventory": {
     "title": "I miei badge",

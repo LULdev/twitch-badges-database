@@ -4,14 +4,19 @@ import {
   fetchBadgebaseDetail,
   type BadgebaseCard,
 } from "@/lib/twitch/badgebase";
-import { badgeStatus, guessCategory, isStatusSetId } from "@/lib/twitch/types";
+import {
+  guessCategory,
+  isStatusSetId,
+  resolveStatus,
+} from "@/lib/twitch/types";
 import { logChange } from "@/lib/changelog";
 
 export interface BadgebaseSyncSummary {
   activeCards: number;
   upcomingCards: number;
   enriched: number;
-  insertedUpcoming: number;
+  inserted: number;
+  demotedToExpired: number;
   errors: number;
 }
 
@@ -49,12 +54,13 @@ async function mapLimit<T, R>(
 }
 
 /**
- * Sync drop metadata from badgebase.de's curated listing pages:
- *   /active   → currently redeemable badges with availability windows
- *   /upcoming → announced badges, inserted as upcoming before Twitch
- *               exposes them globally
- * End dates (countdown expiry) and how-to-earn steps come from each badge's
- * detail page.
+ * Authoritative drop-status sync from badgebase.de's curated listings:
+ *   /active   → currently redeemable (status 'active' + is_confirmed_active)
+ *   /upcoming → announced, pre-release (status 'upcoming')
+ * Every badge NOT on the active list and without a live claim window is
+ * demoted to 'expired' — only genuinely redeemable badges stay "active".
+ * End dates (countdown expiry) and how-to-earn steps come from the detail
+ * pages.
  */
 export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
   const supabase = createAdminClient();
@@ -75,49 +81,39 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
 
   const allBadges = await supabase
     .from("badges")
-    .select(
-      "id,set_id,version,image_url_1x,image_url_2x,start_date,end_date,release_date,is_paid,how_to_earn,description,status",
-    )
+    .select("*")
     .then(({ data, error }) => {
       if (error) throw error;
-      return (data ?? []) as Array<{
-        id: string;
-        set_id: string;
-        version: string;
-        image_url_1x: string | null;
-        image_url_2x: string | null;
-        start_date: string | null;
-        end_date: string | null;
-        release_date: string | null;
-        is_paid: boolean;
-        how_to_earn: string | null;
-        description: string | null;
-        status: string;
-      }>;
+      return (data ?? []) as Array<Record<string, unknown>>;
     });
 
-  const byUuid = new Map<string, (typeof allBadges)[number]>();
-  const bySetId = new Map<string, (typeof allBadges)[number]>();
+  const byUuid = new Map<string, Record<string, unknown>>();
+  const bySetId = new Map<string, Record<string, unknown>>();
   for (const row of allBadges) {
-    const uuid = extractUuid(row.image_url_1x) ?? extractUuid(row.image_url_2x);
+    const uuid = extractUuid(row.image_url_1x as string | null) ??
+      extractUuid(row.image_url_2x as string | null);
     if (uuid) byUuid.set(uuid, row);
-    if (!bySetId.has(row.set_id)) bySetId.set(row.set_id, row);
+    if (!bySetId.has(row.set_id as string)) bySetId.set(row.set_id as string, row);
   }
 
   const now = new Date();
   let enriched = 0;
-  let insertedUpcoming = 0;
+  let inserted = 0;
+  let demotedToExpired = 0;
   let errors = 0;
+
+  // Keys confirmed active by the /active listing (uuid or set_id).
+  const activeKeys = new Set<string>();
+  for (const card of activeCards) {
+    if (card.imageUuid) activeKeys.add(card.imageUuid);
+    activeKeys.add(card.slug);
+  }
 
   for (const { item: card, result: detail } of detailed) {
     if (!detail) {
       errors += 1;
       continue;
     }
-    await applyCard(card, detail);
-  }
-
-  async function applyCard(card: BadgebaseCard, detail: Awaited<ReturnType<typeof fetchBadgebaseDetail>>) {
     const existing =
       (card.imageUuid ? byUuid.get(card.imageUuid) : undefined) ??
       bySetId.get(card.slug);
@@ -133,6 +129,7 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
         : null;
     const howToEarn = detail.howToEarn;
     const releaseDate = startDate;
+    const confirmedActive = card.status === "active";
 
     if (existing) {
       const patch: Record<string, unknown> = {};
@@ -151,10 +148,19 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
       ) {
         patch.description = detail.description;
       }
-      const status = badgeStatus(
-        { start_date: startDate ?? existing.start_date, end_date: endDate ?? existing.end_date },
-        now,
-      );
+      if ((existing.is_confirmed_active as boolean | null) !== confirmedActive) {
+        patch.is_confirmed_active = confirmedActive;
+      }
+      const status = confirmedActive
+        ? "active"
+        : resolveStatus(
+            {
+              start_date: (startDate ?? existing.start_date) as string | null,
+              end_date: (endDate ?? existing.end_date) as string | null,
+              is_confirmed_active: confirmedActive,
+            },
+            now,
+          );
       if (status !== existing.status && existing.status !== "removed") {
         patch.status = status;
       }
@@ -166,11 +172,11 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
         if (error) throw error;
         enriched += 1;
       }
-      return;
+      continue;
     }
 
     // Unknown to the catalog: a badgebase announcement — usually an upcoming
-    // drop before Twitch exposes it globally.
+    // drop before Twitch exposes it globally, or a fresh active one.
     const { error } = await supabase.from("badges").upsert(
       {
         set_id: card.slug,
@@ -187,7 +193,10 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
         start_date: startDate,
         end_date: endDate,
         release_date: releaseDate,
-        status: badgeStatus({ start_date: startDate, end_date: endDate }, now),
+        status: confirmedActive
+          ? "active"
+          : resolveStatus({ start_date: startDate, end_date: endDate }, now),
+        is_confirmed_active: confirmedActive,
         source: "badgebase",
         first_seen_at: now.toISOString(),
         last_seen_at: now.toISOString(),
@@ -195,19 +204,59 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
       { onConflict: "set_id,version", ignoreDuplicates: true },
     );
     if (error) throw error;
-    insertedUpcoming += 1;
+    inserted += 1;
+  }
+
+  // Sweep: every badge NOT confirmed by the /active listing and without a
+  // live window is demoted to 'expired' (permanent badges included).
+  const sweepRows: Array<Record<string, unknown>> = [];
+  for (const row of allBadges) {
+    if (row.status === "removed") continue;
+    const keyUuid = extractUuid(row.image_url_1x as string | null) ??
+      extractUuid(row.image_url_2x as string | null);
+    const onActiveList =
+      activeKeys.has(row.set_id as string) ||
+      (keyUuid ? activeKeys.has(keyUuid) : false);
+    if (onActiveList) continue;
+
+    const confirmed = false;
+    const nextStatus = resolveStatus(
+      {
+        start_date: row.start_date as string | null,
+        end_date: row.end_date as string | null,
+        is_confirmed_active: confirmed,
+      },
+      now,
+    );
+    if (row.status !== nextStatus || (row.is_confirmed_active as boolean)) {
+      sweepRows.push({
+        ...row,
+        is_confirmed_active: confirmed,
+        status: nextStatus,
+      });
+      if (nextStatus === "expired" && row.status !== "expired") {
+        demotedToExpired += 1;
+      }
+    }
+  }
+  for (let i = 0; i < sweepRows.length; i += 200) {
+    const { error } = await supabase
+      .from("badges")
+      .upsert(sweepRows.slice(i, i + 200), { onConflict: "set_id,version" });
+    if (error) throw error;
   }
 
   await logChange(
     {
       kind: "data_sync",
       title: "Badgebase listing sync completed",
-      body: `${activeCards.length} active + ${upcomingCards.length} upcoming cards processed, ${enriched} badges enriched with drop windows and how-to-earn steps, ${insertedUpcoming} new badges inserted, ${errors} detail fetch errors.`,
+      body: `${activeCards.length} active + ${upcomingCards.length} upcoming cards processed, ${enriched} badges enriched, ${inserted} new badges inserted, ${demotedToExpired} badges demoted to expired, ${errors} detail fetch errors.`,
       payload: {
         activeCards: activeCards.length,
         upcomingCards: upcomingCards.length,
         enriched,
-        insertedUpcoming,
+        inserted,
+        demotedToExpired,
         errors,
         ranAt: now.toISOString(),
       },
@@ -219,7 +268,8 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
     activeCards: activeCards.length,
     upcomingCards: upcomingCards.length,
     enriched,
-    insertedUpcoming,
+    inserted,
+    demotedToExpired,
     errors,
   };
 }

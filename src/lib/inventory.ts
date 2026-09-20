@@ -1,5 +1,6 @@
 import { createAdminClient } from "./supabase/admin";
 import { fetchUserBadges } from "./twitch/perfil";
+import { fetchPotatUser } from "./twitch/potat";
 
 export interface InventorySyncResult {
   owned: number;
@@ -7,6 +8,7 @@ export interface InventorySyncResult {
   removed: number;
   unmatched: number;
   lastSyncedAt: string;
+  potatEnriched: boolean;
 }
 
 /**
@@ -99,15 +101,40 @@ export async function syncUserInventory(
     );
   if (stateError) throw stateError;
 
-  // Keep profile Twitch metadata fresh (avatar / display name).
+  // Keep profile Twitch metadata fresh (avatar / display name / creation).
   await supabase
     .from("profiles")
     .update({
       display_name: perfil.displayName,
       avatar_url: perfil.profileImageURL,
       twitch_id: perfil.id,
+      twitch_created_at: perfil.createdAt ?? null,
     })
     .eq("id", userId);
+
+  // Best-effort potat.app enrichment: level, potatoes, first-seen, color and
+  // cross-platform connections go straight onto the public profile.
+  let potatEnriched = false;
+  try {
+    const potat = await fetchPotatUser(username, 0);
+    if (potat) {
+      const { error: potatError } = await supabase
+        .from("profiles")
+        .update({
+          potat_level: potat.level,
+          potatoes: potat.potatoes,
+          potat_first_seen: potat.firstSeen,
+          potat_connections: potat.connections,
+        })
+        .eq("id", userId);
+      if (!potatError) potatEnriched = true;
+    }
+  } catch (error) {
+    console.warn(
+      "[inventory] potat enrichment failed:",
+      error instanceof Error ? error.message : error,
+    );
+  }
 
   return {
     owned: ownedIds.size,
@@ -115,5 +142,6 @@ export async function syncUserInventory(
     removed: toRemove.length,
     unmatched,
     lastSyncedAt: now,
+    potatEnriched,
   };
 }

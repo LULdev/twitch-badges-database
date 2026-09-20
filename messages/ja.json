@@ -117,7 +117,7 @@
     "percentageOfUsers": "追跡ユーザーの{value}%",
     "rarityScore": "レアリティスコア",
     "aboutRarity": "レアリティ指数について",
-    "rarityFormula": "Twitchバッジレアリティ指数（TBRI）は4つのシグナルから算出されます：所有者の希少性（対数スケール、45%）、現在もバッジを表示している所有者の割合（15%）、入手ウィンドウの入手しやすさ（25%）、バッジの経過期間（10%）。結果は0〜100のスコアとして6段階に区分されます。",
+    "rarityFormula": "TBRI v2は6つのシグナルを組み合わせます：所有者の希少性（40%）、装着率（10%）、入手容易性（20%）、経過期間（10%）、potat.appの24時間の勢い（10%）、入手期間の短さ（10%）— 0〜100のスコアを6段階に判定します。",
     "ownerTrend": "所有者数の推移",
     "ownerTrendSubtitle": "potat.appのライブデータ、15分ごとに更新",
     "noStats": "このバッジの統計はまだ記録されていません。",
@@ -126,7 +126,8 @@
     "notFound": "このバッジは存在しません。",
     "channelBadge": "チャンネルバッジ",
     "setId": "セットID",
-    "version": "バージョン"
+    "version": "バージョン",
+    "liveCount": "現在のライブアクティブ"
   },
   "countdown": {
     "expiresIn": "終了まで",
@@ -201,7 +202,11 @@
     "notFoundTitle": "「{username}」のプロフィールはまだありません",
     "notFoundBody": "このユーザーはまだここにログインしていません。比較ツールならバッジを見られます。",
     "inventoryHidden": "このコレクターは所持リストを非公開にしています。",
-    "claim": "あなたですか？Twitchでログインしてこのプロフィールを取得しましょう。"
+    "claim": "あなたですか？Twitchでログインしてこのプロフィールを取得しましょう。",
+    "potatLevel": "Potatレベル",
+    "potatoes": "ポテト",
+    "potatSince": "potat.app歴",
+    "connections": "連携アカウント"
   },
   "inventory": {
     "title": "マイバッジ",

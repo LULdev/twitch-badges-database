@@ -13,8 +13,15 @@ export function formatCompact(value: number | null | undefined): string {
 
 export async function StatusChip({ status }: { status: BadgeRow["status"] }) {
   const t = await getTranslations("common");
+  if (status === "active") {
+    return (
+      <span className="chip chip-live pointer-events-none">
+        <span className="live-dot" aria-hidden />
+        {t(status)}
+      </span>
+    );
+  }
   const styles: Record<string, string> = {
-    active: "border-[color-mix(in_srgb,var(--success)_40%,transparent)] text-success",
     upcoming: "border-[color-mix(in_srgb,var(--info)_40%,transparent)] text-info",
     expired: "border-[color-mix(in_srgb,var(--muted)_35%,transparent)] text-muted",
     removed: "border-[color-mix(in_srgb,var(--danger)_35%,transparent)] text-danger",

@@ -51,6 +51,11 @@ export interface ProfileRow {
   showcase_slots: string[];
   inventory_public: boolean;
   is_admin: boolean;
+  twitch_created_at: string | null;
+  potat_level: number | null;
+  potatoes: number | null;
+  potat_first_seen: string | null;
+  potat_connections: Array<{ platform: string; id: string }> | null;
   created_at: string;
   updated_at: string;
 }

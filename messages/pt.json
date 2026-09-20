@@ -117,7 +117,7 @@
     "percentageOfUsers": "{value}% dos usuários rastreados",
     "rarityScore": "Pontuação de raridade",
     "aboutRarity": "Sobre o índice de raridade",
-    "rarityFormula": "O Twitch Badge Rarity Index (TBRI) é calculado a partir de quatro sinais: escassez de proprietários (escala logarítmica, 45%), quantos proprietários ainda exibem a insígnia (15%), disponibilidade da janela de obtenção (25%) e idade da insígnia (10%). O resultado é uma pontuação de 0–100 mapeada em seis níveis.",
+    "rarityFormula": "O TBRI v2 combina seis sinais: escassez de proprietários (40%), taxa de uso (10%), obtibilidade (20%), idade (10%), momentum de 24h do potat.app (10%) e brevidade da janela (10%) — uma pontuação de 0–100 em seis níveis.",
     "ownerTrend": "Tendência de proprietários",
     "ownerTrendSubtitle": "Dados ao vivo do potat.app, atualizados a cada 15 minutos",
     "noStats": "Ainda não há estatísticas registradas para esta insígnia.",
@@ -126,7 +126,8 @@
     "notFound": "Esta insígnia não existe.",
     "channelBadge": "Insígnia de canal",
     "setId": "ID do conjunto",
-    "version": "Versão"
+    "version": "Versão",
+    "liveCount": "Ativos agora (ao vivo)"
   },
   "countdown": {
     "expiresIn": "Expira em",
@@ -201,7 +202,11 @@
     "notFoundTitle": "Ainda não há perfil para \"{username}\"",
     "notFoundBody": "Este usuário ainda não entrou aqui. Você ainda pode ver as insígnias dele na ferramenta de comparação.",
     "inventoryHidden": "Este colecionador mantém o inventário privado.",
-    "claim": "É você? Entre com a Twitch para assumir este perfil."
+    "claim": "É você? Entre com a Twitch para assumir este perfil.",
+    "potatLevel": "Nível Potat",
+    "potatoes": "Potatoes",
+    "potatSince": "No potat.app desde",
+    "connections": "Contas conectadas"
   },
   "inventory": {
     "title": "Minhas insígnias",

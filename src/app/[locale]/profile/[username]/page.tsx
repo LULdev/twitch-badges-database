@@ -205,12 +205,15 @@ export default async function ProfilePage({ params }: PageProps) {
             {profile?.bio && (
               <p className="mt-2 max-w-xl text-sm leading-relaxed">{profile.bio}</p>
             )}
-            {profile?.created_at && (
+            {(profile?.created_at || profile?.twitch_created_at) && (
               <p className="mt-2 text-xs text-muted">
-                {t("memberSince")}:{" "}
-                {new Date(profile.created_at).toLocaleDateString(locale, {
-                  dateStyle: "medium",
-                })}
+                {profile?.created_at
+                  ? `${t("memberSince")}: ${new Date(profile.created_at).toLocaleDateString(locale, { dateStyle: "medium" })}`
+                  : ""}
+                {profile?.created_at && profile?.twitch_created_at ? " · " : ""}
+                {profile?.twitch_created_at
+                  ? `${t("twitchSince")}: ${new Date(profile.twitch_created_at).toLocaleDateString(locale, { dateStyle: "medium" })}`
+                  : ""}
               </p>
             )}
           </div>
@@ -255,6 +258,45 @@ export default async function ProfilePage({ params }: PageProps) {
             <dd className="stat-value">{showcaseBadges.length}</dd>
             <dt className="stat-label">{t("showcase")}</dt>
           </div>
+          {profile.potat_level !== null && (
+            <div className="card stat-tile">
+              <dd className="stat-value">{profile.potat_level}</dd>
+              <dt className="stat-label">{t("potatLevel")}</dt>
+            </div>
+          )}
+          {profile.potatoes !== null && (
+            <div className="card stat-tile">
+              <dd className="stat-value">
+                {new Intl.NumberFormat(locale).format(profile.potatoes)}
+              </dd>
+              <dt className="stat-label">{t("potatoes")}</dt>
+            </div>
+          )}
+        </section>
+      )}
+
+      {profile &&
+        (profile.potat_first_seen ||
+          (profile.potat_connections ?? []).length > 0) && (
+        <section className="card flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4 text-xs text-muted">
+          {profile.potat_first_seen && (
+            <span>
+              {t("potatSince")}:{" "}
+              {new Date(profile.potat_first_seen).toLocaleDateString(locale, {
+                dateStyle: "medium",
+              })}
+            </span>
+          )}
+          {(profile.potat_connections ?? []).length > 0 && (
+            <span className="flex flex-wrap items-center gap-1.5">
+              {t("connections")}:
+              {(profile.potat_connections ?? []).map((conn) => (
+                <span key={conn.platform} className="chip pointer-events-none text-[0.5625rem]">
+                  {conn.platform}
+                </span>
+              ))}
+            </span>
+          )}
         </section>
       )}
 

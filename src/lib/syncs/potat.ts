@@ -3,7 +3,7 @@ import {
   fetchAllDistribution,
   fetchAllOwners,
 } from "@/lib/twitch/potat";
-import { badgeStatus } from "@/lib/twitch/types";
+import { resolveStatus } from "@/lib/twitch/types";
 import { computeRarity } from "@/lib/rarity";
 import { logChange } from "@/lib/changelog";
 
@@ -81,6 +81,16 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
     if (uuid) byUuid.set(uuid, row);
   }
 
+  // 24h active-user growth (rarity momentum input) from the time series.
+  const { data: momentumRows } = await supabase
+    .from("badge_momentum")
+    .select("badge_id, growth_24h");
+  const growthByBadge = new Map<string, number | null>(
+    ((momentumRows ?? []) as Array<{ badge_id: string; growth_24h: number | null }>).map(
+      (row) => [row.badge_id, row.growth_24h],
+    ),
+  );
+
   const now = new Date();
   let matched = 0;
   let statsInserted = 0;
@@ -114,6 +124,7 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
         startDate: badge.start_date,
         endDate: badge.end_date,
         firstSeenAt: badge.first_seen_at,
+        growth24h: growthByBadge.get(badge.id) ?? null,
       },
       now,
     );
@@ -121,8 +132,13 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
     const nextStatus =
       badge.status === "removed"
         ? badge.status
-        : badgeStatus(
-            { start_date: badge.start_date, end_date: badge.end_date },
+        : resolveStatus(
+            {
+              start_date: badge.start_date,
+              end_date: badge.end_date,
+              is_confirmed_active:
+                (badge.is_confirmed_active as boolean | null) ?? false,
+            },
             now,
           );
 

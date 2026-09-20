@@ -106,6 +106,33 @@ export function badgeStatus(
   return "active";
 }
 
+/**
+ * Authoritative status resolution. A badge is 'active' ONLY if
+ *  - it has a claim window and `now` is inside it, or
+ *  - it has no window but is on badgebase's curated /active list
+ *    (is_confirmed_active, maintained by the badgebase listing sync).
+ * Dateless, unconfirmed badges (subscriber, bits, turbo, …) count as
+ * 'expired' — they are permanent states, not currently-redeemable drops.
+ */
+export function resolveStatus(
+  badge: {
+    start_date?: string | null;
+    end_date?: string | null;
+    is_confirmed_active?: boolean | null;
+  },
+  now: Date = new Date(),
+): "active" | "upcoming" | "expired" {
+  if (badge.end_date && new Date(badge.end_date).getTime() < now.getTime())
+    return "expired";
+  if (
+    badge.start_date &&
+    new Date(badge.start_date).getTime() > now.getTime()
+  )
+    return "upcoming";
+  if (badge.start_date || badge.end_date) return "active";
+  return badge.is_confirmed_active ? "active" : "expired";
+}
+
 const CATEGORY_RULES: Array<[RegExp, string]> = [
   [/^twitchcon/, "twitchcon"],
   [/^(subtember|sub-tember)/, "subtember"],
