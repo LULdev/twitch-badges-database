@@ -1,19 +1,18 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
-  fetchBadgebaseFeed,
+  fetchBadgebaseListing,
   fetchBadgebaseDetail,
+  type BadgebaseCard,
 } from "@/lib/twitch/badgebase";
-import {
-  badgeSlug,
-  badgeStatus,
-  guessCategory,
-} from "@/lib/twitch/types";
+import { badgeStatus, guessCategory, isStatusSetId } from "@/lib/twitch/types";
 import { logChange } from "@/lib/changelog";
 
 export interface BadgebaseSyncSummary {
-  feedItems: number;
+  activeCards: number;
+  upcomingCards: number;
   enriched: number;
-  inserted: number;
+  insertedUpcoming: number;
+  errors: number;
 }
 
 const BADGE_UUID = /badges\/v1\/([0-9a-f-]{36})/i;
@@ -28,59 +27,71 @@ async function mapLimit<T, R>(
   items: T[],
   limit: number,
   fn: (item: T) => Promise<R>,
-): Promise<R[]> {
-  const results: R[] = [];
+): Promise<Array<{ item: T; result: R | null }>> {
+  const results: Array<{ item: T; result: R | null }> = new Array(items.length);
   let cursor = 0;
-  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
-    while (cursor < items.length) {
-      const index = cursor;
-      cursor += 1;
-      results[index] = await fn(items[index]);
-    }
-  });
+  const workers = Array.from(
+    { length: Math.min(limit, items.length) },
+    async () => {
+      while (cursor < items.length) {
+        const index = cursor;
+        cursor += 1;
+        try {
+          results[index] = { item: items[index], result: await fn(items[index]) };
+        } catch {
+          results[index] = { item: items[index], result: null };
+        }
+      }
+    },
+  );
   await Promise.all(workers);
   return results;
 }
 
 /**
- * Enrich the catalog with badgebase.de drop metadata (start/end windows,
- * free/paid, how-to-earn) and insert genuinely new upcoming badges that have
- * not appeared in the official catalog yet.
+ * Sync drop metadata from badgebase.de's curated listing pages:
+ *   /active   → currently redeemable badges with availability windows
+ *   /upcoming → announced badges, inserted as upcoming before Twitch
+ *               exposes them globally
+ * End dates (countdown expiry) and how-to-earn steps come from each badge's
+ * detail page.
  */
 export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
   const supabase = createAdminClient();
-  const feed = await fetchBadgebaseFeed();
 
-  // Respect the source: cap detail fetches and run a small concurrency pool.
-  const recent = feed.slice(0, 40);
-  const details = await mapLimit(recent, 4, async (item) => {
-    try {
-      return await fetchBadgebaseDetail(item.link);
-    } catch (error) {
-      console.warn(
-        `[badgebase] detail failed for ${item.link}:`,
-        error instanceof Error ? error.message : error,
-      );
-      return { startDate: null, endDate: null, tags: [] };
-    }
-  });
+  const [activeCards, upcomingCards] = await Promise.all([
+    fetchBadgebaseListing("/active"),
+    fetchBadgebaseListing("/upcoming/"),
+  ]);
+  const cards = [...activeCards, ...upcomingCards].filter(
+    (card) => !isStatusSetId(card.slug),
+  );
+
+  // Politeness: cap detail fetches per run, small concurrency pool.
+  const capped = cards.slice(0, 45);
+  const detailed = await mapLimit(capped, 4, (card) =>
+    fetchBadgebaseDetail(`/b/${card.badgeId}-${card.slug}/`),
+  );
 
   const allBadges = await supabase
     .from("badges")
-    .select("id,set_id,version,slug,image_url_1x,image_url_2x,start_date,end_date,is_paid,how_to_earn,status")
+    .select(
+      "id,set_id,version,image_url_1x,image_url_2x,start_date,end_date,release_date,is_paid,how_to_earn,description,status",
+    )
     .then(({ data, error }) => {
       if (error) throw error;
       return (data ?? []) as Array<{
         id: string;
         set_id: string;
         version: string;
-        slug: string;
         image_url_1x: string | null;
         image_url_2x: string | null;
         start_date: string | null;
         end_date: string | null;
+        release_date: string | null;
         is_paid: boolean;
         how_to_earn: string | null;
+        description: string | null;
         status: string;
       }>;
     });
@@ -93,39 +104,57 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
     if (!bySetId.has(row.set_id)) bySetId.set(row.set_id, row);
   }
 
-  let enriched = 0;
-  let inserted = 0;
   const now = new Date();
+  let enriched = 0;
+  let insertedUpcoming = 0;
+  let errors = 0;
 
-  for (let i = 0; i < recent.length; i += 1) {
-    const item = recent[i];
-    const detail = details[i];
-    const itemUuid = extractUuid(item.imageUrl);
+  for (const { item: card, result: detail } of detailed) {
+    if (!detail) {
+      errors += 1;
+      continue;
+    }
+    await applyCard(card, detail);
+  }
+
+  async function applyCard(card: BadgebaseCard, detail: Awaited<ReturnType<typeof fetchBadgebaseDetail>>) {
     const existing =
-      (itemUuid ? byUuid.get(itemUuid) : undefined) ??
-      bySetId.get(item.slug ?? "");
+      (card.imageUuid ? byUuid.get(card.imageUuid) : undefined) ??
+      bySetId.get(card.slug);
 
-    const startDate = detail.startDate;
+    const startDate =
+      detail.startDate ??
+      (card.startTs ? new Date(card.startTs * 1000).toISOString() : null);
     const endDate = detail.endDate;
-    const isPaid = item.isPaid ?? null;
-    const status = badgeStatus(
-      { start_date: startDate, end_date: endDate },
-      now,
-    );
+    const isPaid = card.tags.includes("paid")
+      ? true
+      : card.tags.includes("free")
+        ? false
+        : null;
+    const howToEarn = detail.howToEarn;
+    const releaseDate = startDate;
 
     if (existing) {
       const patch: Record<string, unknown> = {};
       if (startDate && startDate !== existing.start_date)
         patch.start_date = startDate;
       if (endDate && endDate !== existing.end_date) patch.end_date = endDate;
+      if (releaseDate && releaseDate !== existing.release_date)
+        patch.release_date = releaseDate;
       if (isPaid !== null && isPaid !== existing.is_paid)
         patch.is_paid = isPaid;
+      if (howToEarn && howToEarn !== existing.how_to_earn)
+        patch.how_to_earn = howToEarn;
       if (
-        item.requirements &&
-        item.requirements !== existing.how_to_earn
+        detail.description &&
+        detail.description !== existing.description
       ) {
-        patch.how_to_earn = item.requirements;
+        patch.description = detail.description;
       }
+      const status = badgeStatus(
+        { start_date: startDate ?? existing.start_date, end_date: endDate ?? existing.end_date },
+        now,
+      );
       if (status !== existing.status && existing.status !== "removed") {
         patch.status = status;
       }
@@ -137,29 +166,28 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
         if (error) throw error;
         enriched += 1;
       }
-      continue;
+      return;
     }
 
-    // Unknown to the catalog: a badgebase drop announcement — often an
-    // upcoming badge before Twitch exposes it globally. Insert as upcoming.
-    const setId = item.slug ?? item.sourceId?.toString() ?? item.name;
-    const slug = badgeSlug(setId, "1");
+    // Unknown to the catalog: a badgebase announcement — usually an upcoming
+    // drop before Twitch exposes it globally.
     const { error } = await supabase.from("badges").upsert(
       {
-        set_id: setId,
+        set_id: card.slug,
         version: "1",
-        slug,
-        title: item.name,
-        image_url_1x: item.imageUrl || null,
-        image_url_2x: item.imageUrl || null,
-        image_url_4x: item.imageUrl || null,
-        category: guessCategory(setId),
+        slug: `${card.slug}-v1`,
+        title: card.title ?? card.slug,
+        description: detail.description,
+        image_url_1x: card.imageUrl,
+        image_url_2x: card.imageUrl,
+        image_url_4x: card.imageUrl,
+        category: guessCategory(card.slug),
         is_paid: isPaid ?? false,
-        how_to_earn: item.requirements || null,
+        how_to_earn: howToEarn,
         start_date: startDate,
         end_date: endDate,
-        release_date: startDate,
-        status,
+        release_date: releaseDate,
+        status: badgeStatus({ start_date: startDate, end_date: endDate }, now),
         source: "badgebase",
         first_seen_at: now.toISOString(),
         last_seen_at: now.toISOString(),
@@ -167,23 +195,31 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
       { onConflict: "set_id,version", ignoreDuplicates: true },
     );
     if (error) throw error;
-    inserted += 1;
+    insertedUpcoming += 1;
   }
 
   await logChange(
     {
       kind: "data_sync",
-      title: "Badgebase drop sync completed",
-      body: `${recent.length} feed items processed, ${enriched} badges enriched with drop windows, ${inserted} new upcoming badges inserted.`,
+      title: "Badgebase listing sync completed",
+      body: `${activeCards.length} active + ${upcomingCards.length} upcoming cards processed, ${enriched} badges enriched with drop windows and how-to-earn steps, ${insertedUpcoming} new badges inserted, ${errors} detail fetch errors.`,
       payload: {
-        feedItems: recent.length,
+        activeCards: activeCards.length,
+        upcomingCards: upcomingCards.length,
         enriched,
-        inserted,
+        insertedUpcoming,
+        errors,
         ranAt: now.toISOString(),
       },
     },
     supabase,
   );
 
-  return { feedItems: recent.length, enriched, inserted };
+  return {
+    activeCards: activeCards.length,
+    upcomingCards: upcomingCards.length,
+    enriched,
+    insertedUpcoming,
+    errors,
+  };
 }

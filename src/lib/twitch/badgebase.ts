@@ -1,106 +1,143 @@
-import { XMLParser } from "fast-xml-parser";
 import { envOrNull } from "@/lib/env";
-import type { FeedBadge, FeedBadgeDetail } from "./types";
+import type { FeedBadgeDetail } from "./types";
 
 const DEFAULT_BASE = "https://badgebase.de";
-const DEFAULT_FEED = "https://badgebase.de/feed.xml";
 
-interface RssItem {
-  title?: string | { "#text"?: string };
-  link?: string;
-  guid?: string;
-  pubDate?: string;
-  category?: string | string[];
-  enclosure?: { url?: string } | { "@_url"?: string };
-  description?: string;
+const BADGE_UUID = /badges\/v1\/([0-9a-f-]{36})/i;
+
+function base(): string {
+  return envOrNull("BADGEBASE_BASE_URL") ?? DEFAULT_BASE;
 }
 
-interface RssDocument {
-  rss?: { channel?: { item?: RssItem | RssItem[] } };
-}
-
-function text(value: unknown): string {
-  if (!value) return "";
-  if (typeof value === "string") return value;
-  if (typeof value === "object") {
-    const inline: unknown = (value as { "#text"?: string })["#text"];
-    if (typeof inline === "string") return inline;
-  }
-  return "";
-}
-
-function toList(value: unknown): string[] {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [String(value)];
-}
-
-/** badgebase.de RSS feed — badge drops with images and free/paid tags. */
-export async function fetchBadgebaseFeed(): Promise<FeedBadge[]> {
-  const feedUrl = envOrNull("BADGEBASE_FEED_URL") ?? DEFAULT_FEED;
-  const res = await fetch(feedUrl, { next: { revalidate: 0 } });
-  if (!res.ok) {
-    throw new Error(`badgebase feed failed: ${res.status} ${res.statusText}`);
-  }
-
-  const parser = new XMLParser({ ignoreAttributes: false });
-  const doc = parser.parse(await res.text()) as RssDocument;
-  const items = doc.rss?.channel?.item;
-  if (!items) return [];
-
-  const badges: FeedBadge[] = [];
-  for (const raw of Array.isArray(items) ? items : [items]) {
-    const link = text(raw.link);
-    const match = /\/b\/(\d+)-([^/]+)\/$/.exec(link);
-    const enclosure = raw.enclosure as
-      | { url?: string; "@_url"?: string }
-      | undefined;
-    const enclosureUrl = enclosure?.url ?? enclosure?.["@_url"];
-    const categories = toList(raw.category);
-
-    badges.push({
-      sourceId: match ? Number(match[1]) : null,
-      slug: match ? match[2] : null,
-      name: text(raw.title),
-      imageUrl: enclosureUrl ?? "",
-      category: categories[0] ?? null,
-      isPaid: categories.includes("paid")
-        ? true
-        : categories.includes("free")
-          ? false
-          : null,
-      requirements: text(raw.description),
-      link,
-      pubDate: text(raw.pubDate) || null,
-    });
-  }
-  return badges;
-}
-
-/** Scrape a badgebase detail page for availability window + tags. */
-export async function fetchBadgebaseDetail(
-  link: string,
-): Promise<FeedBadgeDetail> {
-  const base = envOrNull("BADGEBASE_BASE_URL") ?? DEFAULT_BASE;
-  if (!link.startsWith("http")) link = `${base}${link}`;
-
-  const res = await fetch(link, {
+async function fetchHtml(path: string): Promise<string> {
+  const res = await fetch(`${base()}${path}`, {
     headers: { accept: "text/html" },
     next: { revalidate: 0 },
   });
   if (!res.ok) {
-    throw new Error(`badgebase detail failed: ${res.status} for ${link}`);
+    throw new Error(`badgebase ${path} failed: ${res.status} ${res.statusText}`);
   }
-  const html = await res.text();
+  return res.text();
+}
+
+/** A badge card parsed from the /active or /upcoming listing pages. */
+export interface BadgebaseCard {
+  /** Badge slug, e.g. "wsci-2026" (matches the catalog set_id in most cases). */
+  slug: string;
+  badgeId: string;
+  status: "active" | "upcoming";
+  tags: string[];
+  /** Start/release timestamp in seconds (data-ts attribute). */
+  startTs: number | null;
+  imageUuid: string | null;
+  imageUrl: string | null;
+  title: string | null;
+}
+
+function attr(html: string, name: string): string | null {
+  const match = new RegExp(`${name}="([^"]*)"`).exec(html);
+  return match ? match[1] : null;
+}
+
+/**
+ * Parse the curated listing pages:
+ *   /active   → currently redeemable badges (start dates on the cards)
+ *   /upcoming → announced badges before they go live (release dates)
+ */
+export async function fetchBadgebaseListing(
+  path: "/active" | "/upcoming/",
+): Promise<BadgebaseCard[]> {
+  const html = await fetchHtml(path);
+  const cards: BadgebaseCard[] = [];
+
+  const anchor = /<a\s[^>]*href="(\/b\/(\d+)-([^"\/]+)\/)"[^>]*>/g;
+  let match: RegExpExecArray | null;
+  while ((match = anchor.exec(html)) !== null) {
+    const href = match[1];
+    const badgeId = match[2];
+    const slug = match[3];
+
+    // Card content = from the anchor up to its closing tag.
+    const start = match.index;
+    const end = html.indexOf("</a>", start);
+    if (end === -1) continue;
+    const block = html.slice(start, end);
+
+    const status = attr(block, "data-status");
+    if (status !== "active" && status !== "upcoming") continue;
+
+    const tags = (attr(block, "data-tags") ?? "")
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+
+    const ts = attr(block, "data-ts");
+    const img = /<img[^>]+src="(https:\/\/static-cdn\.jtvnw\.net\/badges\/v1\/[^"]+)"/i.exec(
+      block,
+    );
+    const titleMatch = /<h2[^>]*>\s*([\s\S]*?)\s*<\/h2>/i.exec(block);
+
+    cards.push({
+      slug,
+      badgeId,
+      status,
+      tags,
+      startTs: ts ? Number(ts) : null,
+      imageUuid: img ? (BADGE_UUID.exec(img[1])?.[1] ?? null) : null,
+      imageUrl: img ? img[1] : null,
+      title: titleMatch
+        ? titleMatch[1].replace(/<[^>]+>/g, "").trim()
+        : null,
+    });
+  }
+  return cards;
+}
+
+/** Extended detail scrape: availability window + how-to-earn steps. */
+export interface BadgebaseDetail extends FeedBadgeDetail {
+  howToEarn: string | null;
+  description: string | null;
+}
+
+interface HowToSchema {
+  "@type"?: string;
+  step?: Array<{ name?: string; text?: string }>;
+}
+
+function parseHowTo(html: string): string | null {
+  // Detail pages embed schema.org HowTo JSON-LD with numbered steps.
+  const blocks = html.match(
+    /<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi,
+  );
+  if (!blocks) return null;
+  for (const block of blocks) {
+    const jsonText = block.replace(/<[^>]+>/g, "");
+    try {
+      const parsed = JSON.parse(jsonText) as HowToSchema | HowToSchema[];
+      const entries = Array.isArray(parsed) ? parsed : [parsed];
+      for (const entry of entries) {
+        if (entry["@type"] !== "HowTo") continue;
+        const steps = (entry.step ?? [])
+          .map((step, index) => step.text?.trim() && `${index + 1}. ${step.text.trim()}`)
+          .filter(Boolean) as string[];
+        if (steps.length > 0) return steps.join(" ");
+      }
+    } catch {
+      // malformed JSON-LD — skip
+    }
+  }
+  return null;
+}
+
+export async function fetchBadgebaseDetail(
+  slugPath: string,
+): Promise<BadgebaseDetail> {
+  const html = await fetchHtml(slugPath);
 
   const endMatch = /data-reset="(\d+)"/.exec(html);
   const tsMatch = /data-ts="(\d+)"/.exec(html);
   const tagsMatch = /data-tags="([^"]*)"/.exec(html);
-  const tags = tagsMatch
-    ? tagsMatch[1]
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean)
-    : [];
+  const descMatch = /<meta name="description" content="([^"]*)"/i.exec(html);
 
   return {
     endDate: endMatch
@@ -109,6 +146,13 @@ export async function fetchBadgebaseDetail(
     startDate: tsMatch
       ? new Date(Number(tsMatch[1]) * 1000).toISOString()
       : null,
-    tags,
+    tags: tagsMatch
+      ? tagsMatch[1]
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : [],
+    howToEarn: parseHowTo(html),
+    description: descMatch ? descMatch[1] : null,
   };
 }

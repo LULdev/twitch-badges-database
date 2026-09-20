@@ -127,3 +127,14 @@ export function guessCategory(setId: string): string {
   }
   return "events";
 }
+
+/**
+ * Role/status badges (moderator, VIP, broadcaster, staff, partner, …) are
+ * permanent account states, not collectible drops — the catalog excludes
+ * them entirely.
+ */
+export function isStatusSetId(setId: string): boolean {
+  return /^(moderator|vip|broadcaster|staff|admin|global.?mod|ambassador|partner|verified|artist-badge|artist|game.?developer|extensions?|chat.?bot|clip.?champ|moments)([-_]|$)/i.test(
+    setId,
+  );
+}

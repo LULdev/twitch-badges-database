@@ -4,6 +4,7 @@ import {
   badgeSlug,
   badgeStatus,
   guessCategory,
+  isStatusSetId,
   type BadgeVersionSource,
 } from "@/lib/twitch/types";
 import { logChange } from "@/lib/changelog";
@@ -20,22 +21,17 @@ export interface GlobalSyncSummary {
   addedTitles: string[];
 }
 
-interface ExistingBadge {
+type ExistingBadge = Record<string, unknown> & {
   id: string;
   set_id: string;
   version: string;
   slug: string;
   title: string;
-  description: string | null;
-  image_url_1x: string | null;
-  image_url_2x: string | null;
-  image_url_4x: string | null;
-  click_url: string | null;
   status: string;
   start_date: string | null;
   end_date: string | null;
   removed_at: string | null;
-}
+};
 
 const PAID_SET_PATTERNS =
   /subtember|paid|premium|turbo|all.?access|pass|sub-?gift/i;
@@ -51,16 +47,35 @@ function chunk<T>(items: T[], size: number): T[][] {
 export async function runGlobalSync(): Promise<GlobalSyncSummary> {
   const supabase = createAdminClient();
   const { sets, source } = await fetchGlobalBadgeCatalog();
-  const incoming: BadgeVersionSource[] = sets.flatMap((set) => set.versions);
+  const incoming: BadgeVersionSource[] = sets
+    .flatMap((set) => set.versions)
+    .filter((version) => !isStatusSetId(version.setId));
+
+  // Role/status badges (moderator, VIP, partner, …) are permanent account
+  // states, not collectible drops — remove any that exist in the catalog.
+  const { data: deletedStatus, error: statusDeleteError } = await supabase
+    .from("badges")
+    .delete()
+    .eq("category", "status")
+    .select("id");
+  if (statusDeleteError) throw statusDeleteError;
+  if ((deletedStatus ?? []).length > 0) {
+    await logChange(
+      {
+        kind: "badge_removed",
+        title: `${deletedStatus!.length} status badges removed from the catalog`,
+        body: "Role badges (moderator, VIP, partner, …) are permanent account states and no longer tracked.",
+      },
+      supabase,
+    );
+  }
 
   // Load the full current catalog (paginated).
   const existing = new Map<string, ExistingBadge>();
   for (let offset = 0; ; offset += 1000) {
     const { data, error } = await supabase
       .from("badges")
-      .select(
-        "id,set_id,version,slug,title,description,image_url_1x,image_url_2x,image_url_4x,click_url,status,start_date,end_date,removed_at",
-      )
+      .select("*")
       .range(offset, offset + 999);
     if (error) throw error;
     for (const row of (data ?? []) as ExistingBadge[]) {
@@ -138,7 +153,7 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
       statusChanged += 1;
     }
 
-    upserts.push({ ...patch, set_id: v.setId, version: v.version });
+    upserts.push({ ...ex, ...patch });
   }
 
   // Badges missing from the live catalog are marked removed.

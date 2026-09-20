@@ -8,7 +8,11 @@ Read `README.md` for data sources and setup; read this file before editing.
 
 - `src/app/[locale]/` — all pages (locale-prefixed, `localePrefix: "always"`)
 - `src/app/api/` — cron endpoints, push, inventory sync, OG images, RSS
-- `src/lib/twitch/` — external data services (helix, ivr, badgebase, potat, perfil)
+- `src/lib/twitch/` — external data services (helix, ivr, badgebase, potat, perfil).
+  Status/role badges (moderator, VIP, partner, …) are EXCLUDED from the
+  catalog (`isStatusSetId` in types.ts; global sync deletes any that exist).
+  badgebase sync reads the curated `/active` + `/upcoming/` listing pages and
+  scrapes each detail page for the end date (`data-reset`) and HowTo JSON-LD.
 - `src/lib/syncs/` — sync engines shared by `scripts/*.ts` AND `/api/cron/*`
 - `src/lib/` — queries.ts (DB reads via server client), rarity.ts (TBRI),
   changelog.ts, inventory.ts, push.ts, markdown.ts, seo.ts
