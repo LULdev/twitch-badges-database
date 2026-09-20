@@ -87,18 +87,21 @@ Verification ritual: `lint && typecheck && build` before finishing any change.
 
 ## Deployment
 
-Live on Vercel as `luul/twitch-badges-database` (`.vercel/project.json` links
-it; CLI authenticated). Production URL: `twitch-badges-database.vercel.app`.
-Deploy with `vercel deploy -y --no-wait --scope luul` (env vars for
-production AND preview are configured on the project).
+Repo: `github.com/LULdev/twitch-badges-database` (private, `main`). Live on
+Vercel as `luul/twitch-badges-database` — the project is git-connected, so
+**every push to `main` is a production deployment** (other branches get
+previews). Production URL: `twitch-badges-database.vercel.app`. Env vars for
+production AND preview are configured on the Vercel project.
 
-**Hobby plan = max 2 cron jobs, daily only.** `vercel.json` therefore
-registers two daily crons: `/api/cron/global` (catalog diff + badgebase
-enrichment combined) at 06:00 UTC and `/api/cron/potat` at 06:30 UTC. The
-intended 15-minute stats cadence needs either a Pro plan or an external
-scheduler (e.g. cron-job.org / GitHub Actions) hitting
-`/api/cron/potat` with `Authorization: Bearer $CRON_SECRET`. Don't add
-sub-daily schedules to vercel.json — the deploy will be rejected.
+**Sync schedule** (Vercel Hobby = max 2 cron jobs, daily only):
+- `/api/cron/global` (catalog diff + badgebase enrichment) — daily 06:00 UTC
+- `/api/cron/potat` (owner stats, rarity, status sweeps) — daily 06:30 UTC
+- **Every 15 minutes**: GitHub Actions workflow `.github/workflows/potat-sync.yml`
+  hits `/api/cron/potat` with the `CRON_SECRET` repo secret. Don't add
+  sub-daily schedules to vercel.json — Hobby rejects the deploy.
+
+The potat sync writes in chunked bulk upserts (~6s total) — per-row PATCH
+loops would exceed the 60s serverless limit; keep it that way.
 
 After changing the production domain, update `NEXT_PUBLIC_SITE_URL` on
 Vercel and add the domain to Supabase → Auth → URL Configuration
