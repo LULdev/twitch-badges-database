@@ -66,6 +66,20 @@ Everything lives in `.env.local` (see `.env.example` for documentation):
 
 The `handle_new_user` trigger creates the profile row on first login.
 
+## Gamification
+
+Logged-in collectors earn XP and coins: daily login (+10 XP, +50 coins, streak
+bonus), unlocking Twitch badges (+1,000 XP / +500 coins each), 125 achievements,
+13 arcade games and a daily Wheel of Fortune (XP 25–2,500; Twitch Turbo jackpot
+at probability 1 : 100,000,000). Levels 1–100 (curve: 100 + (L-1)·50 XP →
+254,900 total) render unique sparkle-animated level badges that are always
+visible on profiles. Every XP event streams to the public live feed (`/feed`).
+Extras: coin heists with victim-configured prices and flood checks, coin rain,
+35 profile customization settings, visitor tracking with 5-minute IP dedup,
+and a blog with view counters + emoji reactions (23 seeded posts, all 300+
+words) plus a 20-question FAQ in all languages. DB tables in
+`supabase/migrations/0003_gamification.sql`; blog seeds in `scripts/`.
+
 ## Commands
 
 | Command | Purpose |

@@ -20,6 +20,10 @@ Read `README.md` for data sources and setup; read this file before editing.
 - `src/lib/syncs/` — sync engines shared by `scripts/*.ts` AND `/api/cron/*`
 - `src/lib/` — queries.ts (DB reads via server client), rarity.ts (TBRI),
   changelog.ts, inventory.ts, push.ts, markdown.ts, seo.ts
+- `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 125 achievements
+  (achievements.ts, self-evaluating), games.ts (13 server-authoritative games),
+  wheel.ts (daily wheel + Turbo jackpot 1:1e8), daily.ts (login bonus, heists,
+  coin rain), visits.ts (5-min-IP-dedup view counters), session.ts
 - `src/components/`, `messages/` (one JSON per locale), `supabase/migrations/`, `scripts/`
 
 ## Commands
