@@ -87,30 +87,27 @@ Verification ritual: `lint && typecheck && build` before finishing any change.
 
 ## Deployment
 
-Repo: `github.com/LULdev/twitch-badges-database` (private, `main`). Live on
-Vercel as `luul/twitch-badges-database`, production URL
+Repo: `github.com/LULdev/twitch-badges-database` (private, `main`), connected
+to Vercel project `luul/twitch-badges-database` — **every push to `main` is a
+production deployment** (other branches get previews). Production URL:
 `twitch-badges-database.vercel.app`. Env vars for production AND preview are
 configured on the Vercel project.
 
-⚠ **2026-09-20: all NEW Vercel deployments are platform-BLOCKED** (instant
-`BLOCKED` readyState, no build machine, no error message — even
-`--prebuilt` uploads). The existing production deployment keeps serving
-fine. Git integration was disconnected during diagnosis; once deploys work
-again, re-run `vercel git connect https://github.com/LULdev/twitch-badges-database.git
---scope luul --yes` to get git-push production deploys. The optimized
-potat-sync code (bulk upserts, ~6s) is committed on `main` but NOT yet
-deployed for this reason.
+(2026-09-20 note: Vercel briefly platform-blocked all new deployments for
+~1h — instant `BLOCKED` state, no error, even prebuilt. It resolved itself;
+if it recurs, check the Vercel dashboard for account notices and retry later.
+Blocked deployments can be DELETEd via the v13 API; the cancel API 400s.)
 
 **Sync schedule** (Vercel Hobby = max 2 cron jobs, daily only):
 - `/api/cron/global` (catalog diff + badgebase enrichment) — daily 06:00 UTC
 - `/api/cron/potat` (owner stats, rarity, status sweeps) — daily 06:30 UTC
 - **Every 15 minutes**: GitHub Actions `.github/workflows/potat-sync.yml`
   hits `/api/cron/potat` with the `CRON_SECRET` repo secret (verified
-  working — run 35483603783). Don't add sub-daily schedules to vercel.json
-  (Hobby rejects the deploy).
+  working). Don't add sub-daily schedules to vercel.json (Hobby rejects
+  the deploy).
 
-The potat sync writes in chunked bulk upserts — per-row PATCH loops would
-exceed the 60s serverless limit; keep it that way.
+The potat sync writes in chunked bulk upserts (~6s) — per-row PATCH loops
+would exceed the 60s serverless limit; keep it that way.
 
 After changing the production domain, update `NEXT_PUBLIC_SITE_URL` on
 Vercel and add the domain to Supabase → Auth → URL Configuration
