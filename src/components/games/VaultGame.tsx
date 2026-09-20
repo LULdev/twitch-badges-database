@@ -1,0 +1,87 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useGame, BetBar, GameError } from "./useGame";
+
+/** Crack the Vault: stop three rotating needles inside the green zone. */
+export default function VaultGame() {
+  const { bet, setBet, busy, error, play, t } = useGame("vault");
+  const [phase, setPhase] = useState<"idle" | "dial1" | "dial2" | "dial3" | "done">("idle");
+  const [angles, setAngles] = useState([0, 0, 0]);
+  const [matches, setMatches] = useState(0);
+  const raf = useRef<number>(0);
+  const dialIndex = phase === "dial1" ? 0 : phase === "dial2" ? 1 : phase === "dial3" ? 2 : -1;
+
+  useEffect(() => {
+    if (dialIndex < 0) return;
+    const speed = 220 + dialIndex * 160;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const angle = (((now - start) / 1000) * speed) % 360;
+      setAngles((prev) => {
+        const next = [...prev];
+        next[dialIndex] = angle;
+        return next;
+      });
+      raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf.current);
+  }, [dialIndex]);
+
+  function inZone(dial: number): boolean {
+    const zone = (30 + dial * 100) % 360;
+    const angle = angles[dial];
+    const diff = Math.min(Math.abs(angle - zone), 360 - Math.abs(angle - zone));
+    return diff <= 22;
+  }
+
+  function stop() {
+    cancelAnimationFrame(raf.current);
+    const hit = inZone(dialIndex);
+    const newMatches = matches + (hit ? 1 : 0);
+    setMatches(newMatches);
+    const nextPhase = phase === "dial1" ? "dial2" : phase === "dial2" ? "dial3" : "done";
+    setPhase(nextPhase);
+    if (nextPhase === "done") void play({ matches: newMatches });
+  }
+
+  function start() {
+    setMatches(0);
+    setAngles([0, 0, 0]);
+    setPhase("dial1");
+  }
+
+  return (
+    <div className="space-y-4">
+      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={null} />
+      <GameError error={error} />
+      <div className="card space-y-4 p-6">
+        <div className="flex justify-center gap-6">
+          {angles.map((angle, index) => (
+            <div key={index} className={`relative size-24 rounded-full border-4 ${dialIndex === index ? "border-accent" : "border-line"}`}>
+              <div className="absolute inset-2 rounded-full bg-surface-2" />
+              <div
+                className="absolute inset-0"
+                style={{ transform: `rotate(${angle}deg)` }}
+              >
+                <div className="absolute left-1/2 top-1.5 h-4 w-1 -translate-x-1/2 rounded bg-accent" />
+              </div>
+              <div className="absolute left-1/2 top-1 size-2 -translate-x-1/2 rounded-full bg-success" />
+            </div>
+          ))}
+        </div>
+        {phase === "idle" && (
+          <button type="button" onClick={start} className="btn btn-primary w-full">{t("start")}</button>
+        )}
+        {dialIndex >= 0 && phase !== "done" && (
+          <button type="button" onClick={stop} className="btn btn-primary w-full">{t("stop")}</button>
+        )}
+        {phase === "done" && (
+          <button type="button" onClick={start} className="btn btn-secondary w-full">{t("again")}</button>
+        )}
+        <p className="text-center text-xs text-muted">{t("vaultHint")}</p>
+      </div>
+    </div>
+  );
+}

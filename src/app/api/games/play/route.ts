@@ -1,0 +1,18 @@
+import { authUserId } from "@/lib/gamification/session";
+import { playGame, type PlayInput } from "@/lib/gamification/games";
+
+export const dynamic = "force-dynamic";
+
+export async function POST(request: Request) {
+  const userId = await authUserId();
+  if (!userId) return Response.json({ error: "not authenticated" }, { status: 401 });
+
+  const body = (await request.json().catch(() => null)) as
+    | { game?: string; bet?: number; input?: PlayInput }
+    | null;
+  if (!body?.game || typeof body.bet !== "number") {
+    return Response.json({ error: "invalid payload" }, { status: 400 });
+  }
+  const result = await playGame(userId, body.game, body.bet, body.input ?? {});
+  return Response.json(result, { status: result.ok ? 200 : 400 });
+}

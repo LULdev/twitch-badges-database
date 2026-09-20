@@ -81,6 +81,31 @@ export async function syncUserInventory(
     if (error) throw error;
   }
 
+  // Badge-unlock rewards: 1,000 XP + 500 coins per newly claimed badge,
+  // one public feed entry each (aggregated into a single progress update).
+  if (toAdd.length > 0) {
+    const { award, logActivity } = await import("./gamification/xp");
+    const catalogRows = (catalog ?? []) as unknown as Array<{ id: string; slug: string; title: string }>;
+    const addedBadges = catalogRows.filter((row) => toAdd.includes(row.id));
+    for (const badge of addedBadges) {
+      await logActivity({
+        userId,
+        kind: "badge_claim",
+        title: `unlocked badge: ${badge.title}`,
+        body: "New Twitch badge claimed — +1,000 XP, +500 coins.",
+        xpAmount: 1000,
+        coinsAmount: 500,
+        payload: { badge: badge.slug },
+      });
+    }
+    await award(userId, {
+      xp: addedBadges.length * 1000,
+      coins: addedBadges.length * 500,
+      source: "badge_claims",
+      skipAchievements: false,
+    });
+  }
+
   const now = new Date().toISOString();
   const { error: stateError } = await supabase
     .from("user_sync_state")

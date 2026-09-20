@@ -24,10 +24,15 @@ export default function Header({ user }: { user: HeaderUser | null }) {
     { href: "/badges", label: t("badges") },
     { href: "/active", label: t("active") },
     { href: "/upcoming", label: t("upcoming") },
+    { href: "/games", label: t("games") },
+    { href: "/wheel", label: "🎡" },
     { href: "/leaderboards", label: t("leaderboards") },
+    { href: "/achievements", label: t("achievementsNav") },
+    { href: "/feed", label: t("feedNav") },
     { href: "/compare", label: t("compare") },
     { href: "/stats", label: t("stats") },
     { href: "/blog", label: t("blog") },
+    { href: "/faq", label: t("faqNav") },
     { href: "/changelog", label: t("changelog") },
   ];
 

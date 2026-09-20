@@ -16,6 +16,16 @@ import { BadgeImage } from "@/components/badges/BadgeImage";
 import RarityChip from "@/components/badges/RarityChip";
 import ShareButtons from "@/components/ShareButtons";
 import TwitchLoginButton from "@/components/TwitchLoginButton";
+import LevelBadge from "@/components/LevelBadge";
+import AchievementBadge from "@/components/AchievementBadge";
+import CoinRainButton from "@/components/CoinRainButton";
+import StealPanel from "@/components/StealPanel";
+import { getProgress } from "@/lib/gamification/xp";
+import { levelFromXp } from "@/lib/gamification/levels";
+import { ACH_BY_ID } from "@/lib/gamification/achievements";
+import { recordProfileVisit } from "@/lib/gamification/visits";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { authUserId, visitorIpHash } from "@/lib/gamification/session";
 import { localeAlternates } from "@/lib/seo";
 
 export const revalidate = 300;
@@ -68,6 +78,24 @@ export default async function ProfilePage({ params }: PageProps) {
     data: { user: viewer },
   } = await supabase.auth.getUser();
   const isOwn = Boolean(viewer && profile && viewer.id === profile.id);
+
+  // View counter with 5-minute per-IP reload block + visitor log.
+  let latestVisitors: Array<{ username: string | null; avatar_url: string | null }> = [];
+  if (profile) {
+    const [ipHash] = await Promise.all([visitorIpHash()]);
+    await recordProfileVisit(profile.id, viewer?.id ?? null, ipHash).catch(() => false);
+    const admin = createAdminClient();
+    const { data: visitorRows } = await admin
+      .from("profile_visits")
+      .select("visitor:profiles(username, avatar_url)")
+      .eq("profile_id", profile.id)
+      .not("visitor_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(12);
+    latestVisitors = (visitorRows ?? []).map(
+      (row) => (Array.isArray(row?.visitor) ? row.visitor[0] : row?.visitor),
+    ) as typeof latestVisitors;
+  }
 
   // Resolved live for non-member profiles (ephemeral view + claim CTA).
   let liveBadges: Array<{ slug: string; setId: string; version: string; title: string; image: string | null; tier: BadgeRow["rarity_tier"] | null }> = [];
@@ -170,6 +198,30 @@ export default async function ProfilePage({ params }: PageProps) {
       ? Math.round((ownedBadges.length / totalCatalog) * 100)
       : 0;
 
+  // Gamification: level (badge ALWAYS visible), coins, achievements, visitors.
+  let progress: Awaited<ReturnType<typeof getProgress>> | null = null;
+  let level = null as ReturnType<typeof levelFromXp> | null;
+  let unlockedAchievements: Array<{ achievement_id: string; unlocked_at: string }> = [];
+  if (profile) {
+    const admin = createAdminClient();
+    const [progressRow, achievementRes] = await Promise.all([
+      getProgress(profile.id).catch(() => null),
+      admin
+        .from("user_achievements")
+        .select("achievement_id, unlocked_at")
+        .eq("user_id", profile.id)
+        .order("unlocked_at", { ascending: false })
+        .limit(25),
+    ]);
+    const achievementRows = (achievementRes.data ?? []) as Array<{
+      achievement_id: string;
+      unlocked_at: string;
+    }>;
+    progress = progressRow;
+    if (progressRow) level = levelFromXp(progressRow.xp);
+    unlockedAchievements = achievementRows;
+  }
+
   return (
     <div className="space-y-8">
       {/* Banner + identity */}
@@ -198,10 +250,31 @@ export default async function ProfilePage({ params }: PageProps) {
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-2xl font-extrabold tracking-tight">
-              {displayName}
-            </h1>
-            <p className="text-sm text-muted">@{handle}</p>
+            <div className="flex items-center gap-3">
+              {level && <LevelBadge level={level.level} size={64} />}
+              <div className="min-w-0">
+                <h1 className="truncate text-2xl font-extrabold tracking-tight">
+                  {displayName}
+                </h1>
+                <p className="text-sm text-muted">@{handle}</p>
+              </div>
+            </div>
+            {level && (
+              <div className="mt-2 max-w-xs">
+                <div className="h-2 overflow-hidden rounded-full bg-surface-3">
+                  <div className="h-full rounded-full bg-accent" style={{ width: `${Math.round(level.progress * 100)}%` }} />
+                </div>
+                <p className="mt-1 text-[0.6875rem] text-muted tabular-nums">
+                  {t("level")} {level.level} · {level.xpIntoLevel}/{level.xpForNext || "∞"} XP
+                  {progress ? ` · 🪙 ${progress.coins.toLocaleString(locale)}` : ""}
+                </p>
+              </div>
+            )}
+            {profile?.mood && (
+              <p className="mt-2 inline-block rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-semibold">
+                {String(profile.mood)}
+              </p>
+            )}
             {profile?.bio && (
               <p className="mt-2 max-w-xl text-sm leading-relaxed">{profile.bio}</p>
             )}
@@ -235,6 +308,7 @@ export default async function ProfilePage({ params }: PageProps) {
               path={`/${locale}/profile/${handle}`}
               title={`${displayName} — ${tc("viewAll")}`}
             />
+            {profile && !isOwn && <CoinRainButton profileId={profile.id} />}
           </div>
         </div>
       </section>
@@ -306,6 +380,72 @@ export default async function ProfilePage({ params }: PageProps) {
           <p className="text-sm text-muted">{t("claim")}</p>
           <TwitchLoginButton />
         </section>
+      )}
+
+      {/* Achievement hero showcase */}
+      {profile && unlockedAchievements.length > 0 && (
+        <section aria-labelledby="ach-hero" className="card achievement-hero p-6">
+          <div className="section-title">
+            <h2 id="ach-hero">{t("achievements")}</h2>
+            <span className="chip pointer-events-none">
+              {unlockedAchievements.length} · {progress?.achievements_points ?? 0} {t("achievementPoints")}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-4">
+            {unlockedAchievements.slice(0, 12).map((entry) => {
+              const achievement = ACH_BY_ID.get(entry.achievement_id);
+              if (!achievement) return null;
+              return (
+                <div key={entry.achievement_id} className="flex w-20 flex-col items-center gap-1.5 text-center">
+                  <AchievementBadge title={achievement.title} category={achievement.category} size={52} />
+                  <p className="line-clamp-2 text-[0.625rem] font-bold leading-tight">{achievement.title}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Latest visitors + view count */}
+      {profile && (
+        <section className="card flex flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4">
+          <span className="text-xs text-muted">
+            <span className="font-black text-foreground tabular-nums">{profile.view_count ?? 0}</span> {t("views")}
+          </span>
+          {latestVisitors.length > 0 && (
+            <span className="flex items-center gap-1.5">
+              <span className="text-xs text-muted">{t("latestVisitors")}:</span>
+              {latestVisitors.slice(0, 8).map((visitor, index) =>
+                visitor.username ? (
+                  <Link
+                    key={`${visitor.username}-${index}`}
+                    href={`/profile/${visitor.username}`}
+                    title={visitor.username}
+                    className="transition-transform hover:scale-110"
+                  >
+                    {visitor.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={visitor.avatar_url} alt={visitor.username} width={24} height={24} className="rounded-full" />
+                    ) : (
+                      <span className="grid size-6 place-items-center rounded-full bg-accent-soft text-[0.5625rem] font-bold text-accent">
+                        {visitor.username.slice(0, 2).toUpperCase()}
+                      </span>
+                    )}
+                  </Link>
+                ) : null,
+              )}
+            </span>
+          )}
+        </section>
+      )}
+
+      {/* Steal panel on other profiles */}
+      {profile && !isOwn && (
+        <StealPanel
+          victim={profile.username}
+          price={profile.steal_enabled === false ? 0 : (profile.steal_price ?? 100)}
+          maxAmount={profile.steal_max ?? 250}
+        />
       )}
 
       {/* Showcase */}

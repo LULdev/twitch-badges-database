@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getInventory } from "@/lib/queries";
 import AccountSettings from "@/components/account/AccountSettings";
+import ProfileCustomizer from "@/components/account/ProfileCustomizer";
 import PushToggle from "@/components/PushToggle";
 import TwitchLoginButton from "@/components/TwitchLoginButton";
 
@@ -47,7 +48,7 @@ export default async function AccountPage({
     supabase
       .from("profiles")
       .select(
-        "username, display_name, bio, banner_url, color, inventory_public, showcase_slots",
+        "username, display_name, bio, banner_url, color, inventory_public, showcase_slots, customization, mood, steal_enabled, steal_price, steal_max",
       )
       .eq("id", user.id)
       .maybeSingle(),
@@ -67,6 +68,12 @@ export default async function AccountPage({
 
   const slots = profile?.showcase_slots;
 
+  const steal = {
+    enabled: (profile?.steal_enabled as boolean | null) ?? true,
+    price: (profile?.steal_price as number | null) ?? 100,
+    max: (profile?.steal_max as number | null) ?? 250,
+  };
+
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <header>
@@ -84,6 +91,12 @@ export default async function AccountPage({
           showcaseSlots: Array.isArray(slots) ? (slots as string[]) : [],
         }}
         ownedBadges={ownedBadges}
+      />
+
+      <ProfileCustomizer
+        initial={((profile?.customization as Record<string, unknown> | null) ?? {})}
+        initialMood={(profile?.mood as string | null) ?? ""}
+        steal={steal}
       />
 
       <section className="card space-y-3 p-6">

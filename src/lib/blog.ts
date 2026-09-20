@@ -61,3 +61,40 @@ export async function createDropPost(
     console.warn("[blog] auto drop post failed:", error);
   }
 }
+
+export interface FeaturePostInput {
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  tags?: string[];
+  cover?: string | null;
+}
+
+/**
+ * Auto-publish a blog post for a shipped feature, game or special event
+ * (turbo jackpot, …). Idempotent by slug.
+ */
+export async function createFeaturePost(post: FeaturePostInput): Promise<void> {
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("blog_posts").upsert(
+    {
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      cover_url: post.cover ?? null,
+      status: "published",
+      is_auto: true,
+      tags: ["feature", ...(post.tags ?? [])],
+    },
+    { onConflict: "slug", ignoreDuplicates: true },
+  );
+  if (error) throw error;
+  await supabase.from("changelog").insert({
+    kind: "blog",
+    title: `Blog post published: ${post.title}`,
+    body: post.excerpt,
+    payload: { slug: post.slug },
+  }).then(() => undefined, () => undefined);
+}

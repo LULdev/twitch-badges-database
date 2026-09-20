@@ -1,0 +1,225 @@
+import { createAdminClient } from "@/lib/supabase/admin";
+import { award, getProgress, logActivity } from "./xp";
+import { evaluateAchievements } from "./achievements";
+
+/**
+ * Daily login bonus: +10 XP (+5 per streak day, capped at +50) and +50 coins.
+ * One claim per UTC day.
+ */
+export async function claimDaily(userId: string): Promise<
+  { ok: false; reason: "already" } | { ok: true; xp: number; coins: number; streak: number }
+> {
+  const supabase = createAdminClient();
+  const progress = await getProgress(userId);
+  const todayStr = new Date().toISOString().slice(0, 10);
+  if (progress.last_login_date === todayStr) return { ok: false, reason: "already" };
+
+  const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+  const streak = progress.last_login_date === yesterday
+    ? progress.login_streak + 1
+    : 1;
+  const bonus = Math.min(50, (streak - 1) * 5);
+  const xp = 10 + bonus;
+  const coins = 50 + Math.min(250, (streak - 1) * 25);
+
+  const { error } = await supabase
+    .from("user_progress")
+    .update({
+      last_login_date: todayStr,
+      login_streak: streak,
+      best_login_streak: Math.max(progress.best_login_streak, streak),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId);
+  if (error) throw error;
+
+  await award(userId, {
+    xp,
+    coins,
+    source: "daily",
+    feedKind: "daily",
+    feedTitle: `claimed the daily bonus (day ${streak} streak)`,
+    payload: { streak, bonus },
+  });
+
+  return { ok: true, xp, coins, streak };
+}
+
+/**
+ * Coin stealing via share link. The VICTIM configures price / max amount;
+ * chance depends on the level difference between thief and victim.
+ * Flood check: 5 minutes between attempts on the same victim, max 6/hour.
+ */
+export interface StealSettings {
+  enabled: boolean;
+  price: number; // what an attempt costs the thief
+  maxAmount: number; // upper bound per successful heist
+}
+
+export const STEAL_DEFAULTS: StealSettings = {
+  enabled: true,
+  price: 100,
+  maxAmount: 250,
+};
+
+export async function attemptSteal(
+  thiefId: string,
+  victimUsername: string,
+): Promise<
+  | { ok: false; error: string }
+  | {
+      ok: true;
+      success: boolean;
+      stolen: number;
+      cost: number;
+      chance: number;
+      balance: number;
+    }
+> {
+  const supabase = createAdminClient();
+
+  const { data: victimProfile } = await supabase
+    .from("profiles")
+    .select("id, username, steal_enabled, steal_price, steal_max")
+    .ilike("username", victimUsername.trim())
+    .maybeSingle();
+  if (!victimProfile || !victimProfile.id) return { ok: false, error: "Victim not found." };
+  if (victimProfile.id === thiefId) return { ok: false, error: "You cannot steal from yourself." };
+
+  const settings: StealSettings = {
+    enabled: victimProfile.steal_enabled ?? STEAL_DEFAULTS.enabled,
+    price: Math.max(0, victimProfile.steal_price ?? STEAL_DEFAULTS.price),
+    maxAmount: Math.max(10, victimProfile.steal_max ?? STEAL_DEFAULTS.maxAmount),
+  };
+  if (!settings.enabled) return { ok: false, error: "This collector disabled stealing." };
+
+  const thief = await getProgress(thiefId);
+  if (thief.coins < settings.price) {
+    return { ok: false, error: `An attempt costs ${settings.price} coins.` };
+  }
+
+  // Flood checks: one attempt per victim per 5 min, max 6 victims per hour.
+  const fiveMinAgo = new Date(Date.now() - 5 * 60_000).toISOString();
+  const { count: recentPair } = await supabase
+    .from("steal_attempts")
+    .select("id", { count: "exact", head: true })
+    .eq("thief_id", thiefId)
+    .eq("victim_id", victimProfile.id)
+    .gte("created_at", fiveMinAgo);
+  if ((recentPair ?? 0) > 0) {
+    return { ok: false, error: "Flood check: wait 5 minutes between attempts on the same collector." };
+  }
+  const hourAgo = new Date(Date.now() - 3_600_000).toISOString();
+  const { count: recentHour } = await supabase
+    .from("steal_attempts")
+    .select("id", { count: "exact", head: true })
+    .eq("thief_id", thiefId)
+    .gte("created_at", hourAgo);
+  if ((recentHour ?? 0) >= 6) {
+    return { ok: false, error: "Flood check: max 6 steal attempts per hour." };
+  }
+
+  const victim = await getProgress(victimProfile.id);
+  if (victim.coins <= 0) return { ok: false, error: "Victim has no coins to steal." };
+
+  // Success chance: 50% base ± 1% per level difference, clamped 20–80%.
+  const chance = Math.min(0.8, Math.max(0.2, 0.5 + (thief.level - victim.level) * 0.01));
+  const success = Math.random() < chance;
+
+  const stealable = Math.min(settings.maxAmount, Math.floor(victim.coins * 0.1), victim.coins);
+  const stolen = success ? Math.max(1, Math.floor(stealable * (0.5 + Math.random() * 0.5))) : 0;
+
+  const { error: attemptError } = await supabase.from("steal_attempts").insert({
+    thief_id: thiefId,
+    victim_id: victimProfile.id,
+    cost: settings.price,
+    coins: stolen,
+    success,
+  });
+  if (attemptError) throw attemptError;
+
+  // Thief pays the attempt cost; the victim keeps it.
+  await supabase
+    .from("user_progress")
+    .update({
+      coins: Math.max(0, thief.coins - settings.price + stolen),
+      steals_successful: thief.steals_successful + (success ? 1 : 0),
+      steals_failed: thief.steals_failed + (success ? 0 : 1),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", thiefId);
+  await supabase
+    .from("user_progress")
+    .update({
+      coins: Math.max(0, victim.coins - stolen + (success ? 0 : settings.price)),
+      times_robbed: victim.times_robbed + 1,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", victimProfile.id);
+
+  const thiefProfile = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", thiefId)
+    .maybeSingle()
+    .then(({ data }) => data?.username ?? "someone");
+
+  await logActivity({
+    userId: thiefId,
+    kind: success ? "steal" : "steal_defended",
+    title: success
+      ? `stole ${stolen.toLocaleString("en")} coins from ${victimProfile.username}`
+      : `failed to steal from ${victimProfile.username} — attempt cost ${settings.price} coins`,
+    coinsAmount: success ? stolen : -settings.price,
+    payload: { victim: victimProfile.username, stolen, cost: settings.price, chance },
+  });
+
+  await evaluateAchievements(thiefId).catch(() => undefined);
+  await evaluateAchievements(victimProfile.id).catch(() => undefined);
+
+  const balance = Math.max(0, thief.coins - settings.price + stolen);
+  return { ok: true, success, stolen, cost: settings.price, chance, balance };
+}
+
+/** Coin rain easter egg: a visitor gifts the profile owner 1 coin (once/day). */
+export async function coinRain(
+  giverId: string | null,
+  profileOwnerId: string,
+): Promise<{ ok: boolean; already?: boolean }> {
+  const supabase = createAdminClient();
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const since = new Date(Date.now() - 86_400_000).toISOString();
+  const { count } = await supabase
+    .from("activity_events")
+    .select("id", { count: "exact", head: true })
+    .eq("kind", "coin_rain")
+    .eq("user_id", profileOwnerId)
+    .gte("created_at", since)
+    .contains("payload", { giver: giverId ?? "anonymous" });
+  if ((count ?? 0) > 0) return { ok: false, already: true };
+
+  const owner = await getProgress(profileOwnerId);
+  await supabase
+    .from("user_progress")
+    .update({ coins: owner.coins + 1, updated_at: new Date().toISOString() })
+    .eq("user_id", profileOwnerId);
+
+  await logActivity({
+    userId: profileOwnerId,
+    kind: "coin_rain",
+    title: "received a coin rain (+1 coin)",
+    coinsAmount: 1,
+    payload: { role: "receiver", giver: giverId ?? "anonymous" },
+  });
+  if (giverId) {
+    await logActivity({
+      userId: giverId,
+      kind: "coin_rain",
+      title: "sent a coin rain (+1 coin to the collector)",
+      coinsAmount: 0,
+      payload: { role: "giver", receiver: profileOwnerId },
+    });
+  }
+  await evaluateAchievements(profileOwnerId).catch(() => undefined);
+  return { ok: true };
+}

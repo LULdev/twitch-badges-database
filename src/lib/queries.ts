@@ -56,6 +56,12 @@ export interface ProfileRow {
   potatoes: number | null;
   potat_first_seen: string | null;
   potat_connections: Array<{ platform: string; id: string }> | null;
+  customization: Record<string, unknown> | null;
+  view_count: number | null;
+  mood: string | null;
+  steal_enabled: boolean | null;
+  steal_price: number | null;
+  steal_max: number | null;
   created_at: string;
   updated_at: string;
 }

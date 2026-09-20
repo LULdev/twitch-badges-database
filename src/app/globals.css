@@ -727,3 +727,109 @@ html {
     transform: none;
   }
 }
+
+/* ============================================================
+   Level badges & achievement badges (sparkle animations)
+   ============================================================ */
+
+.level-badge {
+  filter: drop-shadow(0 0 6px var(--level-halo, rgba(169, 112, 255, 0.4)));
+  animation: level-breathe 3.2s ease-in-out infinite;
+}
+
+@keyframes level-breathe {
+  0%, 100% { filter: drop-shadow(0 0 4px var(--level-halo, rgba(169, 112, 255, 0.35))); }
+  50% { filter: drop-shadow(0 0 14px var(--level-halo, rgba(169, 112, 255, 0.7))); }
+}
+
+.level-badge-rotate {
+  transform-origin: 32px 32px;
+  animation: level-rotate 6s linear infinite;
+}
+
+@keyframes level-rotate {
+  to { transform: rotate(360deg); }
+}
+
+.level-sparkle {
+  position: absolute;
+  width: 0.6rem;
+  height: 0.6rem;
+  background: #fff;
+  clip-path: polygon(
+    50% 0%, 61% 39%, 100% 50%, 61% 61%,
+    50% 100%, 39% 61%, 0% 50%, 39% 39%
+  );
+  filter: drop-shadow(0 0 3px currentColor);
+  animation: level-twinkle 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.level-sparkle.sparkle-a {
+  top: -2px;
+  right: 2px;
+}
+
+.level-sparkle.sparkle-b {
+  bottom: 4px;
+  left: -2px;
+  width: 0.45rem;
+  height: 0.45rem;
+  animation-delay: 1s;
+}
+
+@keyframes level-twinkle {
+  0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1.1) rotate(30deg); opacity: 1; }
+}
+
+.achievement-badge {
+  animation: achievement-pulse 2.6s ease-in-out infinite;
+}
+
+.achievement-special {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(169, 112, 255, 0.35), transparent 70%),
+    conic-gradient(from var(--rarity-angle, 0deg), #f8717155, #fbbf2455, #a970ff55, #60a5fa55, #f8717155);
+  animation: achievement-pulse 2.2s ease-in-out infinite, rarity-spin 4s linear infinite;
+}
+
+@keyframes achievement-pulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(255, 255, 255, 0.15); }
+  50% { box-shadow: 0 0 18px rgba(255, 255, 255, 0.45); }
+}
+
+/* Profile achievement hero showcase */
+.achievement-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(169, 112, 255, 0.12), transparent 70%),
+    var(--surface);
+}
+
+.achievement-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.06) 50%, transparent 60%);
+  transform: translateX(-130%);
+  animation: hero-shimmer 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes hero-shimmer {
+  0%, 60% { transform: translateX(-130%); }
+  90%, 100% { transform: translateX(130%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .level-badge,
+  .level-badge-rotate,
+  .level-sparkle,
+  .achievement-badge,
+  .achievement-special,
+  .achievement-hero::before {
+    animation: none;
+  }
+}

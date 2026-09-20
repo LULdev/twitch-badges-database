@@ -1,0 +1,62 @@
+import { levelTheme } from "@/lib/gamification/levels";
+
+/**
+ * Level badge (1–100): unique bracket-themed shield with the level number,
+ * animated sparkles and glow. ALWAYS visible on profiles — cannot be hidden.
+ */
+export default function LevelBadge({
+  level,
+  size = 72,
+}: {
+  level: number;
+  size?: number;
+}) {
+  const theme = levelTheme(level);
+  return (
+    <span
+      className="level-badge relative inline-grid place-items-center"
+      style={{
+        width: size,
+        height: size,
+        ["--level-glow" as string]: theme.glow,
+        ["--level-halo" as string]: theme.halo,
+      }}
+      role="img"
+      aria-label={`Level ${level}`}
+    >
+      <svg viewBox="0 0 64 64" className="absolute inset-0 size-full drop-shadow-[0_0_8px_var(--level-halo)]">
+        <defs>
+          <linearGradient id={`lg-${level}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#000000" stopOpacity="0.2" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M32 2 58 12v22c0 15-11 24-26 28C17 58 6 49 6 34V12L32 2z"
+          fill="url(#lg-shield)"
+          style={{ fill: theme.gradient.includes("conic") ? undefined : theme.gradient }}
+          stroke={theme.glow}
+          strokeWidth="2.5"
+        />
+        {level >= 90 && (
+          <path
+            d="M32 2 58 12v22c0 15-11 24-26 28C17 58 6 49 6 34V12L32 2z"
+            fill="none"
+            stroke="url(#lg-shield)"
+            strokeWidth="2.5"
+            className="level-badge-rotate"
+          />
+        )}
+        <linearGradient id="lg-shield">
+          <stop offset="0%" stopColor={theme.glow} stopOpacity="0.35" />
+          <stop offset="100%" stopColor={theme.glow} stopOpacity="0.08" />
+        </linearGradient>
+      </svg>
+      <span className="relative z-10 font-black tabular-nums" style={{ fontSize: size * 0.34, color: theme.glow }}>
+        {level}
+      </span>
+      <span className="level-sparkle sparkle-a" aria-hidden />
+      <span className="level-sparkle sparkle-b" aria-hidden />
+    </span>
+  );
+}

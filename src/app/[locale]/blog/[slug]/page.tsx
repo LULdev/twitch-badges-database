@@ -6,6 +6,10 @@ import { getPostBySlug } from "@/lib/queries";
 import { renderMarkdown } from "@/lib/markdown";
 import ShareButtons from "@/components/ShareButtons";
 import { localeAlternates } from "@/lib/seo";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { recordBlogView } from "@/lib/gamification/visits";
+import { visitorIpHash } from "@/lib/gamification/session";
+import EmojiReactions from "@/components/EmojiReactions";
 
 export const revalidate = 300;
 
@@ -45,6 +49,25 @@ export default async function BlogPostPage({ params }: PageProps) {
   if (!post || post.status !== "published") notFound();
 
   const html = renderMarkdown(post.content);
+
+  // View counter (5-minute per-IP dedup) + emoji reactions.
+  let viewCount = 0;
+  const reactions: Record<string, number> = {};
+  try {
+    const ipHash = await visitorIpHash();
+    await recordBlogView(post.id, ipHash);
+    const admin = createAdminClient();
+    const [viewsRes, reactionsRes] = await Promise.all([
+      admin.from("blog_views").select("id", { count: "exact", head: true }).eq("post_id", post.id),
+      admin.from("blog_reactions").select("emoji"),
+    ]);
+    viewCount = viewsRes.count ?? 0;
+    for (const row of (reactionsRes.data ?? []) as Array<{ emoji: string }>) {
+      reactions[row.emoji] = (reactions[row.emoji] ?? 0) + 1;
+    }
+  } catch {
+    // counters are best-effort
+  }
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -90,7 +113,7 @@ export default async function BlogPostPage({ params }: PageProps) {
               dateStyle: "long",
             }),
           })}{" "}
-          · {t("by", { author: post.author })}
+          · {t("by", { author: post.author })} · <span className="tabular-nums">👁 {viewCount.toLocaleString(locale)}</span>
         </p>
       </header>
 
@@ -110,6 +133,9 @@ export default async function BlogPostPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: html }}
       />
 
+      <div className="border-t border-line pt-4">
+        <EmojiReactions slug={post.slug} initial={reactions} />
+      </div>
       <div className="border-t border-line pt-4">
         <ShareButtons
           path={`/${locale}/blog/${post.slug}`}
