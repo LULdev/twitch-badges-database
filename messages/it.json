@@ -117,7 +117,7 @@
     "percentageOfUsers": "{value}% degli utenti tracciati",
     "rarityScore": "Punteggio di rarità",
     "aboutRarity": "Informazioni sull'indice di rarità",
-    "rarityFormula": "Il TBRI v2 combina sei segnali: scarsità dei possessori (40%), tasso di indosso (10%), ottenebilità (20%), età (10%), slancio 24h da potat.app (10%) e brevità della finestra (10%) — un punteggio 0–100 su sei livelli.",
+    "rarityFormula": "Il TBRI v2 combina sei segnali: scarsità dei possessori (40%), tasso di indosso (10%), ottenebilità (20%), età (10%), slancio 24h da potat.app (10%) e brevità della finestra (10%) — un punteggio 0–100 su sei livelli. I badge che richiedono l'acquisto di un biglietto (TwitchCon ecc.) sono sempre leggendari.",
     "ownerTrend": "Andamento dei possessori",
     "ownerTrendSubtitle": "Dati live da potat.app, aggiornati ogni 15 minuti",
     "noStats": "Nessuna statistica registrata per questo badge.",

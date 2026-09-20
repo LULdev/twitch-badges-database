@@ -37,6 +37,8 @@ export interface RarityInput {
   firstSeenAt: string | null;
   /** Absolute active-user growth over the last ~24h (potat time series). */
   growth24h?: number | null;
+  /** Ticket-purchase badges (TwitchCon & co.) are always legendary. */
+  requiresTicket?: boolean;
 }
 
 export interface RarityResult {
@@ -135,6 +137,13 @@ export function computeRarity(
     WEIGHTS.age * ageOf(input.firstSeenAt, now) +
     WEIGHTS.momentum * momentumOf(input) +
     WEIGHTS.brevity * brevityOf(input);
+
+  // Ticket-purchase badges (TwitchCon & co.) are pinned to legendary:
+  // physical presence plus a paid ticket makes them inherently scarce.
+  if (input.requiresTicket) {
+    const score = Math.min(87, Math.max(76, Math.round((100 * raw) / WEIGHT_SUM)));
+    return { score, tier: "legendary" };
+  }
 
   const score = Math.round((100 * raw) / WEIGHT_SUM);
   return { score, tier: tierOf(score) };

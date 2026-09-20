@@ -117,7 +117,7 @@
     "percentageOfUsers": "{value}% of tracked users",
     "rarityScore": "Rarity score",
     "aboutRarity": "About the rarity index",
-    "rarityFormula": "The TBRI v2 combines six signals: owner scarcity (40%), wear rate (10%), obtainability (20%), age (10%), 24h momentum from potat.app (10%) and claim-window brevity (10%) — a 0–100 score mapped to six tiers.",
+    "rarityFormula": "The TBRI v2 combines six signals: owner scarcity (40%), wear rate (10%), obtainability (20%), age (10%), 24h momentum from potat.app (10%) and claim-window brevity (10%) — a 0–100 score mapped to six tiers. Badges that require buying a ticket (TwitchCon & co.) are always legendary.",
     "ownerTrend": "Owner trend",
     "ownerTrendSubtitle": "Live counts from potat.app, polled every 15 minutes",
     "noStats": "No statistics recorded for this badge yet.",

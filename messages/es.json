@@ -117,7 +117,7 @@
     "percentageOfUsers": "{value}% de los usuarios rastreados",
     "rarityScore": "Puntuación de rareza",
     "aboutRarity": "Sobre el índice de rareza",
-    "rarityFormula": "El TBRI v2 combina seis señales: escasez de propietarios (40%), tasa de uso (10%), obtenibilidad (20%), antigüedad (10%), impulso de 24h de potat.app (10%) y brevedad de la ventana (10%) — una puntuación de 0–100 en seis niveles.",
+    "rarityFormula": "El TBRI v2 combina seis señales: escasez de propietarios (40%), tasa de uso (10%), obtenibilidad (20%), antigüedad (10%), impulso de 24h de potat.app (10%) y brevedad de la ventana (10%) — una puntuación de 0–100 en seis niveles. Las insignias que requieren comprar una entrada (TwitchCon y afines) siempre son legendarias.",
     "ownerTrend": "Tendencia de propietarios",
     "ownerTrendSubtitle": "Datos en vivo de potat.app, consultados cada 15 minutos",
     "noStats": "Aún no hay estadísticas registradas para esta insignia.",

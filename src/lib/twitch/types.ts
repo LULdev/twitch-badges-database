@@ -165,3 +165,20 @@ export function isStatusSetId(setId: string): boolean {
     setId,
   );
 }
+
+/**
+ * Badges that require buying a ticket (TwitchCon & co.). Physical presence
+ * + purchase makes them inherently scarce — rarity always pins them to
+ * "legendary".
+ */
+export function isTicketBadge(
+  setId: string,
+  howToEarn?: string | null,
+  description?: string | null,
+): boolean {
+  if (/twitchcon|ticket/i.test(setId)) return true;
+  const text = `${howToEarn ?? ""} ${description ?? ""}`;
+  return /bought?\s+(?:a\s+)?ticket|purchase\s+(?:a\s+)?ticket|buy\s+(?:a\s+)?ticket|kauf(?:e|en)?\s+(?:ein\s+)?ticket/i.test(
+    text,
+  );
+}

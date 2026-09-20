@@ -3,7 +3,7 @@ import {
   fetchAllDistribution,
   fetchAllOwners,
 } from "@/lib/twitch/potat";
-import { resolveStatus } from "@/lib/twitch/types";
+import { isTicketBadge, resolveStatus } from "@/lib/twitch/types";
 import { computeRarity } from "@/lib/rarity";
 import { logChange } from "@/lib/changelog";
 
@@ -125,6 +125,11 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
         endDate: badge.end_date,
         firstSeenAt: badge.first_seen_at,
         growth24h: growthByBadge.get(badge.id) ?? null,
+        requiresTicket: isTicketBadge(
+          badge.set_id as string,
+          badge.how_to_earn as string | null,
+          badge.description as string | null,
+        ),
       },
       now,
     );
@@ -149,7 +154,8 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
       !badge.last_polled_at ||
       now.getTime() - new Date(badge.last_polled_at).getTime() > 3_600_000;
 
-    if (valuesChanged || lastOld || nextStatus !== badge.status) {
+    const tierChanged = rarity.tier !== badge.rarity_tier;
+    if (valuesChanged || lastOld || nextStatus !== badge.status || tierChanged) {
       upsertRows.push({
         ...badge,
         owner_count: totalOwners,

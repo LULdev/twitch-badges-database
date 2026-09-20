@@ -117,7 +117,7 @@
     "percentageOfUsers": "占追踪用户的 {value}%",
     "rarityScore": "稀有度评分",
     "aboutRarity": "关于稀有度指数",
-    "rarityFormula": "TBRI v2 综合六个信号：所有者稀缺度（40%）、佩戴率（10%）、可获得性（20%）、年龄（10%）、来自 potat.app 的 24 小时增长势头（10%）以及领取窗口的短长度（10%）——0–100 分，映射到六个等级。",
+    "rarityFormula": "TBRI v2 综合六个信号：所有者稀缺度（40%）、佩戴率（10%）、可获得性（20%）、年龄（10%）、来自 potat.app 的 24 小时增长势头（10%）以及领取窗口的短长度（10%）——0–100 分，映射到六个等级。. 需要购买门票的徽章（TwitchCon 等）始终为传说级。",
     "ownerTrend": "持有者趋势",
     "ownerTrendSubtitle": "来自 potat.app 的实时数据，每 15 分钟刷新一次",
     "noStats": "该徽章尚无统计数据。",
