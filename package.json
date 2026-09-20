@@ -1,0 +1,44 @@
+{
+  "name": "twitch-badges-database",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "db:apply": "tsx scripts/db-apply.ts",
+    "sync:global": "tsx scripts/sync-global.ts",
+    "sync:badgebase": "tsx scripts/sync-badgebase.ts",
+    "sync:potat": "tsx scripts/sync-potat.ts",
+    "send:push": "tsx scripts/send-push.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.116.0",
+    "@vercel/og": "^1.0.2",
+    "dotenv": "^17.2.2",
+    "fast-xml-parser": "^5.11.1",
+    "next": "16.3.5",
+    "next-intl": "^4.5.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "recharts": "^3.10.1",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/web-push": "^3.6.4",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.5",
+    "postgres": "^3.4.5",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.13",
+    "typescript": "^5"
+  }
+}

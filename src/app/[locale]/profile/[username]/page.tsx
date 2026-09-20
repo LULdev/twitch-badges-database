@@ -1,0 +1,353 @@
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
+import { createClient } from "@/lib/supabase/server";
+import {
+  getProfileByUsername,
+  getInventory,
+  listBadges,
+  type BadgeRow,
+  type ProfileRow,
+} from "@/lib/queries";
+import { fetchUserBadges } from "@/lib/twitch/perfil";
+import BadgeGrid from "@/components/badges/BadgeGrid";
+import { BadgeImage } from "@/components/badges/BadgeImage";
+import RarityChip from "@/components/badges/RarityChip";
+import ShareButtons from "@/components/ShareButtons";
+import TwitchLoginButton from "@/components/TwitchLoginButton";
+import { localeAlternates } from "@/lib/seo";
+
+export const revalidate = 300;
+
+interface PageProps {
+  params: Promise<{ locale: string; username: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale, username } = await params;
+  const t = await getTranslations({ locale, namespace: "meta" });
+  const title = t("profileTitle", { username });
+  const description = t("profileDescription", { username });
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}/profile/${username}`,
+      languages: localeAlternates(`/profile/${username}`),
+    },
+    openGraph: {
+      type: "profile",
+      title,
+      description,
+      images: [
+        {
+          url: `/api/og/profile?u=${encodeURIComponent(username)}&locale=${locale}`,
+        },
+      ],
+    },
+  };
+}
+
+export default async function ProfilePage({ params }: PageProps) {
+  const { locale, username } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("profile");
+  const tc = await getTranslations("common");
+  const ti = await getTranslations("inventory");
+
+  let profile: ProfileRow | null = null;
+  try {
+    profile = await getProfileByUsername(username);
+  } catch {
+    profile = null;
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user: viewer },
+  } = await supabase.auth.getUser();
+  const isOwn = Boolean(viewer && profile && viewer.id === profile.id);
+
+  // Resolved live for non-member profiles (ephemeral view + claim CTA).
+  let liveBadges: Array<{ slug: string; setId: string; version: string; title: string; image: string | null; tier: BadgeRow["rarity_tier"] | null }> = [];
+  let liveAvatar: string | null = null;
+  let liveDisplayName: string | null = null;
+  if (!profile) {
+    try {
+      const perfil = await fetchUserBadges(decodeURIComponent(username), 900);
+      liveAvatar = perfil.profileImageURL || null;
+      liveDisplayName = perfil.displayName;
+      const { data: catalog } = await supabase
+        .from("badges")
+        .select("id,slug,set_id,version,title,image_url_2x,rarity_tier")
+        .neq("status", "removed");
+      const byKey = new Map(
+        (catalog ?? []).map((row) => [
+          `${row.set_id}:${row.version}`,
+          row as {
+            id: string;
+            slug: string;
+            set_id: string;
+            version: string;
+            title: string;
+            image_url_2x: string | null;
+            rarity_tier: BadgeRow["rarity_tier"];
+          },
+        ]),
+      );
+      liveBadges = perfil.badges
+        .map((b) => {
+          const match = byKey.get(`${b.setID}:${b.version}`);
+          if (!match) return null;
+          return {
+            slug: match.slug,
+            setId: b.setID,
+            version: b.version,
+            title: b.title ?? match.title,
+            image: b.image2x ?? match.image_url_2x,
+            tier: match.rarity_tier,
+          };
+        })
+        .filter(
+          (entry): entry is {
+            slug: string;
+            setId: string;
+            version: string;
+            title: string;
+            image: string | null;
+            tier: BadgeRow["rarity_tier"];
+          } => entry !== null,
+        )
+        .sort((a, b) => a.tier.localeCompare(b.tier));
+    } catch {
+      notFound();
+    }
+  }
+
+  if (!profile && liveBadges.length === 0 && !liveAvatar) notFound();
+
+  const displayName =
+    profile?.display_name ?? liveDisplayName ?? decodeURIComponent(username);
+  const avatar = profile?.avatar_url ?? liveAvatar;
+  const handle = profile?.username ?? decodeURIComponent(username).toLowerCase();
+
+  // Member data: showcase + inventory.
+  let showcaseBadges: BadgeRow[] = [];
+  let ownedBadges: BadgeRow[] = [];
+  let totalCatalog = 0;
+  let inventoryVisible = false;
+  if (profile) {
+    inventoryVisible = profile.inventory_public || isOwn;
+    const [catalog, inventory] = await Promise.all([
+      listBadges({ perPage: 12, sort: "rarity" }).catch(() => null),
+      inventoryVisible ? getInventory(profile.id).catch(() => []) : Promise.resolve([]),
+    ]);
+    totalCatalog = catalog?.total ?? 0;
+    ownedBadges = inventory
+      .map((item) => item.badge)
+      .filter(Boolean) as BadgeRow[];
+
+    const slugs = Array.isArray(profile.showcase_slots)
+      ? profile.showcase_slots.slice(0, 6)
+      : [];
+    if (slugs.length > 0) {
+      const { data: rows } = await supabase
+        .from("badges")
+        .select("*")
+        .in("slug", slugs);
+      const bySlug = new Map(
+        ((rows ?? []) as BadgeRow[]).map((row) => [row.slug, row]),
+      );
+      showcaseBadges = slugs
+        .map((slug) => bySlug.get(slug))
+        .filter(Boolean) as BadgeRow[];
+    }
+  }
+
+  const percent =
+    profile && totalCatalog > 0
+      ? Math.round((ownedBadges.length / totalCatalog) * 100)
+      : 0;
+
+  return (
+    <div className="space-y-8">
+      {/* Banner + identity */}
+      <section className="card overflow-hidden">
+        <div
+          className="h-28 bg-accent-soft sm:h-36"
+          style={
+            profile?.banner_url
+              ? {
+                  backgroundImage: `url(${profile.banner_url})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }
+              : undefined
+          }
+        />
+        <div className="flex flex-col gap-4 px-6 pb-6 sm:flex-row sm:items-end">
+          <div className="-mt-10 shrink-0 rounded-full border-4 border-surface bg-surface">
+            {avatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={avatar} alt={handle} width={88} height={88} className="rounded-full" />
+            ) : (
+              <span className="grid size-[88px] place-items-center rounded-full bg-accent-soft text-2xl font-bold text-accent">
+                {handle.slice(0, 2).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-2xl font-extrabold tracking-tight">
+              {displayName}
+            </h1>
+            <p className="text-sm text-muted">@{handle}</p>
+            {profile?.bio && (
+              <p className="mt-2 max-w-xl text-sm leading-relaxed">{profile.bio}</p>
+            )}
+            {profile?.created_at && (
+              <p className="mt-2 text-xs text-muted">
+                {t("memberSince")}:{" "}
+                {new Date(profile.created_at).toLocaleDateString(locale, {
+                  dateStyle: "medium",
+                })}
+              </p>
+            )}
+          </div>
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            {isOwn ? (
+              <Link href="/account" className="btn btn-secondary text-xs">
+                {t("editProfile")}
+              </Link>
+            ) : null}
+            <a
+              href={`https://www.twitch.tv/${handle}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-ghost text-xs"
+            >
+              {t("viewOnTwitch")} ↗
+            </a>
+            <ShareButtons
+              path={`/${locale}/profile/${handle}`}
+              title={`${displayName} — ${tc("viewAll")}`}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      {profile && (
+        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="card stat-tile">
+            <dd className="stat-value">{ownedBadges.length}</dd>
+            <dt className="stat-label">{t("owned")}</dt>
+          </div>
+          <div className="card stat-tile">
+            <dd className="stat-value">{Math.max(0, totalCatalog - ownedBadges.length)}</dd>
+            <dt className="stat-label">{t("missing")}</dt>
+          </div>
+          <div className="card stat-tile">
+            <dd className="stat-value">{percent}%</dd>
+            <dt className="stat-label">{t("completion")}</dt>
+          </div>
+          <div className="card stat-tile">
+            <dd className="stat-value">{showcaseBadges.length}</dd>
+            <dt className="stat-label">{t("showcase")}</dt>
+          </div>
+        </section>
+      )}
+
+      {/* Non-member claim hint */}
+      {!profile && (
+        <section className="card flex flex-col items-center gap-3 p-6 text-center">
+          <p className="text-sm text-muted">{t("claim")}</p>
+          <TwitchLoginButton />
+        </section>
+      )}
+
+      {/* Showcase */}
+      {profile && (
+        <section aria-labelledby="showcase">
+          <div className="section-title">
+            <h2 id="showcase">{t("showcase")}</h2>
+          </div>
+          {showcaseBadges.length > 0 ? (
+            <div className="card grid grid-cols-3 gap-3 p-5 sm:grid-cols-6">
+              {showcaseBadges.map((badge) => (
+                <Link
+                  key={badge.id}
+                  href={`/badges/${badge.slug}`}
+                  className="badge-tile card-interactive rounded-[var(--radius-card)]"
+                >
+                  <BadgeImage badge={badge} size={48} />
+                  <p className="line-clamp-2 text-[0.6875rem] font-semibold leading-tight">
+                    {badge.title}
+                  </p>
+                  <RarityChip tier={badge.rarity_tier} compact />
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="card p-6 text-center text-sm text-muted">
+              {t("showcaseEmpty")}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Owned badges */}
+      {profile && (
+        <section aria-labelledby="profile-owned">
+          <div className="section-title">
+            <h2 id="profile-owned">
+              {t("owned")} ({ownedBadges.length})
+            </h2>
+          </div>
+          {inventoryVisible ? (
+            ownedBadges.length > 0 ? (
+              <BadgeGrid badges={ownedBadges} showCountdown={false} />
+            ) : (
+              <div className="card p-10 text-center text-sm text-muted">
+                {ti("emptyOwned")}
+              </div>
+            )
+          ) : (
+            <div className="card p-10 text-center text-sm text-muted">
+              {t("inventoryHidden")}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Live (non-member) badge list */}
+      {!profile && liveBadges.length > 0 && (
+        <section aria-labelledby="live-owned">
+          <div className="section-title">
+            <h2 id="live-owned">
+              {t("owned")} ({liveBadges.length})
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6">
+            {liveBadges.slice(0, 48).map((badge) => (
+              <Link
+                key={`${badge.setId}:${badge.version}`}
+                href={`/badges/${badge.slug}`}
+                className="card card-interactive badge-tile"
+              >
+                {badge.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={badge.image} alt={badge.title} width={48} height={48} loading="lazy" />
+                ) : null}
+                <p className="line-clamp-2 text-[0.6875rem] font-semibold leading-tight">
+                  {badge.title}
+                </p>
+                {badge.tier ? <RarityChip tier={badge.tier} compact /> : null}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
