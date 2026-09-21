@@ -1,6 +1,7 @@
 import { envOrNull } from "@/lib/env";
 import { runGlobalSync } from "@/lib/syncs/global";
 import { runBadgebaseSync } from "@/lib/syncs/badgebase";
+import { pruneHeartbeats, recordHeartbeat, withHeartbeat } from "@/lib/health";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -12,13 +13,21 @@ export async function GET(request: Request) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
+  const started = Date.now();
+
   // Hobby plans allow only 2 daily crons, so this handler runs the catalog
   // diff AND the badgebase drop-window enrichment together.
   let summary: unknown;
   try {
-    summary = await runGlobalSync();
+    summary = await withHeartbeat("sync/global", () => runGlobalSync());
   } catch (error) {
     console.error("[cron/global]", error);
+    await recordHeartbeat({
+      source: "cron/global",
+      status: "error",
+      durationMs: Date.now() - started,
+      message: error instanceof Error ? error.message : "failed",
+    });
     return Response.json(
       { ok: false, error: error instanceof Error ? error.message : "failed" },
       { status: 500 },
@@ -27,10 +36,22 @@ export async function GET(request: Request) {
 
   let badgebase: unknown = null;
   try {
-    badgebase = await runBadgebaseSync();
+    badgebase = await withHeartbeat("sync/badgebase", () => runBadgebaseSync());
   } catch (error) {
     console.error("[cron/badgebase]", error);
   }
 
-  return Response.json({ ok: true, summary, badgebase });
+  // Daily housekeeping: keep the heartbeat table bounded.
+  const pruned = await pruneHeartbeats(90);
+
+  const durationMs = Date.now() - started;
+  await recordHeartbeat({
+    source: "cron/global",
+    status: badgebase ? "ok" : "degraded",
+    durationMs,
+    message: badgebase ? null : "badgebase enrichment failed",
+    payload: { prunedHeartbeats: pruned },
+  });
+
+  return Response.json({ ok: true, summary, badgebase, durationMs, pruned });
 }

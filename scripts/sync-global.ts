@@ -4,7 +4,8 @@ config({ path: ".env.local" });
 
 async function main() {
   const { runGlobalSync } = await import("@/lib/syncs/global");
-  const summary = await runGlobalSync();
+  const { withHeartbeat } = await import("@/lib/health");
+  const summary = await withHeartbeat("sync/global", () => runGlobalSync());
   console.log("[sync:global]", JSON.stringify(summary, null, 2));
 }
 

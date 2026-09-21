@@ -4,7 +4,8 @@ config({ path: ".env.local" });
 
 async function main() {
   const { runBadgebaseSync } = await import("@/lib/syncs/badgebase");
-  const summary = await runBadgebaseSync();
+  const { withHeartbeat } = await import("@/lib/health");
+  const summary = await withHeartbeat("sync/badgebase", () => runBadgebaseSync());
   console.log("[sync:badgebase]", JSON.stringify(summary, null, 2));
 }
 

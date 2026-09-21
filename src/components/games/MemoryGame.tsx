@@ -75,8 +75,8 @@ export default function MemoryGame() {
     }
   }
 
-  // eslint-disable-next-line react-hooks/purity -- event-driven callback
   async function finish(finalCards: Card[]) {
+    // eslint-disable-next-line react-hooks/purity -- event-driven callback
     const timeMs = Date.now() - startTime.current;
     const finalMisses = finalCards.every((c) => c.matched) ? misses : misses;
     setStarted(false);

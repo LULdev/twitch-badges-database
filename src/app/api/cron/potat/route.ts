@@ -1,5 +1,6 @@
 import { envOrNull } from "@/lib/env";
 import { runPotatSync } from "@/lib/syncs/potat";
+import { recordHeartbeat, withHeartbeat } from "@/lib/health";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -10,10 +11,21 @@ export async function GET(request: Request) {
   if (!secret || auth !== `Bearer ${secret}`) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
+
+  const started = Date.now();
   try {
-    const summary = await runPotatSync();
-    return Response.json({ ok: true, summary });
+    const summary = await withHeartbeat("sync/potat", () => runPotatSync());
+    const durationMs = Date.now() - started;
+    await recordHeartbeat({ source: "cron/potat", status: "ok", durationMs });
+    return Response.json({ ok: true, summary, durationMs });
   } catch (error) {
+    const durationMs = Date.now() - started;
+    await recordHeartbeat({
+      source: "cron/potat",
+      status: "error",
+      durationMs,
+      message: error instanceof Error ? error.message : "failed",
+    });
     console.error("[cron/potat]", error);
     return Response.json(
       { ok: false, error: error instanceof Error ? error.message : "failed" },

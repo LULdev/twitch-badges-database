@@ -19,11 +19,15 @@ Read `README.md` for data sources and setup; read this file before editing.
   count on badge pages; the badge_momentum view feeds rarity momentum.
 - `src/lib/syncs/` — sync engines shared by `scripts/*.ts` AND `/api/cron/*`
 - `src/lib/` — queries.ts (DB reads via server client), rarity.ts (TBRI),
-  changelog.ts, inventory.ts, push.ts, markdown.ts, seo.ts
+  changelog.ts, inventory.ts, push.ts, markdown.ts, seo.ts, health.ts
+  (heartbeats), stats.ts (reads the `stats_*` views for `/stats`)
 - `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 125 achievements
   (achievements.ts, self-evaluating), games.ts (13 server-authoritative games),
   wheel.ts (daily wheel + Turbo jackpot 1:1e8), daily.ts (login bonus, heists,
   coin rain), visits.ts (5-min-IP-dedup view counters), session.ts
+- `src/components/stats/` — animated chart set for the stats dashboard
+  (CountUp, Reveal, TrendChart, DonutChart, DistributionBars, LevelHistogram,
+  UptimeGauge, UptimeCalendar, AvailabilityStrip, LiveStatus, useChartTheme)
 - `src/components/`, `messages/` (one JSON per locale), `supabase/migrations/`, `scripts/`
 
 ## Commands
@@ -33,9 +37,15 @@ npm run dev | build | lint | typecheck
 npm run db:apply        # apply pending migrations once (supabase_migrations ledger)
 npm run sync:global | sync:badgebase | sync:potat
 npm run send:push -- "Title" "Body" "/en/badges/slug"
+npm run log:change -- <feature|bugfix|data_sync|…> "Title" "Explanation" '{"json":"payload"}'
 ```
 
 Verification ritual: `lint && typecheck && build` before finishing any change.
+
+**Every change and every bug fix gets a changelog entry with a timestamp** —
+`npm run log:change` (or `logChange()` in code) with a one-paragraph
+explanation of what was changed and why. The `/changelog` page and its RSS
+feed are generated from that table, so an undocumented change is invisible.
 
 ## Architecture rules
 
@@ -45,11 +55,18 @@ Verification ritual: `lint && typecheck && build` before finishing any change.
   call the same functions; don't duplicate sync logic.
 - **Every sync mutation must write a changelog row** via `logChange()` — the
   changelog page is fully automatic by design.
+- **Every sync/health unit is wrapped in `withHeartbeat()`** (`src/lib/health.ts`)
+  so `system_heartbeats` stays the single source of truth for uptime; the
+  global cron prunes rows older than 90 days.
 - **New badges** (non-seed runs) trigger changelog + notification + web push +
   auto blog post. Initial-seed runs (empty catalog) are detected and skipped.
 - Pages read through `src/lib/queries.ts` (anon key + RLS); most catalog
   queries are wrapped in `.catch(() => …)` so an un-migrated DB renders empty
   states, not crashes.
+- **Stats aggregation lives in Postgres** (`stats_*` views in migration 0004).
+  They are `security_invoker = off` so aggregates over RLS tables are complete,
+  but they expose only aggregates and non-sensitive profile columns
+  (`username`, `avatar_url`) — never `profiles.email`.
 - RLS: catalog/content tables are public-read, service-role-write only;
   `profiles` never exposes email.
 
@@ -77,7 +94,18 @@ Verification ritual: `lint && typecheck && build` before finishing any change.
 - **React Compiler lint rules**: no synchronous `setState` inside effect
   bodies (wrap in `requestAnimationFrame`/`setTimeout`); no `Date.now()`
   during component render (server components need an inline
-  `eslint-disable-next-line react-hooks/purity`).
+  `eslint-disable-next-line react-hooks/purity`). Put the disable comment on
+  the **line of the call**, not above the enclosing function — the rule
+  reports the call site.
+- **Build memory**: `next build` spawns 15 static-generation workers. On a
+  machine with little free RAM the worker dies with exit code 134 /
+  3221226505 and no readable error. Close the dev server, free memory and
+  re-run; `NODE_OPTIONS=--max-old-space-size=4096` helps.
+- **i18n keys must exist before the page renders**: next-intl throws
+  `MISSING_MESSAGE` for unknown keys, and a page that builds keys dynamically
+  (see `FAQ_KEYS` in `[locale]/faq/page.tsx`) fails silently per locale. After
+  touching messages, check the build log for `MISSING_MESSAGE` — the build
+  still succeeds, so nothing else will warn you.
 - `useSearchParams()` must sit inside a `<Suspense>` boundary or prerendering
   fails (see `[locale]/auth/callback/page.tsx`).
 - **satori OG images** (`/api/og/profile`): every div with >1 child needs an
