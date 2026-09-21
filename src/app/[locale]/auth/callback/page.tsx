@@ -28,12 +28,16 @@ function CallbackInner() {
         // network hiccup) — continue instead of showing a dead end.
         const { data: sessionData } = await supabase.auth.getSession();
         if (sessionData.session) {
+          // refresh() drops the cached pre-login layout so the header shows
+          // the account instead of the login link until a manual reload.
+          router.refresh();
           router.replace("/inventory");
           return;
         }
         setError(exchangeError.message);
         return;
       }
+      router.refresh();
       router.replace("/inventory");
     };
     void exchange();
