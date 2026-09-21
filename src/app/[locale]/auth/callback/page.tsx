@@ -1,13 +1,25 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/browser";
 
+/**
+ * Hard navigation instead of router.replace(): the callback page was
+ * server-rendered BEFORE the session cookies existed, so the client router
+ * cache would keep replaying that logged-out layout (header kept showing the
+ * login link). A full page load re-renders the target server-side with the
+ * fresh session — router.refresh()/replace() orderings proved unreliable
+ * against the router cache.
+ */
+function goToInventory() {
+  const locale = window.location.pathname.split("/")[1] || "en";
+  window.location.replace(`/${locale}/inventory`);
+}
+
 function CallbackInner() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
   const [error, setError] = useState<string | null>(null);
@@ -28,20 +40,16 @@ function CallbackInner() {
         // network hiccup) — continue instead of showing a dead end.
         const { data: sessionData } = await supabase.auth.getSession();
         if (sessionData.session) {
-          // refresh() drops the cached pre-login layout so the header shows
-          // the account instead of the login link until a manual reload.
-          router.refresh();
-          router.replace("/inventory");
+          goToInventory();
           return;
         }
         setError(exchangeError.message);
         return;
       }
-      router.refresh();
-      router.replace("/inventory");
+      goToInventory();
     };
     void exchange();
-  }, [code, router]);
+  }, [code]);
 
   const t = useTranslations("login");
 
