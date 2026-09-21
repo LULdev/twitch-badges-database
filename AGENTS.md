@@ -121,6 +121,15 @@ feed are generated from that table, so an undocumented change is invisible.
 - **Scripts**: tsx runs in CJS mode — scripts use `config({path: ".env.local"})`
   first, then **dynamic** `import()` of `@/lib/…` so env vars load before
   module init. No top-level await.
+- **NEXT_PUBLIC_ vars in client code must be STATIC references** — the
+  bundler only inlines literal `process.env.NEXT_PUBLIC_X` member
+  expressions at build time. Reading them through `envOr(name)` /
+  `process.env[name]` (src/lib/env.ts) works on the server (real runtime
+  `process.env`) but resolves to `undefined` in the browser bundle. This
+  silently killed the Twitch login button (unhandled rejection, no visible
+  error). `src/lib/supabase/browser.ts` therefore references its vars
+  statically — keep env helpers out of any module a client component
+  imports.
 - badgebase.de detail pages expose dates via `data-ts=` / `data-reset=`
   attributes (seconds); match feed items to catalog rows by badge image UUID,
   fallback set_id.
