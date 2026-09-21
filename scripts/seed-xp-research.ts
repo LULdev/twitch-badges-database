@@ -26,19 +26,19 @@ const content = `When we set out to build the level system, we researched thirty
 
 1. OAuth-gated progress so XP belongs to real Twitch accounts.
 2. A fair, published level curve: 100 + (level-1) x 50 XP per level, 254,900 total.
-3. Coins as a parallel spendable currency.
+3. BadgesCoins as a parallel spendable currency.
 4. Daily login reward with streak memory.
 5. Server-authoritative randomness — no client-controlled outcomes.
 6. Rate limiting on games and heists.
 7. Persisted progress with atomic updates.
-8. Leaderboard-ready aggregates (games, wins, coins).
+8. Leaderboard-ready aggregates (games, wins, BadgesCoins).
 9. Graceful empty states when systems have no data yet.
 10. Multilingual UI — all features in eleven languages.
 
 ## Ten unexpected features (the surprises)
 
 1. A Twitch Turbo jackpot at exactly 1 : 100,000,000.
-2. Achievements for *failing* — Cursed Dice (10 losses), Rock Bottom (0 coins).
+2. Achievements for *failing* — Cursed Dice (10 losses), Rock Bottom (0 BadgesCoins).
 3. Level 42 and 69 trophies because the numbers are funny.
 4. Exact-777 coin balance trophy.
 5. A 3 AM Gambler award for night-session wins.
@@ -46,7 +46,7 @@ const content = `When we set out to build the level system, we researched thirty
 7. Ghost Town — a reward for a week-old profile with zero visitors.
 8. Zen Week — a 7-day streak with fewer games than days.
 9. Wheel of Misfortune — twenty spins, never above 100 XP, and still a trophy.
-10. Robin Hood — steal successfully, then gamble 1,000 coins away.
+10. Robin Hood — steal successfully, then gamble 1,000 BadgesCoins away.
 
 Thirty ideas, thirty shipped features. The research phase mattered: half of the unique list came from studying what badge collectors actually do — sync, hunt drops, compare collections — and wiring XP directly into those behaviors instead of inventing busywork.`;
 

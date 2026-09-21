@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import Coin from "@/components/Coin";
 
 /** Daily bonus claim button (+10 XP, streak bonus). */
 export default function DailyClaim({ compact = false }: { compact?: boolean }) {
@@ -58,7 +59,7 @@ export default function DailyClaim({ compact = false }: { compact?: boolean }) {
       </button>
       {reward && (
         <p className="text-sm font-bold text-success">
-          +{reward.xp} XP · +{reward.coins} 🪙 · {t("streak")}: {reward.streak}
+          +{reward.xp} XP · +{reward.coins} <Coin size={14} /> · {t("streak")}: {reward.streak}
         </p>
       )}
       {state === "already" && <p className="text-xs text-muted">{t("dailyComeBack")}</p>}

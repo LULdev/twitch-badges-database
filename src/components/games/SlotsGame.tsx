@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useGame, BetBar, GameError } from "./useGame";
+import Coin from "@/components/Coin";
 
 interface Symbol {
   id: string;
@@ -96,12 +97,12 @@ export default function SlotsGame() {
             onClick={spin}
             className="btn btn-primary w-full py-3 text-base"
           >
-            {spinning ? t("spinning") : `🎰 ${t("spin")} (${bet.toLocaleString("en")} 🪙)`}
+            {spinning ? t("spinning") : (<span>🎰 {t("spin")} (<span className="inline-flex items-center gap-1">{bet.toLocaleString("en")} <Coin size={14} /></span>)</span>)}
           </button>
           {lastWin && (
             <p className={`mt-3 text-center text-lg font-extrabold ${lastWin.payout > bet ? "text-success" : "text-muted"}`}>
               {lastWin.payout > bet
-                ? `+${(lastWin.payout - bet).toLocaleString("en")} 🪙 — ${lastWin.lines} ${t("paylines")}${lastWin.scatter >= 3 ? ` · ${lastWin.scatter}× SCATTER!` : ""}`
+                ? (<span>+{(lastWin.payout - bet).toLocaleString("en")} <Coin size={14} /> — {lastWin.lines} {t("paylines")}{lastWin.scatter >= 3 ? ` · ${lastWin.scatter}x SCATTER!` : ""}</span>)
                 : t("noWin")}
             </p>
           )}

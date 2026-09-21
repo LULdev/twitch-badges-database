@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import Coin from "@/components/Coin";
 
 export interface FeedEvent {
   id: number;
@@ -119,8 +120,8 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
                 <span>· {timeAgo(event.created_at)}</span>
                 {event.xp_amount ? <span className="font-bold text-accent">+{event.xp_amount} XP</span> : null}
                 {event.coins_amount ? (
-                  <span className={`font-bold ${event.coins_amount > 0 ? "text-success" : "text-danger"}`}>
-                    {event.coins_amount > 0 ? "+" : ""}{event.coins_amount.toLocaleString("en")} 🪙
+                  <span className={`inline-flex items-center gap-1 font-bold ${event.coins_amount > 0 ? "text-success" : "text-danger"}`}>
+                    {event.coins_amount > 0 ? "+" : ""}{event.coins_amount.toLocaleString("en")} <Coin size={12} />
                   </span>
                 ) : null}
               </div>

@@ -19,6 +19,7 @@ import TwitchLoginButton from "@/components/TwitchLoginButton";
 import LevelBadge from "@/components/LevelBadge";
 import AchievementBadge from "@/components/AchievementBadge";
 import CoinRainButton from "@/components/CoinRainButton";
+import Coin from "@/components/Coin";
 import StealPanel from "@/components/StealPanel";
 import { getProgress } from "@/lib/gamification/xp";
 import { levelFromXp } from "@/lib/gamification/levels";
@@ -266,7 +267,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 </div>
                 <p className="mt-1 text-[0.6875rem] text-muted tabular-nums">
                   {t("level")} {level.level} · {level.xpIntoLevel}/{level.xpForNext || "∞"} XP
-                  {progress ? ` · 🪙 ${progress.coins.toLocaleString(locale)}` : ""}
+                  {progress ? (<span> · <span className="inline-flex items-center gap-1">{progress.coins.toLocaleString(locale)} <Coin size={13} /></span></span>) : ""}
                 </p>
               </div>
             )}

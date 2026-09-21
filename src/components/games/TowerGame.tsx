@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useGame, BetBar, GameError } from "./useGame";
+import Coin from "@/components/Coin";
 
 export default function TowerGame() {
   const { bet, setBet, busy, error, play, t } = useGame("tower");
@@ -62,7 +63,7 @@ export default function TowerGame() {
         </button>
         {last && (
           <p className={`text-center text-lg font-extrabold ${last.survived ? "text-success" : "text-danger"}`}>
-            {last.survived ? t("youWin") : t("crashed")} ({last.payout.toLocaleString("en")} 🪙)
+            {last.survived ? t("youWin") : t("crashed")} (<span className="inline-flex items-center gap-1">{last.payout.toLocaleString("en")} <Coin size={14} /></span>)
           </p>
         )}
       </div>

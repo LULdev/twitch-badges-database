@@ -7,13 +7,14 @@ import { levelFromXp } from "@/lib/gamification/levels";
 import { GAMES } from "@/lib/gamification/games";
 import DailyClaim from "@/components/DailyClaim";
 import LevelBadge from "@/components/LevelBadge";
+import Coin from "@/components/Coin";
 import { localeAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 const GAME_ICONS: Record<string, string> = {
   rps: "✊", slots: "🎰", shoot: "🎯", memory: "🃏", quiz: "❓",
-  coinflip: "🪙", hilo: "📈", roulette: "🔴", blackjack: "🂡",
+  coinflip: "🪜", hilo: "📈", roulette: "🔴", blackjack: "🂡",
   vault: "🔐", scratch: "🎟️", tower: "🗼", catcher: "🧺",
 };
 
@@ -70,7 +71,7 @@ export default async function GamesHubPage({
                 />
               </div>
               <p className="mt-1.5 text-xs text-muted tabular-nums">
-                {t("level")} {level.level} · {level.xpIntoLevel}/{level.xpForNext || "∞"} XP · 🪙 {coins.toLocaleString("en")}
+                {t("level")} {level.level} · {level.xpIntoLevel}/{level.xpForNext || "∞"} XP · <span className="inline-flex items-center gap-1">{coins.toLocaleString("en")} <Coin size={13} /></span>
               </p>
             </div>
           )}
@@ -98,7 +99,7 @@ export default async function GamesHubPage({
                 {game.type === "luck" ? t("luck") : t("skill")}
               </span>
               <span className="chip pointer-events-none text-[0.5625rem]">
-                {game.minBet}–{game.maxBet} 🪙
+                {game.minBet}–{game.maxBet} <Coin size={11} />
               </span>
             </div>
           </Link>

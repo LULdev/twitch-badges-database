@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import Coin from "@/components/Coin";
 
 export interface PlayResponse {
   ok: boolean;
@@ -113,7 +114,7 @@ export function BetBar({
       />
       {balance !== null && (
         <span className="ms-auto text-sm font-bold tabular-nums">
-          🪙 {balance.toLocaleString("en")}
+          <Coin size={15} /> {balance.toLocaleString("en")}
         </span>
       )}
     </div>

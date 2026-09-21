@@ -6,6 +6,7 @@ import { authUserId } from "@/lib/gamification/session";
 import { getProgress } from "@/lib/gamification/xp";
 import AchievementBadge from "@/components/AchievementBadge";
 import TwitchLoginButton from "@/components/TwitchLoginButton";
+import Coin from "@/components/Coin";
 import { localeAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -114,7 +115,7 @@ export default async function AchievementsPage({
                       <p className="truncate text-sm font-bold">{achievement.title}</p>
                       <p className="line-clamp-2 text-xs text-muted">{achievement.description}</p>
                       <p className="mt-1 text-[0.625rem] font-bold text-accent">
-                        +{achievement.xp} XP · +{achievement.coins} 🪙 · {achievement.points} {t("points")}
+                        +{achievement.xp} XP · +{achievement.coins} <Coin size={12} /> · {achievement.points} {t("points")}
                       </p>
                     </div>
                   </div>

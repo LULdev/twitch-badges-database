@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import Coin from "@/components/Coin";
 
 interface Slot {
   id: string;
@@ -106,7 +107,7 @@ export default function WheelOfFortune() {
           <div className={`card mx-auto mt-4 max-w-sm p-5 ${result.turbo ? "border-warning" : ""}`}>
             <p className="text-2xl font-black">{result.turbo ? "🎁 TWITCH TURBO!" : result.label}</p>
             <p className="mt-1 text-sm text-muted">
-              {result.turbo ? t("turboWon") : `+${result.coins.toLocaleString("en")} 🪙`}
+              {result.turbo ? t("turboWon") : (<span className="inline-flex items-center gap-1.5">+{result.coins.toLocaleString("en")} <Coin size={16} className="bcoin-lg" /></span>)}
             </p>
           </div>
         )}
