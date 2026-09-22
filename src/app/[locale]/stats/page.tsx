@@ -978,9 +978,12 @@ export default async function StatsPage({
                   <th>{t("lastRun")}</th>
                   <th>{t("lastStatus")}</th>
                   <th>Ø ms</th>
-                  <th>24h</th>
-                  <th>7d</th>
-                  <th>30d</th>
+                  {/* The cells below are: run count (24h), then the success
+                      rate for 24h and 7d. The headers read "24h / 7d / 30d",
+                      so the percentages sat under the wrong labels. */}
+                  <th>{t("checks")} 24h</th>
+                  <th>24h %</th>
+                  <th>7d %</th>
                 </tr>
               </thead>
               <tbody>
