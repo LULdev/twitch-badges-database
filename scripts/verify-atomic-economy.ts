@@ -30,6 +30,14 @@ async function main() {
   const profile = profiles[0];
   console.log("test profile:", profile.username, profile.id);
 
+  // getProgress upserts a row when none exists, so a member without one would
+  // be left with a zero row by this test. Remember which case it is.
+  const { data: existed } = await supabase
+    .from("user_progress")
+    .select("user_id")
+    .eq("user_id", profile.id)
+    .maybeSingle();
+  const rowExisted = Boolean(existed);
   const snapshot = await getProgress(profile.id);
   const eventHigh = Number(
     (
@@ -237,6 +245,9 @@ async function main() {
       .from("activity_events")
       .delete()
       .gt("id", eventHigh)
+      // Scoped to the test user: without this, any OTHER member's feed row that
+      // happened to be written during the run was destroyed too.
+      .eq("user_id", profile.id)
       .select("id");
     const { data: achievementRows } = await supabase
       .from("user_achievements")
@@ -245,6 +256,12 @@ async function main() {
       .gt("unlocked_at", achievementHigh)
       .select("achievement_id");
 
+    if (!rowExisted) {
+      await supabase
+        .from("user_progress")
+        .delete()
+        .eq("user_id", profile.id);
+    }
     const restored = await getProgress(profile.id);
     const exact =
       Number(restored.xp) === Number(snapshot.xp) &&
