@@ -185,14 +185,25 @@ export async function attemptSteal(
   // players earned in the meantime — and the counters move in one statement
   // for the same reason. Their errors are inspected: the round used to report
   // success while games_won/coins_won or the counter stayed behind.
-  const balance = await bumpCoins(thiefId, -settings.price + stolen);
-
-  // The victim receives the attempt cost on BOTH outcomes — that is what the
-  // comment (and the anti-abuse design) means: paying to harass has to benefit
+  // Both balances move in ONE statement: as two `add_coins` calls an error
+  // between them left the transfer half-applied while the flood window was
+  // already consumed. The victim receives the attempt cost on BOTH outcomes —
+  // that is what the anti-abuse design means: paying to harass has to benefit
   // the target. Only giving it back on a failure removed `price` from the
   // economy on every successful heist, a deflationary sink the victim sized
   // themselves via `steal_price`.
-  await bumpCoins(victimProfile.id, -stolen + settings.price);
+  const transferred = await supabase.rpc("apply_pair_deltas", {
+    p_a: thiefId,
+    p_a_delta: -settings.price + stolen,
+    p_b: victimProfile.id,
+    p_b_delta: -stolen + settings.price,
+  });
+  if (transferred.error) throw transferred.error;
+  const pairRow = Array.isArray(transferred.data) ? transferred.data[0] : transferred.data;
+  const balance = Number(
+    (pairRow as { a_coins?: number } | null)?.a_coins ??
+      Math.max(0, thief.coins - settings.price + stolen),
+  );
 
   // Counters move only after BOTH coin moves. Throwing in between used to leave
   // the transfer half-applied — the thief charged, the victim not credited —
@@ -238,6 +249,31 @@ export async function attemptSteal(
   return { ok: true, success, stolen, cost: settings.price, chance, balance };
 }
 
+/**
+ * Drop coin-rain gate rows older than the retention window. Only today's rows
+ * are ever consulted (the primary key includes the UTC day), so anything older
+ * is dead weight that would otherwise grow by one row per (profile, giver, day)
+ * forever.
+ */
+export async function prunedCoinRainGate(olderThanDays = 7): Promise<number> {
+  try {
+    const supabase = createAdminClient();
+    const cutoff = new Date(Date.now() - olderThanDays * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    const { data, error } = await supabase
+      .from("coin_rain_gate")
+      .delete()
+      .lt("day", cutoff)
+      .select("day");
+    if (error) throw error;
+    return data?.length ?? 0;
+  } catch (error) {
+    console.warn("[coin-rain] gate prune failed:", error);
+    return 0;
+  }
+}
+
 /** Coin rain easter egg: a visitor gifts the profile owner 1 coin (once/day). */
 export async function coinRain(
   giverId: string | null,
@@ -251,9 +287,9 @@ export async function coinRain(
 ): Promise<{ ok: boolean; already?: boolean }> {
   const supabase = createAdminClient();
 
-  // The id arrives from the client — verify it is a real profile before it
-  // reaches getProgress(), which would try to upsert user_progress against the
-  // foreign key and turn a bad request into a 500.
+  // The id arrives from the client — verify it is a real profile before the
+  // gate insert below, whose foreign key would otherwise turn a bad request into
+  // a 500.
   const { data: ownerProfile } = await supabase
     .from("profiles")
     .select("id")
@@ -275,6 +311,11 @@ export async function coinRain(
   // public-read.
   const day = new Date().toISOString().slice(0, 10);
   const giverKey = giverId ?? anonymousKey ?? "anonymous";
+  // The owner must have a progress row before the coin is added: add_coins is a
+  // silent zero-row no-op without one, so the gate row was consumed and the
+  // client was told ok:true for a coin that never existed — and the retry then
+  // answered already:true.
+  await ensureProgress(profileOwnerId);
   const { error: gateError } = await supabase
     .from("coin_rain_gate")
     .insert({ owner_id: profileOwnerId, giver_key: giverKey, day });

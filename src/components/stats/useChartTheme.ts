@@ -37,7 +37,7 @@ export function useChartTheme(): ChartTheme {
   const [theme, setTheme] = useState<ChartTheme>(FALLBACK);
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
+    const readTheme = () => {
       const styles = getComputedStyle(document.documentElement);
       const read = (name: string, fallback: string) =>
         styles.getPropertyValue(name).trim() || fallback;
@@ -52,8 +52,24 @@ export function useChartTheme(): ChartTheme {
         surface2: read("--surface-2", FALLBACK.surface2),
         foreground: read("--foreground", FALLBACK.foreground),
       });
+    };
+
+    // Reading the tokens needs the DOM, so the first pass waits a frame (the
+    // React Compiler lint rules forbid a synchronous setState in an effect
+    // body). The observer is what makes the hook's promise true: the theme
+    // toggle only swaps a class on <html>, which no React state would notice.
+    const frame = requestAnimationFrame(readTheme);
+    const observer = new MutationObserver((records) => {
+      if (records.some((r) => r.attributeName === "class")) readTheme();
     });
-    return () => cancelAnimationFrame(frame);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
   }, []);
 
   return theme;

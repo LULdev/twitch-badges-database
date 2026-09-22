@@ -64,7 +64,6 @@ export default async function ProfilePage({ params }: PageProps) {
   const { locale, username } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("profile");
-  const tc = await getTranslations("common");
   const ti = await getTranslations("inventory");
 
   let profile: ProfileRow | null = null;
@@ -315,7 +314,7 @@ export default async function ProfilePage({ params }: PageProps) {
             </a>
             <ShareButtons
               path={`/${locale}/profile/${handle}`}
-              title={`${displayName} — ${tc("viewAll")}`}
+              title={t("shareTitle", { name: displayName })}
             />
             {profile && !isOwn && <CoinRainButton profileId={profile.id} />}
           </div>

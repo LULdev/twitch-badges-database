@@ -335,11 +335,22 @@ export default async function StatsPage({
   };
   const sourceLabel = (id: string) => SOURCE_LABELS[id] ?? t("sourceOther");
 
-  const uptimeSources = uptime.sources.map((source) => ({
-    ...source,
-    rate24h: source.checks_24h > 0 ? (source.ok_24h / source.checks_24h) * 100 : null,
-    rate7d: source.checks_7d > 0 ? (source.ok_7d / source.checks_7d) * 100 : null,
-  }));
+  // The raw `source` id is destructured away on purpose: it keys the aggregation
+  // upstream, but on a public page it otherwise survives in the serialized
+  // payload (it did, as the row key) even after the visible cell became a
+  // neutral label. Every other field is passed through untouched.
+  const uptimeSources = uptime.sources.map((entry, index) => {
+    const { source: rawId, ...rest } = entry;
+    void rawId;
+    return {
+      ...rest,
+      key: `${index}-${sourceLabel(entry.source)}`,
+      label: sourceLabel(entry.source),
+      rate24h:
+        entry.checks_24h > 0 ? (entry.ok_24h / entry.checks_24h) * 100 : null,
+      rate7d: entry.checks_7d > 0 ? (entry.ok_7d / entry.checks_7d) * 100 : null,
+    };
+  });
 
   const calendarCells = (() => {
     const byDay = new Map<
@@ -1024,9 +1035,9 @@ export default async function StatsPage({
                   </tr>
                 ) : (
                   uptimeSources.map((source) => (
-                    <tr key={source.source}>
+                    <tr key={source.key}>
                       <td className="text-[11px] font-semibold">
-                        {sourceLabel(source.source)}
+                        {source.label}
                       </td>
                       <td className="text-muted">{relativeTime(source.last_at, locale)}</td>
                       <td>

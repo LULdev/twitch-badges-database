@@ -81,7 +81,9 @@
     "filterPrice": "가격 필터",
     "errorTitle": "문제가 발생했습니다",
     "errorBody": "페이지를 불러올 수 없습니다. 대개 일시적인 문제이니 다시 시도해 주세요.",
-    "errorRetry": "다시 시도"
+    "errorRetry": "다시 시도",
+    "levelAria": "레벨 {level}",
+    "streakDay": "{streak}일차"
   },
   "home": {
     "heroTitle": "모든 Twitch 배지를 하나의 데이터베이스에서.",
@@ -227,7 +229,8 @@
     "title": "배지 컬렉션",
     "twitchSince": "Twitch 시작일",
     "viewOnTwitch": "Twitch에서 보기",
-    "views": "조회"
+    "views": "조회",
+    "shareTitle": "{name} — 배지 컬렉션"
   },
   "inventory": {
     "title": "내 배지",

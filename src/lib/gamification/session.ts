@@ -32,10 +32,23 @@ function clientIp(headersLike: { get(name: string): string | null }): string {
   return parts.length > 0 ? parts[parts.length - 1] : "unknown";
 }
 
-/** Stable pseudonymous visitor hash from the client IP. */
+/**
+ * Stable pseudonymous visitor hash from the client IP.
+ *
+ * The salt must be secret: with a public value the hash is reversible by brute
+ * force, because the whole IPv4 space is small enough to enumerate. Every caller
+ * of this runs server-side, so a server-only secret is used — a dedicated
+ * IP_HASH_SALT when configured, otherwise the service-role key, which is never
+ * exposed to the browser. Rotating it only resets the dedup windows.
+ */
 function hashIp(ip: string): string {
+  const salt =
+    process.env.IP_HASH_SALT ??
+    process.env.SUPABASE_SERVICE_ROLE_KEY ??
+    process.env.CRON_SECRET ??
+    "tbd";
   return createHash("sha256")
-    .update(`${ip}:${process.env.NEXT_PUBLIC_SUPABASE_URL ?? "tbd"}`)
+    .update(`${ip}:${salt}`)
     .digest("hex")
     .slice(0, 40);
 }

@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { levelTheme } from "@/lib/gamification/levels";
 
 /**
@@ -11,6 +12,7 @@ export default function LevelBadge({
   level: number;
   size?: number;
 }) {
+  const t = useTranslations("common");
   const theme = levelTheme(level);
   return (
     <span
@@ -22,7 +24,7 @@ export default function LevelBadge({
         ["--level-halo" as string]: theme.halo,
       }}
       role="img"
-      aria-label={`Level ${level}`}
+      aria-label={t("levelAria", { level })}
     >
       <svg viewBox="0 0 64 64" className="absolute inset-0 size-full drop-shadow-[0_0_8px_var(--level-halo)]">
         <defs>

@@ -81,7 +81,9 @@
     "filterPrice": "تصفية السعر",
     "errorTitle": "حدث خطأ ما",
     "errorBody": "تعذّر تحميل الصفحة. غالبًا ما يكون ذلك مؤقتًا — يُرجى المحاولة مرة أخرى.",
-    "errorRetry": "إعادة المحاولة"
+    "errorRetry": "إعادة المحاولة",
+    "levelAria": "المستوى {level}",
+    "streakDay": "اليوم {streak}"
   },
   "home": {
     "heroTitle": "كل شارات Twitch. قاعدة بيانات واحدة.",
@@ -227,7 +229,8 @@
     "title": "مجموعة الشارات",
     "twitchSince": "على Twitch منذ",
     "viewOnTwitch": "عرض على Twitch",
-    "views": "مشاهدة"
+    "views": "مشاهدة",
+    "shareTitle": "{name} — مجموعة الشارات"
   },
   "inventory": {
     "title": "شاراتي",

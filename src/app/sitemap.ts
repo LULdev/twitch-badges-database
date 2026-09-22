@@ -31,24 +31,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // lastModified of the static pages. `new Date()` per entry made every URL
   // claim it had just changed on every revalidation, which search engines learn
   // to ignore.
-  let badges: Array<{ slug: string; updated_at: string }> = [];
-  let posts: Array<{ slug: string; updated_at: string }> = [];
+  const badges: Array<{ slug: string; updated_at: string }> = [];
+  const posts: Array<{ slug: string; updated_at: string }> = [];
   try {
     const supabase = createAdminClient();
-    const [badgeRes, postRes] = await Promise.all([
-      supabase
+    // Paged, because PostgREST caps a response at 1000 rows regardless of the
+    // requested limit — a single request silently dropped everything past 1000.
+    const PAGE = 1000;
+    for (let offset = 0; ; offset += PAGE) {
+      const { data, error } = await supabase
         .from("badges")
         .select("slug, updated_at")
         .neq("status", "removed")
-        .limit(3000),
-      supabase
+        .range(offset, offset + PAGE - 1);
+      if (error) throw error;
+      badges.push(...((data ?? []) as typeof badges));
+      if (!data || data.length < PAGE) break;
+    }
+    for (let offset = 0; ; offset += PAGE) {
+      const { data, error } = await supabase
         .from("blog_posts")
         .select("slug, updated_at")
         .eq("status", "published")
-        .limit(1000),
-    ]);
-    badges = (badgeRes.data ?? []) as typeof badges;
-    posts = (postRes.data ?? []) as typeof posts;
+        .range(offset, offset + PAGE - 1);
+      if (error) throw error;
+      posts.push(...((data ?? []) as typeof posts));
+      if (!data || data.length < PAGE) break;
+    }
   } catch {
     // DB unavailable — static entries only, with no lastModified claim
   }

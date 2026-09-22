@@ -93,6 +93,21 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     if (uuid) incomingUuids.add(uuid);
   }
 
+  // A provider incident must not read as a mass deletion. The sweep below marks
+  // every badge missing from the live catalog as removed, so an empty or
+  // truncated feed — a 200 with no payload, a changed response shape — used to
+  // wipe the whole catalog while the heartbeat still reported ok. Refuse before
+  // anything is written and fail loudly instead.
+  const MIN_INCOMING = 50;
+  const suspicious =
+    incoming.length < MIN_INCOMING ||
+    (existing.size > 20 && incoming.length < existing.size * 0.5);
+  if (suspicious) {
+    throw new Error(
+      `catalog feed returned ${incoming.length} badges against ${existing.size} known — refusing to sweep, treating this as a provider incident`,
+    );
+  }
+
   const addedTitles: string[] = [];
   // The slugs inserted by THIS run. Re-selecting by set_id matched the whole
   // live catalog, so the "newest N+10" rows were handed to the badge_events

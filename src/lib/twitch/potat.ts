@@ -90,7 +90,7 @@ export async function fetchAllDistribution(): Promise<PotatBadgeDistribution[]> 
   // floor; fail loudly rather than feed a silently truncated catalog to the
   // sync (the missing badges would keep stale/null owner counts).
   if (cursor) {
-    throw new Error("potat distribution exceeded 50 pages — refusing to truncate");
+    throw new Error("owner-statistics distribution exceeded 50 pages — refusing to truncate");
   }
   return all;
 }
@@ -114,7 +114,7 @@ export async function fetchAllOwners(): Promise<PotatBadgeOwners[]> {
     if (!cursor) break;
   }
   if (cursor) {
-    throw new Error("potat owners exceeded 50 pages — refusing to truncate");
+    throw new Error("owner-statistics feed exceeded 50 pages — refusing to truncate");
   }
   return all;
 }

@@ -10,9 +10,12 @@ export default function VaultGame() {
   const [angles, setAngles] = useState([0, 0, 0]);
   const [matches, setMatches] = useState(0);
   const raf = useRef<number>(0);
-  // Blocks a second click from advancing another dial (and from paying a
-  // second round) before the phase transition has been applied.
-  const stopping = useRef(false);
+  // Which dial has already been stopped. A plain boolean was reset only in
+  // start(), so after dial 1 every later Stop returned at the guard: dials 2 and
+  // 3 could never be stopped, play() never ran, no "play again" appeared and a
+  // reload was the only way out. Tracking the dial itself keeps the double-click
+  // protection per dial.
+  const stoppedDial = useRef(-1);
   const dialIndex = phase === "dial1" ? 0 : phase === "dial2" ? 1 : phase === "dial3" ? 2 : -1;
 
   useEffect(() => {
@@ -50,8 +53,8 @@ export default function VaultGame() {
   }
 
   function stop() {
-    if (stopping.current || dialIndex < 0) return;
-    stopping.current = true;
+    if (dialIndex < 0 || stoppedDial.current === dialIndex) return;
+    stoppedDial.current = dialIndex;
     cancelAnimationFrame(raf.current);
     const hit = inZone(dialIndex);
     const newMatches = matches + (hit ? 1 : 0);
@@ -62,7 +65,7 @@ export default function VaultGame() {
   }
 
   function start() {
-    stopping.current = false;
+    stoppedDial.current = -1;
     setMatches(0);
     setAngles([0, 0, 0]);
     setPhase("dial1");

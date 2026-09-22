@@ -81,7 +81,9 @@
     "filterPrice": "价格筛选",
     "errorTitle": "出错了",
     "errorBody": "页面无法加载。通常是暂时性的，请重试。",
-    "errorRetry": "重试"
+    "errorRetry": "重试",
+    "levelAria": "等级 {level}",
+    "streakDay": "第 {streak} 天"
   },
   "home": {
     "heroTitle": "所有 Twitch 徽章，尽在一个数据库。",
@@ -227,7 +229,8 @@
     "title": "徽章收藏",
     "twitchSince": "Twitch 注册于",
     "viewOnTwitch": "在 Twitch 上查看",
-    "views": "浏览"
+    "views": "浏览",
+    "shareTitle": "{name} — 徽章收藏"
   },
   "inventory": {
     "title": "我的徽章",

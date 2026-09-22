@@ -81,7 +81,9 @@
     "filterPrice": "Filtro prezzo",
     "errorTitle": "Qualcosa è andato storto",
     "errorBody": "Non è stato possibile caricare la pagina. Di solito è temporaneo: riprova.",
-    "errorRetry": "Riprova"
+    "errorRetry": "Riprova",
+    "levelAria": "Livello {level}",
+    "streakDay": "Giorno {streak}"
   },
   "home": {
     "heroTitle": "Tutti i badge Twitch. Un solo database.",
@@ -227,7 +229,8 @@
     "title": "Collezione di badge",
     "twitchSince": "Su Twitch dal",
     "viewOnTwitch": "Vedi su Twitch",
-    "views": "visite"
+    "views": "visite",
+    "shareTitle": "{name} — collezione di badge"
   },
   "inventory": {
     "title": "I miei badge",

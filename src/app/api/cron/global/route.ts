@@ -2,6 +2,7 @@ import { isAuthorizedCron } from "@/lib/cron-auth";
 import { runGlobalSync } from "@/lib/syncs/global";
 import { runBadgebaseSync } from "@/lib/syncs/badgebase";
 import { pruneHeartbeats, recordHeartbeat, withHeartbeat } from "@/lib/health";
+import { prunedCoinRainGate } from "@/lib/gamification/daily";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -50,16 +51,20 @@ export async function GET(request: Request) {
     badgebaseError = error instanceof Error ? error.message : "failed";
   }
 
-  // Daily housekeeping: keep the heartbeat table bounded.
+  // Daily housekeeping: keep the heartbeat table bounded. The coin-rain gate
+  // only ever consults today's rows, so anything older is dead weight.
   const pruned = await pruneHeartbeats(90);
+  const prunedRainGate = await prunedCoinRainGate().catch(() => 0);
 
   const durationMs = Date.now() - started;
   await recordHeartbeat({
     source: "cron/global",
     status: badgebaseFailed ? "degraded" : "ok",
     durationMs,
-    message: badgebaseFailed ? (badgebaseError ?? "badgebase enrichment failed") : null,
-    payload: { prunedHeartbeats: pruned, badgebaseFailed },
+    message: badgebaseFailed
+      ? (badgebaseError ?? "drop-window enrichment failed")
+      : null,
+    payload: { prunedHeartbeats: pruned, prunedRainGate, badgebaseFailed },
   });
 
   // 207 signals a partial success: the catalog diff succeeded but the
@@ -72,5 +77,6 @@ export async function GET(request: Request) {
     badgebaseFailed,
     durationMs,
     pruned,
+    prunedRainGate,
   }, { status: badgebaseFailed ? 207 : 200 });
 }

@@ -81,7 +81,9 @@
     "filterPrice": "価格絞り込み",
     "errorTitle": "問題が発生しました",
     "errorBody": "ページを読み込めませんでした。多くは一時的なものです。もう一度お試しください。",
-    "errorRetry": "再試行"
+    "errorRetry": "再試行",
+    "levelAria": "レベル {level}",
+    "streakDay": "{streak} 日目"
   },
   "home": {
     "heroTitle": "Twitchの全バッジを、一つのデータベースに。",
@@ -227,7 +229,8 @@
     "title": "バッジコレクション",
     "twitchSince": "Twitch歴",
     "viewOnTwitch": "Twitchで見る",
-    "views": "閲覧"
+    "views": "閲覧",
+    "shareTitle": "{name} — バッジコレクション"
   },
   "inventory": {
     "title": "マイバッジ",

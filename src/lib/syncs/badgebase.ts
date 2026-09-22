@@ -69,6 +69,15 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
     fetchBadgebaseListing("/active"),
     fetchBadgebaseListing("/upcoming/"),
   ]);
+  // The /active listing is the authority for "currently redeemable". An empty
+  // listing — a provider hiccup, not a real state of the world — would clear
+  // is_confirmed_active on every row and demote every dateless badge to expired.
+  if (activeCards.length === 0) {
+    throw new Error(
+      "drop-window listing is empty — refusing to clear confirmations and demote badges",
+    );
+  }
+
   const cards = [...activeCards, ...upcomingCards].filter(
     (card) => !isStatusSetId(card.slug),
   );
@@ -272,7 +281,7 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
   await logChange(
     {
       kind: "data_sync",
-      title: "Badgebase listing sync completed",
+      title: "Drop-window listing sync completed",
       body: `${activeCards.length} active + ${upcomingCards.length} upcoming cards processed, ${enriched} badges enriched, ${inserted} new badges inserted, ${demotedToExpired} badges demoted to expired, ${errors} detail fetch errors.`,
       payload: {
         activeCards: activeCards.length,

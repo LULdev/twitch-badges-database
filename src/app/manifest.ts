@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Badges DB",
     description:
       "Track every global Twitch badge: live drops, countdown timers, rarity and leaderboards.",
-    start_url: "/en",
+    start_url: "/",
     display: "standalone",
     background_color: "#0b0b11",
     theme_color: "#a970ff",

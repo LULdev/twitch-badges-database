@@ -81,7 +81,9 @@
     "filterPrice": "Price filter",
     "errorTitle": "Something went wrong",
     "errorBody": "The page could not be loaded. This is usually temporary — please try again.",
-    "errorRetry": "Try again"
+    "errorRetry": "Try again",
+    "levelAria": "Level {level}",
+    "streakDay": "Day {streak}"
   },
   "home": {
     "heroTitle": "Every Twitch badge. One database.",
@@ -227,7 +229,8 @@
     "title": "Badge collection",
     "twitchSince": "On Twitch since",
     "viewOnTwitch": "View on Twitch",
-    "views": "views"
+    "views": "views",
+    "shareTitle": "{name} — badge collection"
   },
   "inventory": {
     "title": "My badges",

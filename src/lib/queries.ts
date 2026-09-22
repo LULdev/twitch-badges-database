@@ -276,13 +276,16 @@ export async function getBadgeStatsHistory(
   limit = 250,
 ): Promise<StatsPoint[]> {
   const supabase = await createClient();
+  // Newest-first for the limit, then reversed for the chart: ordering ascending
+  // took the OLDEST 250 points, so a badge with a longer history showed a chart
+  // that stopped updating weeks ago.
   const { data } = await supabase
     .from("badge_stats")
     .select("polled_at, owner_count, active_count")
     .eq("badge_id", badgeId)
-    .order("polled_at", { ascending: true })
+    .order("polled_at", { ascending: false })
     .limit(limit);
-  return (data ?? []) as StatsPoint[];
+  return ((data ?? []) as StatsPoint[]).reverse();
 }
 
 export interface HomeData {

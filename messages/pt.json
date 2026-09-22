@@ -81,7 +81,9 @@
     "filterPrice": "Filtro de preço",
     "errorTitle": "Algo deu errado",
     "errorBody": "Não foi possível carregar a página. Normalmente é temporário — tente novamente.",
-    "errorRetry": "Tentar novamente"
+    "errorRetry": "Tentar novamente",
+    "levelAria": "Nível {level}",
+    "streakDay": "Dia {streak}"
   },
   "home": {
     "heroTitle": "Todas as insígnias da Twitch. Um só banco de dados.",
@@ -227,7 +229,8 @@
     "title": "Coleção de insígnias",
     "twitchSince": "Na Twitch desde",
     "viewOnTwitch": "Ver na Twitch",
-    "views": "visitas"
+    "views": "visitas",
+    "shareTitle": "{name} — coleção de selos"
   },
   "inventory": {
     "title": "Minhas insígnias",

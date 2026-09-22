@@ -50,7 +50,11 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
       .then((rows) => ({ ok: true as const, rows }))
       .catch(() => ({ ok: false as const, rows: [] })),
   ]);
-  const ownersOk = ownersResult.ok;
+  // A feed that RESOLVES with an empty list is as uninformative as one that
+  // throws: `ownersByBadge` would be empty and every lookup below would fall
+  // through to null, wiping all owner counts. Treating it as a failure keeps the
+  // stored numbers and reports ownersFeedOk=false.
+  const ownersOk = ownersResult.ok && ownersResult.rows.length > 0;
 
   // Unlike the owners feed, the distribution feed drives every derived value
   // this sync writes, so a failed or truncated one must not reach the writes at

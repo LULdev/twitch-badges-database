@@ -102,7 +102,6 @@ export default function MemoryGame() {
                     ? "border-accent bg-accent-soft"
                     : "border-line bg-surface-3"
               }`}
-              style={{ transform: card.flipped || card.matched ? "rotateY(0deg)" : "rotateY(0deg)" }}
             >
               {card.flipped || card.matched ? (
                 card.image ? (

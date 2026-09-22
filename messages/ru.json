@@ -81,7 +81,9 @@
     "filterPrice": "Фильтр по цене",
     "errorTitle": "Что-то пошло не так",
     "errorBody": "Не удалось загрузить страницу. Обычно это временно — попробуйте снова.",
-    "errorRetry": "Повторить"
+    "errorRetry": "Повторить",
+    "levelAria": "Уровень {level}",
+    "streakDay": "День {streak}"
   },
   "home": {
     "heroTitle": "Все значки Twitch. Одна база данных.",
@@ -227,7 +229,8 @@
     "title": "Коллекция значков",
     "twitchSince": "В Twitch с",
     "viewOnTwitch": "Открыть на Twitch",
-    "views": "просм."
+    "views": "просм.",
+    "shareTitle": "{name} — коллекция значков"
   },
   "inventory": {
     "title": "Мои значки",

@@ -81,7 +81,9 @@
     "filterPrice": "Preis-Filter",
     "errorTitle": "Etwas ist schiefgelaufen",
     "errorBody": "Die Seite konnte nicht geladen werden. Das ist meist vorübergehend — bitte versuche es erneut.",
-    "errorRetry": "Erneut versuchen"
+    "errorRetry": "Erneut versuchen",
+    "levelAria": "Level {level}",
+    "streakDay": "Tag {streak}"
   },
   "home": {
     "heroTitle": "Alle Twitch-Badges. Eine Datenbank.",
@@ -227,7 +229,8 @@
     "title": "Badge-Sammlung",
     "twitchSince": "Auf Twitch seit",
     "viewOnTwitch": "Auf Twitch ansehen",
-    "views": "Aufrufe"
+    "views": "Aufrufe",
+    "shareTitle": "{name} — Badge-Sammlung"
   },
   "inventory": {
     "title": "Meine Badges",

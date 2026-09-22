@@ -43,7 +43,7 @@ export default function DailyClaim({ compact = false }: { compact?: boolean }) {
         onClick={claim}
         disabled={state === "busy" || state === "done" || state === "already"}
         className={`btn text-xs ${state === "done" ? "btn-secondary" : "btn-primary"}`}
-        title={reward ? `+${reward.xp} XP · Tag ${reward.streak}` : undefined}
+        title={reward ? `+${reward.xp} XP · ${t("streakDay", { streak: reward.streak })}` : undefined}
       >
         {state === "done"
           ? `✓ ${t("dailyDone")}`

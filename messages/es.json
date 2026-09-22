@@ -81,7 +81,9 @@
     "filterPrice": "Filtro de precio",
     "errorTitle": "Algo ha salido mal",
     "errorBody": "No se pudo cargar la página. Suele ser temporal: inténtalo de nuevo.",
-    "errorRetry": "Reintentar"
+    "errorRetry": "Reintentar",
+    "levelAria": "Nivel {level}",
+    "streakDay": "Día {streak}"
   },
   "home": {
     "heroTitle": "Todas las insignias de Twitch. Una sola base de datos.",
@@ -227,7 +229,8 @@
     "title": "Colección de insignias",
     "twitchSince": "En Twitch desde",
     "viewOnTwitch": "Ver en Twitch",
-    "views": "visitas"
+    "views": "visitas",
+    "shareTitle": "{name} — colección de insignias"
   },
   "inventory": {
     "title": "Mis insignias",

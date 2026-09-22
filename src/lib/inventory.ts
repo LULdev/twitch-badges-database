@@ -23,19 +23,33 @@ export async function syncUserInventory(
   const supabase = createAdminClient();
   const perfil = await fetchUserBadges(username, 0);
 
-  const { data: catalog, error: catalogError } = await supabase
-    .from("badges")
-    .select("id,set_id,version")
-    .neq("status", "removed");
-  if (catalogError) throw catalogError;
-
+  // Paged: PostgREST returns at most 1000 rows per request, so a single select
+  // would silently stop matching badges beyond that and report them as
+  // unmatched ("not owned").
+  const PAGE = 1000;
   const byKey = new Map<string, string>();
-  for (const row of (catalog ?? []) as Array<{
-    id: string;
-    set_id: string;
-    version: string;
-  }>) {
-    byKey.set(`${row.set_id}:${row.version}`, row.id);
+  // The rows themselves are kept too: the badge-unlock reward path below needs
+  // id/slug/title, and re-querying them would double the round trips.
+  const catalog: Array<{ id: string; slug: string; title: string }> = [];
+  for (let offset = 0; ; offset += PAGE) {
+    const { data, error } = await supabase
+      .from("badges")
+      .select("id,set_id,version,slug,title")
+      .neq("status", "removed")
+      .range(offset, offset + PAGE - 1);
+    if (error) throw error;
+    const page = (data ?? []) as Array<{
+      id: string;
+      set_id: string;
+      version: string;
+      slug: string;
+      title: string;
+    }>;
+    for (const row of page) {
+      byKey.set(`${row.set_id}:${row.version}`, row.id);
+      catalog.push({ id: row.id, slug: row.slug, title: row.title });
+    }
+    if (page.length < PAGE) break;
   }
 
   const ownedIds = new Set<string>();
@@ -96,7 +110,7 @@ export async function syncUserInventory(
   // one public feed entry each (aggregated into a single progress update).
   if (toAdd.length > 0) {
     const { award, logActivity } = await import("./gamification/xp");
-    const catalogRows = (catalog ?? []) as unknown as Array<{ id: string; slug: string; title: string }>;
+    const catalogRows = catalog;
     const addedBadges = catalogRows.filter((row) => toAdd.includes(row.id));
     for (const badge of addedBadges) {
       await logActivity({
