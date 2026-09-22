@@ -30,7 +30,9 @@
     "achievementsNav": "Errungenschaften",
     "feedNav": "Live-Feed",
     "faqNav": "FAQ",
-    "wheel": "Glücksrad"
+    "wheel": "Glücksrad",
+    "mainNav": "Hauptnavigation",
+    "mobileNav": "Mobile Navigation"
   },
   "common": {
     "search": "Badges suchen…",
@@ -237,7 +239,8 @@
     "progress": "{owned} von {total} Katalog-Badges besessen ({percent} %)",
     "emptyOwned": "Noch keine Badges synchronisiert.",
     "emptyMissing": "Es fehlt nichts — unglaublich!",
-    "channelNote": "Kanal-spezifische Badges (z. B. deine eigenen Abonnenten-Stufen) werden gezählt, gehören aber nicht zum globalen Katalog."
+    "channelNote": "Kanal-spezifische Badges (z. B. deine eigenen Abonnenten-Stufen) werden gezählt, gehören aber nicht zum globalen Katalog.",
+    "moreHidden": "+{count} weitere — nach Seltenheit sortiert"
   },
   "blog": {
     "title": "Twitch Badge Blog",

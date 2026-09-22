@@ -30,7 +30,9 @@
     "achievementsNav": "업적",
     "feedNav": "실시간 피드",
     "faqNav": "FAQ",
-    "wheel": "운명의 수레바퀴"
+    "wheel": "운명의 수레바퀴",
+    "mainNav": "주요 메뉴",
+    "mobileNav": "모바일 메뉴"
   },
   "common": {
     "search": "배지 검색…",
@@ -237,7 +239,8 @@
     "progress": "카탈로그 {total}개 중 {owned}개 소유({percent}%)",
     "emptyOwned": "아직 동기화된 배지가 없습니다.",
     "emptyMissing": "부족한 배지가 없습니다 — 대단해요!",
-    "channelNote": "채널 전용 배지(예: 내 구독자 등급)는 집계되지만 전역 카탈로그에는 포함되지 않습니다."
+    "channelNote": "채널 전용 배지(예: 내 구독자 등급)는 집계되지만 전역 카탈로그에는 포함되지 않습니다.",
+    "moreHidden": "+{count}개 더 — 희귀도순"
   },
   "blog": {
     "title": "Twitch 배지 블로그",

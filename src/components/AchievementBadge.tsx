@@ -27,8 +27,14 @@ export default function AchievementBadge({
         width: size,
         height: size,
         borderColor: style.ring,
-        boxShadow: `0 0 10px ${style.ring}55, inset 0 0 8px ${style.ring}22`,
-        background: `radial-gradient(circle at 30% 25%, ${style.ring}33, transparent 70%)`,
+        // The special tier draws its own conic ring and pulse in CSS; an inline
+        // background here overrode that, so every special badge looked plain.
+        ...(category === "special"
+          ? {}
+          : {
+              boxShadow: `0 0 10px ${style.ring}55, inset 0 0 8px ${style.ring}22`,
+              background: `radial-gradient(circle at 30% 25%, ${style.ring}33, transparent 70%)`,
+            }),
       }}
       title={title}
       role="img"

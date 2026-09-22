@@ -66,7 +66,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
           <span className="hidden text-sm sm:inline">Twitch Badges DB</span>
         </Link>
 
-        <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Main">
+        <nav className="hidden items-center gap-0.5 xl:flex" aria-label={t("mainNav")}>
           {links.map((link) => (
             <Link
               key={link.href}
@@ -184,7 +184,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
       {menuOpen && (
         <nav
           className="border-t border-line bg-surface px-4 py-3 xl:hidden"
-          aria-label="Mobile"
+          aria-label={t("mobileNav")}
         >
           <div className="grid grid-cols-2 gap-1">
             {links.map((link) => (

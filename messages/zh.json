@@ -30,7 +30,9 @@
     "achievementsNav": "成就",
     "feedNav": "实时动态",
     "faqNav": "FAQ",
-    "wheel": "命运转盘"
+    "wheel": "命运转盘",
+    "mainNav": "主导航",
+    "mobileNav": "移动端导航"
   },
   "common": {
     "search": "搜索徽章…",
@@ -237,7 +239,8 @@
     "progress": "已拥有目录中 {total} 个徽章中的 {owned} 个（{percent}%）",
     "emptyOwned": "尚未同步任何徽章。",
     "emptyMissing": "一个不缺——太惊人了！",
-    "channelNote": "频道专属徽章（例如你自己的订阅等级）会被计数，但不属于全球目录。"
+    "channelNote": "频道专属徽章（例如你自己的订阅等级）会被计数，但不属于全球目录。",
+    "moreHidden": "还有 {count} 枚——按稀有度排序"
   },
   "blog": {
     "title": "Twitch 徽章博客",

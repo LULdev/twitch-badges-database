@@ -30,7 +30,9 @@
     "achievementsNav": "Achievements",
     "feedNav": "Live Feed",
     "faqNav": "FAQ",
-    "wheel": "Wheel of Fortune"
+    "wheel": "Wheel of Fortune",
+    "mainNav": "Main navigation",
+    "mobileNav": "Mobile navigation"
   },
   "common": {
     "search": "Search badges…",
@@ -237,7 +239,8 @@
     "progress": "{owned} of {total} catalog badges owned ({percent}%)",
     "emptyOwned": "No badges synced yet.",
     "emptyMissing": "Nothing missing — incredible!",
-    "channelNote": "Channel-specific badges (e.g. your own subscriber tiers) are counted but not part of the global catalog."
+    "channelNote": "Channel-specific badges (e.g. your own subscriber tiers) are counted but not part of the global catalog.",
+    "moreHidden": "+{count} more — sorted by rarity"
   },
   "blog": {
     "title": "Twitch Badge Blog",

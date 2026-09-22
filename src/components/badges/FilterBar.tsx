@@ -95,6 +95,10 @@ export default function FilterBar({
           <input
             type="search"
             name="q"
+            // Uncontrolled on purpose (the form submits a plain GET), but keyed
+            // on the active query so clearing the filter actually empties the
+            // field instead of leaving the old text in place.
+            key={current.q}
             defaultValue={current.q}
             placeholder={t("search")}
             className="input ps-9"

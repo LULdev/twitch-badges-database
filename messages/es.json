@@ -30,7 +30,9 @@
     "achievementsNav": "Logros",
     "feedNav": "Feed en vivo",
     "faqNav": "FAQ",
-    "wheel": "Ruleta de la fortuna"
+    "wheel": "Ruleta de la fortuna",
+    "mainNav": "Navegación principal",
+    "mobileNav": "Navegación móvil"
   },
   "common": {
     "search": "Buscar insignias…",
@@ -237,7 +239,8 @@
     "progress": "{owned} de {total} insignias del catálogo obtenidas ({percent} %)",
     "emptyOwned": "Aún no hay insignias sincronizadas.",
     "emptyMissing": "No falta nada — ¡increíble!",
-    "channelNote": "Las insignias específicas de canal (p. ej., tus propios niveles de suscriptor) se cuentan, pero no forman parte del catálogo global."
+    "channelNote": "Las insignias específicas de canal (p. ej., tus propios niveles de suscriptor) se cuentan, pero no forman parte del catálogo global.",
+    "moreHidden": "+{count} más — ordenadas por rareza"
   },
   "blog": {
     "title": "Blog de insignias de Twitch",

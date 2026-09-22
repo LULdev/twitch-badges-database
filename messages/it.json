@@ -30,7 +30,9 @@
     "achievementsNav": "Obiettivi",
     "feedNav": "Feed in diretta",
     "faqNav": "FAQ",
-    "wheel": "Ruota della fortuna"
+    "wheel": "Ruota della fortuna",
+    "mainNav": "Navigazione principale",
+    "mobileNav": "Navigazione mobile"
   },
   "common": {
     "search": "Cerca badge…",
@@ -237,7 +239,8 @@
     "progress": "{owned} badge su {total} del catalogo posseduti ({percent}%)",
     "emptyOwned": "Nessun badge sincronizzato.",
     "emptyMissing": "Non manca nulla — incredibile!",
-    "channelNote": "I badge specifici del canale (es. i tuoi livelli da abbonato) vengono contati ma non fanno parte del catalogo globale."
+    "channelNote": "I badge specifici del canale (es. i tuoi livelli da abbonato) vengono contati ma non fanno parte del catalogo globale.",
+    "moreHidden": "+{count} altri — ordinati per rarità"
   },
   "blog": {
     "title": "Blog dei badge Twitch",

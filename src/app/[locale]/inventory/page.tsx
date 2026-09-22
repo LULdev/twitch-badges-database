@@ -163,8 +163,9 @@ export default async function InventoryPage({
             <BadgeGrid badges={missingBadges} showCountdown={false} />
             {totalCatalog > ownedIds.size + missingBadges.length && (
               <p className="mt-3 text-center text-xs text-muted">
-                +{totalCatalog - ownedIds.size - missingBadges.length} more —
-                sorted by rarity
+                {t("moreHidden", {
+                  count: totalCatalog - ownedIds.size - missingBadges.length,
+                })}
               </p>
             )}
           </>

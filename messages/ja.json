@@ -30,7 +30,9 @@
     "achievementsNav": "実績",
     "feedNav": "ライブフィード",
     "faqNav": "FAQ",
-    "wheel": "フォーチュンホイール"
+    "wheel": "フォーチュンホイール",
+    "mainNav": "メインナビゲーション",
+    "mobileNav": "モバイルナビゲーション"
   },
   "common": {
     "search": "バッジを検索…",
@@ -237,7 +239,8 @@
     "progress": "カタログ{total}個中{owned}個を所有（{percent}%）",
     "emptyOwned": "まだ同期されたバッジはありません。",
     "emptyMissing": "不足なし — 素晴らしい！",
-    "channelNote": "チャンネル固有のバッジ（自分のサブスクライバー段位など）はカウントされますが、グローバルカタログには含まれません。"
+    "channelNote": "チャンネル固有のバッジ（自分のサブスクライバー段位など）はカウントされますが、グローバルカタログには含まれません。",
+    "moreHidden": "ほか{count}個 — レアリティ順"
   },
   "blog": {
     "title": "Twitchバッジブログ",

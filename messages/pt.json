@@ -30,7 +30,9 @@
     "achievementsNav": "Conquistas",
     "feedNav": "Feed ao vivo",
     "faqNav": "FAQ",
-    "wheel": "Roleta da fortuna"
+    "wheel": "Roleta da fortuna",
+    "mainNav": "Navegação principal",
+    "mobileNav": "Navegação móvel"
   },
   "common": {
     "search": "Buscar insígnias…",
@@ -237,7 +239,8 @@
     "progress": "{owned} de {total} insígnias do catálogo obtidas ({percent}%)",
     "emptyOwned": "Nenhuma insígnia sincronizada ainda.",
     "emptyMissing": "Nada faltando — incrível!",
-    "channelNote": "Insígnias específicas de canal (ex.: seus próprios níveis de inscrito) são contadas, mas não fazem parte do catálogo global."
+    "channelNote": "Insígnias específicas de canal (ex.: seus próprios níveis de inscrito) são contadas, mas não fazem parte do catálogo global.",
+    "moreHidden": "+{count} mais — ordenadas por raridade"
   },
   "blog": {
     "title": "Blog de Insígnias da Twitch",

@@ -30,7 +30,9 @@
     "achievementsNav": "Succès",
     "feedNav": "Fil en direct",
     "faqNav": "FAQ",
-    "wheel": "Roue de la fortune"
+    "wheel": "Roue de la fortune",
+    "mainNav": "Navigation principale",
+    "mobileNav": "Navigation mobile"
   },
   "common": {
     "search": "Rechercher des badges…",
@@ -237,7 +239,8 @@
     "progress": "{owned} badges du catalogue sur {total} possédés ({percent} %)",
     "emptyOwned": "Aucun badge synchronisé pour le moment.",
     "emptyMissing": "Rien ne manque — incroyable !",
-    "channelNote": "Les badges spécifiques à une chaîne (ex. vos propres paliers d'abonné) sont comptés mais ne font pas partie du catalogue global."
+    "channelNote": "Les badges spécifiques à une chaîne (ex. vos propres paliers d'abonné) sont comptés mais ne font pas partie du catalogue global.",
+    "moreHidden": "+{count} de plus — triés par rareté"
   },
   "blog": {
     "title": "Blog des badges Twitch",
