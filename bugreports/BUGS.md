@@ -193,6 +193,59 @@ under `bugreports/*.mjs` so the results are reproducible.
 | `SlotsGame` interval cleanup | Cleared in the effect return |
 | 8 `setTimeout` sites flagged as "no clearTimeout" | One-shot kickoff/state-flush timers; no leak (React 19 tolerates the post-unmount call) |
 
+## Second pass — one further bug (found while re-auditing the fixes)
+
+## B12 — `getProfileByUsername` used the URL segment as a LIKE pattern
+
+- **Severity**: medium
+- **Side**: server
+- **File**: `src/lib/queries.ts:360`
+- **Evidence**: `.ilike("username", username)` with the raw path segment.
+- **Why it is a bug**: same class as B7 but on the profile route — a `%` in the
+  URL matches an arbitrary profile, and multiple matches make `maybeSingle()`
+  error so the page 404s instead of rendering.
+- **Confidence**: confirmed
+- **Fix direction**: escape `\`, `%`, `_` (applied).
+
+A third pass (`bugreports/audit-static.mjs`, `audit-i18n.mjs`, plus greps for
+`process.env[`, `.ilike(`, `alert(`, `dangerouslySetInnerHTML` and
+timer/cleanup mismatches) produced no further findings.
+
+## What was fixed
+
+| Bug | Status | Evidence |
+|---|---|---|
+| B1 translation gaps | fixed | 2081 strings across 9 locales; gap audit 111 → 22, all remaining verified as legitimate word coincidences (fr "Notifications"/"Total"/"badges", it "Database") |
+| B2 profile column escalation | fixed | migration 0006 trigger; grants unchanged |
+| B3 IP spoofing | fixed | `x-real-ip` first, last forwarded entry as fallback |
+| B4 JSON-LD escaping | fixed | `src/lib/jsonld.ts`, used by 3 pages |
+| B5 coinRain lost update + bad id | fixed | atomic `add_coins`, profile existence check |
+| B6 view_count lost update | fixed | atomic `bump_view_count` |
+| B7 LIKE wildcards (steal) | fixed | escaped pattern |
+| B8 push delete ownership | fixed | query constrained by `user_id` |
+| B9 `alert()` in PushToggle | fixed | inline `role="alert"` message |
+| B10 award() lost update | fixed | atomic `apply_xp_coins`; verified by `scripts/verify-atomic-economy.ts` (two parallel awards sum correctly, 5 concurrent view bumps = +5, account restored exactly) |
+| B11 broken `{BadgesCoins}` placeholder | fixed | `{coins}` restored in all 11 locales |
+| B12 LIKE wildcards (profile route) | fixed | escaped pattern |
+
+### Known residual, deliberately not changed
+
+- Three **message key names** still contain the word `potat`
+  (`profile.potatLevel`, `profile.potatoes`, `profile.potatSince`). They are
+  internal identifiers, their visible values are neutral, and renaming them
+  touches code — which the "text only" instruction excluded.
+- 22 translation entries equal their English value because the target word is
+  the same (French "Notifications", "Total", "badges"; Italian "Account",
+  "Database"). Verified individually, not gaps.
+- Per-user **counter** fields (`games_played`, `games_won`, `coins_won`,
+  `coins_lost`, `steals_*`, `times_robbed`, `wheel_spins`) are still written as
+  read-modify-write in a few places. The currency itself (XP, coins) and the
+  view counter are atomic now; these counters are display statistics and drift
+  only under same-user concurrency. Listed as an optimisation in
+  `IMPROVEMENTS.md`.
+- The changelog keeps its historical entries naming a vendor, because it is an
+  append-only log of what happened; only user-facing pages were cleaned.
+
 ## Coverage
 
 Scopes audited first-party (the 20 planned sub-agent scopes):
