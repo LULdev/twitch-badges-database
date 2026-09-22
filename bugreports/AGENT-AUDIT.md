@@ -611,6 +611,31 @@ one skip row per day — no de-duplication needed unless that route goes sub-dai
 catalog size of 125 — the single remaining occurrence is the narrated correction
 described above.
 
+## Round 19 — spot-fixing was the mistake, so this round searched exhaustively
+
+The round-18 agent (`verify-round18.md`) reported 1 medium and 2 low, and the
+medium one exposed the pattern behind the previous three rounds: I kept fixing
+**the instance that was reported** instead of the **class**.
+
+| ID | Finding | Fix |
+|---|---|---|
+| **v18-01 (medium)** | a **third** script writing `messages/*.json` still hardcoded the stat subtitle's old numbers. Re-running it would have recreated the exact 123-KPI / 125-subtitle contradiction v17-01 had just fixed | the values now come from the live message files. **This time I searched every script that writes the message files against every form of a hardcoded achievement count** — it was the only one left, and the Python parses |
+| v18-02 (low) | the seed template's **excerpt** still carried the old tier split (50/50/25) while its title said 123. My previous check named lines 55/59/132/135 and missed line 56 | corrected to 50/48/25 |
+| v18-03 (low) | my "changelog is clean" claim was premature **again**: six announcement titles were corrected but their bodies still asserted the old split | all six corrected; and my count was wrong — **four** rows mention 125 as narration (292, 296, 300, 301), not three |
+
+**The exhaustive sweep this round covered:** all 11 message files, every script
+that writes them, every text column of `blog_posts` (title, excerpt, content),
+`changelog` title and body, and the whole source tree — all case-insensitively,
+against every spelling of a stale count. **Nothing stale remains** except the four
+documented narration rows and one post slug that must stay for link stability.
+
+**A method note worth keeping:** three consecutive rounds found "one more place"
+carrying the same stale number, because each check was scoped to what the previous
+report had named. Searching for the *shape* of the defect (any writer of the
+message files, any text column of the row) found the remainder in one pass. The
+same applies to the checks themselves: my round-17 regex was case-sensitive and
+missed six titles.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents
