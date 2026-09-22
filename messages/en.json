@@ -76,7 +76,9 @@
     "apply": "Apply",
     "clear": "Clear",
     "empty": "Nothing here yet.",
-    "setupHint": "The catalog is empty. Run the sync scripts or wait for the next cron run to populate it."
+    "setupHint": "The catalog is empty. Run the sync scripts or wait for the next cron run to populate it.",
+    "filterStatus": "Status filter",
+    "filterPrice": "Price filter"
   },
   "home": {
     "heroTitle": "Every Twitch badge. One database.",

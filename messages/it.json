@@ -76,7 +76,9 @@
     "apply": "Applica",
     "clear": "Azzera",
     "empty": "Ancora niente qui.",
-    "setupHint": "Il catalogo è vuoto. Esegui gli script di sincronizzazione o attendi la prossima esecuzione del cron."
+    "setupHint": "Il catalogo è vuoto. Esegui gli script di sincronizzazione o attendi la prossima esecuzione del cron.",
+    "filterStatus": "Filtro stato",
+    "filterPrice": "Filtro prezzo"
   },
   "home": {
     "heroTitle": "Tutti i badge Twitch. Un solo database.",

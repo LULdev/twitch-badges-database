@@ -55,8 +55,11 @@ export async function GET(request: Request) {
     payload: { prunedHeartbeats: pruned },
   });
 
+  // 207 signals a partial success: the catalog diff succeeded but the
+  // enrichment half failed. A plain 200 hid that from anything watching the
+  // status code, and a 5xx would have wrongly marked the whole run as failed.
   return Response.json({
-    ok: true,
+    ok: badgebase ? true : false,
     summary,
     badgebase,
     // Explicit rather than implied by a null field: the run is a success, but
@@ -64,5 +67,5 @@ export async function GET(request: Request) {
     badgebaseFailed: !badgebase,
     durationMs,
     pruned,
-  });
+  }, { status: badgebase ? 200 : 207 });
 }

@@ -76,7 +76,9 @@
     "apply": "Anwenden",
     "clear": "Leeren",
     "empty": "Hier gibt es noch nichts.",
-    "setupHint": "Der Katalog ist leer. Führe die Synchronisierungs-Skripte aus oder warte auf den nächsten Cron-Lauf, um ihn zu füllen."
+    "setupHint": "Der Katalog ist leer. Führe die Synchronisierungs-Skripte aus oder warte auf den nächsten Cron-Lauf, um ihn zu füllen.",
+    "filterStatus": "Status-Filter",
+    "filterPrice": "Preis-Filter"
   },
   "home": {
     "heroTitle": "Alle Twitch-Badges. Eine Datenbank.",

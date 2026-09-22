@@ -76,7 +76,9 @@
     "apply": "应用",
     "clear": "清除",
     "empty": "这里还没有内容。",
-    "setupHint": "目录为空。请运行同步脚本，或等待下一次定时任务填充数据。"
+    "setupHint": "目录为空。请运行同步脚本，或等待下一次定时任务填充数据。",
+    "filterStatus": "状态筛选",
+    "filterPrice": "价格筛选"
   },
   "home": {
     "heroTitle": "所有 Twitch 徽章，尽在一个数据库。",

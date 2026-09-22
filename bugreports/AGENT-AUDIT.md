@@ -254,10 +254,27 @@ filters, never written as feed kinds, so no `t(kind)` can miss a key) and
 `pg-7` (the auto blog post is an English document; its links intentionally point
 at the English badge pages).
 
+### Still open after this round
+
+`cron-6`, `ui-6`, `ui-7`, `ui-8`, `cat-4`, `cat-7`, `cat-8`, `cat-9`, `pg-4`,
+`pg-5`, `pg-6`, `pg-8`, `stats-4`, `stats-5`, and the older medium/low findings
+from rounds 1–3.
+
+---
+
+## Round 7 — the last three findings named by the objective
+
+| ID | Fix | Verification |
+|---|---|---|
+| ui-4 | the account menu in the header stayed open until its own button was pressed again: it had no outside-click or Escape handling, unlike the language panel beside it | closes on a pointerdown outside and on Escape; `aria-haspopup="true"`, the meaningless `role="menu"` removed (no `menuitem` children) |
+| cat-6 | the catalog filter chips were purely visual — no state reached assistive tech, and both groups announced the same label | `aria-pressed` carries the active state; distinct group labels `common.filterStatus` / `common.filterPrice` added in all 11 locales |
+| cron-2 | `/api/cron/global` answered `ok: true` with HTTP 200 when the badgebase enrichment had failed and only the catalog diff ran — a silent data outage looked healthy to Vercel and to any monitor | partial runs answer `ok: false`, `badgebaseFailed: true`, HTTP **207** |
+
+Verification: lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`,
+all 11 locale files still key-identical (658 keys each).
+
 ### Still open
 
-`cron-2`, `cron-6`, `ui-4`, `ui-6`, `ui-7`, `ui-8`, `cat-4`, `cat-6`, `cat-7`,
-`cat-8`, `cat-9`, `pg-4`, `pg-5`, `pg-6`, `pg-8`, `stats-4`, `stats-5`, and the
-older medium/low findings from rounds 1–3.
-
-The "no bugs remain" bar is still **not** met.
+`cron-6`, `ui-6`, `ui-7`, `ui-8`, `cat-4`, `cat-7`, `cat-8`, `cat-9`, `pg-4`,
+`pg-5`, `pg-6`, `pg-8`, `stats-4`, `stats-5`, plus the older medium/low findings
+from rounds 1–3. The "no bugs remain" bar is still **not** met.

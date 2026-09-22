@@ -76,7 +76,9 @@
     "apply": "Appliquer",
     "clear": "Effacer",
     "empty": "Rien ici pour le moment.",
-    "setupHint": "Le catalogue est vide. Lancez les scripts de synchronisation ou attendez le prochain passage du cron pour le remplir."
+    "setupHint": "Le catalogue est vide. Lancez les scripts de synchronisation ou attendez le prochain passage du cron pour le remplir.",
+    "filterStatus": "Filtre de statut",
+    "filterPrice": "Filtre de prix"
   },
   "home": {
     "heroTitle": "Tous les badges Twitch. Une seule base de données.",

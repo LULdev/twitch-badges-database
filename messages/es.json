@@ -76,7 +76,9 @@
     "apply": "Aplicar",
     "clear": "Limpiar",
     "empty": "Aún no hay nada aquí.",
-    "setupHint": "El catálogo está vacío. Ejecuta los scripts de sincronización o espera la próxima ejecución del cron para poblarlo."
+    "setupHint": "El catálogo está vacío. Ejecuta los scripts de sincronización o espera la próxima ejecución del cron para poblarlo.",
+    "filterStatus": "Filtro de estado",
+    "filterPrice": "Filtro de precio"
   },
   "home": {
     "heroTitle": "Todas las insignias de Twitch. Una sola base de datos.",

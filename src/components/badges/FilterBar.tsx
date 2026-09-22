@@ -107,11 +107,12 @@ export default function FilterBar({
         </div>
 
         {showStatus && !statusLocked && (
-          <div className="flex gap-1" role="group" aria-label={t("filters")}>
+          <div className="flex gap-1" role="group" aria-label={t("filterStatus")}>
             {statusOptions.map((option) => (
               <button
                 key={option.value}
                 type="button"
+                aria-pressed={current.status === option.value}
                 className={`chip ${current.status === option.value ? "chip-active" : ""}`}
                 onClick={() => navigate({ status: option.value })}
               >
@@ -121,11 +122,12 @@ export default function FilterBar({
           </div>
         )}
 
-        <div className="flex gap-1" role="group" aria-label={t("filters")}>
+        <div className="flex gap-1" role="group" aria-label={t("filterPrice")}>
           {priceOptions.map((option) => (
             <button
               key={option.value}
               type="button"
+              aria-pressed={current.price === option.value}
               className={`chip ${current.price === option.value ? "chip-active" : ""}`}
               onClick={() => navigate({ price: option.value })}
             >

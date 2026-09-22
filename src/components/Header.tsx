@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -19,6 +19,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   const links: Array<{ href: string; label: string }> = [
     { href: "/badges", label: t("badges") },
@@ -42,6 +43,26 @@ export default function Header({ user }: { user: HeaderUser | null }) {
     }
     return pathname.startsWith(href);
   }
+
+  // The account menu stayed open until its own button was pressed again: it had
+  // no outside-click or Escape handling, unlike the language panel.
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!userMenuRef.current?.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setUserMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [userMenuOpen]);
 
   async function logout() {
     try {
@@ -86,12 +107,12 @@ export default function Header({ user }: { user: HeaderUser | null }) {
           <LanguageSwitcher />
           <ThemeToggle />
           {user ? (
-            <div className="relative">
+            <div className="relative" ref={userMenuRef}>
               <button
                 type="button"
                 onClick={() => setUserMenuOpen((open) => !open)}
                 className="flex items-center gap-2 rounded-full border border-line py-1 pe-2.5 ps-1 transition-colors hover:border-line-strong"
-                aria-haspopup="menu"
+                aria-haspopup="true"
                 aria-expanded={userMenuOpen}
               >
                 {user.avatarUrl ? (
@@ -113,10 +134,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
                 </span>
               </button>
               {userMenuOpen && (
-                <div
-                  role="menu"
-                  className="card absolute end-0 top-11 z-50 w-44 overflow-hidden p-1"
-                >
+                <div className="card absolute end-0 top-11 z-50 w-44 overflow-hidden p-1">
                   <Link
                     href={`/profile/${user.username}`}
                     className="block rounded-lg px-3 py-2 text-[0.8125rem] font-medium text-muted hover:bg-surface-2 hover:text-foreground"
