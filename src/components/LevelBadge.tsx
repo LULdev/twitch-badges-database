@@ -33,7 +33,7 @@ export default function LevelBadge({
         </defs>
         <path
           d="M32 2 58 12v22c0 15-11 24-26 28C17 58 6 49 6 34V12L32 2z"
-          fill="url(#lg-shield)"
+          fill={`url(#lg-shield-${level})`}
           style={{ fill: theme.gradient.includes("conic") ? undefined : theme.gradient }}
           stroke={theme.glow}
           strokeWidth="2.5"
@@ -42,12 +42,12 @@ export default function LevelBadge({
           <path
             d="M32 2 58 12v22c0 15-11 24-26 28C17 58 6 49 6 34V12L32 2z"
             fill="none"
-            stroke="url(#lg-shield)"
+            stroke={`url(#lg-shield-${level})`}
             strokeWidth="2.5"
             className="level-badge-rotate"
           />
         )}
-        <linearGradient id="lg-shield">
+        <linearGradient id={`lg-shield-${level}`}>
           <stop offset="0%" stopColor={theme.glow} stopOpacity="0.35" />
           <stop offset="100%" stopColor={theme.glow} stopOpacity="0.08" />
         </linearGradient>

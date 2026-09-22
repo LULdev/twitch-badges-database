@@ -66,7 +66,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
           <span className="hidden text-sm sm:inline">Twitch Badges DB</span>
         </Link>
 
-        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main">
+        <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Main">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -165,7 +165,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
           )}
           <button
             type="button"
-            className="btn btn-ghost px-2.5 py-2 lg:hidden"
+            className="btn btn-ghost px-2.5 py-2 xl:hidden"
             aria-label={t("menu")}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((open) => !open)}
@@ -183,7 +183,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
 
       {menuOpen && (
         <nav
-          className="border-t border-line bg-surface px-4 py-3 lg:hidden"
+          className="border-t border-line bg-surface px-4 py-3 xl:hidden"
           aria-label="Mobile"
         >
           <div className="grid grid-cols-2 gap-1">
