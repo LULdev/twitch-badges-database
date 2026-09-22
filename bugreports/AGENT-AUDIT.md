@@ -451,6 +451,38 @@ error, `/auth/callback` still resolves to `/{locale}/auth/callback`, a page
 request carrying a bogus `sb-` cookie still returns 200 (the proxy refresh
 branch), and the OG profile card returns `image/png`.
 
-The "no bugs remain" bar is still **not** met — the audit keeps finding new
-issues every round, though its severity keeps dropping: this round's new items
-were three medium and five low, and all of them are now fixed.
+## Round 11 — verifying the low-findings commit
+
+A verification agent checked `49453c4` (`bugreports/verify-round10.md`): **1 high,
+5 low**, plus an explicit clean list (proxy both paths + redirect + no double
+refresh + no login loop, the race-guard's "nothing moves before the guard", the
+steal's zero-sum arithmetic, `ensureProgress`, the blog `post_id` dedup,
+`error.tsx` in all 11 locales, the OG font gate and its 32-entry cache, the
+`0001` guard, `0003`'s drop+recreate, and the `/api/account` bound).
+
+| ID | Finding | Fix |
+|---|---|---|
+| **v10-1 (high)** | the coin-rain dedup filtered `activity_events` on `payload.giver = <salted IP hash>` while the row was written with `payload.giver = "anonymous"` — for logged-out visitors the check never matched, so `/api/coinrain` was an unbounded +1-coin faucet against any profile. The earlier `sec-2` fix had changed only the read side | migration 0014 adds `coin_rain_gate` with primary key `(owner_id, giver_key, day)`, RLS on and **no** policy, so the gate is a true compare-and-set **and** the hash stays out of the public-read `activity_events`. Verified live: first insert 1 row, second identical insert **23505**, anon read **401**. Window changes from a rolling 24 h to a UTC day |
+| v10-2 | the thief's counter error was thrown between the two coin moves, leaving a half-applied non-zero-sum transfer plus a 5-minute lockout | both coin moves first, then both counters; a counter problem is logged, not thrown |
+| v10-3 | the compensating DELETE discarded its error, so an unsettled round/attempt could survive and count for streaks, `maxBet` and the feed; the comment also claimed only the first racer voids | the delete error is checked and logged; the comment now matches reality (every racer voids — conservative and free, nothing has moved yet) |
+| v10-4 | `fetchAllDistribution()` had no `.catch()`, so the new page-cap throw aborted the whole 15-minute sync with a 500 | the distribution feed fails **before any write**, with the provider's reason; the previous claim that the caller catches it held only for the owners feed |
+| v10-5 | 0012's validating CHECKs run against pre-existing rows, so a legacy oversized blob would block the migration and every later one | applies cleanly here (1 profile, `{}`) and is already applied — recorded as a note for other environments rather than changing history |
+| v10-6 | a persistent dedup-read error silently dropped every blog view; `recordProfileVisit` reported "not counted" after its row was already inserted | both dedup failures are logged; the contradictory profile lookup is gone (the foreign key already proves the profile exists) |
+
+Also fixed on the way: dead `thiefProfile` query per steal removed, and
+`/api/coinrain` no longer answers `already: true` for an unknown profile or a
+self-rain — it now reports only what the gate actually did (live-confirmed
+before the fix: an unknown profile answered `already: true`).
+
+**Still open after this round:** `fp-3` (most `ProfileCustomizer` settings are
+stored but never applied — feature work, not a fix), the daily-XP-budget refund
+that needs a consume+apply function, the 19 historical `blog_views` rows with
+pre-fix duplicates, and 0012's CHECK hazard for other environments. **No High,
+Medium or Low defect from any agent report is open.**
+
+Verification: lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`,
+atomicity **16/16**, economy sim 13/13 games below the stake (worst hilo 0.9873).
+Deployed as `098ce06`; live smoke **165/165 routes across 11 locales**, plus
+`POST /api/coinrain` rejects a missing profile id (400), leaves zero gate rows
+and zero feed rows for an unknown profile, `/api/health` 200, `/api/cron/global`
+401 without the secret.
