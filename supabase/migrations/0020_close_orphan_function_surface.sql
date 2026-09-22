@@ -19,17 +19,41 @@
 -- defence in depth and removes them from the reachable surface. Revoking EXECUTE
 -- does not affect the triggers themselves, which run as the table owner.
 
-revoke all on function public.latest_badge_stats(integer) from public;
-revoke all on function public.latest_badge_stats(integer) from anon, authenticated;
-grant execute on function public.latest_badge_stats(integer) to service_role;
+-- v25-01: the two orphan RPCs exist in THIS database but no migration creates
+-- them, so an unconditional REVOKE aborts on a fresh install with 42883
+-- ("function does not exist") and blocks every later migration — the documented
+-- `npm run db:apply` path would never complete. Each revoke is therefore guarded
+-- by a existence check, which is a no-op on a fresh database.
+do $$
+begin
+  if to_regprocedure('public.latest_badge_stats(integer)') is not null then
+    revoke all on function public.latest_badge_stats(integer) from public, anon, authenticated;
+    grant execute on function public.latest_badge_stats(integer) to service_role;
+  end if;
 
-revoke all on function public.get_own_profile_email() from public;
-revoke all on function public.get_own_profile_email() from anon, authenticated;
-grant execute on function public.get_own_profile_email() to service_role;
+  if to_regprocedure('public.get_own_profile_email()') is not null then
+    revoke all on function public.get_own_profile_email() from public, anon, authenticated;
+    grant execute on function public.get_own_profile_email() to service_role;
+  end if;
 
-revoke all on function public.handle_new_user() from public, anon, authenticated;
-revoke all on function public.touch_updated_at() from public, anon, authenticated;
-revoke all on function public.touch_badges_updated_at() from public, anon, authenticated;
+  -- Trigger functions. They exist on every install (0001 creates them), but the
+  -- same guard costs nothing and keeps this file uniform.
+  if to_regprocedure('public.handle_new_user()') is not null then
+    revoke all on function public.handle_new_user() from public, anon, authenticated;
+  end if;
+  if to_regprocedure('public.touch_updated_at()') is not null then
+    revoke all on function public.touch_updated_at() from public, anon, authenticated;
+  end if;
+  if to_regprocedure('public.touch_badges_updated_at()') is not null then
+    revoke all on function public.touch_badges_updated_at() from public, anon, authenticated;
+  end if;
+  -- v25-02: this one was missed by the first sweep and was still executable by
+  -- anon and authenticated (a direct call fails with 0A000, so it was never
+  -- exploitable, but the claim that nothing was reachable was wrong).
+  if to_regprocedure('public.protect_profile_columns()') is not null then
+    revoke all on function public.protect_profile_columns() from public, anon, authenticated;
+  end if;
+end $$;
 
 insert into public.changelog (kind, title, body, payload) values (
   'bugfix',

@@ -789,6 +789,29 @@ three economy RPCs are service-role only.
 atomicity **17/17** with an exact restore, economy 13/13 below the stake (worst
 0.9851).
 
+## Round 26 — my migration would have blocked a fresh install
+
+The round-25 agent reported **1 high (not live), 2 low, 1 info — and no live
+defect** (`verify-round25.md`). The high one matters anyway, because it breaks the
+documented setup path.
+
+| ID | Finding | Fix |
+|---|---|---|
+| **v25-01 (high, fresh-install only)** | migration 0020 revoked privileges on two functions that exist **in this database** but that **no migration creates**. An unconditional `REVOKE` aborts with 42883 on a fresh install, and because `db:apply` runs migrations in order inside transactions, it blocks **every later migration** — `npm run db:apply`, the path the README documents, would never complete. The agent reproduced it in a rolled-back transaction | every revoke is guarded with `to_regprocedure(...) is not null`, so it is a no-op where the function does not exist. Verified by running exactly that block after renaming the two orphans away in a transaction: it completes without error |
+| v25-02 (low) | my sweep missed `protect_profile_columns()`, still executable by PUBLIC, anon and authenticated (a direct call fails with 0A000, so never exploitable — but the "nothing is reachable" claim was wrong) | migration 0021 revokes it. Verified with a corrected ACL query: **0 of 16** functions are reachable |
+| v25-03 (low) | gating the whole inventory section made the "inventory hidden" branch **dead code** and orphaned eleven locale keys | the section renders for everyone; only the count in the heading depends on visibility, so there is neither a false "Owned (0)" nor a missing explanation |
+| v25-04 (info) | my new test check was a **tautology** (`Array.isArray` can only be false if the call throws) | it now requires every unlocked id to resolve to a known achievement, so an evaluation that produces something unrenderable fails the run |
+
+**A method note, again:** my first ACL check reported all 16 functions as reachable
+because its pattern matched the *owner* grant in every ACL. The corrected query
+counts what actually matters — `anon=`/`authenticated=` entries or a NULL ACL —
+and reports 0. The same too-greedy-pattern mistake I made once before with the
+"125" scan.
+
+**Verification:** lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`,
+atomicity 17/17 with an exact restore (6 feed and 4 achievement rows removed),
+function surface 0 of 16 reachable.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents

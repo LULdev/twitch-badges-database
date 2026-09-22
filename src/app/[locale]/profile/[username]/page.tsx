@@ -566,13 +566,17 @@ export default async function ProfilePage({ params }: PageProps) {
         </section>
       )}
 
-      {/* Owned badges. The heading shows the count, so it is part of the same
-          gate — otherwise it read "Owned (0)" above an empty section. */}
-      {profile && inventoryVisible && (
+      {/* Owned badges. The section renders for everyone so the "inventory hidden"
+          message stays reachable; only the count in the heading depends on
+          visibility, because it would otherwise read "Owned (0)" for a hidden
+          inventory (the rows are never fetched then). */}
+      {profile && (
         <section aria-labelledby="profile-owned">
           <div className="section-title">
             <h2 id="profile-owned">
-              {t("owned")} ({ownedBadges.length})
+              {inventoryVisible
+                ? `${t("owned")} (${ownedBadges.length})`
+                : t("owned")}
             </h2>
           </div>
           {inventoryVisible ? (

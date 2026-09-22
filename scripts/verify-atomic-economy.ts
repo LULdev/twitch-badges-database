@@ -13,7 +13,7 @@ config({ path: ".env.local" });
 async function main() {
   const { createAdminClient } = await import("@/lib/supabase/admin");
   const { award, adjustCoins, getProgress } = await import("@/lib/gamification/xp");
-  const { evaluateAchievements, ACTIVE_ACHIEVEMENTS } = await import(
+  const { evaluateAchievements, ACTIVE_ACHIEVEMENTS, ACH_BY_ID } = await import(
     "@/lib/gamification/achievements"
   );
 
@@ -203,7 +203,11 @@ async function main() {
     // user_progress query). Running it here also proves the whole path still
     // evaluates without throwing; the restore below deletes whatever it unlocks.
     const unlocked = await evaluateAchievements(profile.id);
-    check("achievement evaluation returns a list", Array.isArray(unlocked) ? 1 : 0, 1);
+    // A real assertion, not a tautology: the evaluation may only unlock entries
+    // that exist, so an id that does not resolve means it produced something the
+    // UI cannot render.
+    const unknown = unlocked.filter((id) => !ACH_BY_ID.has(id));
+    check("every unlocked id resolves to a known achievement", unknown.length, 0);
     console.log(
       "  achievements evaluated:",
       ACTIVE_ACHIEVEMENTS.length,
