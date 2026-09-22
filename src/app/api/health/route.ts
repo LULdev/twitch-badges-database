@@ -8,6 +8,15 @@ export const maxDuration = 15;
 const STARTED_AT = Date.now();
 
 /**
+ * The endpoint is public and unauthenticated, so it must not write a row per
+ * call: a flood would grow `system_heartbeats` without bound and skew the
+ * availability figures the /stats page derives from it. One row per minute per
+ * instance is plenty for an uptime signal.
+ */
+let lastHeartbeatAt = 0;
+const HEARTBEAT_MIN_INTERVAL_MS = 60_000;
+
+/**
  * Public health probe. Returns live service metrics and records a `web`
  * heartbeat, which is what feeds the availability section on /stats.
  * Deliberately unauthenticated: it exposes no secrets, only timings.
@@ -47,18 +56,22 @@ export async function GET() {
   const totalMs = Date.now() - started;
   const status = dbOk && totalMs < 2000 ? "ok" : dbOk ? "degraded" : "error";
 
-  await recordHeartbeat({
-    source: "web",
-    status,
-    durationMs: totalMs,
-    message: error,
-    payload: {
-      dbLatencyMs,
-      catalogTotal,
-      catalogLastSeen,
-      region: envOrNull("VERCEL_REGION"),
-    },
-  });
+  const now = Date.now();
+  if (now - lastHeartbeatAt >= HEARTBEAT_MIN_INTERVAL_MS) {
+    lastHeartbeatAt = now;
+    await recordHeartbeat({
+      source: "web",
+      status,
+      durationMs: totalMs,
+      message: error,
+      payload: {
+        dbLatencyMs,
+        catalogTotal,
+        catalogLastSeen,
+        region: envOrNull("VERCEL_REGION"),
+      },
+    });
+  }
 
   return Response.json(
     {
