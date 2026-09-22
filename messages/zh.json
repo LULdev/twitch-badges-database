@@ -29,7 +29,8 @@
     "games": "游戏",
     "achievementsNav": "成就",
     "feedNav": "实时动态",
-    "faqNav": "FAQ"
+    "faqNav": "FAQ",
+    "wheel": "命运转盘"
   },
   "common": {
     "search": "搜索徽章…",
@@ -604,7 +605,8 @@
     "attempt": "尝试偷取",
     "failed": "防守成功！这次尝试花掉了你 {coins} BadgesCoins。",
     "hint": "每次尝试花费 {price} BadgesCoins（失败时归受害者所有）。最大收获：{max} BadgesCoins。成功率取决于等级差。",
-    "success": "得手：+{coins} BadgesCoins！"
+    "success": "得手：+{coins} BadgesCoins！",
+    "disabled": "该收藏者已关闭硬币偷取。"
   },
   "faq": {
     "achievementsA": "125 个：50 个普通里程碑、50 个创意挑战和 25 个真正意想不到的特殊成就。每个都奖励 XP、BadgesCoins 和积分，并在主页成就展柜中显示一枚闪亮徽章。",

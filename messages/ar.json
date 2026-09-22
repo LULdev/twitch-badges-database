@@ -29,7 +29,8 @@
     "games": "الألعاب",
     "achievementsNav": "الإنجازات",
     "feedNav": "الخلاصة المباشرة",
-    "faqNav": "FAQ"
+    "faqNav": "FAQ",
+    "wheel": "عجلة الحظ"
   },
   "common": {
     "search": "ابحث عن شارات…",
@@ -604,7 +605,8 @@
     "attempt": "حاول السرقة",
     "failed": "تم الصد! كلّفتك المحاولة {coins} BadgesCoins.",
     "hint": "تكلّف المحاولة {price} BadgesCoins (تُدفع للضحية عند الفشل). أقصى غنيمة: {max} BadgesCoins. الاحتمال يعتمد على فرق المستوى.",
-    "success": "نجحت السرقة: ‎+{coins} BadgesCoins!"
+    "success": "نجحت السرقة: ‎+{coins} BadgesCoins!",
+    "disabled": "قام هذا الجامع بتعطيل سرقة العملات."
   },
   "faq": {
     "achievementsA": "125 إنجازًا: 50 محطة عادية و50 تحديًا إبداعيًا و25 خاصًا مفاجئًا حقًا. كل منها يمنح XP وBadgesCoins ونقاطًا، مع شارة لامعة في واجهة إنجازات ملفك.",

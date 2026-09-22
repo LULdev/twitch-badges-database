@@ -29,7 +29,8 @@
     "games": "게임",
     "achievementsNav": "업적",
     "feedNav": "실시간 피드",
-    "faqNav": "FAQ"
+    "faqNav": "FAQ",
+    "wheel": "운명의 수레바퀴"
   },
   "common": {
     "search": "배지 검색…",
@@ -604,7 +605,8 @@
     "attempt": "강탈 시도",
     "failed": "방어 성공! 시도로 {coins} BadgesCoins를 잃었습니다.",
     "hint": "시도 비용은 {price} BadgesCoins (실패 시 상대에게 지급). 최대 습득: {max} BadgesCoins. 성공률은 레벨 차이에 따라 달라집니다.",
-    "success": "강탈 성공: +{coins} BadgesCoins!"
+    "success": "강탈 성공: +{coins} BadgesCoins!",
+    "disabled": "이 수집가는 코인 훔치기를 꺼두었습니다."
   },
   "faq": {
     "achievementsA": "125개: 일반 이정표 50, 창의적 도전 50, 진짜 예상 밖의 특별 25. 각각 XP, BadgesCoins, 포인트를 주고 프로필 업적 쇼케이스에 반짝이는 배지가 표시됩니다.",

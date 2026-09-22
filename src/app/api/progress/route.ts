@@ -14,5 +14,9 @@ export async function GET() {
     coins: progress.coins,
     level: levelFromXp(progress.xp),
     loginStreak: progress.login_streak,
+    // Lets the wheel show its used state on load instead of offering a button
+    // that can only answer "already spun today".
+    wheelSpunToday:
+      progress.last_wheel_date === new Date().toISOString().slice(0, 10),
   });
 }

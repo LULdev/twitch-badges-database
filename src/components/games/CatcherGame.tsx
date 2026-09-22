@@ -132,7 +132,7 @@ export default function CatcherGame() {
         {items.map((item) =>
           item.bomb ? (
             <span key={item.id} className="absolute text-2xl" style={{ left: item.x, top: item.y }}>
-              💣
+              !
             </span>
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
@@ -160,8 +160,8 @@ export default function CatcherGame() {
         )}
         {running && (
           <div className="pointer-events-none absolute inset-x-0 top-3 flex justify-between px-4 text-xs font-black tabular-nums">
-            <span>⏱ {timeLeft}s</span>
-            <span>🏅 {caught} · ✗ {missed}</span>
+            <span>{timeLeft}s</span>
+            <span>{caught} · ✗ {missed}</span>
           </div>
         )}
       </div>

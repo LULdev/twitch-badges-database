@@ -29,7 +29,8 @@
     "games": "Spiele",
     "achievementsNav": "Errungenschaften",
     "feedNav": "Live-Feed",
-    "faqNav": "FAQ"
+    "faqNav": "FAQ",
+    "wheel": "Glücksrad"
   },
   "common": {
     "search": "Badges suchen…",
@@ -604,7 +605,8 @@
     "attempt": "Überfall starten",
     "failed": "Abgewehrt! Der Versuch kostete dich {coins} BadgesCoins.",
     "hint": "Versuch kostet {price} BadgesCoins (bei Misserfolg an das Opfer). Max-Beute: {max} BadgesCoins. Chance hängt vom Level-Unterschied ab.",
-    "success": "Überfall erfolgreich: +{coins} BadgesCoins!"
+    "success": "Überfall erfolgreich: +{coins} BadgesCoins!",
+    "disabled": "Dieser Sammler hat das Stehlen von Coins deaktiviert."
   },
   "faq": {
     "achievementsA": "125: 50 gewöhnliche Meilensteine, 50 kreative Herausforderungen und 25 völlig unerwartete Spezielle. Jede bringt XP, BadgesCoins und Punkte plus ein Funkel-Badge in der Errungenschaften-Vitrine deines Profils.",

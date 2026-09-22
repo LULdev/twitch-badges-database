@@ -9,10 +9,13 @@ export default function StealPanel({
   victim,
   price,
   maxAmount,
+  enabled = true,
 }: {
   victim: string;
   price: number;
   maxAmount: number;
+  /** The victim's `steal_enabled` setting; a disabled target shows a note. */
+  enabled?: boolean;
 }) {
   const t = useTranslations("steal");
   const router = useRouter();
@@ -47,10 +50,20 @@ export default function StealPanel({
     }
   }
 
+  // A collector who disabled stealing must not be presented with a working
+  // button that can only fail — the server refuses the attempt anyway.
+  if (!enabled) {
+    return (
+      <div className="card p-4">
+        <p className="text-xs text-muted">{t("disabled")}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="card space-y-2 p-4">
       <p className="text-xs text-muted">
-        🥷 {t("hint", { price: price.toLocaleString("en"), max: maxAmount.toLocaleString("en") })}
+        {t("hint", { price: price.toLocaleString("en"), max: maxAmount.toLocaleString("en") })}
       </p>
       <button type="button" onClick={attempt} disabled={state === "busy"} className="btn btn-danger w-full text-xs">
         {state === "busy" ? "…" : t("attempt")}

@@ -25,7 +25,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
     { href: "/active", label: t("active") },
     { href: "/upcoming", label: t("upcoming") },
     { href: "/games", label: t("games") },
-    { href: "/wheel", label: "🎡" },
+    { href: "/wheel", label: t("wheel") },
     { href: "/leaderboards", label: t("leaderboards") },
     { href: "/achievements", label: t("achievementsNav") },
     { href: "/feed", label: t("feedNav") },

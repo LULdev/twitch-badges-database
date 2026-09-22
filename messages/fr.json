@@ -29,7 +29,8 @@
     "games": "Jeux",
     "achievementsNav": "Succès",
     "feedNav": "Fil en direct",
-    "faqNav": "FAQ"
+    "faqNav": "FAQ",
+    "wheel": "Roue de la fortune"
   },
   "common": {
     "search": "Rechercher des badges…",
@@ -604,7 +605,8 @@
     "attempt": "Tenter un braquage",
     "failed": "Défendu ! La tentative t'a coûté {coins} BadgesCoins.",
     "hint": "La tentative coûte {price} BadgesCoins (versés à la victime en cas d'échec). Butin maximal : {max} BadgesCoins. La probabilité dépend de l'écart de niveau.",
-    "success": "Coup réussi : +{coins} BadgesCoins !"
+    "success": "Coup réussi : +{coins} BadgesCoins !",
+    "disabled": "Ce collectionneur a désactivé le vol de pièces."
   },
   "faq": {
     "achievementsA": "125 : 50 jalons communs, 50 défis créatifs et 25 spéciaux vraiment inattendus. Chacun donne de l'XP, des BadgesCoins et des points, plus un badge scintillant dans la vitrine de succès de ton profil.",

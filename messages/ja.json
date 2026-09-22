@@ -29,7 +29,8 @@
     "games": "ゲーム",
     "achievementsNav": "実績",
     "feedNav": "ライブフィード",
-    "faqNav": "FAQ"
+    "faqNav": "FAQ",
+    "wheel": "フォーチュンホイール"
   },
   "common": {
     "search": "バッジを検索…",
@@ -604,7 +605,8 @@
     "attempt": "強奪を試す",
     "failed": "防衛成功！試行で{coins} BadgesCoinsを失った。",
     "hint": "試行には{price} BadgesCoinsが必要（失敗時は相手に支払われる）。最大獲得：{max} BadgesCoins。成功率はレベル差で変動。",
-    "success": "強奪成功：+{coins} BadgesCoins！"
+    "success": "強奪成功：+{coins} BadgesCoins！",
+    "disabled": "このコレクターはコイン強奪を無効にしています。"
   },
   "faq": {
     "achievementsA": "125種：コモンの節目50、クリエイティブな挑戦50、まさかのスペシャル25。それぞれXP・BadgesCoins・ポイントがもらえ、プロフィールの実績ショーケースにキラキラバッジが並びます。",

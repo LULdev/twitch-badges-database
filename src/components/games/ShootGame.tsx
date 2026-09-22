@@ -151,8 +151,8 @@ export default function ShootGame() {
         )}
         {running && (
           <div className="pointer-events-none absolute inset-x-0 top-3 flex justify-between px-4 text-xs font-black tabular-nums">
-            <span>⏱ {timeLeft}s</span>
-            <span>🎯 {hits}/{shots}</span>
+            <span>{timeLeft}s</span>
+            <span>{hits}/{shots}</span>
           </div>
         )}
         {summary && !running && (

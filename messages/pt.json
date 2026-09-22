@@ -29,7 +29,8 @@
     "games": "Jogos",
     "achievementsNav": "Conquistas",
     "feedNav": "Feed ao vivo",
-    "faqNav": "FAQ"
+    "faqNav": "FAQ",
+    "wheel": "Roleta da fortuna"
   },
   "common": {
     "search": "Buscar insígnias…",
@@ -604,7 +605,8 @@
     "attempt": "Tentar um assalto",
     "failed": "Defendido! A tentativa custou {coins} BadgesCoins.",
     "hint": "A tentativa custa {price} BadgesCoins (pagos à vítima em caso de falha). Saque máximo: {max} BadgesCoins. A chance depende da diferença de nível.",
-    "success": "Golpe bem-sucedido: +{coins} BadgesCoins!"
+    "success": "Golpe bem-sucedido: +{coins} BadgesCoins!",
+    "disabled": "Este colecionador desativou o roubo de moedas."
   },
   "faq": {
     "achievementsA": "125: 50 marcos comuns, 50 desafios criativos e 25 especiais realmente inesperados. Cada um dá XP, BadgesCoins e pontos, além de um emblema brilhante na vitrine de conquistas do seu perfil.",

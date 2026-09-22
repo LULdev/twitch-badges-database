@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import Coin from "@/components/Coin";
 
@@ -32,6 +32,22 @@ export default function WheelOfFortune() {
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<Slot | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // The daily limit is per account, not per page load: read the current state
+  // so a reload does not offer a spin that the server will refuse.
+  const [usedToday, setUsedToday] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/progress")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { wheelSpunToday?: boolean } | null) => {
+        if (!cancelled && data?.wheelSpunToday) setUsedToday(true);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function spin() {
     if (spinning) return;
@@ -44,7 +60,12 @@ export default function WheelOfFortune() {
         | { slot: { id: string }; turboWon: boolean }
         | { error: string };
       if ("error" in data) {
-        setError(data.error === "already-spun-today" ? t("already") : data.error);
+        if (data.error === "already-spun-today") {
+          setUsedToday(true);
+          setError(t("already"));
+        } else {
+          setError(data.error);
+        }
         setSpinning(false);
         return;
       }
@@ -99,13 +120,18 @@ export default function WheelOfFortune() {
       </div>
 
       <div className="text-center">
-        <button type="button" onClick={spin} disabled={spinning} className="btn btn-primary px-10 py-3 text-base">
-          {spinning ? t("spinning") : t("spin")}
+        <button
+          type="button"
+          onClick={spin}
+          disabled={spinning || usedToday}
+          className="btn btn-primary px-10 py-3 text-base"
+        >
+          {spinning ? t("spinning") : usedToday ? t("already") : t("spin")}
         </button>
         {error && <p className="mt-3 text-sm font-semibold text-warning">{error}</p>}
         {result && (
           <div className={`card mx-auto mt-4 max-w-sm p-5 ${result.turbo ? "border-warning" : ""}`}>
-            <p className="text-2xl font-black">{result.turbo ? "🎁 TWITCH TURBO!" : result.label}</p>
+            <p className="text-2xl font-black">{result.turbo ? t("turboWon") : result.label}</p>
             <p className="mt-1 text-sm text-muted">
               {result.turbo ? t("turboWon") : (<span className="inline-flex items-center gap-1.5">+{result.coins.toLocaleString("en")} <Coin size={16} className="bcoin-lg" /></span>)}
             </p>

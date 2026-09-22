@@ -18,8 +18,18 @@ export default function DailyClaim({ compact = false }: { compact?: boolean }) {
         setState("already");
         return;
       }
-      const data = (await res.json()) as { xp: number; coins: number; streak: number };
-      setReward(data);
+      // Anything that is not a 2xx is a failure: parsing an error body used to
+      // produce a "reward" of undefined values ("+undefined XP").
+      if (!res.ok) {
+        setState("idle");
+        return;
+      }
+      const data = (await res.json()) as { xp?: number; coins?: number; streak?: number };
+      if (typeof data.xp !== "number") {
+        setState("idle");
+        return;
+      }
+      setReward({ xp: data.xp, coins: data.coins ?? 0, streak: data.streak ?? 0 });
       setState("done");
     } catch {
       setState("idle");
@@ -39,14 +49,18 @@ export default function DailyClaim({ compact = false }: { compact?: boolean }) {
           ? `✓ ${t("dailyDone")}`
           : state === "already"
             ? `✓ ${t("dailyDone")}`
-            : `🎁 ${t("dailyClaim")}`}
+            : t("dailyClaim")}
       </button>
     );
   }
 
   return (
     <div className="card flex flex-col items-center gap-3 p-6 text-center">
-      <span className="text-3xl">🎁</span>
+      <span aria-hidden className="grid size-12 place-items-center rounded-2xl bg-accent-soft text-accent">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <path d="M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+        </svg>
+      </span>
       <h2 className="font-bold">{t("dailyTitle")}</h2>
       <p className="text-sm text-muted">{t("dailyHint")}</p>
       <button

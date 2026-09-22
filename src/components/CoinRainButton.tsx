@@ -17,8 +17,15 @@ export default function CoinRainButton({ profileId }: { profileId: string }) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ profileId }),
       });
-      const data = (await res.json()) as { ok: boolean; already?: boolean };
-      setState(data.ok ? "done" : "again");
+      const data = (await res.json()) as {
+        ok?: boolean;
+        already?: boolean;
+      };
+      if (data.ok) setState("done");
+      // "already" is the once-per-day limit; anything else is a transient
+      // failure and must leave the button usable instead of locking it.
+      else if (data.already) setState("again");
+      else setState("idle");
       if (data.ok) {
         // little coin-shower effect
         for (let i = 0; i < 12; i += 1) {

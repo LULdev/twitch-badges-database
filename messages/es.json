@@ -29,7 +29,8 @@
     "games": "Juegos",
     "achievementsNav": "Logros",
     "feedNav": "Feed en vivo",
-    "faqNav": "FAQ"
+    "faqNav": "FAQ",
+    "wheel": "Ruleta de la fortuna"
   },
   "common": {
     "search": "Buscar insignias…",
@@ -604,7 +605,8 @@
     "attempt": "Intentar un golpe",
     "failed": "¡Defendido! El intento te costó {coins} BadgesCoins.",
     "hint": "El intento cuesta {price} BadgesCoins (pagados a la víctima si fallas). Botín máximo: {max} BadgesCoins. La probabilidad depende de la diferencia de nivel.",
-    "success": "¡Golpe exitoso: +{coins} BadgesCoins!"
+    "success": "¡Golpe exitoso: +{coins} BadgesCoins!",
+    "disabled": "Este coleccionista ha desactivado el robo de monedas."
   },
   "faq": {
     "achievementsA": "125: 50 hitos comunes, 50 retos creativos y 25 especiales realmente inesperados. Cada uno otorga XP, BadgesCoins y puntos, además de una insignia brillante en la vitrina de logros de tu perfil.",

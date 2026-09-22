@@ -29,7 +29,8 @@
     "games": "Giochi",
     "achievementsNav": "Obiettivi",
     "feedNav": "Feed in diretta",
-    "faqNav": "FAQ"
+    "faqNav": "FAQ",
+    "wheel": "Ruota della fortuna"
   },
   "common": {
     "search": "Cerca badge…",
@@ -604,7 +605,8 @@
     "attempt": "Tenta un colpo",
     "failed": "Difeso! Il tentativo ti è costato {coins} BadgesCoins.",
     "hint": "Il tentativo costa {price} BadgesCoins (pagati alla vittima se fallisci). Bottino massimo: {max} BadgesCoins. La probabilità dipende dal divario di livello.",
-    "success": "Colpo riuscito: +{coins} BadgesCoins!"
+    "success": "Colpo riuscito: +{coins} BadgesCoins!",
+    "disabled": "Questo collezionista ha disattivato il furto di monete."
   },
   "faq": {
     "achievementsA": "125: 50 traguardi comuni, 50 sfide creative e 25 speciali davvero inaspettati. Ognuno dà XP, BadgesCoins e punti, più un badge scintillante nella vetrina obiettivi del profilo.",

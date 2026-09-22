@@ -97,7 +97,7 @@ export default function SlotsGame() {
             onClick={spin}
             className="btn btn-primary w-full py-3 text-base"
           >
-            {spinning ? t("spinning") : (<span>🎰 {t("spin")} (<span className="inline-flex items-center gap-1">{bet.toLocaleString("en")} <Coin size={14} /></span>)</span>)}
+            {spinning ? t("spinning") : (<span>{t("spin")} (<span className="inline-flex items-center gap-1">{bet.toLocaleString("en")} <Coin size={14} /></span>)</span>)}
           </button>
           {lastWin && (
             <p className={`mt-3 text-center text-lg font-extrabold ${lastWin.payout > bet ? "text-success" : "text-muted"}`}>

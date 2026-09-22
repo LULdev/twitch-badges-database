@@ -452,8 +452,9 @@ export default async function ProfilePage({ params }: PageProps) {
       {profile && !isOwn && (
         <StealPanel
           victim={profile.username}
-          price={profile.steal_enabled === false ? 0 : (profile.steal_price ?? 100)}
+          price={profile.steal_price ?? 100}
           maxAmount={profile.steal_max ?? 250}
+          enabled={profile.steal_enabled !== false}
         />
       )}
 

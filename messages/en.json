@@ -29,7 +29,8 @@
     "games": "Games",
     "achievementsNav": "Achievements",
     "feedNav": "Live Feed",
-    "faqNav": "FAQ"
+    "faqNav": "FAQ",
+    "wheel": "Wheel of Fortune"
   },
   "common": {
     "search": "Search badges…",
@@ -604,7 +605,8 @@
     "attempt": "Attempt heist",
     "failed": "Defended! The attempt cost you {coins} BadgesCoins.",
     "hint": "Attempt costs {price} BadgesCoins (paid to the victim on failure). Max haul: {max} BadgesCoins. Chance depends on level difference.",
-    "success": "Heist successful: +{coins} BadgesCoins!"
+    "success": "Heist successful: +{coins} BadgesCoins!",
+    "disabled": "This collector turned coin stealing off."
   },
   "faq": {
     "achievementsA": "125: 50 common milestones, 50 creative challenges and 25 truly unexpected specials. Each one awards XP, BadgesCoins and points, plus a sparkle badge in your profile's achievement showcase.",

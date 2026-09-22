@@ -70,7 +70,12 @@ export async function spinWheel(userId: string): Promise<
   });
 
   if (turboWon) {
-    await supabase.from("turbo_wins").insert({ user_id: userId });
+    // The jackpot must be recorded before the UI is told about it: discarding
+    // this error let the client celebrate a win that was never persisted.
+    const { error: turboError } = await supabase
+      .from("turbo_wins")
+      .insert({ user_id: userId });
+    if (turboError) throw turboError;
     await logActivity({
       userId,
       kind: "turbo_win",
