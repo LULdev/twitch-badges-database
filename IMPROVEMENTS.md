@@ -245,3 +245,62 @@ Grouped by character. `T` = ties directly into Twitch badges.
 3. Then social loops: #11 (drop room), #18 (duels), #19 (tournament).
 4. Then the big swings: #42 (real-time multiplayer), #43 (provable fairness),
    #50 (assistant).
+
+---
+
+## Part 3 — 24 ideas from the idea sub-agents
+
+Two idea agents ran after the platform quota recovered (the other eight scopes
+stayed first-party). Their full write-ups are in `bugreports/agent-idea-01.md`
+and `bugreports/agent-idea-02.md`; none duplicates the fifty above.
+
+### Unique / innovative
+- **Silhouette Showdown** [S] — a quiz that shows only a badge's outline; the
+  catalog's image UUIDs make the asset side trivial.
+- **Leak Radar** [M] — watch for a badge appearing in public inventories before
+  its official window opens, and surface it as a scoop.
+- **Fading Badges** [S] — badges whose claim window is closing drift visually
+  toward grey as their `end_date` approaches.
+- **Achievement Composer** [M] — let collectors define their own achievement
+  from composable predicates, tracked by the existing evaluation loop.
+- **Collection Completion Solver** [M] — "which 12 badges would make my
+  collection the most complete per coin spent", solved over the catalog.
+- **Art-Style Atlas** [M] — cluster badges by artwork family so collectors can
+  chase a whole lineage.
+- **Badge DNA Barcode** [S] — render a badge's six TBRI signals as a small
+  barcode, shareable and comparable.
+
+### Impressive / technical
+- **Badge Futures Market** [L] — trade on a badge's predicted rarity tier using
+  the momentum series; settles against the real tier.
+- **Badge Time Machine** [L] — reconstruct any past date's catalog from
+  `badge_stats` and inventory snapshots.
+- **Drop Survival Lab** [M] — simulate how long a badge survives at a given
+  owner-growth rate, using the window-brevity input.
+- **Verifiable Badge Credential** [M] — sign a profile's rarest-badge claim so
+  it can be verified elsewhere without trusting the page.
+- **Live Owner-Delta Stream** [M] — stream owner-count changes as they land,
+  the data the momentum score already consumes.
+
+### Unexpected
+- **Badge Half-Life** [M] — publish the median time-to-expiry per category.
+- **Timezone Drop Lottery** [S] — which region unlocks a badge first, from
+  anonymised owner deltas.
+- **Orphan Badge Watch** [S] — badges with an owner count of zero or a missing
+  image, presented as a museum of the forgotten.
+- **Co-Ownership Recommendations** [M] — "collectors who own this also own…",
+  derived from the owner lists already synced.
+
+### Cool
+- **TBRI-100 Index** [M] — a market-index style composite of the catalog.
+- **Rarity Promotion & Demotion Ticker** [S] — a live feed of badges crossing a
+  tier boundary.
+- **Silhouette Daily Badge Game** [M] — one silhouette per day, streak-based.
+- **Collector Percentile Card** [S] — a shareable "you are in the top X%" card.
+- **Collection Fingerprint** [S] — a deterministic visual hash of a collection.
+- **Deadline Density Calendar** [S] — a heatmap of upcoming expiry days.
+- **Badge Bingo** [M] — a card of categories/rarities to complete.
+- **Collector Net Worth** [M] — value a collection with derived BadgesCoins.
+
+**Total collected: 10 optimisation areas, 50 first-party ideas and 24
+sub-agent ideas = 74 feature ideas across the five requested categories.**
