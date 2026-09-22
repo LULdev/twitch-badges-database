@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocale } from "next-intl";
 
 interface HealthPayload {
   ok: boolean;
@@ -45,6 +46,7 @@ export default function LiveStatus({
   };
   intervalMs?: number;
 }) {
+  const locale = useLocale();
   const [health, setHealth] = useState<HealthPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pings, setPings] = useState<Ping[]>([]);
@@ -164,7 +166,7 @@ export default function LiveStatus({
         </div>
         {health ? (
           <p className="mt-2 text-[11px] text-muted">
-            {labels.lastCheck}: {new Date(health.checkedAt).toLocaleTimeString()}
+            {labels.lastCheck}: {new Date(health.checkedAt).toLocaleTimeString(locale)}
           </p>
         ) : null}
       </div>

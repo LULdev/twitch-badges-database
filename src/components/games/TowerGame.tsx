@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "next-intl";
 import { useGame, BetBar, GameError } from "./useGame";
 import Coin from "@/components/Coin";
 
 export default function TowerGame() {
   const { bet, setBet, busy, error, balance, play, t } = useGame("tower");
+  const locale = useLocale();
   const [cashoutAt, setCashoutAt] = useState(5);
   const [last, setLast] = useState<{ floor: number; survived: boolean; payout: number } | null>(null);
 
@@ -71,7 +73,7 @@ export default function TowerGame() {
         </button>
         {last && (
           <p className={`text-center text-lg font-extrabold ${last.survived ? "text-success" : "text-danger"}`}>
-            {last.survived ? t("youWin") : t("crashed")} (<span className="inline-flex items-center gap-1">{last.payout.toLocaleString("en")} <Coin size={14} /></span>)
+            {last.survived ? t("youWin") : t("crashed")} (<span className="inline-flex items-center gap-1">{last.payout.toLocaleString(locale)} <Coin size={14} /></span>)
           </p>
         )}
       </div>

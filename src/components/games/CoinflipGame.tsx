@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "next-intl";
 import { useGame, BetBar, GameError } from "./useGame";
 
 export default function CoinflipGame() {
   const { bet, setBet, busy, error, play, t } = useGame("coinflip");
+  const locale = useLocale();
   const [side, setSide] = useState<"heads" | "tails">("heads");
   const [target, setTarget] = useState(3);
   const [flips, setFlips] = useState<string[] | null>(null);
@@ -29,7 +31,7 @@ export default function CoinflipGame() {
         <label className="block text-center text-sm">
           <span className="text-muted">{t("ladderTarget")}: </span>
           <span className="font-bold">
-            {target}× ({t("payout")}: {Math.floor(bet * Math.pow(2, target) * 0.97).toLocaleString("en")})
+            {target}× ({t("payout")}: {Math.floor(bet * Math.pow(2, target) * 0.97).toLocaleString(locale)})
           </span>
           <input
             type="range"

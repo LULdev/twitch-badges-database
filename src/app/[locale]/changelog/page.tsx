@@ -54,6 +54,10 @@ export default async function ChangelogPage({
     "data_sync",
     "feature",
     "bugfix",
+    // Both kinds exist in the data and have translations, but had no filter
+    // chip, so those entries could not be selected.
+    "blog",
+    "push",
   ];
 
   const filterHref = (value: string) =>

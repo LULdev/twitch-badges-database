@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 /** Steal coins from another collector (share-link target). */
 export default function StealPanel({
@@ -18,6 +18,7 @@ export default function StealPanel({
   enabled?: boolean;
 }) {
   const t = useTranslations("steal");
+  const locale = useLocale();
   const router = useRouter();
   const [state, setState] = useState<"idle" | "busy">("idle");
   const [result, setResult] = useState<string | null>(null);
@@ -37,10 +38,10 @@ export default function StealPanel({
       if (!data.ok) {
         setResult(data.error);
       } else if (data.success) {
-        setResult(t("success", { coins: data.stolen.toLocaleString("en") }));
+        setResult(t("success", { coins: data.stolen.toLocaleString(locale) }));
         router.refresh();
       } else {
-        setResult(t("failed", { coins: data.cost.toLocaleString("en") }));
+        setResult(t("failed", { coins: data.cost.toLocaleString(locale) }));
         router.refresh();
       }
     } catch {
@@ -63,7 +64,7 @@ export default function StealPanel({
   return (
     <div className="card space-y-2 p-4">
       <p className="text-xs text-muted">
-        {t("hint", { price: price.toLocaleString("en"), max: maxAmount.toLocaleString("en") })}
+        {t("hint", { price: price.toLocaleString(locale), max: maxAmount.toLocaleString(locale) })}
       </p>
       <button type="button" onClick={attempt} disabled={state === "busy"} className="btn btn-danger w-full text-xs">
         {state === "busy" ? "…" : t("attempt")}

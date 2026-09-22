@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Coin from "@/components/Coin";
 
 interface Slot {
@@ -28,6 +28,7 @@ const SEGMENT_ANGLE = 360 / SEGMENTS.length;
 /** Daily Wheel of Fortune with animated spin and Turbo jackpot slot. */
 export default function WheelOfFortune() {
   const t = useTranslations("wheel");
+  const locale = useLocale();
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<Slot | null>(null);
@@ -133,7 +134,7 @@ export default function WheelOfFortune() {
           <div className={`card mx-auto mt-4 max-w-sm p-5 ${result.turbo ? "border-warning" : ""}`}>
             <p className="text-2xl font-black">{result.turbo ? t("turboWon") : result.label}</p>
             <p className="mt-1 text-sm text-muted">
-              {result.turbo ? t("turboWon") : (<span className="inline-flex items-center gap-1.5">+{result.coins.toLocaleString("en")} <Coin size={16} className="bcoin-lg" /></span>)}
+              {result.turbo ? t("turboWon") : (<span className="inline-flex items-center gap-1.5">+{result.coins.toLocaleString(locale)} <Coin size={16} className="bcoin-lg" /></span>)}
             </p>
           </div>
         )}

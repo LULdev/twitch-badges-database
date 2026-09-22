@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import Coin from "@/components/Coin";
 
@@ -34,6 +34,7 @@ const KIND_COLORS: Record<string, string> = {
 /** Public live feed with 5-second polling (real-time-ish). */
 export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[] }) {
   const t = useTranslations("feed");
+  const locale = useLocale();
   const [events, setEvents] = useState<FeedEvent[]>(initialEvents ?? []);
   const [paused, setPaused] = useState(false);
   const seenIds = useRef(new Set<number>((initialEvents ?? []).map((e) => e.id)));
@@ -132,7 +133,7 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
                 {event.xp_amount ? <span className="font-bold text-accent">+{event.xp_amount} XP</span> : null}
                 {event.coins_amount ? (
                   <span className={`inline-flex items-center gap-1 font-bold ${event.coins_amount > 0 ? "text-success" : "text-danger"}`}>
-                    {event.coins_amount > 0 ? "+" : ""}{event.coins_amount.toLocaleString("en")} <Coin size={12} />
+                    {event.coins_amount > 0 ? "+" : ""}{event.coins_amount.toLocaleString(locale)} <Coin size={12} />
                   </span>
                 ) : null}
               </div>

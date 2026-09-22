@@ -71,7 +71,7 @@ export default async function GamesHubPage({
                 />
               </div>
               <p className="mt-1.5 text-xs text-muted tabular-nums">
-                {t("level")} {level.level} · {level.xpIntoLevel}/{level.xpForNext || "∞"} XP · <span className="inline-flex items-center gap-1">{coins.toLocaleString("en")} <Coin size={13} /></span>
+                {t("level")} {level.level} · {level.xpIntoLevel}/{level.xpForNext || "∞"} XP · <span className="inline-flex items-center gap-1">{coins.toLocaleString(locale)} <Coin size={13} /></span>
               </p>
             </div>
           )}

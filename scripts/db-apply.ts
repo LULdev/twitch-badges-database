@@ -45,8 +45,13 @@ async function main() {
     for (const name of pending) {
       const text = readFileSync(resolve(migrationsDir, name), "utf8");
       console.log(`Applying ${name} ...`);
-      await sql.unsafe(text);
-      await sql`insert into supabase_migrations (name) values (${name})`;
+      // One transaction: if the process dies between the migration and its
+      // ledger row, the next run would apply the migration a second time — and
+      // 0001 contains destructive DROP statements.
+      await sql.begin(async (tx) => {
+        await tx.unsafe(text);
+        await tx`insert into supabase_migrations (name) values (${name})`;
+      });
       console.log(`OK ${name}`);
     }
   } finally {

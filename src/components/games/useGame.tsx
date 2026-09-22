@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Coin from "@/components/Coin";
 
 export interface PlayResponse {
@@ -84,6 +84,7 @@ export function BetBar({
   busy: boolean;
   balance: number | null;
 }) {
+  const locale = useLocale();
   const t = useTranslations("games");
   return (
     <div className="card flex flex-wrap items-center gap-3 p-4">
@@ -114,7 +115,7 @@ export function BetBar({
       />
       {balance !== null && (
         <span className="ms-auto text-sm font-bold tabular-nums">
-          <Coin size={15} /> {balance.toLocaleString("en")}
+          <Coin size={15} /> {balance.toLocaleString(locale)}
         </span>
       )}
     </div>

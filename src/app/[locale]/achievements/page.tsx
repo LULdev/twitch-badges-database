@@ -69,7 +69,7 @@ export default async function AchievementsPage({
               <dt className="stat-label">{t("unlocked")}</dt>
             </div>
             <div className="card stat-tile py-3">
-              <dd className="stat-value">{points.toLocaleString("en")}</dd>
+              <dd className="stat-value">{points.toLocaleString(locale)}</dd>
               <dt className="stat-label">{t("points")}</dt>
             </div>
           </div>

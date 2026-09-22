@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLocale } from "next-intl";
 import { useGame, BetBar, GameError } from "./useGame";
 import Coin from "@/components/Coin";
 
@@ -13,6 +14,7 @@ interface Symbol {
 /** Badges of Ra 6 Deluxe — 5 reels × 3 rows, real Twitch badge symbols. */
 export default function SlotsGame() {
   const { bet, setBet, busy, error, play, t } = useGame("slots");
+  const locale = useLocale();
   const [symbols, setSymbols] = useState<Symbol[]>([]);
   const [reels, setReels] = useState<string[][]>(
     Array.from({ length: 3 }, () => Array(5).fill("")),
@@ -97,12 +99,12 @@ export default function SlotsGame() {
             onClick={spin}
             className="btn btn-primary w-full py-3 text-base"
           >
-            {spinning ? t("spinning") : (<span>{t("spin")} (<span className="inline-flex items-center gap-1">{bet.toLocaleString("en")} <Coin size={14} /></span>)</span>)}
+            {spinning ? t("spinning") : (<span>{t("spin")} (<span className="inline-flex items-center gap-1">{bet.toLocaleString(locale)} <Coin size={14} /></span>)</span>)}
           </button>
           {lastWin && (
             <p className={`mt-3 text-center text-lg font-extrabold ${lastWin.payout > bet ? "text-success" : "text-muted"}`}>
               {lastWin.payout > bet
-                ? (<span>+{(lastWin.payout - bet).toLocaleString("en")} <Coin size={14} /> — {lastWin.lines} {t("paylines")}{lastWin.scatter >= 3 ? ` · ${lastWin.scatter}x SCATTER!` : ""}</span>)
+                ? (<span>+{(lastWin.payout - bet).toLocaleString(locale)} <Coin size={14} /> — {lastWin.lines} {t("paylines")}{lastWin.scatter >= 3 ? ` · ${lastWin.scatter}x SCATTER!` : ""}</span>)
                 : t("noWin")}
             </p>
           )}

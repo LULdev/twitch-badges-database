@@ -22,6 +22,10 @@ export async function GET(request: Request) {
     summary = await withHeartbeat("sync/global", () => runGlobalSync());
   } catch (error) {
     console.error("[cron/global]", error);
+    // Retention must not be coupled to the least reliable step: the prune used
+    // to sit after this early return, so a failing catalog sync also stopped
+    // the heartbeat table from ever being trimmed.
+    await pruneHeartbeats(90).catch(() => 0);
     await recordHeartbeat({
       source: "cron/global",
       status: "error",
@@ -53,5 +57,14 @@ export async function GET(request: Request) {
     payload: { prunedHeartbeats: pruned },
   });
 
-  return Response.json({ ok: true, summary, badgebase, durationMs, pruned });
+  return Response.json({
+    ok: true,
+    summary,
+    badgebase,
+    // Explicit rather than implied by a null field: the run is a success, but
+    // the operator should see that the enrichment half failed.
+    badgebaseFailed: !badgebase,
+    durationMs,
+    pruned,
+  });
 }
