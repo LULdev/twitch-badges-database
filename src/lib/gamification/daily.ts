@@ -167,7 +167,15 @@ export async function attemptSteal(
     .gte("created_at", hourAgo);
   if ((racedPair ?? 0) > 1 || (racedHour ?? 0) > 6) {
     if (attempt?.id != null) {
-      await supabase.from("steal_attempts").delete().eq("id", attempt.id);
+      // Same reasoning as the game-round cleanup: a surviving attempt row would
+      // pollute the flood window for the next five minutes.
+      const { error: voidError } = await supabase
+        .from("steal_attempts")
+        .delete()
+        .eq("id", attempt.id);
+      if (voidError) {
+        console.warn("[steal] could not void the raced attempt:", voidError.message);
+      }
     }
     return { ok: false, error: "Flood check: too many attempts at once." };
   }
@@ -178,14 +186,6 @@ export async function attemptSteal(
   // for the same reason. Their errors are inspected: the round used to report
   // success while games_won/coins_won or the counter stayed behind.
   const balance = await bumpCoins(thiefId, -settings.price + stolen);
-  const { error: thiefCounterError } = await supabase.rpc("bump_counters", {
-    p_user_id: thiefId,
-    p_deltas: {
-      steals_successful: success ? 1 : 0,
-      steals_failed: success ? 0 : 1,
-    },
-  });
-  if (thiefCounterError) throw thiefCounterError;
 
   // The victim receives the attempt cost on BOTH outcomes — that is what the
   // comment (and the anti-abuse design) means: paying to harass has to benefit
@@ -193,18 +193,31 @@ export async function attemptSteal(
   // economy on every successful heist, a deflationary sink the victim sized
   // themselves via `steal_price`.
   await bumpCoins(victimProfile.id, -stolen + settings.price);
-  const { error: victimCounterError } = await supabase.rpc("bump_counters", {
-    p_user_id: victimProfile.id,
-    p_deltas: { times_robbed: 1 },
-  });
-  if (victimCounterError) throw victimCounterError;
 
-  const thiefProfile = await supabase
-    .from("profiles")
-    .select("username")
-    .eq("id", thiefId)
-    .maybeSingle()
-    .then(({ data }) => data?.username ?? "someone");
+  // Counters move only after BOTH coin moves. Throwing in between used to leave
+  // the transfer half-applied — the thief charged, the victim not credited —
+  // plus a five-minute lockout on a request whose coins had already moved. Now
+  // the settlement is complete before anything can fail, and a counter problem
+  // is reported instead of aborting a steal that did happen.
+  const [thiefCounter, victimCounter] = await Promise.all([
+    supabase.rpc("bump_counters", {
+      p_user_id: thiefId,
+      p_deltas: {
+        steals_successful: success ? 1 : 0,
+        steals_failed: success ? 0 : 1,
+      },
+    }),
+    supabase.rpc("bump_counters", {
+      p_user_id: victimProfile.id,
+      p_deltas: { times_robbed: 1 },
+    }),
+  ]);
+  if (thiefCounter.error || victimCounter.error) {
+    console.warn(
+      "[steal] counter update failed after the coins moved:",
+      thiefCounter.error?.message ?? victimCounter.error?.message,
+    );
+  }
 
   await logActivity({
     userId: thiefId,
@@ -253,20 +266,23 @@ export async function coinRain(
   // the anonymous key).
   if (giverId && giverId === profileOwnerId) return { ok: false };
 
-  // The dedup below is a read-then-write on `activity_events` (which has no
-  // unique constraint to make it a real gate), so a parallel burst of requests
-  // can each observe "no rain today" and each award a coin. Closing that needs
-  // a compare-and-set RPC or a unique index on (owner, giver, UTC day) — SQL
-  // this file cannot add — see the report.
-  const since = new Date(Date.now() - 86_400_000).toISOString();
-  const { count } = await supabase
-    .from("activity_events")
-    .select("id", { count: "exact", head: true })
-    .eq("kind", "coin_rain")
-    .eq("user_id", profileOwnerId)
-    .gte("created_at", since)
-    .contains("payload", { giver: giverId ?? anonymousKey ?? "anonymous" });
-  if ((count ?? 0) > 0) return { ok: false, already: true };
+  // Atomic once-per-day gate. The primary key on (owner, giver, UTC day) makes a
+  // parallel burst collide instead of every request observing "no rain today".
+  // It replaces a read-then-write on activity_events whose filter compared the
+  // anonymous giver's IP hash against a payload value only ever written as
+  // "anonymous" — so for logged-out visitors it never matched and every POST
+  // awarded another coin. The hash cannot go into that table instead: it is
+  // public-read.
+  const day = new Date().toISOString().slice(0, 10);
+  const giverKey = giverId ?? anonymousKey ?? "anonymous";
+  const { error: gateError } = await supabase
+    .from("coin_rain_gate")
+    .insert({ owner_id: profileOwnerId, giver_key: giverKey, day });
+  if (gateError) {
+    // 23505 unique_violation: this giver already rained on this profile today.
+    if (gateError.code === "23505") return { ok: false, already: true };
+    throw gateError;
+  }
 
   // Atomic +1: an absolute write would discard any award that landed between
   // the read and the write.

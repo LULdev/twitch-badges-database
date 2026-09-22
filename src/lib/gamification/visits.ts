@@ -13,34 +13,40 @@ export async function recordProfileVisit(
 ): Promise<boolean> {
   const supabase = createAdminClient();
   const since = new Date(Date.now() - DEDUP_WINDOW_MS).toISOString();
-  const { count } = await supabase
+  const { count, error } = await supabase
     .from("profile_visits")
     .select("id", { count: "exact", head: true })
     .eq("profile_id", profileId)
     .eq("ip_hash", ipHash)
     .gte("created_at", since);
+  // A failed dedup read is not "no recent visit": treating it that way arms the
+  // window twice and inflates the counter, the same way it inflated blog views.
+  if (error) {
+    console.warn("[visit] dedup read failed, not counting:", error.message);
+    return false;
+  }
   if ((count ?? 0) > 0) return false;
 
-  const { error } = await supabase
+  const { error: insertError } = await supabase
     .from("profile_visits")
     .insert({ profile_id: profileId, visitor_id: visitorId, ip_hash: ipHash });
-  if (error) return false;
+  if (insertError) return false;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("id", profileId)
-    .maybeSingle();
-  if (!profile) return false;
-
-  // Atomic increment: reading view_count and writing it back lost one
-  // increment whenever two visitors arrived inside the same window. The RPC's
-  // error is inspected because a visitor whose counter never moved must not be
-  // reported as counted.
+  // A successful insert already proves the profile exists (the foreign key
+  // enforces it), so the extra lookup that used to sit here could only produce a
+  // contradictory answer: "not counted" while the visit row was already stored
+  // and the five-minute window therefore armed.
+  //
+  // Atomic increment: reading view_count and writing it back lost one increment
+  // whenever two visitors arrived inside the same window.
   const { error: bumpError } = await supabase.rpc("bump_view_count", {
     p_profile_id: profileId,
   });
-  return !bumpError;
+  if (bumpError) {
+    console.warn("[visit] counter bump failed:", bumpError.message);
+    return false;
+  }
+  return true;
 }
 
 /** Blog view with the same 5-minute per-IP dedup. Returns true when counted. */
@@ -61,8 +67,12 @@ export async function recordBlogView(
     .eq("ip_hash", ipHash)
     .gte("created_at", since);
   // A failed dedup read must not be read as "no recent view" — that is exactly
-  // how the counter was inflated. Refuse to count this view instead.
-  if (error) return false;
+  // how the counter was inflated. Refuse to count this view instead, and say so:
+  // a persistent error here would otherwise drop every view silently.
+  if (error) {
+    console.warn("[visit] blog dedup read failed, not counting:", error.message);
+    return false;
+  }
   if ((count ?? 0) > 0) return false;
 
   const { error: insertError } = await supabase

@@ -133,10 +133,10 @@ export async function playGame(
   // The 1/s flood check above reads the newest existing round and this insert
   // happens after it, so two requests fired in parallel both passed. Re-reading
   // the two newest rows now that ours is in closes that hole: a burst leaves a
-  // ~0 ms gap between them, so every racer but the first voids its own round —
-  // and nothing has moved yet (counters, coins and XP all come later). A truly
-  // atomic guard needs a unique index on (user_id, epoch second), which is not
-  // in the schema.
+  // ~0 ms gap between them, so EVERY racer voids its own round — conservative
+  // on purpose, and harmless because nothing has moved yet (counters, coins and
+  // XP all come later); the user simply retries. A truly atomic guard needs a
+  // unique index on (user_id, epoch second), which is not in the schema.
   const { data: newest } = await supabase
     .from("game_rounds")
     .select("created_at")
@@ -151,7 +151,15 @@ export async function playGame(
       RATE_RACE_MS
   ) {
     if (round?.id != null) {
-      await supabase.from("game_rounds").delete().eq("id", round.id);
+      // The cleanup must not fail silently: a surviving row would count for
+      // streaks, maxBet and the feed without ever being settled.
+      const { error: voidError } = await supabase
+        .from("game_rounds")
+        .delete()
+        .eq("id", round.id);
+      if (voidError) {
+        console.warn("[game] could not void the raced round:", voidError.message);
+      }
     }
     return fail("Slow down — one round per second.");
   }

@@ -42,13 +42,31 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
   // The owners feed can fail without failing the whole sync. That must NOT be
   // mistaken for "nobody owns anything": writing null over every owner_count
   // destroys the catalog's statistics and feeds the rarity index.
-  const [distribution, ownersResult] = await Promise.all([
-    fetchAllDistribution(),
+  const [distributionResult, ownersResult] = await Promise.all([
+    fetchAllDistribution()
+      .then((rows) => ({ ok: true as const, rows, error: null as unknown }))
+      .catch((error: unknown) => ({ ok: false as const, rows: [], error })),
     fetchAllOwners()
       .then((rows) => ({ ok: true as const, rows }))
       .catch(() => ({ ok: false as const, rows: [] })),
   ]);
   const ownersOk = ownersResult.ok;
+
+  // Unlike the owners feed, the distribution feed drives every derived value
+  // this sync writes, so a failed or truncated one must not reach the writes at
+  // all — and must not look like a healthy run. It fails here, before anything
+  // is touched, with the reason the provider gave (including the pagination cap
+  // in fetchAllDistribution).
+  if (!distributionResult.ok) {
+    throw new Error(
+      `potat distribution feed unavailable: ${
+        distributionResult.error instanceof Error
+          ? distributionResult.error.message
+          : "unknown error"
+      }`,
+    );
+  }
+  const distribution = distributionResult.rows;
 
   const ownersByBadge = new Map<string, number>();
   for (const row of ownersResult.rows) {
