@@ -722,6 +722,34 @@ ledger already prevents a second migration run.
 atomicity 16/16, Python syntax of all eleven changed scripts checked, and three
 guards verified by actual execution (all refuse, all message files unchanged).
 
+## Round 23 — the three open items, worked off
+
+The round-22 agent confirmed the guard closure with **0 high, 0 medium, 1 low, 2
+info — and no live defect**: all six guards precede every write, parse and fire on
+execution, the classification reproduces exactly (10/10 message writers guarded,
+0 unguarded), and nothing in `src/`, cron, CI or `package.json` reaches them.
+
+Its one low finding (`ALLOW_ONE_OFF_MIGRATION` undocumented, and the `.py` guards
+read the process environment only) is fixed in `.env.example`.
+
+Then the three items that were still open:
+
+| Item | What was done |
+|---|---|
+| **cli-9** | the language listbox keeps focus on the trigger with `tabIndex={-1}` options, so `aria-activedescendant` belongs on the element owning `role="listbox"`. My earlier attempt put it on the button and eslint rejected it — correctly. Focus now moves into the panel on open; the panel carries the attribute and the keyboard handling (arrows with wrap, Home/End, Enter/Space, Tab dismisses) |
+| **fp-3** | the customizer writes ~35 settings to `profiles.customization` and the public profile applied **none** of them: a member could hide their coins, level, stats or visitors and nothing changed. The five visibility toggles now work, plus `nameGradient` and `bannerOverlay` (the gradient is validated as a comma-separated hex list so it cannot smuggle CSS). The effect/animation and layout settings still need their own CSS and are enumerated in `FIXES.md` |
+| **XP budget (gam-7 residual)** | migration 0017 adds `consume_and_apply_game_xp`: the cap is clamped under the row lock and the XP and coins move in the **same** UPDATE, so a failure cannot spend budget without granting. Migration 0018 fixes an ambiguity I introduced in 0017 — the OUT columns were named `xp`/`coins`, colliding with the table's columns, so every call raised 42702 and the function was broken rather than improved; `create or replace` cannot rename OUT parameters, hence the drop-first |
+
+**Functionally verified** in a rolled-back transaction: 80 requested grants 80, then
+50 requested with 20 left grants exactly **20**; xp +100, coins +5, the daily
+budget lands on exactly 100 and never above; the rolled-back state is unchanged;
+an anon call gets **401**.
+
+**Verification:** lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`,
+atomicity 16/16, economy 13/13 (worst 0.9850). Live: 30/30 routes, and the profile
+still renders the level badge, the stat tiles and the view count under the
+defaults — the toggles only hide when explicitly set.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents
