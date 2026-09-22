@@ -11,6 +11,13 @@ async function main() {
     "sync/badgebase",
     () => runBadgebaseSync(),
     (result) => result as unknown as Record<string, unknown>,
+    (result) =>
+      typeof (result as { skipped?: string }).skipped === "string"
+        ? {
+            status: "degraded" as const,
+            message: "drop-window enrichment skipped: empty listing",
+          }
+        : { status: "ok" as const },
   );
   console.log("[sync:badgebase]", JSON.stringify(summary, null, 2));
   if (typeof (summary as { skipped?: string }).skipped === "string") {

@@ -49,14 +49,23 @@ export async function withHeartbeat<T>(
   source: HeartbeatSource,
   run: () => Promise<T>,
   summarize?: (result: T) => Record<string, unknown> | null,
+  /**
+   * A run can finish without failing and still have achieved nothing (the
+   * drop-window sync skips when its listing comes back empty). Without this the
+   * heartbeat recorded "ok" and the uptime view stayed green through the very
+   * incident the caller wanted to surface.
+   */
+  statusOf?: (result: T) => { status: "ok" | "degraded"; message?: string | null },
 ): Promise<T> {
   const started = Date.now();
   try {
     const result = await run();
+    const outcome = statusOf?.(result);
     await recordHeartbeat({
       source,
-      status: "ok",
+      status: outcome?.status ?? "ok",
       durationMs: Date.now() - started,
+      message: outcome?.message ?? null,
       payload: summarize ? summarize(result) : null,
     });
     return result;

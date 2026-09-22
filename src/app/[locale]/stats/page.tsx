@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import type { CSSProperties, ReactNode } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { ACTIVE_ACHIEVEMENTS } from "@/lib/gamification/achievements";
 import { getSiteStats } from "@/lib/queries";
 import { daySeries, getPlatformStats } from "@/lib/stats";
-import { ACH_BY_ID } from "@/lib/gamification/achievements";
+import {
+  ACH_BY_ID,
+  ACTIVE_ACHIEVEMENTS,
+} from "@/lib/gamification/achievements";
 import { GAMES } from "@/lib/gamification/games";
 import { levelTheme } from "@/lib/gamification/levels";
 import BadgeGrid from "@/components/badges/BadgeGrid";
@@ -284,8 +286,11 @@ export default async function StatsPage({
     { unlocks: 0, common: 0, creative: 0, special: 0 },
   );
 
+  // The catalog size counts ACTIVE achievements only. Iterating ACH_BY_ID
+  // counted the retired entries too, so this KPI read 125 while the subtitle on
+  // the same page read 123.
   const catalogTotals = { common: 0, creative: 0, special: 0 };
-  for (const achievement of ACH_BY_ID.values()) {
+  for (const achievement of ACTIVE_ACHIEVEMENTS) {
     catalogTotals[achievement.category] += 1;
   }
   const achievementCatalogSize =

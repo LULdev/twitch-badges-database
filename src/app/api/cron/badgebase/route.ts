@@ -18,6 +18,13 @@ export async function GET(request: Request) {
       "sync/badgebase",
       () => runBadgebaseSync(),
       (result) => result as unknown as Record<string, unknown>,
+      (result) =>
+        typeof (result as { skipped?: string }).skipped === "string"
+          ? {
+              status: "degraded" as const,
+              message: "drop-window enrichment skipped: empty listing",
+            }
+          : { status: "ok" as const },
     );
     const skipped = typeof (summary as { skipped?: string }).skipped === "string";
     const durationMs = Date.now() - started;

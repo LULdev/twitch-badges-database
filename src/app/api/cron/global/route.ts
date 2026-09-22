@@ -51,7 +51,14 @@ export async function GET(request: Request) {
     badgebase = await withHeartbeat(
       "sync/badgebase",
       () => runBadgebaseSync(),
-      (summary) => summary as unknown as Record<string, unknown>,
+    (result) => result as unknown as Record<string, unknown>,
+    (result) =>
+      typeof (result as { skipped?: string }).skipped === "string"
+        ? {
+            status: "degraded",
+            message: "drop-window enrichment skipped: empty listing",
+          }
+        : { status: "ok" },
     );
     badgebaseSkipped =
       typeof (badgebase as { skipped?: string }).skipped === "string";

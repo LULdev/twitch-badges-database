@@ -69,7 +69,7 @@ The `handle_new_user` trigger creates the profile row on first login.
 ## Gamification
 
 Logged-in collectors earn XP and coins: daily login (+10 XP, +50 coins, streak
-bonus), unlocking Twitch badges (+1,000 XP / +500 coins each), 125 achievements,
+bonus), unlocking Twitch badges (+1,000 XP / +500 coins each), 123 achievements,
 13 arcade games and a daily Wheel of Fortune (XP 25–2,500; Twitch Turbo jackpot
 at probability 1 : 100,000,000). Levels 1–100 (curve: 100 + (L-1)·50 XP →
 254,900 total) render unique sparkle-animated level badges that are always
