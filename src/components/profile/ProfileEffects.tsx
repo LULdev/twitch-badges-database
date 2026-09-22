@@ -95,7 +95,7 @@ export function ProfileAutoRain({ accent }: { accent?: string }) {
     const frame = requestAnimationFrame(() => {
       setCoins(Array.from({ length: 12 }, () => Math.random()));
     });
-    const timer = window.setTimeout(() => setCoins([]), 4000);
+    const timer = window.setTimeout(() => setCoins([]), 4200);
     return () => {
       cancelAnimationFrame(frame);
       window.clearTimeout(timer);
@@ -106,28 +106,22 @@ export function ProfileAutoRain({ accent }: { accent?: string }) {
   return (
     <span className="pf-auto-rain" aria-hidden>
       {coins.map((seed, index) => (
+        // The fall itself is a keyframe (see .pf-rain-coin), so the coins are
+        // visible for their whole duration instead of being set to opacity 0 by
+        // script and never recovering.
         <span
           key={index}
-          className="bcoin"
+          className="pf-rain-coin"
           style={{
             left: `${8 + seed * 84}vw`,
-            fontSize: `${13 + seed * 12}px`,
-            color: accent,
-            transition: "top 1.6s ease-in, opacity 1.6s",
-            opacity: 0,
+            width: 14 + seed * 8,
+            height: 14 + seed * 8,
+            animationDuration: `${2.2 + seed * 1.6}s`,
+            animationDelay: `${seed * 0.9}s`,
+            background: accent,
+            borderColor: accent,
           }}
-          ref={(node) => {
-            // Start above the viewport, then drop: requestAnimationFrame keeps
-            // the setState out of the effect body (React Compiler lint rule).
-            if (!node) return;
-            requestAnimationFrame(() => {
-              node.style.top = "100vh";
-              node.style.opacity = "0";
-            });
-          }}
-        >
-          <span className="bcoin-face" style={{ color: accent }}>B</span>
-        </span>
+        />
       ))}
     </span>
   );

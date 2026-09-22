@@ -8,9 +8,12 @@ import { levelTheme } from "@/lib/gamification/levels";
 export default function LevelBadge({
   level,
   size = 72,
+  halo,
 }: {
   level: number;
   size?: number;
+  /** Overrides the tier's default halo colour (the profile customizer uses it). */
+  halo?: string;
 }) {
   const t = useTranslations("common");
   const theme = levelTheme(level);
@@ -21,7 +24,9 @@ export default function LevelBadge({
         width: size,
         height: size,
         ["--level-glow" as string]: theme.glow,
-        ["--level-halo" as string]: theme.halo,
+        // The inline value shadows any wrapper, so an override has to be
+        // passed in here rather than set on a parent element.
+        ["--level-halo" as string]: halo ?? theme.halo,
       }}
       role="img"
       aria-label={t("levelAria", { level })}

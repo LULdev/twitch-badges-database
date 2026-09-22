@@ -210,7 +210,10 @@ export default async function ProfilePage({ params }: PageProps) {
     ? nameGradientRaw
     : "";
   const bannerOverlay = Math.min(90, Math.max(0, num("bannerOverlay", 0)));
-  const customColor = hex(text("color"), "#a970ff");
+  // The account page writes the colour BOTH to the column and the document;
+  // the column is the source of truth, so a member who set it there before the
+  // customizer existed still gets their colour.
+  const customColor = hex(profile?.color ?? text("color"), "#a970ff");
   const accent2 = hex(text("accent2"), "#60a5fa");
   const font = one("font", ["sans", "serif", "mono", "rounded"] as const, "sans");
   const cardStyle = one("cardStyle", ["glass", "solid", "outline"] as const, "glass");
@@ -220,18 +223,20 @@ export default async function ProfilePage({ params }: PageProps) {
   const density = one("density", ["cozy", "compact"] as const, "cozy");
   const profileTheme = one("profileTheme", ["auto", "violet", "emerald", "sapphire", "gold"] as const, "auto");
   const effectsIntensity = one("effectsIntensity", ["off", "subtle", "full"] as const, "subtle");
-  const aura = flag("aura", false);
-  const particles = flag("particles", false);
+  // "off" wins over every individual toggle: it is the master switch.
+  const fxOn = effectsIntensity !== "off";
+  const aura = fxOn && flag("aura", false);
+  const particles = fxOn && flag("particles", false);
   const nameRainbow = flag("nameRainbow", false);
   const bannerShine = flag("bannerShine", true);
-  const tilt3d = flag("tilt3d", false);
+  const tilt3d = fxOn && flag("tilt3d", false);
   const pixelAvatar = flag("pixelAvatar", false);
   const achievementTicker = flag("achievementTicker", true);
   const greetingBanner = flag("greetingBanner", true);
   const levelHalo = hex(text("levelHalo"), "#a970ff");
   const cursorBadge = flag("cursorBadge", false);
   const statusBubble = text("statusBubble").slice(0, 120);
-  const coinRainAuto = flag("coinRainAuto", false);
+  const coinRainAuto = fxOn && flag("coinRainAuto", false);
   const visitorMarquee = flag("visitorMarquee", true);
   const memberTitle = text("title").slice(0, 64);
   const socialTwitter = text("socialTwitter").replace(/[^A-Za-z0-9_]/g, "").slice(0, 32);
@@ -240,11 +245,7 @@ export default async function ProfilePage({ params }: PageProps) {
   // The theme only re-maps the accent inside the profile; "auto" keeps the
   // member's own custom colour as the accent when they set one.
   const themeClass =
-    profileTheme === "auto"
-      ? customColor !== "#a970ff"
-        ? ""
-        : ""
-      : `pf-theme-${profileTheme}`;
+    profileTheme === "auto" ? "" : `pf-theme-${profileTheme}`;
   const rootAccentVars =
     profileTheme === "auto"
       ? { "--pf-accent": customColor, "--pf-accent-2": accent2 }
@@ -336,7 +337,7 @@ export default async function ProfilePage({ params }: PageProps) {
       {/* Banner + identity */}
       <section className="card overflow-hidden">
         <div
-          className={`h-28 bg-accent-soft sm:h-36 ${bannerShine ? "pf-banner-shine" : ""}`}
+          className={`pf-banner-root h-28 bg-accent-soft sm:h-36 ${bannerShine ? "pf-banner-shine" : ""}`}
           style={
             profile?.banner_url
               ? {
@@ -381,9 +382,7 @@ export default async function ProfilePage({ params }: PageProps) {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-3">
               {level && showLevel && (
-                <span style={{ "--level-halo": `${levelHalo}66` } as React.CSSProperties}>
-                  <LevelBadge level={level.level} size={64} />
-                </span>
+                <LevelBadge level={level.level} size={64} halo={`${levelHalo}66`} />
               )}
               <div className="min-w-0">
                 <h1
@@ -688,12 +687,35 @@ export default async function ProfilePage({ params }: PageProps) {
           <div className="section-title">
             <h2 id="showcase">{t("showcase")}</h2>
           </div>
-          {showcaseBadges.length > 0 ? (
+          {showcaseBadges.length > 0 && showcaseLayout === "carousel" ? (
+            // A seamless loop needs the content twice: each tile animates by
+            // exactly one content-width, so the duplicate hides the jump.
+            <div className="pf-ticker">
+              <div className="pf-ticker-track">
+                {[0, 1].map((pass) => (
+                  <div key={pass} className="flex shrink-0 gap-3" aria-hidden={pass === 1}>
+                    {showcaseBadges.map((badge) => (
+                      <Link
+                        key={`${pass}-${badge.id}`}
+                        href={`/badges/${badge.slug}`}
+                        className="badge-tile card-interactive w-32 shrink-0 rounded-[var(--radius-card)]"
+                      >
+                        <BadgeImage badge={badge} size={48} alt="" />
+                        <p className="line-clamp-2 text-[0.6875rem] font-semibold leading-tight">
+                          {badge.title}
+                        </p>
+                        <RarityChip tier={badge.rarity_tier} compact />
+                      </Link>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : showcaseBadges.length > 0 ? (
             <div
               className={[
                 "card grid grid-cols-3 gap-3 p-5 sm:grid-cols-6",
                 showcaseLayout === "row" ? "pf-showcase-row" : "",
-                showcaseLayout === "carousel" ? "pf-showcase-carousel" : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
