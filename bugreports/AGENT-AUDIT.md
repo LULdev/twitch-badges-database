@@ -409,6 +409,52 @@ arithmetic (it mirrors `add_coins`) are verified; the runtime proof is pending.
 refund, the 19 historical `blog_views` rows, 0012's CHECK hazard for other
 environments, and the pending `apply_pair_deltas` runtime proof.
 
+## Round 13 — a high-severity defect found while checking a medium one
+
+The server verification agent for round 12 (`verify-round12.md`) reported 1
+medium and 4 low. While reproducing the medium one I ran the real global sync —
+and it failed:
+
+```
+null value in column "id" of relation "badges" violates not-null constraint
+```
+
+**Root cause (high, previously unknown).** The sync wrote existing badges back as
+`{ ...ex, ...patch }` — the whole row. PostgREST takes the **union** of the keys
+in one batch and fills missing columns with NULL, so a new badge batched together
+with an existing one received `id = NULL`; avoiding that by dropping `id` simply
+moved the failure to `slug = NULL` on the existing row. The consequence: **the
+catalog could not grow at all**, and every run that contained both a new and an
+existing badge failed. It stayed invisible until the first real new badge
+appeared after the initial seed, because an insert-only or update-only run works
+and the mixed run does not.
+
+**Fix:** new and existing badges are written in **separate upserts**, and the
+existing row is sent without its `id`, so every row in a batch carries the same
+key set.
+
+**Proven by a real run:** exit 0, `added 1` (`Rematch Blue Lock`), `updated 27`,
+`removed 0`, catalog 475 → 476 versions. The detail page is live (200, title
+rendered) and the badge is searchable.
+
+| ID | Finding | Fix |
+|---|---|---|
+| v12-01 (medium) | the provider guard divided by `existing.size`, which includes rows the sweep never deletes, so its threshold tightened on every run and would eventually block every global sync | counts live rows only |
+| v12-02 | the guard did not precede *every* write: the status-badge cleanup and its changelog ran first | the cleanup moved below the guard |
+| v12-03 | the new paging loops had no `ORDER BY`, so OFFSET/LIMIT was non-deterministic; in the inventory a skipped row would drop a badge from the user's inventory | both order by `id` |
+| v12-04 | the IP-salt chain could fall back to the literal `"tbd"` | throws instead; `IP_HASH_SALT` documented in `.env.example`, with the one-time dedup reset noted |
+| v12-05 | the empty-listing guard could block a genuinely empty window forever and skip the demotion sweep | additionally requires confirmed-active rows to exist |
+
+**Closed from round 12:** the `apply_pair_deltas` runtime proof the pooler had
+blocked. The agent reached the database over port 6543 and it **passes**:
+zero-sum preserved, clamping to 0, a missing row returns NULL, the service role
+receives `[{a_coins,b_coins}]`, `anon` gets 401, and the new CHECK accepts
+8/36/40/`"anonymous"`/128 while rejecting 0/7/129.
+
+**Verification of this round:** lint 0 errors, typecheck 0, build 227/227, 0
+`MISSING_MESSAGE`, 675 keys ×11 identical. Real runs: global sync exit 0
+(added 1 / updated 27 / removed 0), badgebase sync exit 0 (0 errors, 1 demotion).
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents

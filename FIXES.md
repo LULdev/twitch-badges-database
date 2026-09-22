@@ -149,6 +149,23 @@ vendor-text scan    → 0 of 132 rendered pages name a provider
 121 ideas from the ten idea sub-agents — **171 in total**, with a per-report
 index.
 
+## The defect that mattered most (found last)
+
+The global sync wrote existing badges back as `{ ...ex, ...patch }` — the whole
+row. PostgREST takes the **union** of the keys across a batch and fills missing
+columns with NULL, so a new badge batched together with an existing one received
+`id = NULL` (and, once `id` was dropped from the payload, `slug = NULL` on the
+existing row instead). The consequence: **new badges could not be inserted at
+all**, so the catalog could never grow, and every run containing both a new and
+an existing badge failed. It stayed invisible until the first genuine new badge
+appeared after the seed run, because insert-only and update-only runs both work.
+
+Fixed by writing new and existing badges in separate upserts, and sending the
+existing row without its `id`, so every row in a batch carries the same key set.
+Verified by a real run: `added 1` (`Rematch Blue Lock`), `updated 27`,
+`removed 0`, catalog 475 → 476; the detail page is live and the badge is
+searchable.
+
 ## Open, deliberately
 
 These are documented rather than fixed, and none is a defect in the narrow sense:
@@ -164,11 +181,10 @@ These are documented rather than fixed, and none is a defect in the narrow sense
 4. **0012's validating CHECKs** run against pre-existing rows, so an environment
    holding a legacy oversized blob would block that migration. It applied
    cleanly here (one profile, `{}`) and is already applied.
-5. **`apply_pair_deltas` runtime proof** (migration 0015) is pending: the database
-   pooler became unresolvable from the build machine while the REST API stayed
-   healthy. The function exists, is service-role-only (REST returns 401 for
-   `anon`) and mirrors `add_coins`, but the balance/zero-sum/clamping test could
-   not run.
+5. ~~`apply_pair_deltas` runtime proof~~ — **closed**: the agent reached the
+   database over port 6543 and the test passes (zero-sum, clamping to 0, missing
+   row NULL, service-role `[{a_coins,b_coins}]`, `anon` 401; the CHECK accepts
+   8/36/40/`"anonymous"`/128 and rejects 0/7/129).
 6. **Two client nits**: RTL arrow glyphs are not mirrored at the remaining sites,
    and the language listbox lacks `aria-activedescendant`. A real 3-D card flip in
    the memory game is a design task, not a defect.
