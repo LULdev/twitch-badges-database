@@ -832,6 +832,29 @@ execution, not by reasoning.
 atomicity 17/17 **with exit 0** and an exact restore, economy 13/13 below the stake
 (worst 0.9886), fresh-install replay 21/21.
 
+## Round 28 — the migration set replays in all three configurations
+
+The round-27 agent replayed the set again and reported **3 low, 3 info, 0
+medium/high — no live defect** (`verify-round27.md`):
+
+- **from scratch**: 22/22 OK
+- **the whole set a second time** on a migrated database: 22/22 OK
+- **0002–0022** on an intact schema: 21/21 OK
+- the only stop is `0001` refusing on a non-empty catalog (`P0001`) — documented
+  and intentional. The pre-fix controls fail 42710/42710/42P13 exactly as claimed.
+
+| ID | Finding | Fix |
+|---|---|---|
+| v27-01 (low) | **I hardened `0020` and forgot `0021`** — the same "fix the instance, not the class" pattern. `0021` still used the signature-specific guard that **fails open**, so a changed signature would have skipped the revoke silently | `0021` uses the same overload loop |
+| v27-03 (low) | `0011` revoked only SELECT; `TRUNCATE`, `REFERENCES`, `TRIGGER` and `MAINTAIN` stayed granted to anon/authenticated. Nothing was reachable (both roles are NOLOGIN, PostgREST exposes neither privilege) but a grant with no purpose is surface | migration 0023 revokes everything and re-grants exactly the column access the pages use. Verified with the blog page's real reads: `post_id` and `emoji` return 200, `ip_hash` stays 401, and the insert path answers with a foreign-key error, so the grant works |
+| v27-02 (low) | `0022`'s revoke list omitted `MAINTAIN`, which exists on PG17 (server 17.6) | listed explicitly |
+| v27-06 (info) | the verification script **did** leave a trace: it restored every column but set `updated_at` to the current time instead of the snapshot value | restored from the snapshot; measured identical before and after |
+| v27-05 (info) | my commit `d81ddef` said "21 migrations" where the set has 22 (23 now) | corrected in the changelog, since a pushed commit message cannot be edited |
+
+**Verification:** lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`,
+atomicity 17/17 with exit 0 and an exact restore, economy 13/13 (worst 0.9884),
+replay 22/22 in two configurations, no function reachable by anon/authenticated.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents

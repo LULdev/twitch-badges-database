@@ -215,7 +215,9 @@ async function main() {
       unlocked.length,
     );
   } finally {
-    // restore every column of the progress row
+    // restore every column of the progress row, including updated_at —
+    // the tests themselves touch it, so leaving it fresh made "leaves no trace"
+    // imprecise.
     const {
       user_id,
       created_at,
@@ -223,9 +225,12 @@ async function main() {
     } = snapshot as unknown as Record<string, unknown>;
     void user_id;
     void created_at;
+    // `restorable` already carries the snapshot's updated_at; overriding it with
+    // the current time left the row's timestamp freshly stamped, which is a trace
+    // even though every other column was restored.
     await supabase
       .from("user_progress")
-      .update({ ...restorable, updated_at: new Date().toISOString() })
+      .update(restorable)
       .eq("user_id", profile.id);
 
     const { data: feedRows } = await supabase

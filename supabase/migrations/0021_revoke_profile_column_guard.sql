@@ -11,11 +11,24 @@
 -- `to_regprocedure(...) is not null`; production already had it applied, so this
 -- file carries only the function it missed.
 
+-- v27-01: this file kept the signature-specific guard that 0020 was fixed for —
+-- `to_regprocedure('public.protect_profile_columns()')` fails OPEN, so a changed
+-- signature would have skipped the revoke silently, and a single-signature revoke
+-- would miss any overload. Same overload loop as 0020.
 do $$
+declare
+  sig record;
 begin
-  if to_regprocedure('public.protect_profile_columns()') is not null then
-    revoke all on function public.protect_profile_columns() from public, anon, authenticated;
-  end if;
+  for sig in
+    select p.oid::regprocedure as s
+      from pg_proc p
+      join pg_namespace n on n.oid = p.pronamespace
+     where n.nspname = 'public' and p.proname = 'protect_profile_columns'
+  loop
+    execute format(
+      'revoke all on function %s from public, anon, authenticated', sig.s
+    );
+  end loop;
 end $$;
 
 insert into public.changelog (kind, title, body, payload) values (

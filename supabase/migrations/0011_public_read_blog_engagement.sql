@@ -23,8 +23,11 @@ create policy "blog_reactions_public_read" on public.blog_reactions
 
 -- Supabase grants table-level SELECT by default; replace it with a column-level
 -- grant so `ip_hash` cannot be selected even though the row policy allows it.
-revoke select on public.blog_views from anon, authenticated;
-revoke select on public.blog_reactions from anon, authenticated;
+-- Every table privilege, not just SELECT: the roles kept TRUNCATE, REFERENCES,
+-- TRIGGER and MAINTAIN (PG17) on these tables. Neither role is reachable that way
+-- through PostgREST, but the grant has no purpose and no reason to exist.
+revoke all on public.blog_views from anon, authenticated;
+revoke all on public.blog_reactions from anon, authenticated;
 
 grant select (post_id, created_at) on public.blog_views to anon, authenticated;
 grant select (post_id, emoji, created_at) on public.blog_reactions to anon, authenticated;

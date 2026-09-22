@@ -15,7 +15,9 @@
 do $$
 begin
   if to_regclass('public.follows') is not null then
-    revoke insert, update, delete, truncate, references, trigger
+    -- MAINTAIN is PG17 (the server runs 17.6); listing it explicitly keeps the
+    -- revoke complete as privileges are added in later versions.
+    revoke insert, update, delete, truncate, references, trigger, maintain
       on public.follows from anon, authenticated;
     -- keep SELECT for authenticated only if the policies already allowed it, so
     -- nothing that reads it today breaks
