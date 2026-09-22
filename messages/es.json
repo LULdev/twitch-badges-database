@@ -270,7 +270,8 @@
     "blog": "Blog",
     "push": "Notificaciones",
     "empty": "Aún no hay registros.",
-    "source": "Fuente: {source}"
+    "source": "Fuente: {source}",
+    "emptyFilter": "No hay entradas para este filtro."
   },
   "stats": {
     "achCategories": "Desbloqueos por nivel",
@@ -563,7 +564,8 @@
     "towerTitle": "Torre de insignias",
     "towerDesc": "Sube diez pisos de riesgo creciente — retírate antes de que te atrapen los guardias.",
     "catcherTitle": "Atrapa insignias",
-    "catcherDesc": "Atrapa insignias que caen en tu cesta, esquiva las bombas."
+    "catcherDesc": "Atrapa insignias que caen en tu cesta, esquiva las bombas.",
+    "notEnoughBadges": "Todavía no hay suficientes insignias en el catálogo para crear un cuestionario."
   },
   "wheel": {
     "title": "Ruleta de la fortuna",

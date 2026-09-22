@@ -39,6 +39,13 @@
   --radius-input: 10px;
   --radius-card: 14px;
   --radius-panel: 18px;
+
+  /* Leaderboard podium. The sparkle glyphs on rarity/level/coin badges share
+     these so both themes stay legible against their own surface. */
+  --rank-gold: #fbbf24;
+  --rank-silver: #cbd5e1;
+  --rank-bronze: #d97706;
+  --sparkle: rgba(255, 255, 255, 0.92);
 }
 
 .light {
@@ -69,6 +76,14 @@
   --shadow-card: 0 1px 2px rgba(22, 22, 44, 0.05), 0 8px 24px -16px rgba(22, 22, 44, 0.12);
   --shadow-lift: 0 2px 4px rgba(22, 22, 44, 0.06), 0 16px 40px -20px rgba(22, 22, 44, 0.18);
   --shadow-glow: 0 0 0 1px rgba(124, 58, 237, 0.18), 0 12px 40px -12px rgba(124, 58, 237, 0.2);
+
+  /* Darker golds/silvers: `#fbbf24` on white is ~1.7:1 and `#cbd5e1` ~1.35:1,
+     which made the podium rank numbers unreadable in light mode. */
+  --rank-gold: #a16207;
+  --rank-silver: #64748b;
+  --rank-bronze: #92400e;
+  /* Solid white sparkles vanish on a white card; tint them instead. */
+  --sparkle: var(--accent);
 }
 
 @theme inline {
@@ -543,7 +558,7 @@ html {
   height: 1.125rem;
   top: -0.5rem;
   left: -0.4375rem;
-  background: #fff;
+  background: var(--sparkle);
   clip-path: polygon(
     50% 0%, 61% 39%, 100% 50%, 61% 61%,
     50% 100%, 39% 61%, 0% 50%, 39% 39%
@@ -755,7 +770,7 @@ html {
   position: absolute;
   width: 0.6rem;
   height: 0.6rem;
-  background: #fff;
+  background: var(--sparkle);
   clip-path: polygon(
     50% 0%, 61% 39%, 100% 50%, 61% 61%,
     50% 100%, 39% 61%, 0% 50%, 39% 39%
@@ -903,7 +918,7 @@ html {
 /* Twin twinkling sparkles orbiting the coin */
 .bcoin-sparkle {
   position: absolute;
-  background: #fff;
+  background: var(--sparkle);
   clip-path: polygon(
     50% 0%, 61% 39%, 100% 50%, 61% 61%,
     50% 100%, 39% 61%, 0% 50%, 39% 39%
@@ -1334,6 +1349,15 @@ html {
   animation-delay: var(--d, 0ms);
   min-height: 4px;
 }
+/* RTL: `transform-origin` and physical translate have no logical equivalent,
+   so Arabic would otherwise run these intro animations from the inline-end. */
+[dir="rtl"] .grow-bar-fill { transform-origin: right center; }
+[dir="rtl"] .rank-row { animation-name: rank-in-rtl; }
+@keyframes rank-in-rtl {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 .strip-bar.is-bad { background: var(--danger); }
 .strip-bar.is-empty { background: var(--surface-3); min-height: 3px; }
 
@@ -1362,9 +1386,12 @@ html {
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
-.rank-row:nth-child(1) .rank-index { color: #fbbf24; }
-.rank-row:nth-child(2) .rank-index { color: #cbd5e1; }
-.rank-row:nth-child(3) .rank-index { color: #d97706; }
+/* Podium colours: token-driven so light mode gets darker golds/silvers —
+   `#cbd5e1` on a white surface sat at roughly 1.35:1 contrast and the rank
+   number for places 1–2 was effectively invisible. */
+.rank-row:nth-child(1) .rank-index { color: var(--rank-gold); }
+.rank-row:nth-child(2) .rank-index { color: var(--rank-silver); }
+.rank-row:nth-child(3) .rank-index { color: var(--rank-bronze); }
 
 /* Section anchors nav */
 .stats-nav {

@@ -270,7 +270,8 @@
     "blog": "Blog",
     "push": "Notificações",
     "empty": "Ainda não há registros.",
-    "source": "Fonte: {source}"
+    "source": "Fonte: {source}",
+    "emptyFilter": "Nenhuma entrada para este filtro."
   },
   "stats": {
     "achCategories": "Desbloqueios por nível",
@@ -563,7 +564,8 @@
     "towerTitle": "Torre de emblemas",
     "towerDesc": "Suba dez andares de risco crescente — saque antes que os guardas peguem você.",
     "catcherTitle": "Pega emblemas",
-    "catcherDesc": "Pegue emblemas que caem na sua cesta, evite as bombas."
+    "catcherDesc": "Pegue emblemas que caem na sua cesta, evite as bombas.",
+    "notEnoughBadges": "Ainda não há selos suficientes no catálogo para criar um quiz."
   },
   "wheel": {
     "title": "Roleta da fortuna",

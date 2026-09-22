@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ACHIEVEMENTS } from "@/lib/gamification/achievements";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { authUserId } from "@/lib/gamification/session";
 import { getProgress } from "@/lib/gamification/xp";
 import AchievementBadge from "@/components/AchievementBadge";
@@ -42,7 +42,9 @@ export default async function AchievementsPage({
   let unlocked = new Set<string>();
   let points = 0;
   if (userId) {
-    const supabase = createAdminClient();
+    // user_achievements carries a public-read policy; reading it with the anon
+    // client keeps the RLS bypass out of the render path.
+    const supabase = await createClient();
     const [{ data: rows }, progress] = await Promise.all([
       supabase.from("user_achievements").select("achievement_id").eq("user_id", userId),
       getProgress(userId).catch(() => null),

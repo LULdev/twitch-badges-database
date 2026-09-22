@@ -270,7 +270,8 @@
     "blog": "블로그",
     "push": "알림",
     "empty": "아직 항목이 없습니다.",
-    "source": "출처: {source}"
+    "source": "출처: {source}",
+    "emptyFilter": "이 필터에 해당하는 항목이 없습니다."
   },
   "stats": {
     "achCategories": "단계별 해금",
@@ -563,7 +564,8 @@
     "towerTitle": "배지의 탑",
     "towerDesc": "위험이 커지는 10개 층을 오르세요 — 경비병에게 붙잡히기 전에 정산하세요.",
     "catcherTitle": "배지 캐처",
-    "catcherDesc": "떨어지는 배지를 바구니로 받고 폭탄은 피하세요."
+    "catcherDesc": "떨어지는 배지를 바구니로 받고 폭탄은 피하세요.",
+    "notEnoughBadges": "카탈로그에 배지가 아직 충분하지 않아 퀴즈를 만들 수 없습니다."
   },
   "wheel": {
     "title": "운명의 수레바퀴",

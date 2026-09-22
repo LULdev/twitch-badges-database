@@ -270,7 +270,8 @@
     "blog": "博客",
     "push": "通知",
     "empty": "暂无记录。",
-    "source": "来源：{source}"
+    "source": "来源：{source}",
+    "emptyFilter": "此筛选条件下暂无条目。"
   },
   "stats": {
     "achCategories": "各层级解锁数",
@@ -563,7 +564,8 @@
     "towerTitle": "徽章之塔",
     "towerDesc": "攀爬十层，风险递增——在被守卫抓住前及时兑现。",
     "catcherTitle": "接徽章",
-    "catcherDesc": "用篮子接住下落的徽章，避开炸弹。"
+    "catcherDesc": "用篮子接住下落的徽章，避开炸弹。",
+    "notEnoughBadges": "目录中的徽章还不够，暂时无法生成问答。"
   },
   "wheel": {
     "title": "命运转盘",

@@ -270,7 +270,8 @@
     "blog": "Blog",
     "push": "Benachrichtigungen",
     "empty": "Noch keine Einträge.",
-    "source": "Quelle: {source}"
+    "source": "Quelle: {source}",
+    "emptyFilter": "Keine Einträge für diesen Filter."
   },
   "stats": {
     "achCategories": "Freischaltungen nach Stufe",
@@ -563,7 +564,8 @@
     "towerTitle": "Turm der Badges",
     "towerDesc": "Zehn Etagen steigenden Risikos — zahle aus, bevor die Wachen kommen.",
     "catcherTitle": "Drops-Fänger",
-    "catcherDesc": "Fange fallende Badges im Korb, weiche den Bomben aus."
+    "catcherDesc": "Fange fallende Badges im Korb, weiche den Bomben aus.",
+    "notEnoughBadges": "Es sind noch nicht genug Badges im Katalog, um ein Quiz zu erstellen."
   },
   "wheel": {
     "title": "Glücksrad",

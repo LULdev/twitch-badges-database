@@ -34,6 +34,9 @@ export default function UptimeCalendar({
   const formatDay = new Intl.DateTimeFormat(locale, {
     day: "2-digit",
     month: "short",
+    // `cell.day` keys are UTC midnight; formatting them in the runtime's local
+    // zone showed the previous day on any negative-offset runtime.
+    timeZone: "UTC",
   });
   const formatMs = new Intl.NumberFormat(locale);
 

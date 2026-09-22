@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import FeedList, { type FeedEvent } from "@/components/FeedList";
 import LiveRefresher from "@/components/LiveRefresher";
 import { localeAlternates } from "@/lib/seo";
@@ -35,10 +35,13 @@ export default async function FeedPage({
 
   let initialEvents: FeedEvent[] = [];
   try {
-    const supabase = createAdminClient();
+    // The feed is public-read via RLS; the RLS bypass belongs to the write
+    // paths only. `user_id` is dropped for the same reason as in /api/feed:
+    // the UI never needs the internal id.
+    const supabase = await createClient();
     const { data } = await supabase
       .from("activity_events")
-      .select("id,user_id,username,avatar_url,kind,title,body,xp_amount,coins_amount,created_at")
+      .select("id,username,avatar_url,kind,title,body,xp_amount,coins_amount,created_at")
       .order("id", { ascending: false })
       .limit(30);
     initialEvents = (data ?? []) as FeedEvent[];

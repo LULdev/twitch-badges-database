@@ -278,3 +278,52 @@ all 11 locale files still key-identical (658 keys each).
 `cron-6`, `ui-6`, `ui-7`, `ui-8`, `cat-4`, `cat-7`, `cat-8`, `cat-9`, `pg-4`,
 `pg-5`, `pg-6`, `pg-8`, `stats-4`, `stats-5`, plus the older medium/low findings
 from rounds 1–3. The "no bugs remain" bar is still **not** met.
+
+---
+
+## Round 8 — every remaining verified finding, plus migration 0011
+
+| ID | Fix | Verification |
+|---|---|---|
+| cat-4 | a genuine query failure on a badge detail URL was indistinguishable from "no such slug" and published a 404 for a valid page | `getBadgeBySlug` throws on DB errors; `notFound()` is reserved for a null row |
+| cat-7 | the NEW marker had only an upper bound, so a future-dated `first_seen_at` made the delta negative and pinned it for good | requires `first_seen_at <= now` |
+| cat-8 | with no category the filter was a no-op and "Same category" listed the global newest badges | the section is skipped without a category |
+| cat-9 | the tile printed the title as text inside the same link, so the image was announced twice | `BadgeImage` takes `alt`; the tile passes `""` |
+| ui-6 | leaderboard podium colours were literals with no light override (silver `#cbd5e1` on white ≈ 1.35:1 — invisible) | tokens `--rank-gold/-silver/-bronze`, darker in `.light` |
+| ui-7 | `transform-origin` / `translateX` are physical, so under RTL the intro animations ran from the wrong edge | `[dir="rtl"]` overrides for the bars and a mirrored row keyframe |
+| ui-8 | the three sparkle shapes were solid white and vanished on the white light-mode surfaces | themed `--sparkle` token |
+| pg-4 | an unknown `?kind=` reached the query, no chip was active, and the page claimed the whole changelog was empty | `kind` validated against the chip allowlist; separate "no entries for this filter" state |
+| pg-5 | `/games/quiz` rendered a header and then nothing when fewer than four image-bearing badges existed | explicit explanatory card |
+| pg-6 | four spots used emoji glyphs as UI icons (against the stated convention, unthemeable, OS-dependent) | new inline-SVG `GameIcon` set (13 games + wheel + eye icon) |
+| pg-8 | four public pages read through the service-role client, bypassing RLS | feed, achievements, quiz pool and blog counters use the anon server client |
+| stats-4 | uptime calendar tooltips formatted UTC midnight in the local zone, showing the previous day | `timeZone: "UTC"` |
+| stats-5 | `OwnersChart` passed `var()` to SVG presentation attributes, which cannot resolve it | `useChartTheme()`, like every other chart, plus locale-aware numbers |
+| cron-6 | the health status came from the truthiness of the sync result, so a legitimate no-op would read "degraded" | explicit `badgebaseFailed` set in the `catch` |
+
+`pg-8` needed a migration rather than a code change: `blog_views` and
+`blog_reactions` had **no** SELECT policy at all (the reason the page used the
+admin client), and both store `ip_hash`. `0011_public_read_blog_engagement.sql`
+adds public-read policies with **column-level** grants covering only the columns
+the page aggregates over. Live check: `blog_views?select=ip_hash` → **401**,
+`select=post_id,created_at` → **200**; same for reactions; `user_achievements`
+and `activity_events` → 200 with the anon key.
+
+**Verification:** lint 0 errors, typecheck 0, build 227/227, 0
+`MISSING_MESSAGE`, 660 keys ×11 locales identical.
+
+### Still open
+
+The list from rounds 1–3 (medium/low): `games-a-1/2/4/7/9`, `fp-3/5/7/8/10/11`,
+`api-2/3`, `db-6/7`, `sec-3/4/5`, `pdat-5/6/7/8`, `auth-4/5/6/7`, the `gam-*`
+and `sync-3..7` families, plus the ranking-fetch cache note. The "no bugs
+remain" bar is still **not** met, though every High and Medium finding the
+agents raised has now been fixed and verified.
+
+---
+
+## Phase 3 completion — the ten idea sub-agents
+
+All ten idea scopes ran as real read-only sub-agents
+(`bugreports/agent-idea-01..10.md`, 121 ideas). `IMPROVEMENTS.md` now carries
+10 optimisation areas, 50 first-party ideas and those 121 sub-agent ideas —
+171 in total — with a per-report index.

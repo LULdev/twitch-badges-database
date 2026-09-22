@@ -270,7 +270,8 @@
     "blog": "Blog",
     "push": "Notifiche",
     "empty": "Ancora nessuna voce.",
-    "source": "Fonte: {source}"
+    "source": "Fonte: {source}",
+    "emptyFilter": "Nessuna voce per questo filtro."
   },
   "stats": {
     "achCategories": "Sblocchi per livello",
@@ -563,7 +564,8 @@
     "towerTitle": "Torre dei badge",
     "towerDesc": "Sali dieci piani di rischio crescente — incassa prima che le guardie ti prendano.",
     "catcherTitle": "Cattura badge",
-    "catcherDesc": "Cattura i badge che cadono nel cesto, evita le bombe."
+    "catcherDesc": "Cattura i badge che cadono nel cesto, evita le bombe.",
+    "notEnoughBadges": "Non ci sono ancora abbastanza badge nel catalogo per creare un quiz."
   },
   "wheel": {
     "title": "Ruota della fortuna",

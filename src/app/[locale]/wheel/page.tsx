@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import WheelOfFortune from "@/components/WheelOfFortune";
+import GameIcon from "@/components/GameIcon";
 import { localeAlternates } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -32,7 +33,10 @@ export default async function WheelPage({
   return (
     <div className="mx-auto max-w-2xl space-y-8 py-6">
       <header className="text-center">
-        <h1 className="text-3xl font-extrabold tracking-tight">🎡 {t("title")}</h1>
+        <h1 className="flex items-center justify-center gap-2 text-3xl font-extrabold tracking-tight">
+          <GameIcon id="wheel" size={26} className="text-accent" />
+          {t("title")}
+        </h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t("subtitle")}</p>
       </header>
       <WheelOfFortune />

@@ -8,15 +8,10 @@ import { GAMES } from "@/lib/gamification/games";
 import DailyClaim from "@/components/DailyClaim";
 import LevelBadge from "@/components/LevelBadge";
 import Coin from "@/components/Coin";
+import GameIcon from "@/components/GameIcon";
 import { localeAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
-
-const GAME_ICONS: Record<string, string> = {
-  rps: "✊", slots: "🎰", shoot: "🎯", memory: "🃏", quiz: "❓",
-  coinflip: "🪜", hilo: "📈", roulette: "🔴", blackjack: "🂡",
-  vault: "🔐", scratch: "🎟️", tower: "🗼", catcher: "🧺",
-};
 
 export async function generateMetadata({
   params,
@@ -79,7 +74,8 @@ export default async function GamesHubPage({
         <div className="flex flex-col items-center gap-2">
           <DailyClaim compact />
           <Link href="/wheel" className="btn btn-primary text-xs">
-            🎡 {t("wheelLink")}
+            <GameIcon id="wheel" size={14} />
+            {t("wheelLink")}
           </Link>
         </div>
       </header>
@@ -91,7 +87,9 @@ export default async function GamesHubPage({
             href={`/games/${game.id}`}
             className="card card-interactive flex flex-col gap-2 p-5"
           >
-            <span className="text-3xl" aria-hidden>{GAME_ICONS[game.id] ?? "🎮"}</span>
+            <span className="text-accent">
+              <GameIcon id={game.id} size={30} />
+            </span>
             <h2 className="font-bold leading-tight">{t(`${game.id}Title`)}</h2>
             <p className="text-xs leading-relaxed text-muted">{t(`${game.id}Desc`)}</p>
             <div className="mt-auto flex items-center gap-1.5 pt-2">

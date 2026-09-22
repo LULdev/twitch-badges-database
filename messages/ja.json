@@ -270,7 +270,8 @@
     "blog": "ブログ",
     "push": "通知",
     "empty": "まだ記録はありません。",
-    "source": "ソース：{source}"
+    "source": "ソース：{source}",
+    "emptyFilter": "このフィルターに該当する項目はありません。"
   },
   "stats": {
     "achCategories": "段階別解除数",
@@ -563,7 +564,8 @@
     "towerTitle": "バッジの塔",
     "towerDesc": "リスクが増す10階を登る — 警備員に捕まる前にキャッシュアウト。",
     "catcherTitle": "バッジキャッチャー",
-    "catcherDesc": "落ちてくるバッジをカゴで受け、爆弾は避けよう。"
+    "catcherDesc": "落ちてくるバッジをカゴで受け、爆弾は避けよう。",
+    "notEnoughBadges": "カタログにバッジがまだ足りないため、クイズを作成できません。"
   },
   "wheel": {
     "title": "フォーチュンホイール",

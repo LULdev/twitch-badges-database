@@ -68,12 +68,18 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   const tcd = await getTranslations("countdown");
   const tc = await getTranslations("common");
 
-  const badge = await getBadgeBySlug(slug).catch(() => null);
+  // Deliberately no .catch here: getBadgeBySlug returns null only for a missing
+  // slug, so a real query error now surfaces instead of becoming a 404.
+  const badge = await getBadgeBySlug(slug);
   if (!badge) notFound();
 
   const [history, related, live] = await Promise.all([
     getBadgeStatsHistory(badge.id).catch(() => []),
-    listBadges({ category: badge.category, perPage: 7 }).catch(() => null),
+    // Without a category the filter would be a no-op and the section would
+    // list the global newest badges under a "same category" heading.
+    badge.category
+      ? listBadges({ category: badge.category, perPage: 7 }).catch(() => null)
+      : Promise.resolve(null),
     fetchBadgeLiveStats(badge.set_id).catch(() => null),
   ]);
 

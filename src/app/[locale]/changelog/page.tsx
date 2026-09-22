@@ -43,9 +43,6 @@ export default async function ChangelogPage({
   setRequestLocale(locale);
   const t = await getTranslations("changelog");
 
-  const kind = sp.kind;
-  const entries = await listChangelog(kind, 150).catch(() => []);
-
   const kinds = [
     "all",
     "badge_added",
@@ -59,6 +56,12 @@ export default async function ChangelogPage({
     "blog",
     "push",
   ];
+
+  // An unknown ?kind= used to reach the query unchanged: no chip matched, and
+  // the generic "No entries yet" state claimed the whole changelog was empty.
+  const requestedKind = sp.kind ?? "";
+  const kind = kinds.includes(requestedKind) ? requestedKind : "all";
+  const entries = await listChangelog(kind, 150).catch(() => []);
 
   const filterHref = (value: string) =>
     value === "all" ? "/changelog" : `/changelog?kind=${value}`;
@@ -100,7 +103,7 @@ export default async function ChangelogPage({
           <Link
             key={value}
             href={filterHref(value)}
-            className={`chip ${(!kind && value === "all") || kind === value ? "chip-active" : ""}`}
+            className={`chip ${kind === value ? "chip-active" : ""}`}
           >
             {t(value === "all" ? "all" : (value as "feature"))}
           </Link>
@@ -108,7 +111,9 @@ export default async function ChangelogPage({
       </div>
 
       {entries.length === 0 ? (
-        <div className="card p-10 text-center text-sm text-muted">{t("empty")}</div>
+        <div className="card p-10 text-center text-sm text-muted">
+          {kind === "all" ? t("empty") : t("emptyFilter")}
+        </div>
       ) : (
         <div className="space-y-8">
           {[...groups.entries()].map(([day, dayEntries]) => (

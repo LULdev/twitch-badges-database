@@ -11,10 +11,16 @@ export function BadgeImage({
   badge,
   size = 56,
   className = "",
+  alt,
 }: {
   badge: BadgeImageSource | BadgeRow;
   size?: number;
   className?: string;
+  /**
+   * Overrides the accessible name. Pass `""` for a tile that already shows the
+   * title as text in the same link, so screen readers do not announce it twice.
+   */
+  alt?: string;
 }) {
   const src =
     badge.image_url_4x ?? badge.image_url_2x ?? badge.image_url_1x ?? null;
@@ -36,7 +42,7 @@ export function BadgeImage({
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src}
-      alt={badge.title}
+      alt={alt ?? badge.title}
       width={size}
       height={size}
       loading="lazy"

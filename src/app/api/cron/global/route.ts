@@ -36,11 +36,18 @@ export async function GET(request: Request) {
     );
   }
 
+  // An explicit flag rather than the truthiness of the return value: a
+  // legitimate no-op result (e.g. an empty catalog) would otherwise be recorded
+  // as a failure and pollute the uptime view with false "degraded" rows.
   let badgebase: unknown = null;
+  let badgebaseFailed = false;
+  let badgebaseError: string | null = null;
   try {
     badgebase = await withHeartbeat("sync/badgebase", () => runBadgebaseSync());
   } catch (error) {
     console.error("[cron/badgebase]", error);
+    badgebaseFailed = true;
+    badgebaseError = error instanceof Error ? error.message : "failed";
   }
 
   // Daily housekeeping: keep the heartbeat table bounded.
@@ -49,23 +56,21 @@ export async function GET(request: Request) {
   const durationMs = Date.now() - started;
   await recordHeartbeat({
     source: "cron/global",
-    status: badgebase ? "ok" : "degraded",
+    status: badgebaseFailed ? "degraded" : "ok",
     durationMs,
-    message: badgebase ? null : "badgebase enrichment failed",
-    payload: { prunedHeartbeats: pruned },
+    message: badgebaseFailed ? (badgebaseError ?? "badgebase enrichment failed") : null,
+    payload: { prunedHeartbeats: pruned, badgebaseFailed },
   });
 
   // 207 signals a partial success: the catalog diff succeeded but the
   // enrichment half failed. A plain 200 hid that from anything watching the
   // status code, and a 5xx would have wrongly marked the whole run as failed.
   return Response.json({
-    ok: badgebase ? true : false,
+    ok: !badgebaseFailed,
     summary,
     badgebase,
-    // Explicit rather than implied by a null field: the run is a success, but
-    // the operator should see that the enrichment half failed.
-    badgebaseFailed: !badgebase,
+    badgebaseFailed,
     durationMs,
     pruned,
-  }, { status: badgebase ? 200 : 207 });
+  }, { status: badgebaseFailed ? 207 : 200 });
 }

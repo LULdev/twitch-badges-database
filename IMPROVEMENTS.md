@@ -1,10 +1,21 @@
-# Improvements & 50 feature ideas
+# Improvements & feature ideas
 
 Collected 2026-09-22 as phase 3 of the audit request. The ten planned idea
-sub-agents could not be launched (platform quota/concurrency limits on every
-attempt), so the same ten lenses were worked first-party. Every idea says what
-it is and why it earns a place on a Twitch badge site; nothing here is
-implemented yet.
+sub-agents were first worked first-party while the platform was refusing agent
+launches; later in the same session the quota recovered and **all ten did run as
+real read-only sub-agents** (`bugreports/agent-idea-01..10.md`), adding 121
+ideas on top. Every idea says what it is and why it earns a place on a Twitch
+badge site; nothing here is implemented yet.
+
+| Report | Lens | Ideas |
+|---|---|---|
+| `agent-idea-01.md` … `agent-idea-04.md` | product, catalog, gamification, community | 49 |
+| `agent-idea-05.md` | gamification & economy | 12 |
+| `agent-idea-06.md` | data & insights | 12 |
+| `agent-idea-07.md` | accessibility & performance | 12 |
+| `agent-idea-08.md` | growth, retention, content, community | 12 |
+| `agent-idea-09.md` | observability, resilience, data quality, DX | 12 |
+| `agent-idea-10.md` | visual design, interaction, IA | 12 |
 
 ---
 
@@ -302,5 +313,50 @@ and `bugreports/agent-idea-02.md`; none duplicates the fifty above.
 - **Badge Bingo** [M] — a card of categories/rarities to complete.
 - **Collector Net Worth** [M] — value a collection with derived BadgesCoins.
 
-**Total collected: 10 optimisation areas, 50 first-party ideas and 24
-sub-agent ideas = 74 feature ideas across the five requested categories.**
+**Total collected: 10 optimisation areas, 50 first-party ideas and 121
+sub-agent ideas = 171 feature ideas across the five requested categories.**
+
+---
+
+## Part 3 — the six additional idea sub-agents (batch 2)
+
+The objective asked for ten idea sub-agents. Five had run (`agent-idea-01..05`,
+24 ideas) before the platform quota blocked further launches; the quota later
+recovered and the remaining five ran as real read-only sub-agents, so all ten
+scopes now have a report. Each file holds twelve ideas with category, inputs,
+effort and risk.
+
+- **`agent-idea-05.md`** — gamification & economy (seasonal XP resets,
+  collection-driven pass tracks, wager-free practice modes, coin sinks,
+  server-verified tournament rounds, and similar).
+- **`agent-idea-06.md`** — data & insights: Claim-Window Scarcity Forecaster,
+  Rarity Stability Index, Collection Scarcity Curve, Badge Cohort Age Pyramid,
+  Display-Wear Retention Ranking, Category Rarity Benchmarks, Time-to-Plateau
+  Clock, Obtainability × Scarcity Quadrant Map, Window Collision Calendar,
+  Expiry Rarity Impact Forecast, Weekly Rarity Migration Matrix, Collector
+  Similarity Network.
+- **`agent-idea-07.md`** — accessibility & performance: Arabic RTL via CSS
+  logical properties, screen-reader announcements for countdowns and the
+  activity feed, focus management/traps in game modals and the wheel,
+  colour-independent rarity tiers, landmarks + skip link + one H1 per page,
+  `prefers-reduced-motion`, one-round-trip catalog reads, tag-based ISR
+  invalidation from the sync engines, cached OG renders, cached stats views,
+  code-split recharts/game runtime, indexes for the hot read paths.
+- **`agent-idea-08.md`** — growth, retention, content, community: embeddable
+  live badge widget, guest inventory preview, missing-badge challenge card,
+  lapse-back crate, themed leaderboard rotations, catalog-locked profile frames,
+  badge of the day, "this month in badges" digest, how-to-earn playbooks,
+  community corrections queue, collector fleets, feed cheers.
+- **`agent-idea-09.md`** — observability, resilience, data quality, DX: provider
+  contract fixtures, boundary validation for provider payloads, write-band
+  assertions, per-source freshness SLO, `SYNC_DRY_RUN=1`, migration-drift
+  preflight, post-deploy smoke check, shared provider-fetch wrapper (timeout,
+  error classes, circuit breaker), sync cost/time budget guard, locale parity
+  audit in verify, provider registry, anomaly review on the changelog page.
+- **`agent-idea-10.md`** — visual design, interaction, IA: elevation/radius
+  token scale, rarity ramps as tokens, badge-tile progressive reveal with a
+  token-shaped skeleton, countdown urgency states, light-mode contrast pass on
+  `--line`/muted text, locale-aware type scale with logical insets,
+  comfortable/compact density switch, command palette, roving-tabindex grid
+  navigation, persistent URL-backed filter chip rail, `.data-table` responsive
+  card fallback, badge-detail anchor rail.

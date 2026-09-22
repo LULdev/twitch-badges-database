@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { GAMES } from "@/lib/gamification/games";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { authUserId } from "@/lib/gamification/session";
 import TwitchLoginButton from "@/components/TwitchLoginButton";
 import RpsGame from "@/components/games/RpsGame";
@@ -57,10 +57,11 @@ export default async function GamePage({ params }: PageProps) {
     );
   }
 
-  // Quiz needs a badge pool from the catalog.
+  // Quiz needs a badge pool from the catalog. Read with the anon client: the
+  // catalog is public-read, so this page needs no RLS bypass.
   let quizBadges: Array<{ slug: string; title: string; image: string | null }> = [];
   if (game === "quiz") {
-    const supabase = createAdminClient();
+    const supabase = await createClient();
     const { data } = await supabase
       .from("badges")
       .select("slug,title,image_url_2x")
@@ -88,7 +89,16 @@ export default async function GamePage({ params }: PageProps) {
       {game === "slots" && <SlotsGame />}
       {game === "shoot" && <ShootGame />}
       {game === "memory" && <MemoryGame />}
-      {game === "quiz" && quizBadges.length >= 4 && <QuizGame badges={quizBadges} />}
+      {game === "quiz" &&
+        (quizBadges.length >= 4 ? (
+          <QuizGame badges={quizBadges} />
+        ) : (
+          // Without this the page rendered a header and then nothing at all,
+          // which reads as a broken page rather than an empty catalog.
+          <div className="card p-8 text-center text-sm text-muted">
+            {t("notEnoughBadges")}
+          </div>
+        ))}
       {game === "catcher" && <CatcherGame />}
     </div>
   );

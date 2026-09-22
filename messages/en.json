@@ -270,7 +270,8 @@
     "blog": "Blog",
     "push": "Notifications",
     "empty": "No entries yet.",
-    "source": "Source: {source}"
+    "source": "Source: {source}",
+    "emptyFilter": "No entries for this filter."
   },
   "stats": {
     "achCategories": "Unlocks by tier",
@@ -563,7 +564,8 @@
     "towerTitle": "Tower of Badges",
     "towerDesc": "Climb ten floors of rising risk — cash out before the guards get you.",
     "catcherTitle": "Drops Catcher",
-    "catcherDesc": "Catch falling badges in your basket, dodge the bombs."
+    "catcherDesc": "Catch falling badges in your basket, dodge the bombs.",
+    "notEnoughBadges": "There are not enough badges in the catalog to build a quiz yet."
   },
   "wheel": {
     "title": "Wheel of Fortune",

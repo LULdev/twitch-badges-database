@@ -270,7 +270,8 @@
     "blog": "Blog",
     "push": "Notifications",
     "empty": "Aucune entrée pour le moment.",
-    "source": "Source : {source}"
+    "source": "Source : {source}",
+    "emptyFilter": "Aucune entrée pour ce filtre."
   },
   "stats": {
     "achCategories": "Déblocages par palier",
@@ -563,7 +564,8 @@
     "towerTitle": "Tour des badges",
     "towerDesc": "Monte dix étages au risque croissant — encaisse avant que les gardes ne t'attrapent.",
     "catcherTitle": "Attrape-badges",
-    "catcherDesc": "Attrapez les badges qui tombent dans votre panier, évitez les bombes."
+    "catcherDesc": "Attrapez les badges qui tombent dans votre panier, évitez les bombes.",
+    "notEnoughBadges": "Il n'y a pas encore assez de badges dans le catalogue pour créer un quiz."
   },
   "wheel": {
     "title": "Roue de la fortune",

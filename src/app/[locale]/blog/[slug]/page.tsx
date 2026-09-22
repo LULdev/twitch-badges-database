@@ -7,7 +7,7 @@ import { renderMarkdown } from "@/lib/markdown";
 import { jsonLdScript } from "@/lib/jsonld";
 import ShareButtons from "@/components/ShareButtons";
 import { localeAlternates } from "@/lib/seo";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { recordBlogView } from "@/lib/gamification/visits";
 import { visitorIpHash } from "@/lib/gamification/session";
 import EmojiReactions from "@/components/EmojiReactions";
@@ -57,12 +57,16 @@ export default async function BlogPostPage({ params }: PageProps) {
   try {
     const ipHash = await visitorIpHash();
     await recordBlogView(post.id, ipHash);
-    const admin = createAdminClient();
+    // Reads go through the anon server client: migration 0011 gave both tables
+    // a public-read policy with column-level grants, so no RLS bypass is needed
+    // here (and `ip_hash` stays unreachable). recordBlogView above is a write
+    // and keeps its own service-role path.
+    const supabase = await createClient();
     const [viewsRes, reactionsRes] = await Promise.all([
-      admin.from("blog_views").select("id", { count: "exact", head: true }).eq("post_id", post.id),
+      supabase.from("blog_views").select("post_id", { count: "exact", head: true }).eq("post_id", post.id),
       // Without the post filter this counted every reaction on the whole blog,
       // so all posts displayed identical totals.
-      admin.from("blog_reactions").select("emoji").eq("post_id", post.id),
+      supabase.from("blog_reactions").select("emoji").eq("post_id", post.id),
     ]);
     viewCount = viewsRes.count ?? 0;
     for (const row of (reactionsRes.data ?? []) as Array<{ emoji: string }>) {
@@ -116,7 +120,14 @@ export default async function BlogPostPage({ params }: PageProps) {
               dateStyle: "long",
             }),
           })}{" "}
-          · {t("by", { author: post.author })} · <span className="tabular-nums">👁 {viewCount.toLocaleString(locale)}</span>
+          · {t("by", { author: post.author })} ·{" "}
+          <span className="inline-flex items-center gap-1 tabular-nums">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden focusable="false">
+              <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            {viewCount.toLocaleString(locale)}
+          </span>
         </p>
       </header>
 

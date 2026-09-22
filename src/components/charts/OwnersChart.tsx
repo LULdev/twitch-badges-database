@@ -9,7 +9,8 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { useChartTheme } from "@/components/stats/useChartTheme";
 
 export interface OwnersChartPoint {
   label: string;
@@ -19,6 +20,14 @@ export interface OwnersChartPoint {
 
 export default function OwnersChart({ data }: { data: OwnersChartPoint[] }) {
   const t = useTranslations("stats");
+  const locale = useLocale();
+  // SVG presentation attributes cannot resolve `var()`, so the tokens are
+  // resolved to real colours here like every other chart in this set.
+  const theme = useChartTheme();
+  const compact = (value: number | null | undefined) =>
+    value === null || value === undefined
+      ? "—"
+      : new Intl.NumberFormat(locale, { notation: "compact" }).format(value);
 
   if (data.length < 2) return null;
 
@@ -26,44 +35,38 @@ export default function OwnersChart({ data }: { data: OwnersChartPoint[] }) {
     <div className="h-64 w-full" role="img" aria-label={t("legendOwners")}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
-          <CartesianGrid stroke="var(--line)" strokeDasharray="3 3" vertical={false} />
+          <CartesianGrid stroke={theme.line} strokeDasharray="3 3" vertical={false} />
           <XAxis
             dataKey="label"
-            tick={{ fill: "var(--muted)", fontSize: 11 }}
+            tick={{ fill: theme.muted, fontSize: 11 }}
             tickLine={false}
-            axisLine={{ stroke: "var(--line)" }}
+            axisLine={{ stroke: theme.line }}
             minTickGap={40}
           />
           <YAxis
-            tick={{ fill: "var(--muted)", fontSize: 11 }}
+            tick={{ fill: theme.muted, fontSize: 11 }}
             tickLine={false}
             axisLine={false}
             width={48}
-            tickFormatter={(value: number) =>
-              new Intl.NumberFormat("en", { notation: "compact" }).format(value)
-            }
+            tickFormatter={(value: number) => compact(value)}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "var(--surface-2)",
-              border: "1px solid var(--line-strong)",
+              backgroundColor: theme.surface2,
+              border: `1px solid ${theme.line}`,
               borderRadius: 10,
               fontSize: 12,
             }}
-            labelStyle={{ color: "var(--foreground)" }}
+            labelStyle={{ color: theme.foreground }}
             formatter={(value, name) => [
-              value === null || value === undefined
-                ? "—"
-                : new Intl.NumberFormat("en", { notation: "compact" }).format(
-                    Number(value),
-                  ),
+              compact(Number(value)),
               String(name) === "owners" ? t("legendOwners") : t("legendActive"),
             ]}
           />
           <Line
             type="monotone"
             dataKey="owners"
-            stroke="var(--accent)"
+            stroke={theme.accent}
             strokeWidth={2}
             dot={false}
             connectNulls
@@ -71,7 +74,7 @@ export default function OwnersChart({ data }: { data: OwnersChartPoint[] }) {
           <Line
             type="monotone"
             dataKey="active"
-            stroke="var(--info)"
+            stroke={theme.info}
             strokeWidth={2}
             dot={false}
             connectNulls

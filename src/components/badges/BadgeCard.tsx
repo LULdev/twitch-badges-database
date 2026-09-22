@@ -64,8 +64,11 @@ export default async function BadgeCard({
       className="card card-interactive badge-tile group"
     >
       <div className="relative">
-        <BadgeImage badge={badge} size={56} className="transition-transform duration-200 group-hover:scale-110" />
+        {/* The title is rendered as text inside this same link, so the image is
+            decorative: without alt="" a screen reader announced it twice. */}
+        <BadgeImage badge={badge} size={56} alt="" className="transition-transform duration-200 group-hover:scale-110" />
         {badge.first_seen_at &&
+          new Date(badge.first_seen_at).getTime() <= now &&
           now - new Date(badge.first_seen_at).getTime() < 14 * 86_400_000 && (
             <span className="absolute -end-1 -top-1 rounded-full bg-accent px-1.5 py-px text-[0.5625rem] font-bold uppercase tracking-wider text-accent-ink">
               NEW

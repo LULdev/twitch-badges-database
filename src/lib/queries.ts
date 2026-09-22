@@ -253,11 +253,15 @@ export async function listBadges(
 
 export async function getBadgeBySlug(slug: string): Promise<BadgeRow | null> {
   const supabase = await createClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("badges")
     .select("*")
     .eq("slug", slug)
     .maybeSingle();
+  // A query failure is not the same answer as "no such slug": callers turn a
+  // null row into notFound(), so a transient pooler hiccup used to publish a
+  // 404 for a permanently valid badge page and hide the real error.
+  if (error) throw error;
   return (data as BadgeRow | null) ?? null;
 }
 
