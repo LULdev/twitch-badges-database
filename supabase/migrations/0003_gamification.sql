@@ -211,7 +211,7 @@ insert into public.changelog (kind, title, body, payload)
 select
   'feature',
   'Gamification launch: XP, coins, levels, games and achievements',
-  'Level 1–100 XP system with sparkle level badges, coin economy, public live activity feed, daily Wheel of Fortune (Twitch Turbo jackpot at 1:100,000,000), 125 achievements, 13 badge-themed games, coin stealing, profile customization and profile visitors.',
+  'Level 1–100 XP system with sparkle level badges, coin economy, public live activity feed, daily Wheel of Fortune (Twitch Turbo jackpot at 1:100,000,000), 123 achievements, 13 badge-themed games, coin stealing, profile customization and profile visitors.',
   '{"version": "gamification-1.0"}'::jsonb
 where not exists (
   select 1 from public.changelog

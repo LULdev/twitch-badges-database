@@ -12,10 +12,22 @@ export async function GET(request: Request) {
 
   const started = Date.now();
   try {
-    const summary = await withHeartbeat("sync/badgebase", () => runBadgebaseSync());
+    // The summary is passed through so a deliberate skip is visible here too:
+    // this route used to report "ok" for a run that did nothing.
+    const summary = await withHeartbeat(
+      "sync/badgebase",
+      () => runBadgebaseSync(),
+      (result) => result as unknown as Record<string, unknown>,
+    );
+    const skipped = typeof (summary as { skipped?: string }).skipped === "string";
     const durationMs = Date.now() - started;
-    await recordHeartbeat({ source: "cron/badgebase", status: "ok", durationMs });
-    return Response.json({ ok: true, summary, durationMs });
+    await recordHeartbeat({
+      source: "cron/badgebase",
+      status: skipped ? "degraded" : "ok",
+      durationMs,
+      message: skipped ? "drop-window enrichment skipped: empty listing" : null,
+    });
+    return Response.json({ ok: true, skipped, summary, durationMs });
   } catch (error) {
     const durationMs = Date.now() - started;
     await recordHeartbeat({

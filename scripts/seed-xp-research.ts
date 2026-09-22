@@ -19,7 +19,7 @@ const content = `When we set out to build the level system, we researched thirty
 6. **Public level-up broadcasts** — every bracket crossing is an activity-feed event the whole community sees.
 7. **Rarity-momentum economy** — wheel and game odds live beside a rarity index built from potat.app data.
 8. **Coin rain** — visitors gift +1 coin to any profile once per day, a social drip that funds the feed.
-9. **Achievement points as prestige** — a separate score from XP, summed from all 125 trophies.
+9. **Achievement points as prestige** — a separate score from XP, summed from all 123 trophies.
 10. **Live-feed transparency** — every single XP point is publicly observable, making the economy auditable.
 
 ## Ten essential features (table stakes, all shipped)

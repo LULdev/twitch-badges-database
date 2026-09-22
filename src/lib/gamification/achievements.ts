@@ -265,7 +265,11 @@ export const ACTIVE_ACHIEVEMENTS = ACHIEVEMENTS.filter(
   (a) => !RETIRED_ACHIEVEMENT_IDS.has(a.id),
 );
 
-export const ACH_BY_ID = new Map(ACTIVE_ACHIEVEMENTS.map((a) => [a.id, a]));
+// Built from ALL definitions, retired ones included: the evaluation below only
+// ever awards from ACTIVE_ACHIEVEMENTS, but an unlock already stored in the
+// database must still resolve to its title and description — otherwise the
+// profile hero drops it and /stats prints the raw id.
+export const ACH_BY_ID = new Map(ACHIEVEMENTS.map((a) => [a.id, a]));
 
 /** Count-unlock achievements that can't self-check (unlocked N achievements). */
 const META_ACHIEVEMENTS: Array<{ id: string; at: number }> = [
