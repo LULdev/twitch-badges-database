@@ -5,6 +5,10 @@ import type {
   PotatOwnedUser,
 } from "./types";
 
+/** Upper bound for any single third-party request, in milliseconds. */
+const FETCH_TIMEOUT_MS = 15_000;
+
+
 const DEFAULT_API = "https://api.potat.app";
 
 interface PotatDistributionPage {
@@ -30,6 +34,7 @@ async function potatFetch(path: string, revalidate = 0): Promise<Response> {
   const base = envOrNull("POTAT_API_URL") ?? DEFAULT_API;
   const url = path.startsWith("http") ? path : `${base}${path}`;
   const res = await fetch(url, {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     headers: { accept: "application/json" },
     next: { revalidate },
   });
@@ -40,6 +45,7 @@ async function potatFetch(path: string, revalidate = 0): Promise<Response> {
       // The retry can be rate limited again (or fail otherwise) — its status
       // must be checked, or the caller parses an error body as data.
       const retried = await fetch(url, {
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
         headers: { accept: "application/json" },
         next: { revalidate: 0 },
       });
@@ -136,13 +142,37 @@ export interface BadgesBlogRankingEntry {
   rank_position: number;
 }
 
-/** badges.blog top-100 collector ranking (BadgesBR community). */
+/**
+ * The ranking endpoint answers with ~13 MB, which is far over Next's 2 MB data
+ * cache limit — the cache write failed on every request and the whole payload
+ * was re-downloaded each time the leaderboard rendered. The response is now
+ * fetched without the data cache, slimmed to the rows the page actually shows,
+ * and held in a per-instance cache with the same six-hour window.
+ */
+let rankingCache: {
+  fetchedAt: number;
+  rows: BadgesBlogRankingEntry[];
+} | null = null;
+
+const RANKING_TTL_MS = 6 * 60 * 60 * 1000;
+const RANKING_ROWS = 200;
+
 export async function fetchBadgesBlogRanking(
   revalidate = 21600,
 ): Promise<BadgesBlogRankingEntry[]> {
+  void revalidate;
+
+  if (
+    rankingCache &&
+    Date.now() - rankingCache.fetchedAt < RANKING_TTL_MS
+  ) {
+    return rankingCache.rows;
+  }
+
   const res = await fetch("https://www.badges.blog/api/ranking", {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     headers: { accept: "application/json" },
-    next: { revalidate },
+    cache: "no-store",
   });
   if (!res.ok) {
     throw new Error(`badges.blog ranking failed: ${res.status}`);
@@ -150,7 +180,7 @@ export async function fetchBadgesBlogRanking(
   const json = (await res.json()) as {
     data?: Array<Record<string, unknown>>;
   };
-  return (json.data ?? []).map((row) => ({
+  const rows = (json.data ?? []).slice(0, RANKING_ROWS).map((row) => ({
     twitch_id: String(row.twitch_id ?? row.id ?? ""),
     login: String(row.login ?? ""),
     display_name: String(row.display_name ?? row.login ?? ""),
@@ -158,6 +188,9 @@ export async function fetchBadgesBlogRanking(
     badge_count: Number(row.badge_count ?? 0),
     rank_position: Number(row.rank_position ?? 0),
   }));
+
+  rankingCache = { fetchedAt: Date.now(), rows };
+  return rows;
 }
 
 /** Normalized potat.app user profile (GET /users/{username}). */
@@ -190,6 +223,7 @@ export async function fetchPotatUser(
   const clean = login.trim().toLowerCase();
   if (!/^[a-z0-9_]{3,25}$/.test(clean)) return null;
   const res = await fetch(`${envOrNull("POTAT_API_URL") ?? DEFAULT_API}/users/${clean}`, {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     headers: { accept: "application/json" },
     next: { revalidate },
   });
@@ -247,8 +281,8 @@ export async function fetchBadgeLiveStats(
 ): Promise<PotatBadgeLive | null> {
   const base = envOrNull("POTAT_API_URL") ?? DEFAULT_API;
   const res = await fetch(
-    `${base}/twitch/badges?badge=${encodeURIComponent(badgeName)}`,
-    { headers: { accept: "application/json" }, next: { revalidate } },
+    `${base}/twitch/badges?badge=${encodeURIComponent(badgeName)}`, {
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), headers: { accept: "application/json" }, next: { revalidate } },
   );
   if (!res.ok) return null;
   const json = (await res.json()) as {

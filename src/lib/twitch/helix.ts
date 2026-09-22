@@ -1,6 +1,10 @@
 import { envOrNull } from "@/lib/env";
 import type { BadgeSetSource } from "./types";
 
+/** Upper bound for any single third-party request, in milliseconds. */
+const FETCH_TIMEOUT_MS = 15_000;
+
+
 const HELIX_BASE = "https://api.twitch.tv/helix";
 const PUBLIC_WEB_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko";
 
@@ -26,6 +30,7 @@ async function getAppAccessToken(): Promise<string | null> {
     grant_type: "client_credentials",
   });
   const res = await fetch("https://id.twitch.tv/oauth2/token", {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body,
@@ -85,6 +90,7 @@ export async function fetchGlobalBadgesHelix(): Promise<BadgeSetSource[] | null>
 
   const clientId = envOrNull("TWITCH_CLIENT_ID") ?? PUBLIC_WEB_CLIENT_ID;
   const res = await fetch(`${HELIX_BASE}/chat/badges/global`, {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     headers: {
       "client-id": clientId,
       authorization: `Bearer ${token}`,

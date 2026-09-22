@@ -1,6 +1,10 @@
 import { envOrNull } from "@/lib/env";
 import type { BadgeSetSource } from "./types";
 
+/** Upper bound for any single third-party request, in milliseconds. */
+const FETCH_TIMEOUT_MS = 15_000;
+
+
 const DEFAULT_API = "https://api.ivr.fi/v2/twitch/badges";
 
 interface IvrVersion {
@@ -23,6 +27,7 @@ interface IvrSet {
 export async function fetchGlobalBadgesIvr(): Promise<BadgeSetSource[]> {
   const base = envOrNull("IVR_API_URL") ?? DEFAULT_API;
   const res = await fetch(`${base}/global`, {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     headers: { accept: "application/json" },
     next: { revalidate: 0 },
   });

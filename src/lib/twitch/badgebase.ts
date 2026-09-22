@@ -1,6 +1,10 @@
 import { envOrNull } from "@/lib/env";
 import type { FeedBadgeDetail } from "./types";
 
+/** Upper bound for any single third-party request, in milliseconds. */
+const FETCH_TIMEOUT_MS = 15_000;
+
+
 const DEFAULT_BASE = "https://badgebase.de";
 
 const BADGE_UUID = /badges\/v1\/([0-9a-f-]{36})/i;
@@ -11,6 +15,7 @@ function base(): string {
 
 async function fetchHtml(path: string): Promise<string> {
   const res = await fetch(`${base()}${path}`, {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     headers: { accept: "text/html" },
     next: { revalidate: 0 },
   });

@@ -1,6 +1,10 @@
 import { envOrNull } from "@/lib/env";
 import type { PerfilUser } from "./types";
 
+/** Upper bound for any single third-party request, in milliseconds. */
+const FETCH_TIMEOUT_MS = 15_000;
+
+
 const DEFAULT_PERFIL = "https://www.badges.blog/api/perfil";
 const GQL_URL = "https://gql.twitch.tv/gql";
 const GQL_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko";
@@ -61,6 +65,7 @@ async function fetchFromBadgesBlog(
   const base = envOrNull("BADGESBLOG_PERFIL_URL") ?? DEFAULT_PERFIL;
   const url = `${base}?username=${encodeURIComponent(login)}`;
   const res = await fetch(url, {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     headers: { accept: "application/json" },
     next: { revalidate },
   });
@@ -77,6 +82,7 @@ async function fetchFromBadgesBlog(
 async function fetchFromGql(login: string): Promise<PerfilUser> {
   const query = `query($login: String!) { user(login: $login) { id login displayName profileImageURL createdAt badges { setID version title description image1x image2x image4x clickAction clickURL } } }`;
   const res = await fetch(envOrNull("TWITCH_GQL_URL") ?? GQL_URL, {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     method: "POST",
     headers: {
       "client-id": envOrNull("TWITCH_GQL_CLIENT_ID") ?? GQL_CLIENT_ID,
