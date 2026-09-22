@@ -267,6 +267,33 @@ concurrency suite: **16/16 assertions pass**
 landing exactly, the daily and wheel gates producing exactly one winner under
 `Promise.all`, and the game-XP budget being capped at exactly 100.
 
+This pass also covered the SEO/content scope that pass 3 had only skimmed, with
+live evidence instead of file reading:
+
+| Endpoint | Result |
+|---|---|
+| `/sitemap.xml` | HTTP 200, 5 610 `<url>` entries, 1 210 hreflang links, parses as well-formed XML |
+| `/robots.txt` | HTTP 200, allows `/`, disallows `/api/`, `/*/account`, `/*/inventory`, `/*/auth/`, links the sitemap |
+| `/api/changelog/rss` | HTTP 200, 100 items, well-formed XML, no unescaped `&`, valid RFC-822 `pubDate`, stable `guids` |
+| `/api/og/profile?u=<user>` | HTTP 200, 130 KB `image/png` |
+| `/api/og/profile` (missing/invalid param) | HTTP 400 `invalid username` — the guard works |
+
+Two initial "findings" here were mistakes in the probe itself, not defects, and
+are recorded so nobody re-raises them: the OG route takes `?u=` (not
+`?username=`), and `grep '</item>'` under Git Bash reports 0 for an RSS file the
+XML parser reads as 100 well-formed items.
+
+### On the sub-agent requirement
+
+The 20 audit sub-agents and 10 idea sub-agents were attempted **14 times** in
+this session — first as a wave of ten in parallel, then repeatedly as single
+sequential agents, including after the runtime reported a quota reset. Every
+attempt was rejected by the platform with `model concurrency limit exceeded` or
+`exceed quota limit`; no agent ever started. The scopes were therefore executed
+first-party, and this report plus `IMPROVEMENTS.md` are the substitutes. If the
+quota recovers, the agent prompts are reconstructable from the scope list at the
+end of this file.
+
 ## What was fixed
 
 | Bug | Status | Evidence |
