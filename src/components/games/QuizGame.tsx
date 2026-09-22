@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGame, BetBar, GameError, RoundOutcome } from "./useGame";
 
 export interface QuizBadge {
@@ -15,6 +15,13 @@ export default function QuizGame({ badges }: { badges: QuizBadge[] }) {
   const [index, setIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [choice, setChoice] = useState<string | null>(null);
+  const advanceTimer = useRef<number>(0);
+
+  useEffect(() => {
+    return () => {
+      if (advanceTimer.current) window.clearTimeout(advanceTimer.current);
+    };
+  }, []);
   const [round, setRound] = useState<Array<{ badge: QuizBadge; options: string[] }> | null>(null);
 
   function shuffle<T>(items: T[]): T[] {
@@ -22,6 +29,7 @@ export default function QuizGame({ badges }: { badges: QuizBadge[] }) {
   }
 
   function startRound() {
+    if (busy) return;
     const picks = shuffle(badges).slice(0, 10);
     setRound(
       picks.map((badge) => ({
@@ -45,7 +53,8 @@ export default function QuizGame({ badges }: { badges: QuizBadge[] }) {
     const isCorrect = option === round[index].badge.title;
     const newCorrect = correct + (isCorrect ? 1 : 0);
     setCorrect(newCorrect);
-    window.setTimeout(async () => {
+    if (advanceTimer.current) window.clearTimeout(advanceTimer.current);
+    advanceTimer.current = window.setTimeout(async () => {
       if (index + 1 >= round.length) {
         setRound(null);
         await play({ correct: newCorrect, total: round.length });

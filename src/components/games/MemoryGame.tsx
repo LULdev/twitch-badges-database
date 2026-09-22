@@ -60,7 +60,7 @@ export default function MemoryGame() {
         i === first || i === index ? { ...card, matched: true } : card,
       );
       setCards(matched);
-      if (matched.every((card) => card.matched)) void finish(matched);
+      if (matched.every((card) => card.matched)) void finish();
     } else {
       setBusyCards(true);
       setMisses((prev) => prev + 1);
@@ -75,10 +75,10 @@ export default function MemoryGame() {
     }
   }
 
-  async function finish(finalCards: Card[]) {
+  async function finish() {
     // eslint-disable-next-line react-hooks/purity -- event-driven callback
     const timeMs = Date.now() - startTime.current;
-    const finalMisses = finalCards.every((c) => c.matched) ? misses : misses;
+    const finalMisses = misses;
     setStarted(false);
     await play({ timeMs, misses: finalMisses });
   }
@@ -116,12 +116,12 @@ export default function MemoryGame() {
           ))}
         </div>
         {!started && cards.length === 0 && (
-          <button type="button" onClick={start} className="btn btn-primary w-full">
+          <button type="button" onClick={start} disabled={busy} className="btn btn-primary w-full">
             {t("start")}
           </button>
         )}
         {!started && cards.length > 0 && (
-          <button type="button" onClick={start} className="btn btn-secondary w-full">
+          <button type="button" onClick={start} disabled={busy} className="btn btn-secondary w-full">
             {t("again")}
           </button>
         )}

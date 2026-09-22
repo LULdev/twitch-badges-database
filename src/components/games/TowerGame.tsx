@@ -5,18 +5,26 @@ import { useGame, BetBar, GameError } from "./useGame";
 import Coin from "@/components/Coin";
 
 export default function TowerGame() {
-  const { bet, setBet, busy, error, play, t } = useGame("tower");
+  const { bet, setBet, busy, error, balance, play, t } = useGame("tower");
   const [cashoutAt, setCashoutAt] = useState(5);
   const [last, setLast] = useState<{ floor: number; survived: boolean; payout: number } | null>(null);
 
   async function climb() {
-    const result = await play({ cashoutAt });
-    if (result) setLast(result.result as typeof last);
+    const res = await play({ cashoutAt });
+    if (!res) return;
+    // The server result is untyped coming over the wire: read only the fields
+    // that are actually present instead of casting the whole object.
+    const raw = res.result as Record<string, unknown>;
+    setLast({
+      floor: typeof raw.floor === "number" ? raw.floor : 0,
+      survived: raw.survived === true,
+      payout: res.payout,
+    });
   }
 
   return (
     <div className="space-y-4">
-      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={null} />
+      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={balance} />
       <GameError error={error} />
       <div className="card space-y-4 p-6">
         <div className="mx-auto flex max-w-xs flex-col-reverse gap-1">

@@ -189,14 +189,14 @@ export async function listBadges(
       });
       break;
     case "ending":
-      query = query
-        .not("end_date", "is", null)
-        .order("end_date", { ascending: true, nullsFirst: false });
+      // A sort must never decide WHICH rows appear. The previous
+      // `.not("end_date", "is", null)` silently dropped every badge without an
+      // end date — on /active, whose default sort is "ending", that hid live
+      // badges from the page entirely. Rows without a date now simply sort last.
+      query = query.order("end_date", { ascending: true, nullsFirst: false });
       break;
     case "releasing":
-      query = query
-        .not("start_date", "is", null)
-        .order("start_date", { ascending: true, nullsFirst: false });
+      query = query.order("start_date", { ascending: true, nullsFirst: false });
       break;
     case "name":
       query = query.order("title", { ascending: true });

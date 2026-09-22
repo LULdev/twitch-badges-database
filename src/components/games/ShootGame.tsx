@@ -80,8 +80,14 @@ export default function ShootGame() {
         setRunning(false);
         cancelAnimationFrame(raf.current);
         const { hits: h, shots: sh } = stateRef.current;
-        setSummary(`${h} / ${sh} — ${sh > 0 ? Math.round((h / sh) * 100) : 0}%`);
-        void play({ hits: h, shots: sh });
+        void play({ hits: h, shots: sh }).then((res) => {
+          if (!res) return;
+          // The server decides the outcome; the client summary must not imply
+          // a win from its own accuracy figure.
+          setSummary(
+            `${h} / ${sh} — ${res.won ? t("youWin") : t("youLose")} (${res.payout})`,
+          );
+        });
       });
       return () => cancelAnimationFrame(finish);
     }
@@ -144,7 +150,7 @@ export default function ShootGame() {
         ))}
         {!running && (
           <div className="absolute inset-0 grid place-items-center">
-            <button type="button" onClick={start} className="btn btn-primary px-8 py-3">
+            <button type="button" onClick={start} disabled={busy} className="btn btn-primary px-8 py-3">
               {t("start")}
             </button>
           </div>

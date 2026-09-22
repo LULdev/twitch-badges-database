@@ -10,6 +10,9 @@ export default function VaultGame() {
   const [angles, setAngles] = useState([0, 0, 0]);
   const [matches, setMatches] = useState(0);
   const raf = useRef<number>(0);
+  // Blocks a second click from advancing another dial (and from paying a
+  // second round) before the phase transition has been applied.
+  const stopping = useRef(false);
   const dialIndex = phase === "dial1" ? 0 : phase === "dial2" ? 1 : phase === "dial3" ? 2 : -1;
 
   useEffect(() => {
@@ -29,14 +32,26 @@ export default function VaultGame() {
     return () => cancelAnimationFrame(raf.current);
   }, [dialIndex]);
 
+  /**
+   * Where the green zone sits on a dial, in degrees. The marker is rendered at
+   * this angle too — it used to be drawn at a fixed 0° while the judged zone
+   * was 30°/130°/230°, so dials 2 and 3 could not be aimed at the visible
+   * target at all.
+   */
+  function zoneAngle(dial: number): number {
+    return (30 + dial * 100) % 360;
+  }
+
   function inZone(dial: number): boolean {
-    const zone = (30 + dial * 100) % 360;
+    const zone = zoneAngle(dial);
     const angle = angles[dial];
     const diff = Math.min(Math.abs(angle - zone), 360 - Math.abs(angle - zone));
     return diff <= 22;
   }
 
   function stop() {
+    if (stopping.current || dialIndex < 0) return;
+    stopping.current = true;
     cancelAnimationFrame(raf.current);
     const hit = inZone(dialIndex);
     const newMatches = matches + (hit ? 1 : 0);
@@ -47,6 +62,7 @@ export default function VaultGame() {
   }
 
   function start() {
+    stopping.current = false;
     setMatches(0);
     setAngles([0, 0, 0]);
     setPhase("dial1");
@@ -68,7 +84,12 @@ export default function VaultGame() {
               >
                 <div className="absolute left-1/2 top-1.5 h-4 w-1 -translate-x-1/2 rounded bg-accent" />
               </div>
-              <div className="absolute left-1/2 top-1 size-2 -translate-x-1/2 rounded-full bg-success" />
+              <div
+                className="absolute inset-0"
+                style={{ transform: `rotate(${zoneAngle(index)}deg)` }}
+              >
+                <div className="absolute left-1/2 top-1 size-2 -translate-x-1/2 rounded-full bg-success" />
+              </div>
             </div>
           ))}
         </div>
