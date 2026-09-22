@@ -82,8 +82,7 @@
     "errorTitle": "Une erreur est survenue",
     "errorBody": "La page n'a pas pu être chargée. C'est généralement temporaire — réessayez.",
     "errorRetry": "Réessayer",
-    "levelAria": "Niveau {level}",
-    "streakDay": "Jour {streak}"
+    "levelAria": "Niveau {level}"
   },
   "home": {
     "heroTitle": "Tous les badges Twitch. Une seule base de données.",
@@ -580,7 +579,8 @@
     "towerDesc": "Monte dix étages au risque croissant — encaisse avant que les gardes ne t'attrapent.",
     "catcherTitle": "Attrape-badges",
     "catcherDesc": "Attrapez les badges qui tombent dans votre panier, évitez les bombes.",
-    "notEnoughBadges": "Il n'y a pas encore assez de badges dans le catalogue pour créer un quiz."
+    "notEnoughBadges": "Il n'y a pas encore assez de badges dans le catalogue pour créer un quiz.",
+    "streakDay": "Jour {streak}"
   },
   "wheel": {
     "title": "Roue de la fortune",

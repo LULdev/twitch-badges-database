@@ -82,8 +82,7 @@
     "errorTitle": "Algo ha salido mal",
     "errorBody": "No se pudo cargar la página. Suele ser temporal: inténtalo de nuevo.",
     "errorRetry": "Reintentar",
-    "levelAria": "Nivel {level}",
-    "streakDay": "Día {streak}"
+    "levelAria": "Nivel {level}"
   },
   "home": {
     "heroTitle": "Todas las insignias de Twitch. Una sola base de datos.",
@@ -580,7 +579,8 @@
     "towerDesc": "Sube diez pisos de riesgo creciente — retírate antes de que te atrapen los guardias.",
     "catcherTitle": "Atrapa insignias",
     "catcherDesc": "Atrapa insignias que caen en tu cesta, esquiva las bombas.",
-    "notEnoughBadges": "Todavía no hay suficientes insignias en el catálogo para crear un cuestionario."
+    "notEnoughBadges": "Todavía no hay suficientes insignias en el catálogo para crear un cuestionario.",
+    "streakDay": "Día {streak}"
   },
   "wheel": {
     "title": "Ruleta de la fortuna",

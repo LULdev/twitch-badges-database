@@ -82,8 +82,7 @@
     "errorTitle": "Qualcosa è andato storto",
     "errorBody": "Non è stato possibile caricare la pagina. Di solito è temporaneo: riprova.",
     "errorRetry": "Riprova",
-    "levelAria": "Livello {level}",
-    "streakDay": "Giorno {streak}"
+    "levelAria": "Livello {level}"
   },
   "home": {
     "heroTitle": "Tutti i badge Twitch. Un solo database.",
@@ -580,7 +579,8 @@
     "towerDesc": "Sali dieci piani di rischio crescente — incassa prima che le guardie ti prendano.",
     "catcherTitle": "Cattura badge",
     "catcherDesc": "Cattura i badge che cadono nel cesto, evita le bombe.",
-    "notEnoughBadges": "Non ci sono ancora abbastanza badge nel catalogo per creare un quiz."
+    "notEnoughBadges": "Non ci sono ancora abbastanza badge nel catalogo per creare un quiz.",
+    "streakDay": "Giorno {streak}"
   },
   "wheel": {
     "title": "Ruota della fortuna",

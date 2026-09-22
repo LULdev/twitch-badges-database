@@ -82,8 +82,7 @@
     "errorTitle": "問題が発生しました",
     "errorBody": "ページを読み込めませんでした。多くは一時的なものです。もう一度お試しください。",
     "errorRetry": "再試行",
-    "levelAria": "レベル {level}",
-    "streakDay": "{streak} 日目"
+    "levelAria": "レベル {level}"
   },
   "home": {
     "heroTitle": "Twitchの全バッジを、一つのデータベースに。",
@@ -580,7 +579,8 @@
     "towerDesc": "リスクが増す10階を登る — 警備員に捕まる前にキャッシュアウト。",
     "catcherTitle": "バッジキャッチャー",
     "catcherDesc": "落ちてくるバッジをカゴで受け、爆弾は避けよう。",
-    "notEnoughBadges": "カタログにバッジがまだ足りないため、クイズを作成できません。"
+    "notEnoughBadges": "カタログにバッジがまだ足りないため、クイズを作成できません。",
+    "streakDay": "{streak} 日目"
   },
   "wheel": {
     "title": "フォーチュンホイール",

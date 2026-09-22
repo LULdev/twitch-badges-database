@@ -82,8 +82,7 @@
     "errorTitle": "문제가 발생했습니다",
     "errorBody": "페이지를 불러올 수 없습니다. 대개 일시적인 문제이니 다시 시도해 주세요.",
     "errorRetry": "다시 시도",
-    "levelAria": "레벨 {level}",
-    "streakDay": "{streak}일차"
+    "levelAria": "레벨 {level}"
   },
   "home": {
     "heroTitle": "모든 Twitch 배지를 하나의 데이터베이스에서.",
@@ -580,7 +579,8 @@
     "towerDesc": "위험이 커지는 10개 층을 오르세요 — 경비병에게 붙잡히기 전에 정산하세요.",
     "catcherTitle": "배지 캐처",
     "catcherDesc": "떨어지는 배지를 바구니로 받고 폭탄은 피하세요.",
-    "notEnoughBadges": "카탈로그에 배지가 아직 충분하지 않아 퀴즈를 만들 수 없습니다."
+    "notEnoughBadges": "카탈로그에 배지가 아직 충분하지 않아 퀴즈를 만들 수 없습니다.",
+    "streakDay": "{streak}일차"
   },
   "wheel": {
     "title": "운명의 수레바퀴",

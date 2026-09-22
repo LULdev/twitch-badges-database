@@ -16,6 +16,7 @@ export default function VaultGame() {
   // reload was the only way out. Tracking the dial itself keeps the double-click
   // protection per dial.
   const stoppedDial = useRef(-1);
+  const lastStopAt = useRef(0);
   const dialIndex = phase === "dial1" ? 0 : phase === "dial2" ? 1 : phase === "dial3" ? 2 : -1;
 
   useEffect(() => {
@@ -54,6 +55,12 @@ export default function VaultGame() {
 
   function stop() {
     if (dialIndex < 0 || stoppedDial.current === dialIndex) return;
+    // A second click whose events straddle a commit sees the NEXT dial, because
+    // dialIndex is derived from the phase state. The time guard catches that
+    // case as well; without it a double-click could stop two dials at once.
+    const now = performance.now();
+    if (now - lastStopAt.current < 250) return;
+    lastStopAt.current = now;
     stoppedDial.current = dialIndex;
     cancelAnimationFrame(raf.current);
     const hit = inZone(dialIndex);

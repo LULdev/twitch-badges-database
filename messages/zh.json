@@ -82,8 +82,7 @@
     "errorTitle": "出错了",
     "errorBody": "页面无法加载。通常是暂时性的，请重试。",
     "errorRetry": "重试",
-    "levelAria": "等级 {level}",
-    "streakDay": "第 {streak} 天"
+    "levelAria": "等级 {level}"
   },
   "home": {
     "heroTitle": "所有 Twitch 徽章，尽在一个数据库。",
@@ -580,7 +579,8 @@
     "towerDesc": "攀爬十层，风险递增——在被守卫抓住前及时兑现。",
     "catcherTitle": "接徽章",
     "catcherDesc": "用篮子接住下落的徽章，避开炸弹。",
-    "notEnoughBadges": "目录中的徽章还不够，暂时无法生成问答。"
+    "notEnoughBadges": "目录中的徽章还不够，暂时无法生成问答。",
+    "streakDay": "第 {streak} 天"
   },
   "wheel": {
     "title": "命运转盘",

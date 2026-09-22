@@ -82,8 +82,7 @@
     "errorTitle": "Algo deu errado",
     "errorBody": "Não foi possível carregar a página. Normalmente é temporário — tente novamente.",
     "errorRetry": "Tentar novamente",
-    "levelAria": "Nível {level}",
-    "streakDay": "Dia {streak}"
+    "levelAria": "Nível {level}"
   },
   "home": {
     "heroTitle": "Todas as insígnias da Twitch. Um só banco de dados.",
@@ -580,7 +579,8 @@
     "towerDesc": "Suba dez andares de risco crescente — saque antes que os guardas peguem você.",
     "catcherTitle": "Pega emblemas",
     "catcherDesc": "Pegue emblemas que caem na sua cesta, evite as bombas.",
-    "notEnoughBadges": "Ainda não há selos suficientes no catálogo para criar um quiz."
+    "notEnoughBadges": "Ainda não há selos suficientes no catálogo para criar um quiz.",
+    "streakDay": "Dia {streak}"
   },
   "wheel": {
     "title": "Roleta da fortuna",

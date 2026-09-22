@@ -82,8 +82,7 @@
     "errorTitle": "Etwas ist schiefgelaufen",
     "errorBody": "Die Seite konnte nicht geladen werden. Das ist meist vorübergehend — bitte versuche es erneut.",
     "errorRetry": "Erneut versuchen",
-    "levelAria": "Level {level}",
-    "streakDay": "Tag {streak}"
+    "levelAria": "Level {level}"
   },
   "home": {
     "heroTitle": "Alle Twitch-Badges. Eine Datenbank.",
@@ -580,7 +579,8 @@
     "towerDesc": "Zehn Etagen steigenden Risikos — zahle aus, bevor die Wachen kommen.",
     "catcherTitle": "Drops-Fänger",
     "catcherDesc": "Fange fallende Badges im Korb, weiche den Bomben aus.",
-    "notEnoughBadges": "Es sind noch nicht genug Badges im Katalog, um ein Quiz zu erstellen."
+    "notEnoughBadges": "Es sind noch nicht genug Badges im Katalog, um ein Quiz zu erstellen.",
+    "streakDay": "Tag {streak}"
   },
   "wheel": {
     "title": "Glücksrad",
