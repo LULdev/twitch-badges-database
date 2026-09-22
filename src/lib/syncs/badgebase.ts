@@ -93,20 +93,24 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
     const uuid = extractUuid(row.image_url_1x as string | null) ??
       extractUuid(row.image_url_2x as string | null);
     if (uuid) byUuid.set(uuid, row);
+    if (!bySetId.has(row.set_id as string)) bySetId.set(row.set_id as string, row);
+  }
 
   // The /active listing is the authority for "currently redeemable": an empty
   // one would clear is_confirmed_active everywhere and demote every dateless
   // badge. It is only an incident when we currently HAVE confirmed-active rows —
-  // a genuinely empty window must not block this sync forever. Placed after the
-  // catalog load so it can tell those apart, and still before every write.
-  if (activeCards.length === 0 && [...byUuid.values(), ...bySetId.values()].some(
-    (row) => row.is_confirmed_active === true,
-  )) {
+  // a genuinely empty window must not block this sync forever. This sits after
+  // the catalog load (so a partially built map cannot be judged) and still
+  // before every write.
+  if (
+    activeCards.length === 0 &&
+    [...byUuid.values(), ...bySetId.values()].some(
+      (row) => row.is_confirmed_active === true,
+    )
+  ) {
     throw new Error(
       "drop-window listing is empty while confirmed-active badges exist — refusing to clear confirmations and demote badges",
     );
-  }
-    if (!bySetId.has(row.set_id as string)) bySetId.set(row.set_id as string, row);
   }
 
   const now = new Date();
@@ -158,12 +162,7 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
         patch.is_paid = isPaid;
       if (howToEarn && howToEarn !== existing.how_to_earn)
         patch.how_to_earn = howToEarn;
-      if (
-        detail.description &&
-        detail.description !== existing.description
-      ) {
-        patch.description = detail.description;
-      }
+      // Deliberately no description here: see the note above the insert path.
       if ((existing.is_confirmed_active as boolean | null) !== confirmedActive) {
         patch.is_confirmed_active = confirmedActive;
       }

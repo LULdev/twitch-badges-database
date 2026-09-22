@@ -58,6 +58,7 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     const { data, error } = await supabase
       .from("badges")
       .select("*")
+      .order("id")
       .range(offset, offset + 999);
     if (error) throw error;
     for (const row of (data ?? []) as ExistingBadge[]) {
@@ -89,11 +90,11 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     (row) => row.status !== "removed",
   ).length;
   const suspicious =
-    incoming.length < MIN_INCOMING ||
-    (liveExisting > 20 && incoming.length < liveExisting * 0.5);
+    incomingKeys.size < MIN_INCOMING ||
+    (liveExisting > 20 && incomingKeys.size < liveExisting * 0.5);
   if (suspicious) {
     throw new Error(
-      `catalog feed returned ${incoming.length} badges against ${liveExisting} live — refusing to sweep, treating this as a provider incident`,
+      `catalog feed returned ${incomingKeys.size} distinct badges against ${liveExisting} live — refusing to sweep, treating this as a provider incident`,
     );
   }
 
@@ -126,6 +127,21 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
   let statusChanged = 0;
 
   type UpsertRow = Record<string, unknown>;
+  // Columns refreshed by the drop-window and owner-statistics syncs, plus the
+  // database-owned keys. Writing them back from a snapshot taken at the start of
+  // this run would revert anything those syncs wrote in between (the
+  // owner-statistics job runs every fifteen minutes).
+  const OWNED_BY_OTHER_SYNC = new Set([
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_count",
+    "active_count",
+    "percentage",
+    "last_polled_at",
+    "rarity_score",
+    "rarity_tier",
+  ]);
   // New and existing badges are written in SEPARATE upserts. PostgREST takes
   // the union of the keys in one batch and fills the missing ones with NULL, so
   // mixing a row that carries `id`/`slug` with one that does not made the
@@ -202,8 +218,9 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     // key set, because PostgREST fills any key it sees in one row with NULL in
     // the others. `id` is omitted because the row is updated in place through
     // the (set_id, version) conflict target and its value never changes.
-    const { id: _existingId, ...existingWithoutId } = ex;
-    void _existingId;
+    const existingWithoutId = Object.fromEntries(
+      Object.entries(ex).filter(([key]) => !OWNED_BY_OTHER_SYNC.has(key)),
+    );
     upsertsExisting.push({ ...existingWithoutId, ...patch });
   }
 

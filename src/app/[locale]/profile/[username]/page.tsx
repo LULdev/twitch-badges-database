@@ -21,7 +21,7 @@ import AchievementBadge from "@/components/AchievementBadge";
 import CoinRainButton from "@/components/CoinRainButton";
 import Coin from "@/components/Coin";
 import StealPanel from "@/components/StealPanel";
-import { getProgress } from "@/lib/gamification/xp";
+import { readProgress } from "@/lib/gamification/xp";
 import { levelFromXp } from "@/lib/gamification/levels";
 import { ACH_BY_ID } from "@/lib/gamification/achievements";
 import { recordProfileVisit } from "@/lib/gamification/visits";
@@ -207,13 +207,13 @@ export default async function ProfilePage({ params }: PageProps) {
       : 0;
 
   // Gamification: level (badge ALWAYS visible), coins, achievements, visitors.
-  let progress: Awaited<ReturnType<typeof getProgress>> | null = null;
+  let progress: Awaited<ReturnType<typeof readProgress>> = null;
   let level = null as ReturnType<typeof levelFromXp> | null;
   let unlockedAchievements: Array<{ achievement_id: string; unlocked_at: string }> = [];
   if (profile) {
     const admin = createAdminClient();
     const [progressRow, achievementRes] = await Promise.all([
-      getProgress(profile.id).catch(() => null),
+      readProgress(profile.id).catch(() => null),
       admin
         .from("user_achievements")
         .select("achievement_id, unlocked_at")

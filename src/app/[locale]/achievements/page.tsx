@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ACHIEVEMENTS } from "@/lib/gamification/achievements";
+import { ACTIVE_ACHIEVEMENTS } from "@/lib/gamification/achievements";
 import { createClient } from "@/lib/supabase/server";
 import { authUserId } from "@/lib/gamification/session";
 import { getProgress } from "@/lib/gamification/xp";
@@ -86,7 +86,7 @@ export default async function AchievementsPage({
       )}
 
       {categories.map((category) => {
-        const list = ACHIEVEMENTS.filter((a) => a.category === category);
+        const list = ACTIVE_ACHIEVEMENTS.filter((a) => a.category === category);
         const unlockedCount = list.filter((a) => unlocked.has(a.id)).length;
         return (
           <section key={category} className="space-y-3">

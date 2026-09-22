@@ -32,9 +32,12 @@ export default function TowerGame() {
         <div className="mx-auto flex max-w-xs flex-col-reverse gap-1">
           {Array.from({ length: 10 }, (_, index) => {
             const floor = index + 1;
-            const reached = last ? floor <= last.floor : floor <= cashoutAt;
+            // After a round the marker must describe the floor that was played,
+            // not wherever the live slider happens to sit now.
+            const playedFloor = last ? last.floor : cashoutAt;
+            const reached = floor <= playedFloor;
             const survived = last ? last.survived : true;
-            const isCashout = floor === cashoutAt;
+            const isCashout = floor === playedFloor;
             return (
               <div
                 key={floor}

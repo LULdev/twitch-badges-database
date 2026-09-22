@@ -65,10 +65,37 @@ export async function withHeartbeat<T>(
       source,
       status: "error",
       durationMs: Date.now() - started,
-      message: error instanceof Error ? error.message : String(error),
+      message: errorMessage(error),
     });
     throw error;
   }
+}
+
+/**
+ * Human-readable message for anything that can be thrown. Supabase returns its
+ * errors as plain objects, and `String(error)` on one of those produced the
+ * literal "[object Object]" — which the public /stats page then displayed as the
+ * reason a sync had failed.
+ */
+function errorMessage(error: unknown): string {
+  if (error instanceof Error && error.message) return error.message;
+  if (error && typeof error === "object") {
+    const candidate = error as { message?: unknown; details?: unknown; code?: unknown };
+    if (typeof candidate.message === "string" && candidate.message) {
+      return typeof candidate.code === "string"
+        ? `${candidate.message} (${candidate.code})`
+        : candidate.message;
+    }
+    if (typeof candidate.details === "string" && candidate.details) {
+      return candidate.details;
+    }
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return "unknown error";
+    }
+  }
+  return String(error);
 }
 
 /** Keep the heartbeat table bounded — called from the daily global cron. */

@@ -243,7 +243,21 @@ export const ACHIEVEMENTS: Achievement[] = [
   SPECIAL("s_immortal", "Immortal", "Reach the maximum level of 100.", (s) => s.progress.level >= 100, 5000, 10000),
 ];
 
-export const ACH_BY_ID = new Map(ACHIEVEMENTS.map((a) => [a.id, a]));
+/**
+ * Achievements whose described condition no code can observe. They are filtered
+ * out of the catalog instead of staying permanently locked: a locked entry that
+ * can never unlock is a lie in the UI. `k_faq_scholar` ("read the FAQ 5 times")
+ * needs a FAQ-view signal, and recording one would make a statically rendered
+ * page dynamic — the wrong trade for a single achievement. If a gated visit
+ * event is ever added, delete this set.
+ */
+const RETIRED_ACHIEVEMENT_IDS = new Set(["k_faq_scholar"]);
+
+export const ACTIVE_ACHIEVEMENTS = ACHIEVEMENTS.filter(
+  (a) => !RETIRED_ACHIEVEMENT_IDS.has(a.id),
+);
+
+export const ACH_BY_ID = new Map(ACTIVE_ACHIEVEMENTS.map((a) => [a.id, a]));
 
 /** Count-unlock achievements that can't self-check (unlocked N achievements). */
 const META_ACHIEVEMENTS: Array<{ id: string; at: number }> = [
@@ -267,7 +281,7 @@ export async function evaluateAchievements(userId: string): Promise<string[]> {
   );
 
   const newly: string[] = [];
-  for (const ach of ACHIEVEMENTS) {
+  for (const ach of ACTIVE_ACHIEVEMENTS) {
     if (ach.id.startsWith("c_ach_")) continue;
     if (unlocked.has(ach.id)) continue;
     let passed = false;
@@ -342,6 +356,29 @@ function unlockededRowsSafe(rows: unknown): Array<{ achievement_id: string }> {
   return Array.isArray(rows) ? (rows as Array<{ achievement_id: string }>) : [];
 }
 
+/**
+ * Read every row of a query in 1000-row pages. PostgREST caps one response at
+ * 1000 rows regardless of the requested limit, so an unbounded select silently
+ * truncated — and the achievements below aggregate over the whole set.
+ */
+async function pageAll<T>(
+  build: (from: number, to: number) => PromiseLike<{
+    data: unknown;
+    error: unknown;
+  }>,
+): Promise<{ data: T[]; error: unknown }> {
+  const PAGE = 1000;
+  const rows: T[] = [];
+  for (let offset = 0; ; offset += PAGE) {
+    const { data, error } = await build(offset, offset + PAGE - 1);
+    if (error) return { data: rows, error };
+    const page = (data ?? []) as T[];
+    rows.push(...page);
+    if (page.length < PAGE) break;
+  }
+  return { data: rows, error: null };
+}
+
 async function buildStats(userId: string): Promise<AchStats> {
   const supabase = createAdminClient();
   const progress = await getProgress(userId);
@@ -351,16 +388,48 @@ async function buildStats(userId: string): Promise<AchStats> {
     maxBetRes] =
     await Promise.all([
       supabase.from("user_inventory").select("badges(rarity_tier,status,set_id,first_seen_at,rarity_score)").eq("user_id", userId),
-      supabase.from("game_rounds").select("game,won").eq("user_id", userId),
+      pageAll<{ game: string; won: boolean }>((from, to) =>
+        supabase
+          .from("game_rounds")
+          .select("game,won")
+          .eq("user_id", userId)
+          .order("id")
+          .range(from, to),
+      ),
       supabase.from("game_rounds").select("game,won,bet,payout,result,created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(60),
       supabase.from("activity_events").select("xp_amount").eq("user_id", userId).eq("kind", "wheel"),
       supabase.from("turbo_wins").select("id", { count: "exact", head: true }).eq("user_id", userId),
       supabase.from("profiles").select("view_count, customization, mood, twitch_created_at, showcase_slots").eq("id", userId).maybeSingle(),
       supabase.from("activity_events").select("payload").eq("kind", "coin_rain").eq("user_id", userId),
-      supabase.from("steal_attempts").select("thief_id,victim_id,coins,cost,success").or(`thief_id.eq.${userId},victim_id.eq.${userId}`),
+      pageAll<{
+        thief_id: string;
+        victim_id: string;
+        coins: number;
+        cost: number;
+        success: boolean;
+      }>((from, to) =>
+        supabase
+          .from("steal_attempts")
+          .select("thief_id,victim_id,coins,cost,success")
+          .or(`thief_id.eq.${userId},victim_id.eq.${userId}`)
+          .order("id")
+          .range(from, to),
+      ),
       supabase.from("blog_reactions").select("id", { count: "exact", head: true }).eq("user_id", userId),
-      supabase.from("activity_events").select("id", { count: "exact", head: true }).eq("user_id", userId).eq("kind", "profile").eq("payload->>page", "faq"),
-      supabase.from("activity_events").select("payload").in("kind", ["profile_visit", "steal_visit"]).eq("user_id", userId),
+      // Retired — see RETIRED_ACHIEVEMENT_IDS. Kept in place so the
+      // destructuring of the Promise.all result is unchanged.
+      supabase
+        .from("activity_events")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .eq("kind", "__retired__"),
+      // The profiles THIS user visited. It used to read activity_event kinds
+      // (profile_visit/steal_visit) that nothing ever writes.
+      supabase
+        .from("profile_visits")
+        .select("profile_id")
+        .eq("visitor_id", userId)
+        .limit(1000),
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("activity_events").select("kind").eq("user_id", userId),
       supabase.from("profile_visits").select("ip_hash").eq("profile_id", userId).limit(1000),
@@ -438,7 +507,9 @@ async function buildStats(userId: string): Promise<AchStats> {
   const mySteals = steals.filter((s) => s.thief_id === userId);
   const againstMe = steals.filter((s) => s.victim_id === userId);
 
-  const visitPayloads = (visitsRes.data ?? []) as Array<{ payload: Record<string, unknown> | null }>;
+  const distinctVisitors = new Set(
+    ((visitorsRes.data ?? []) as Array<{ ip_hash: string }>).map((v) => v.ip_hash),
+  ).size;
 
   return {
     progress: {
@@ -472,18 +543,22 @@ async function buildStats(userId: string): Promise<AchStats> {
     wheelBest,
     turboWins: turboRes.count ?? 0,
     profileViews: profileRes.data?.view_count ?? 0,
-    visitorsCount: new Set(
-      ((visitorsRes.data ?? []) as Array<{ ip_hash: string }>).map((v) => v.ip_hash),
-    ).size,
+    visitorsCount: distinctVisitors,
     rainsReceived,
     rainsGiven,
-    stealVisits: visitPayloads.filter((v) => v.payload?.page === "steal-link").length,
+    // The share link IS the profile URL, so the visits a collector received are
+    // the closest real signal to "visits through your link".
+    stealVisits: distinctVisitors,
     defendedCount: againstMe.filter((s) => !s.success).length,
     stealCostPaid: mySteals.filter((s) => !s.success).reduce((sum, s) => sum + s.cost, 0),
     bestStealAmount: Math.max(0, ...mySteals.filter((s) => s.success).map((s) => s.coins)),
     reactionsGiven: reactRes.count ?? 0,
     faqVisits: faqRes.count ?? 0,
-    profilesVisited: visitPayloads.filter((v) => v.payload?.page === "profile").length,
+    profilesVisited: new Set(
+      ((visitsRes.data ?? []) as Array<{ profile_id: string }>).map(
+        (v) => v.profile_id,
+      ),
+    ).size,
     customizationKeys: Object.keys(customization).length,
     showcaseSlots: Array.isArray(profileRes.data?.showcase_slots)
       ? profileRes.data.showcase_slots.length

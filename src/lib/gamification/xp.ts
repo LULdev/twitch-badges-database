@@ -79,6 +79,23 @@ export async function logActivity(entry: {
   }
 }
 
+/**
+ * Read a progress row without creating one. `getProgress` upserts a row on miss
+ * — correct for the signed-in user, wrong for a profile someone is merely
+ * viewing: it wrote through the service role on an anonymous GET, inflated the
+ * public "players" KPI and dragged the average level toward 1.
+ */
+export async function readProgress(userId: string): Promise<ProgressRow | null> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("user_progress")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as ProgressRow | null) ?? null;
+}
+
 export async function getProgress(userId: string): Promise<ProgressRow> {
   const supabase = createAdminClient();
   const { data, error } = await supabase

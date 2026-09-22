@@ -12,7 +12,9 @@ export async function GET() {
   return Response.json({
     authenticated: true,
     coins: progress.coins,
-    level: levelFromXp(progress.xp),
+    // Every other surface exposes the number; this returned the whole
+    // LevelInfo object, so a consumer reading `level` would render an object.
+    level: levelFromXp(progress.xp).level,
     loginStreak: progress.login_streak,
     // Lets the wheel show its used state on load instead of offering a button
     // that can only answer "already spun today".
