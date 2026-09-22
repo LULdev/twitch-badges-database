@@ -321,6 +321,49 @@ agents raised has now been fixed and verified.
 
 ---
 
+## Round 9 — the medium/low findings, worked through
+
+| ID | Fix | Verification |
+|---|---|---|
+| games-a-1 | the hilo screen showed a fixed client-side `30` before the first guess while the server rolls its own 30–69 starting value | the score starts empty and is filled from the server's reply |
+| games-a-7 | a tie (`nextScore == currentScore`) matched neither "higher" nor "lower", so it silently counted as a full loss | a tie refunds the stake and renders as "Tie"; the economy sim still reports 13/13 games below the stake (hilo 0.9861) |
+| games-a-2 | the coinflip history was coloured against the **live** side selection, so toggling sides re-coloured past wins as losses | the round records the side it was actually played with, from the server's response |
+| games-a-4 | seven of thirteen games still passed `balance={null}`, so the wagered balance was invisible there while the other six showed it | all thirteen pass the real balance |
+| auth-6 | the callback page ignored the OAuth `error`/`error_description` params and showed the generic "no code" page | the provider message is surfaced with a retry link |
+| api-3 | `PushToggle.disable()` skipped the local `unsubscribe()` when the DELETE request failed — the browser kept receiving pushes while the UI said "off" | the local unsubscribe always runs; the stale server row is pruned on the push service's next 410 |
+| sec-3 | `/api/games/play` forwarded `NaN`/`Infinity`/negative bets to the game library | explicit finite/positive guard at the route layer |
+
+**Refuted, not "fixed":**
+- **auth-5** — `redirectTo` omits the locale prefix, but `/auth/callback` is
+  rewritten to `/{locale}/auth/callback` by the next-intl proxy, and Twitch
+  login is verified working in production. Adding the prefix would additionally
+  require the Supabase redirect allowlist to accept every locale path, so the
+  change carries more risk than the finding. Left as is, deliberately.
+- **sec-5** — `POST /api/blog/react` finds the row by `post_id + ip_hash +
+  emoji` and then deletes **that** id, so it can only remove the caller's own
+  reaction. The "deletes by IP hash only" description does not match the code.
+- **games-a-9** — the client's payout preview and the server's payout use the
+  identical `Math.floor(bet * 2^target * 0.97)` expression, and the bet is an
+  integer, so no off-by-one is reachable.
+- **fp-7 / fp-8** — `DailyClaim` already guards `typeof data.xp !== "number"`
+  before rendering its reward, and `CoinRainButton` only shows success on
+  `data.ok`. Both were fixed in an earlier round; the list entry was stale.
+
+Verification: lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`,
+economy simulation 200 000 rounds per game.
+
+### Still open
+
+`fp-3` (most ProfileCustomizer settings are stored but never applied — a
+feature-sized change, not a defect fix), `fp-5` (relative-time hydration),
+`fp-11`/`sec-4` (unbounded `customization` payload), `db-6/7` (0001 is
+destructive if replayed, 0003 is not idempotent), `pdat-5/6/7/8` (profile-sync
+field clobbering, duplicate-row batches aborting the upsert, PostgREST 1000-row
+cap in stats aggregations), `auth-4/7` (double cookie refresh, global
+`signOut()`), the `gam-*` family and `sync-3..7`. None is High or Medium.
+
+---
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents
