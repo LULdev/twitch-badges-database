@@ -455,6 +455,45 @@ receives `[{a_coins,b_coins}]`, `anon` gets 401, and the new CHECK accepts
 `MISSING_MESSAGE`, 675 keys ×11 identical. Real runs: global sync exit 0
 (added 1 / updated 27 / removed 0), badgebase sync exit 0 (0 errors, 1 demotion).
 
+## Round 14 — verifying the batch-key-union fix
+
+Two agents ran on `5799ec3`/`69ae3b7`: one targeted at the sync fix
+(`verify-round13.md`, 3 medium + 3 low), one as an independent fresh audit
+(`verify-fresh13.md`, 0 high + 3 medium + 5 low). Both independently found the
+**same** medium defect in my own patch, which is the most useful signal either
+produced.
+
+| ID | Finding | Fix |
+|---|---|---|
+| **v13-01 / f13-1 (medium, two agents)** | relocating the drop-window guard put it **inside** the catalog loop — it judged a partially built map and never ran at all on an empty catalog, i.e. exactly the case it exists for | moved after the loop, still before every write |
+| v13-02 (medium) | `withHeartbeat` formatted failures with `String(error)`; Supabase errors are plain objects, so the public `/stats` page displayed `[object Object]` as the reason a sync failed (two live rows carried it) | an `errorMessage()` helper extracts message/code/details from any shape |
+| v13-03 (medium) | the two syncs ping-ponged on `description`, so **every** global run after a drop-window run reported "41 badges updated" and published a false changelog **and RSS** entry | Twitch owns catalog metadata; the enrichment sync no longer writes `description` on update. **Proven by real runs:** badgebase 41 → global 41 before, badgebase 41 → global **0** after, and two consecutive global runs report 0 |
+| f13-2 (medium) | three achievements read event kinds no code writes, so they were permanently unreachable | `profilesVisited` and `stealVisits` now read `profile_visits` (written on every profile view — a closer match to their descriptions than before); the FAQ one is **retired** rather than left locked, with a single filtered list used by both the UI and the evaluation |
+| f13-3 (medium) | the `game_rounds` and `steal_attempts` selects were unbounded, so PostgREST's 1000-row cap silently truncated the aggregates behind `c_games_all`, `s_full_house`, `k_thief_10`, `s_sniper` | both page in 1000-row steps, keeping the same data shape |
+| v13-04 / v13-05 / v13-06 | no `ORDER BY` on the catalog loader; the write-back carried columns the other syncs own; the guard counted raw feed entries rather than distinct badges | ordered by `id`; the potat-owned columns are excluded; the guard counts `incomingKeys.size` |
+| f13-4 | viewing someone's profile created a `user_progress` row through the service role on an **anonymous GET**, inflating the public "players" KPI and pulling the average level toward 1 | new `readProgress()`; the profile page never creates a row |
+| f13-5 / f13-8 | `/api/progress` returned a whole `LevelInfo` object where every other surface exposes a number; the tower marked the **live slider** position after a round instead of the floor that was played | `.level`; the marker uses the played floor |
+| migration 0016 | the shared touch trigger stamped `updated_at` on all ~476 rows every run, defeating the sitemap's per-row `lastModified` | a badges-specific trigger keeps `updated_at` when only `last_seen_at` moved |
+
+**Also fixed, found while checking the above:** retiring one achievement made the
+hardcoded subtitle ("125 achievements — 50/50/25") false while the page rendered
+124 tiles — the same description-does-not-match-content class this round retired
+the entry for. The counts are now placeholders fed from the same list the page
+renders, in all 11 locales and in the page metadata.
+
+**Left open, documented:** `f13-6` — three special achievements check conditions
+that do not implement their descriptions (`s_ghost_town` fires on a new player's
+first action; `s_pioneer` and `s_top_percent` check a coin threshold rather than a
+ranking). That needs a product decision, not a code line. `f13-7` — the short
+overlap window between two sync runs, narrowed for the global sync by the excluded
+columns.
+
+**Verification of this round:** lint 0 errors, typecheck 0, build 227/227, 0
+`MISSING_MESSAGE`, 675 keys ×11 identical. Live: **77/77 routes across 11
+locales**, the subtitle renders the real count ("124 achievements…", "124
+Errungenschaften"), the retired tile is gone, `/stats` is free of
+`[object Object]`, and no placeholder is rendered as text.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents
