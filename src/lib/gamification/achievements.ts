@@ -56,6 +56,10 @@ export interface AchStats {
   activityCount: number;
   dailyCount: number;
   userCount: number;
+  /** Whole days since the profile row was created (0 for today). */
+  accountAgeDays: number;
+  /** Whether the user is one of the three richest collectors. */
+  isTopCoinHolder: boolean;
   twitchBirthday: boolean;
   recentPerfectFlags: Record<string, boolean>;
   recentResults: Array<{ game: string; won: boolean; bet: number; payout: number; hour: number; at: number; flags: Record<string, number | boolean> }>;
@@ -209,12 +213,14 @@ export const ACHIEVEMENTS: Achievement[] = [
   SPECIAL("s_midas", "Midas Touch", "Win 10 games in a row.", (s) => s.winStreak >= 10),
   SPECIAL("s_cursed", "Properly Cursed", "Lose 20 games in a row.", (s) => s.lossStreak >= 20, 1000, 500),
   SPECIAL("s_owl_gambler", "3 AM Gambler", "Win a game between 3 and 4 AM UTC.", (s) => s.recentResults.some((r) => r.won && r.hour === 3)),
-  SPECIAL("s_top_percent", "The 1%", "Be among the top 3 coin holders.", (s) => s.userCount >= 20 && s.progress.coins >= 50000),
+  SPECIAL("s_top_percent", "The 1%", "Be among the top 3 coin holders.", (s) => s.userCount >= 20 && s.isTopCoinHolder),
   SPECIAL("s_broke", "Rock Bottom", "Hit exactly 0 coins after playing 10+ games.", (s) => s.progress.coins === 0 && s.progress.games_played >= 10, 500, 250),
   SPECIAL("s_lazy_week", "Zen Week", "Keep a 7-day login streak with fewer than 7 games played.", (s) => s.progress.login_streak >= 7 && s.progress.games_played < 7),
   SPECIAL("s_generous", "Charitable", "Pay 1,000+ coins in failed steal attempts.", (s) => s.stealCostPaid >= 1000, 750, 0),
   SPECIAL("s_archivist", "Archivist", "Own 25 expired badges.", (s) => s.expiredOwned >= 25),
   SPECIAL("s_completionist", "Museum Curator", "Own 400+ catalog badges.", (s) => s.badgesOwned >= 400, 2500, 2500),
+  // Correct as written: the community has at most 100 members, so the user IS
+  // among the first 100. It stops being earnable once the site grows past that.
   SPECIAL("s_pioneer", "Pioneer", "Be among the first 100 users.", (s) => s.userCount <= 100),
   SPECIAL("s_full_house", "Full House", "Play 10+ rounds of every game.", (s) => GAME_IDS.every((g) => (s.gamesByType[g]?.played ?? 0) >= 10), 1500, 1500),
   SPECIAL("s_lucky_777", "Lucky Sevens", "Hold exactly 777 coins.", (s) => s.progress.coins === 777, 777, 77),
@@ -240,7 +246,10 @@ export const ACHIEVEMENTS: Achievement[] = [
       });
     }, 500, 500),
   SPECIAL("s_perfectionist_rps", "RPS Perfectionist", "Win 70%+ of 20+ RPS duels.", (s) => (s.gamesByType["rps"]?.played ?? 0) >= 20 && (s.gamesByType["rps"]?.won ?? 0) / Math.max(1, s.gamesByType["rps"]?.played ?? 1) >= 0.7),
-  SPECIAL("s_ghost_town", "Ghost Town", "Have zero profile visitors in your first 7 days.", (s) => s.profileViews === 0 && s.activityCount > 0, 100, 100),
+  // The condition used to be "no views and any activity", which fired on the
+  // first action of every new player regardless of age — the "first 7 days" part
+  // of its own description was never checked.
+  SPECIAL("s_ghost_town", "Ghost Town", "Have zero profile visitors in your first 7 days.", (s) => s.profileViews === 0 && s.activityCount > 0 && s.accountAgeDays <= 7, 100, 100),
   SPECIAL("s_endgame", "Endgame Collector", "Own a badge with a 90+ rarity score.", (s) => s.bestBadgeScore >= 90),
   SPECIAL("s_immortal", "Immortal", "Reach the maximum level of 100.", (s) => s.progress.level >= 100, 5000, 10000),
 ];
@@ -396,7 +405,7 @@ async function buildStats(userId: string): Promise<AchStats> {
   const progress = await getProgress(userId);
 
   const [badgesRes, gamesRes, roundsRes, wheelRes, turboRes, profileRes,
-    rainRes, stealRes, reactRes, visitsRes, usersRes, achRes, visitorsRes,
+    rainRes, stealRes, reactRes, visitsRes, usersRes, topCoinsRes, achRes, visitorsRes,
     maxBetRes] =
     await Promise.all([
       supabase.from("user_inventory").select("badges(rarity_tier,status,set_id,first_seen_at,rarity_score)").eq("user_id", userId),
@@ -411,7 +420,7 @@ async function buildStats(userId: string): Promise<AchStats> {
       supabase.from("game_rounds").select("game,won,bet,payout,result,created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(60),
       supabase.from("activity_events").select("xp_amount").eq("user_id", userId).eq("kind", "wheel"),
       supabase.from("turbo_wins").select("id", { count: "exact", head: true }).eq("user_id", userId),
-      supabase.from("profiles").select("view_count, customization, mood, twitch_created_at, showcase_slots").eq("id", userId).maybeSingle(),
+      supabase.from("profiles").select("view_count, customization, mood, twitch_created_at, showcase_slots, created_at").eq("id", userId).maybeSingle(),
       supabase.from("activity_events").select("payload").eq("kind", "coin_rain").eq("user_id", userId),
       pageAll<{
         thief_id: string;
@@ -439,6 +448,13 @@ async function buildStats(userId: string): Promise<AchStats> {
           .range(from, to),
       ),
       supabase.from("profiles").select("id", { count: "exact", head: true }),
+      // The three richest collectors, for the achievement whose description says
+      // "be among the top 3" — it used to check a flat coin threshold instead.
+      supabase
+        .from("user_progress")
+        .select("user_id")
+        .order("coins", { ascending: false })
+        .limit(3),
       supabase.from("activity_events").select("kind").eq("user_id", userId),
       pageAll<{ ip_hash: string }>((from, to) =>
         supabase
@@ -580,6 +596,17 @@ async function buildStats(userId: string): Promise<AchStats> {
     activityCount: (achRes.data ?? []).length,
     dailyCount: (achRes.data ?? []).filter((k) => (k as { kind?: string }).kind === "daily").length,
     userCount: usersRes.count ?? 0,
+    accountAgeDays: (() => {
+      const created = profileRes.data?.created_at as string | null | undefined;
+      if (!created) return Number.POSITIVE_INFINITY;
+      const ms = Date.now() - new Date(created).getTime();
+      return Number.isFinite(ms) ? Math.floor(ms / 86_400_000) : Number.POSITIVE_INFINITY;
+    })(),
+    isTopCoinHolder: new Set(
+      ((topCoinsRes.data ?? []) as Array<{ user_id: string }>).map(
+        (row) => row.user_id,
+      ),
+    ).has(userId),
     twitchBirthday,
     recentPerfectFlags: {},
     recentResults: recentRounds,
