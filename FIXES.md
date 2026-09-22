@@ -170,11 +170,24 @@ searchable.
 
 These are documented rather than fixed, and none is a defect in the narrow sense:
 
-1. **`fp-3`** — most `ProfileCustomizer` settings are stored but never applied.
-   That is feature work, not a bug fix; the full list is in
-   `bugreports/fix-d-auth-client.md`.
-2. **Daily XP-budget refund** — the budget is consumed before the award succeeds;
-   closing it needs a consume-and-apply function in SQL.
+1. **`fp-3` — partially closed.** The five visibility toggles
+   (`showLevel`, `showCoins`, `showStats`, `showVisitors`, `showInventory`) and
+   the two value-only cosmetics (`nameGradient`, `bannerOverlay`) are applied on
+   the public profile now; the gradient is validated as a comma-separated hex
+   list so it cannot smuggle CSS. Still open: the effect and animation settings
+   (`aura`, `particles`, `nameRainbow`, `bannerShine`, `tilt3d`, `pixelAvatar`,
+   `achievementTicker`, `greetingBanner`, `levelHalo`, `cursorBadge`,
+   `statusBubble`, `effectsIntensity`, `coinRainAuto`, `visitorMarquee`) plus the
+   layout/typography ones (`font`, `cardStyle`, `radius`, `density`,
+   `profileTheme`, `avatarFrame`, `showcaseLayout`, `accent2`, `title`,
+   `socialTwitter`, `socialDiscord`) — those need their own CSS, i.e. design work.
+2. ~~Daily XP-budget refund~~ — **closed.** Migration 0017 adds
+   `consume_and_apply_game_xp`, which clamps the cap and applies the XP and coins
+   in one statement under the same row lock. Verified in a rolled-back
+   transaction: 80 granted, then 20 of a 100 budget, xp +100, coins +5, anon 401.
+   (Migration 0018 fixed an ambiguity I introduced in 0017: the OUT columns were
+   named `xp`/`coins`, colliding with the table's columns, so every call raised
+   42702.)
 3. **19 historical `blog_views` rows** with the pre-fix duplicates. The counter is
    display-only; existing production data was left untouched rather than
    deleted unasked.
@@ -185,6 +198,7 @@ These are documented rather than fixed, and none is a defect in the narrow sense
    database over port 6543 and the test passes (zero-sum, clamping to 0, missing
    row NULL, service-role `[{a_coins,b_coins}]`, `anon` 401; the CHECK accepts
    8/36/40/`"anonymous"`/128 and rejects 0/7/129).
-6. **Two client nits**: RTL arrow glyphs are not mirrored at the remaining sites,
-   and the language listbox lacks `aria-activedescendant`. A real 3-D card flip in
-   the memory game is a design task, not a defect.
+6. **One client nit left**: a real 3-D card flip in the memory game is a design
+   task, not a defect. The RTL arrows and the language listbox
+   (`aria-activedescendant` on the element owning `role="listbox"`, focus moved
+   into the panel) are both done.
