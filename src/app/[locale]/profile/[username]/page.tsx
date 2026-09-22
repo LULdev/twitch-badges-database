@@ -226,7 +226,10 @@ export default async function ProfilePage({ params }: PageProps) {
       unlocked_at: string;
     }>;
     progress = progressRow;
-    if (progressRow) level = levelFromXp(progressRow.xp);
+    // `readProgress` never creates a row, so a member who has not played yet
+    // has none — the level badge is documented as ALWAYS visible, so fall back to
+    // the level-1 display instead of hiding it.
+    level = levelFromXp(progressRow?.xp ?? 0);
     unlockedAchievements = achievementRows;
   }
 

@@ -12,6 +12,8 @@ import {
 import { logChange } from "@/lib/changelog";
 
 export interface BadgebaseSyncSummary {
+  /** Set when the run deliberately did nothing (e.g. an empty /active listing). */
+  skipped?: string;
   activeCards: number;
   upcomingCards: number;
   enriched: number;
@@ -98,19 +100,30 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
 
   // The /active listing is the authority for "currently redeemable": an empty
   // one would clear is_confirmed_active everywhere and demote every dateless
-  // badge. It is only an incident when we currently HAVE confirmed-active rows —
-  // a genuinely empty window must not block this sync forever. This sits after
-  // the catalog load (so a partially built map cannot be judged) and still
-  // before every write.
+  // badge. That is only an incident when we currently HAVE confirmed-active
+  // rows, and the check reads `allBadges` rather than the deduplicated maps so
+  // a row cannot hide behind two keys pointing at it.
+  //
+  // It SKIPS the run instead of throwing: with an empty listing there is nothing
+  // to enrich anyway, and a throw would mean an error on every schedule tick for
+  // as long as the provider keeps answering empty — while the only thing that
+  // could clear the flags is this sync succeeding.
   if (
     activeCards.length === 0 &&
-    [...byUuid.values(), ...bySetId.values()].some(
-      (row) => row.is_confirmed_active === true,
-    )
+    allBadges.some((row) => row.is_confirmed_active === true)
   ) {
-    throw new Error(
-      "drop-window listing is empty while confirmed-active badges exist — refusing to clear confirmations and demote badges",
+    console.warn(
+      "[badgebase] /active listing is empty while confirmed-active badges exist — skipping this run",
     );
+    return {
+      activeCards: 0,
+      upcomingCards: upcomingCards.length,
+      enriched: 0,
+      inserted: 0,
+      demotedToExpired: 0,
+      errors: 0,
+      skipped: "empty-listing",
+    };
   }
 
   const now = new Date();

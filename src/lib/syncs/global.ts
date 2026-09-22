@@ -135,6 +135,13 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     "id",
     "created_at",
     "updated_at",
+    // drop-window owned
+    "is_confirmed_active",
+    "start_date",
+    "end_date",
+    "release_date",
+    "how_to_earn",
+    // owner-statistics owned
     "owner_count",
     "active_count",
     "percentage",

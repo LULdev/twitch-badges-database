@@ -44,12 +44,10 @@ export interface AchStats {
   visitorsCount: number;
   rainsReceived: number;
   rainsGiven: number;
-  stealVisits: number;
   defendedCount: number;
   stealCostPaid: number;
   bestStealAmount: number;
   reactionsGiven: number;
-  faqVisits: number;
   profilesVisited: number;
   customizationKeys: number;
   /** Slots actually set in the profile's badge showcase (capped at 6). */
@@ -195,8 +193,10 @@ export const ACHIEVEMENTS: Achievement[] = [
   CREATIVE("k_catcher_100", "Golden Gloves", "Catch 100 badges in one Drops Catcher run.", (s) => hasFlag(s, "catcher", "hundred")),
   CREATIVE("k_shoot_500", "Badge Hunter", "Play 50 rounds of Shoot the Badges.", (s) => (s.gamesByType["shoot"]?.played ?? 0) >= 50),
   CREATIVE("k_reactor", "Reactor", "React to 5 blog posts.", (s) => s.reactionsGiven >= 5),
-  CREATIVE("k_faq_scholar", "FAQ Scholar", "Read the FAQ 5 times.", (s) => s.faqVisits >= 5),
-  CREATIVE("k_sharer", "Influencer", "Get 10 visits through your steal/share link.", (s) => s.stealVisits >= 10),
+  // Retired (see RETIRED_ACHIEVEMENT_IDS): the condition is unreachable on
+  // purpose, because the signal it describes is recorded nowhere. Filtering
+  // happens in one place; this line only keeps the entry's metadata.
+  CREATIVE("k_faq_scholar", "FAQ Scholar", "Read the FAQ 5 times.", () => false),
   CREATIVE("k_big_spender", "Big Spender", "Wager 10,000+ coins in total losses.", (s) => s.progress.coins_lost >= 10000),
   CREATIVE("k_profiteer", "Profiteer", "Win 10,000+ coins in total winnings.", (s) => s.progress.coins_won >= 10000),
   CREATIVE("k_xp_100k", "Six Figures", "Earn 100,000 lifetime XP.", (s) => s.progress.xp >= 100000, 1000, 1000),
@@ -246,12 +246,18 @@ export const ACHIEVEMENTS: Achievement[] = [
 /**
  * Achievements whose described condition no code can observe. They are filtered
  * out of the catalog instead of staying permanently locked: a locked entry that
- * can never unlock is a lie in the UI. `k_faq_scholar` ("read the FAQ 5 times")
- * needs a FAQ-view signal, and recording one would make a statically rendered
- * page dynamic — the wrong trade for a single achievement. If a gated visit
- * event is ever added, delete this set.
+ * can never unlock is a lie in the UI.
+ *
+ * `k_faq_scholar` ("read the FAQ 5 times") needs a FAQ-view signal, and
+ * recording one would make a statically rendered page dynamic — the wrong trade
+ * for one achievement. `k_sharer` ("visits through your steal/share link") needs
+ * a signal that distinguishes arrival from a share — nothing records that, and
+ * pointing it at the received-visit count made it a duplicate of
+ * `k_popular_25` with a description that was not true.
+ *
+ * If either signal is ever recorded, delete the id from this set.
  */
-const RETIRED_ACHIEVEMENT_IDS = new Set(["k_faq_scholar"]);
+const RETIRED_ACHIEVEMENT_IDS = new Set(["k_faq_scholar", "k_sharer"]);
 
 export const ACTIVE_ACHIEVEMENTS = ACHIEVEMENTS.filter(
   (a) => !RETIRED_ACHIEVEMENT_IDS.has(a.id),
@@ -384,7 +390,7 @@ async function buildStats(userId: string): Promise<AchStats> {
   const progress = await getProgress(userId);
 
   const [badgesRes, gamesRes, roundsRes, wheelRes, turboRes, profileRes,
-    rainRes, stealRes, reactRes, faqRes, visitsRes, usersRes, achRes, visitorsRes,
+    rainRes, stealRes, reactRes, visitsRes, usersRes, achRes, visitorsRes,
     maxBetRes] =
     await Promise.all([
       supabase.from("user_inventory").select("badges(rarity_tier,status,set_id,first_seen_at,rarity_score)").eq("user_id", userId),
@@ -416,23 +422,26 @@ async function buildStats(userId: string): Promise<AchStats> {
           .range(from, to),
       ),
       supabase.from("blog_reactions").select("id", { count: "exact", head: true }).eq("user_id", userId),
-      // Retired — see RETIRED_ACHIEVEMENT_IDS. Kept in place so the
-      // destructuring of the Promise.all result is unchanged.
-      supabase
-        .from("activity_events")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", userId)
-        .eq("kind", "__retired__"),
       // The profiles THIS user visited. It used to read activity_event kinds
       // (profile_visit/steal_visit) that nothing ever writes.
-      supabase
-        .from("profile_visits")
-        .select("profile_id")
-        .eq("visitor_id", userId)
-        .limit(1000),
+      pageAll<{ profile_id: string }>((from, to) =>
+        supabase
+          .from("profile_visits")
+          .select("profile_id")
+          .eq("visitor_id", userId)
+          .order("id")
+          .range(from, to),
+      ),
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("activity_events").select("kind").eq("user_id", userId),
-      supabase.from("profile_visits").select("ip_hash").eq("profile_id", userId).limit(1000),
+      pageAll<{ ip_hash: string }>((from, to) =>
+        supabase
+          .from("profile_visits")
+          .select("ip_hash")
+          .eq("profile_id", userId)
+          .order("id")
+          .range(from, to),
+      ),
       // Lifetime maximum bet in ONE row: the recent-round window above cannot
       // answer "never bet more than 10 coins", and an unfiltered round list is
       // capped by PostgREST. Ordering server-side returns the true maximum.
@@ -548,12 +557,10 @@ async function buildStats(userId: string): Promise<AchStats> {
     rainsGiven,
     // The share link IS the profile URL, so the visits a collector received are
     // the closest real signal to "visits through your link".
-    stealVisits: distinctVisitors,
     defendedCount: againstMe.filter((s) => !s.success).length,
     stealCostPaid: mySteals.filter((s) => !s.success).reduce((sum, s) => sum + s.cost, 0),
     bestStealAmount: Math.max(0, ...mySteals.filter((s) => s.success).map((s) => s.coins)),
     reactionsGiven: reactRes.count ?? 0,
-    faqVisits: faqRes.count ?? 0,
     profilesVisited: new Set(
       ((visitsRes.data ?? []) as Array<{ profile_id: string }>).map(
         (v) => v.profile_id,
