@@ -370,3 +370,87 @@ All ten idea scopes ran as real read-only sub-agents
 (`bugreports/agent-idea-01..10.md`, 121 ideas). `IMPROVEMENTS.md` now carries
 10 optimisation areas, 50 first-party ideas and those 121 sub-agent ideas —
 171 in total — with a per-report index.
+
+---
+
+## Round 10 — verification round, then the low findings
+
+Two verification agents ran against `bb7fe91`; their reports are
+`bugreports/verify-round8.md` (5 findings, one medium) and
+`bugreports/verify-independent.md` (8 findings, three medium). Both also listed
+what they checked and found clean.
+
+I distributed the 13 new findings by file ownership to four fix agents so they
+could not overwrite each other, each with an exclusive scope: syncs
+(`fix-a-syncs.md`), DB/API (`fix-b-db.md`), gamification
+(`fix-c-gamification.md`), auth/client (`fix-d-auth-client.md`). Result: 33
+fixes, 6 refutations, migrations 0012 + 0013.
+
+### The two findings that mattered most
+
+**R8-2 (medium, confirmed live).** `recordBlogView` counted existing views with
+`select("id")` on `blog_views`, a table whose columns are
+`(post_id, ip_hash, created_at)` — **there is no `id`**. PostgREST rejected the
+select (42703), the code discarded the error, `count` stayed `null`, and the
+5-minute dedup never engaged: every page view inserted a row. My own live proof
+before the fix: 5 duplicate `(post_id, ip_hash)` groups out of 19 rows, one
+group with four rows. Now counts `post_id` and refuses to count on a failed
+read.
+
+**ind-2 (medium).** The coin-rain gate was a read-then-write on
+`activity_events`, and a signed-in user could rain on their own profile for a
+free coin. Self-rain is now refused; the concurrency window needs a
+compare-and-set RPC that does not exist yet (see residuals).
+
+### What I verified myself rather than taking on trust
+
+- Both economy scripts re-run: **13/13 games below the stake** (worst hilo
+  0.9885) and **16/16 atomicity checks**.
+- The new views are complete, not just "not capped": `stats_catalog_rarity`
+  sums to 164+32+19+228+32 = **475**, exactly the catalog row count.
+- The `sync-5` date-clearing looked like a data-loss regression; the loop
+  `continue`s on a failed detail fetch *before* the patch, so only genuinely
+  unpublished dates are cleared.
+- The `pdat-8` throw is caught by the caller (`ownersOk = false`, existing
+  counts kept) — a silent truncation became a visible partial failure.
+- `ok: !potatEnriched` on the inventory route does **not** break the client:
+  `SyncButton` reads the HTTP status, not the body field, and a degraded run
+  stays 200.
+- The game race-guard cannot crash on a user's first round (`newest.length === 2`
+  guards the access) and the 100 ms slack leaves a 1 Hz player alone.
+- The steal credit change is a true zero-sum transfer: thief `-price + stolen`,
+  victim `+price - stolen`. Previously `price` left the economy on every
+  successful heist.
+- I bounded the new OG font cache at 32 entries — keyed by display name, a CJK
+  subset is 100 KB+, and the map had no cap inside a long-lived instance.
+- `sync-4`'s refutation, by my own scan: no `await fetch(` in `src/lib` or
+  `src/app/api` lacks a timeout.
+
+### Projects' new files
+`supabase/migrations/0012_customization_bounds.sql`,
+`0013_catalog_aggregates.sql`, `src/app/[locale]/error.tsx`,
+`src/components/GameIcon.tsx`, and the six agent reports.
+
+### Residual (documented, not fixed)
+
+- **Coin-rain / view gates** still need a `claim_coin_rain` CAS RPC or a unique
+  index on a UTC-day time bucket; the self-rain exploit itself is closed.
+- **gam-7**'s daily-budget refund needs a consume+apply function in SQL.
+- **blog_views** holds 19 rows with the pre-fix duplicates (5 groups). The
+  counter is display-only; the historical rows were left untouched rather than
+  deleting production data unasked.
+- **fp-3**: most `ProfileCustomizer` settings are still stored but never applied
+  (a feature-sized change; the full list is in `fix-d-auth-client.md`).
+
+### Verification of the shipped commit
+
+lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`, 664 keys ×11
+identical. Deployed as `49453c4`; live smoke test **165/165 routes across 11
+locales**, `/api/feed` default restored, the callback surfaces the provider
+error, `/auth/callback` still resolves to `/{locale}/auth/callback`, a page
+request carrying a bogus `sb-` cookie still returns 200 (the proxy refresh
+branch), and the OG profile card returns `image/png`.
+
+The "no bugs remain" bar is still **not** met — the audit keeps finding new
+issues every round, though its severity keeps dropping: this round's new items
+were three medium and five low, and all of them are now fixed.
