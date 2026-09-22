@@ -546,6 +546,35 @@ page reported a remaining claim. All 16 hits were Tailwind arbitrary values such
 as `text-[0.8125rem]` — the digits live in CSS, not in copy. Worth recording
 because the same naive test would flag any page.
 
+## Round 17 — a false claim in my own changelog entry
+
+The round-16 agent (`verify-round16.md`) reported 0 high, 1 medium and 4 low.
+The medium one is the most important entry in this file: **my changelog entry
+#296 stated that no blog entry contained 125 any more, and that was false.** I
+had corrected titles and bodies but not **excerpts** — and both excerpts are
+publicly visible, as blog cards and as the meta/OpenGraph description.
+
+| ID | Finding | Fix |
+|---|---|---|
+| **v16-01 (medium)** | two `blog_posts.excerpt` values still carried 125, contradicting the claim I had recorded in the changelog | corrected; the affected post also still stated the old tier split (50/50/25 = 125) while its title said 123 — the real split is 50/48/25 after this round's retirements. A full re-check across **title, excerpt and content** finds nothing stale, and the OG description now reads "123 achievements" |
+| v16-02 (low) | same post: body/excerpt numbers disagreed with each other | covered by the re-check above |
+| v16-03 (low) | my restored `k_sharer` comment claimed a stored unlock "can still be rendered", but `ACH_BY_ID` was built from the **filtered** list, so it could not — the profile hero would drop it and `/stats` would print the raw id | `ACH_BY_ID` now maps **all** definitions while the evaluation still awards only active ones, which makes the comment true |
+| v16-04 (low) | the skip visibility from round 16 reached only `cron/global`; `/api/cron/badgebase` and the sync script still recorded `ok` | both pass the summary through and report a skip as `degraded` |
+| v16-05 (low) | the correction lived only in the database — the blog/XP seed scripts and migration 0003 still carried 125, so a fresh install would have seeded it again | all three updated, including the prose tier split ("fifty" → "forty-eight" creative achievements) |
+
+**Verification of this round:** lint 0 errors, typecheck 0, build 227/227, 0
+`MISSING_MESSAGE`, 675 keys ×11 identical. **No source file, message file or blog
+entry carries a stale achievement count**, checked across title, excerpt and
+content. Real run: badgebase exit 0 with 23 active / 18 upcoming cards, 41
+enriched, 0 errors, no skip. Live: 24/24 routes, the blog list is clean, the post
+reads "123 of them", and the OG description reads "123 achievements".
+
+**Note on how this one slipped through:** my round-15 check queried only
+`title` and `content`, so `excerpt` — a column I wrote to but never read back —
+was outside the verification. The lesson is recorded because the same pattern
+(a partial re-read of a row) can hide any correction: the fix was to re-check
+**every** column the page renders.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents
