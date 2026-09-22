@@ -54,7 +54,10 @@ interface Customization {
 const DEFAULTS: Customization = {
   displayName: "", bio: "", bannerUrl: "", color: "#a970ff", accent2: "#60a5fa",
   font: "sans", cardStyle: "glass", radius: "soft", nameGradient: "",
-  avatarFrame: "none", bannerOverlay: 30, showcaseLayout: "grid",
+  // 0, not 30: the profile page treats an unset value as "no overlay", so a
+  // default of 30 darkened every banner on the first save without the member
+  // touching the slider.
+  avatarFrame: "none", bannerOverlay: 0, showcaseLayout: "grid",
   showStats: true, showInventory: true, showLevel: true, showCoins: true,
   showVisitors: true, socialTwitter: "", socialDiscord: "", title: "", density: "cozy",
   aura: false, particles: false, nameRainbow: false, bannerShine: true,

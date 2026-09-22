@@ -750,6 +750,28 @@ atomicity 16/16, economy 13/13 (worst 0.9850). Live: 30/30 routes, and the profi
 still renders the level badge, the stat tiles and the view count under the
 defaults — the toggles only hide when explicitly set.
 
+## Round 24 — the recreated function lost its grants
+
+The round-23 agent verified the three open-item fixes (`verify-round23.md`):
+**0 high, 1 medium, 3 low, 4 info**, and its verdict on the XP-budget change was
+"correct and live-verified" (its own rolled-back test: 80→80, 50→20, 10→0 granted,
+xp +100, coins +5, budget exactly 100, anon `42501`).
+
+| ID | Finding | Fix |
+|---|---|---|
+| **v23-01 (medium)** | migration 0018 had to **drop and recreate** `consume_and_apply_game_xp` to rename its OUT columns, and a fresh create resets the ACL to the default — which grants EXECUTE to PUBLIC. The one economy helper that 0017 had correctly locked to the service role came back callable by PUBLIC, anon and authenticated while its siblings stayed restricted. Not exploitable (anon has no UPDATE on `user_progress`, so the call fails at the update), but it is exactly the exposure an earlier round closed for every other economy RPC | migration 0019 re-applies the revoke/grant. Live: all three functions now read `postgres + service_role`, no PUBLIC, and an anon call returns **401 permission denied** |
+| v23-02 (low) | my `(inventory_public || isOwn) && showInventory` let the toggle hide the **owner's own** inventory, and with stats on it published a false "0 owned / 0% / N missing" | the toggle gates other visitors only; the owner always sees it |
+| v23-03 (low) | the coin balance sat inside the `showLevel` gate, so hiding the level hid the coins even with `showCoins` on | coins render in their own line when the level is hidden |
+| v23-04 (low) | the customizer's `bannerOverlay` default was 30 while the page treats unset as no overlay — and a save writes every key, so the first save darkened the banner 30 % unasked | default is 0, so the default and the rendering agree |
+
+**Two notes accepted without change:** the verification script still tests the now
+unused `consume_game_xp` on purpose (the function still exists and its behaviour
+should stay covered), and the "level badge ALWAYS visible" comment on the profile
+page predates the `showLevel` toggle, so it no longer describes the intent.
+
+**Verification:** lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`,
+atomicity 16/16 with an exact restore, economy 13/13 below the stake (worst 0.9844).
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents

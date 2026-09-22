@@ -209,7 +209,9 @@ export default async function ProfilePage({ params }: PageProps) {
   let totalCatalog = 0;
   let inventoryVisible = false;
   if (profile) {
-    inventoryVisible = (profile.inventory_public || isOwn) && showInventory;
+    // The owner always sees their own inventory; the toggle only gates what
+    // OTHER visitors see.
+    inventoryVisible = isOwn || (profile.inventory_public && showInventory);
     const [catalog, inventory] = await Promise.all([
       listBadges({ perPage: 12, sort: "rarity" }).catch(() => null),
       inventoryVisible ? getInventory(profile.id).catch(() => []) : Promise.resolve([]),
@@ -342,6 +344,13 @@ export default async function ProfilePage({ params }: PageProps) {
                   ) : null}
                 </p>
               </div>
+            )}
+            {progress && showCoins && !showLevel && (
+              <p className="mt-2 text-[0.6875rem] text-muted tabular-nums">
+                <span className="inline-flex items-center gap-1">
+                  {progress.coins.toLocaleString(locale)} <Coin size={13} />
+                </span>
+              </p>
             )}
             {profile?.mood && (
               <p className="mt-2 inline-block rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-semibold">
