@@ -575,6 +575,42 @@ was outside the verification. The lesson is recorded because the same pattern
 (a partial re-read of a row) can hide any correction: the fix was to re-check
 **every** column the page renders.
 
+## Round 18 — my ACH_BY_ID change broke /stats
+
+The round-17 agent (`verify-round17.md`) reported **1 high**, 4 low and 1 info —
+and the high one was caused by my own round-16 repair.
+
+| ID | Finding | Fix |
+|---|---|---|
+| **v17-01 (HIGH)** | round 16 made `ACH_BY_ID` map all definitions (so a stored unlock for a retired entry can still be rendered), but `/stats` computes its achievement **catalog size** by iterating that same map. The KPI and the footnote therefore read **125** while the subtitle on the same page read **123**, with the tier split 50/50/25 instead of 50/48/25 — a page contradicting itself | the catalog size now comes from `ACTIVE_ACHIEVEMENTS`; `ACH_BY_ID` stays the lookup for rendering. Live: `/stats` reads "123 Achievements · 123 goals" and "123 Errungenschaften · 123 Ziele" |
+| v17-02 (low) | the two one-off i18n scripts hardcoded the old numbers **and write `messages/*.json` directly**, so re-running them would have reverted round 15 | both now carry the current templated values |
+| v17-03 (low) | `README.md` and `AGENTS.md` still said 125 | README corrected; **`AGENTS.md` was deliberately left alone** — it is the project's instruction file, so the decision is the user's, and it is reported instead |
+| v17-04 (low) | **six more publicly rendered changelog bodies** carried "125 achievements" — the gamification launch entry and five blog announcements quoting the old post title. Same class as the blog excerpts, in a table I had not checked | all corrected. The row count is unchanged (nothing deleted) |
+| v17-05 (low) | `withHeartbeat` hardcoded status `ok`, so a skip still recorded a healthy row and the sync script recorded none at all | the helper takes an optional status derivation; all three badgebase call sites report a skip as `degraded` with its reason |
+
+**Two corrections to my own verification method, recorded so they are not repeated:**
+
+1. My round-17 check was **case-sensitive** (`/125 achievement/`), so it missed
+   "125 **A**chievements" in the six announcement titles. A case-insensitive
+   re-check found them. Any "is this text gone" query must be
+   case-insensitive — and must cover **every** column the page renders.
+2. `changelog` rows **292, 296 and 301** still contain the number 125 on purpose:
+   they narrate the correction ("123 of the originally 125 achievements are
+   active", "the copy claimed 125"). That is accurate history, not a claim about
+   the catalog, and it must not be re-flagged as a stale text. If a future check
+   greps for the number, exclude changelog narration.
+
+**Changelog-spam question answered:** my worry was unfounded. The drop-window
+sync runs **daily** via `cron/global`; the 15-minute GitHub job hits
+`/api/cron/potat` only, and `/api/cron/badgebase` currently has no caller. At most
+one skip row per day — no de-duplication needed unless that route goes sub-daily.
+
+**Verification of this round:** lint 0 errors, typecheck 0, build 227/227, 0
+`MISSING_MESSAGE`, 675 keys ×11 identical, atomicity 16/16. Live: 20/20 routes,
+`/stats` internally consistent at 123 in both languages, and no page asserts a
+catalog size of 125 — the single remaining occurrence is the narrated correction
+described above.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents
