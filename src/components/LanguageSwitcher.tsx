@@ -91,6 +91,16 @@ export default function LanguageSwitcher() {
   );
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Focus moves INTO the listbox on open. The options are tabIndex={-1} and the
+  // highlighted one is announced through aria-activedescendant, which is only
+  // valid on the element that owns role="listbox" — putting it on the trigger
+  // button was rejected by the a11y lint rule, correctly.
+  useEffect(() => {
+    if (!open) return;
+    panelRef.current?.focus();
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -124,26 +134,33 @@ export default function LanguageSwitcher() {
     });
   }
 
+  /** On the trigger: opening is all that is needed — focus then moves in. */
   function onKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
-      if (!open) {
-        setOpen(true);
-        return;
-      }
-      const delta = event.key === "ArrowDown" ? 1 : -1;
-      setHighlighted(
-        (current) =>
-          (current + delta + routing.locales.length) % routing.locales.length,
-      );
+      setOpen(true);
     } else if (event.key === "Enter" || event.key === " ") {
-      if (open) {
-        event.preventDefault();
-        select(routing.locales[highlighted]);
-      } else {
-        event.preventDefault();
-        setOpen(true);
-      }
+      event.preventDefault();
+      setOpen(true);
+    }
+  }
+
+  /** On the listbox, which holds focus while it is open. */
+  function onListKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    const last = routing.locales.length - 1;
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const delta = event.key === "ArrowDown" ? 1 : -1;
+      setHighlighted((current) => (current + delta + last + 1) % (last + 1));
+    } else if (event.key === "Home" || event.key === "End") {
+      event.preventDefault();
+      setHighlighted(event.key === "Home" ? 0 : last);
+    } else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      select(routing.locales[highlighted]);
+    } else if (event.key === "Tab") {
+      // Tabbing away is a dismissal; let the focus move on naturally.
+      setOpen(false);
     }
   }
 
@@ -166,7 +183,16 @@ export default function LanguageSwitcher() {
       </button>
 
       {open ? (
-        <div id="lang-listbox" className="lang-panel" role="listbox" aria-label={t("language")}>
+        <div
+          id="lang-listbox"
+          ref={panelRef}
+          className="lang-panel outline-none"
+          role="listbox"
+          tabIndex={-1}
+          aria-label={t("language")}
+          aria-activedescendant={`lang-opt-${routing.locales[highlighted]}`}
+          onKeyDown={onListKeyDown}
+        >
           <div className="lang-panel-head">
             <span className="lang-panel-title">{t("language")}</span>
             <span className="lang-panel-count">{routing.locales.length}</span>

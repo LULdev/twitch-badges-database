@@ -192,44 +192,53 @@ export async function award(
   const coinsAwarded = Math.floor(options.coins ?? 0);
   const today = new Date().toISOString().slice(0, 10);
 
-  // The daily game cap is consumed under a row lock, so two rounds resolving at
-  // the same moment cannot both spend the last of the 100 XP budget.
-  //
-  // Residual risk (deliberate): the spend is committed here, before
-  // apply_xp_coins grants the XP, so a hard failure of the next statement burns
-  // that much of the day's remaining budget without granting anything. Undoing
-  // it needs one consume+apply function in SQL, which cannot be added here; the
-  // ordering is kept because reserving the budget before applying is the only
-  // way the cap holds under concurrency.
-  if (options.countsAsGameXp && xpAwarded > 0) {
-    const consumed = await supabase.rpc("consume_game_xp", {
-      p_user_id: userId,
-      p_today: today,
-      p_requested: xpAwarded,
-    });
-    if (consumed.error) throw consumed.error;
-    xpAwarded = Number(consumed.data ?? 0);
-  }
-
   const before = levelFromXp(current.xp).level;
 
   // XP and coins move through an atomic SQL increment. Writing absolute
   // values read from `current` lost one of two overlapping awards (e.g. a
   // game round resolving while a wheel spin lands), silently deleting XP.
-  const applied = await supabase.rpc("apply_xp_coins", {
-    p_user_id: userId,
-    p_xp: xpAwarded,
-    p_coins: coinsAwarded,
-  });
-  if (applied.error) throw applied.error;
-  const appliedRow = Array.isArray(applied.data) ? applied.data[0] : applied.data;
-  const newXp = Number(
-    (appliedRow as { xp?: number } | null)?.xp ?? current.xp + xpAwarded,
-  );
-  const newCoins = Number(
-    (appliedRow as { coins?: number } | null)?.coins ??
-      Math.max(0, current.coins + coinsAwarded),
-  );
+  // Game XP takes the daily cap and the award through ONE statement: the budget
+  // is clamped under the same row lock and the XP and coins move in the same
+  // UPDATE, so a failure can no longer spend part of the day's budget without
+  // granting anything. Everything else uses the plain increment.
+  let newXp: number;
+  let newCoins: number;
+  if (options.countsAsGameXp && xpAwarded > 0) {
+    const applied = await supabase.rpc("consume_and_apply_game_xp", {
+      p_user_id: userId,
+      p_today: today,
+      p_requested: xpAwarded,
+      p_coins: coinsAwarded,
+    });
+    if (applied.error) throw applied.error;
+    const row = Array.isArray(applied.data) ? applied.data[0] : applied.data;
+    const granted = Number((row as { granted?: number } | null)?.granted ?? 0);
+    xpAwarded = granted;
+    newXp = Number(
+      (row as { out_xp?: number } | null)?.out_xp ?? current.xp + granted,
+    );
+    newCoins = Number(
+      (row as { out_coins?: number } | null)?.out_coins ??
+        Math.max(0, current.coins + coinsAwarded),
+    );
+  } else {
+    const applied = await supabase.rpc("apply_xp_coins", {
+      p_user_id: userId,
+      p_xp: xpAwarded,
+      p_coins: coinsAwarded,
+    });
+    if (applied.error) throw applied.error;
+    const appliedRow = Array.isArray(applied.data)
+      ? applied.data[0]
+      : applied.data;
+    newXp = Number(
+      (appliedRow as { xp?: number } | null)?.xp ?? current.xp + xpAwarded,
+    );
+    newCoins = Number(
+      (appliedRow as { coins?: number } | null)?.coins ??
+        Math.max(0, current.coins + coinsAwarded),
+    );
+  }
   const after = levelFromXp(newXp).level;
 
   // The remaining row patch must not carry ANY column that an atomic RPC owns.

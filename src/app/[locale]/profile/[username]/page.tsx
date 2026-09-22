@@ -168,13 +168,48 @@ export default async function ProfilePage({ params }: PageProps) {
   const avatar = profile?.avatar_url ?? liveAvatar;
   const handle = profile?.username ?? decodeURIComponent(username).toLowerCase();
 
+  // The customizer stores its settings in `profiles.customization`, and until now
+  // the public profile applied NONE of them — a member could hide their coins,
+  // their level or their visitors and nothing changed. The functional toggles and
+  // the two value-only cosmetics are honoured here; the rest are effect and
+  // animation settings that need their own CSS (listed in FIXES.md).
+  const customization = (profile?.customization ?? {}) as Record<string, unknown>;
+  const flag = (key: string, fallback: boolean) =>
+    typeof customization[key] === "boolean"
+      ? (customization[key] as boolean)
+      : fallback;
+  const text = (key: string, fallback: string) =>
+    typeof customization[key] === "string" && (customization[key] as string).trim()
+      ? (customization[key] as string)
+      : fallback;
+  const number = (key: string, fallback: number) =>
+    typeof customization[key] === "number" &&
+    Number.isFinite(customization[key] as number)
+      ? (customization[key] as number)
+      : fallback;
+
+  const showLevel = flag("showLevel", true);
+  const showCoins = flag("showCoins", true);
+  const showStats = flag("showStats", true);
+  const showVisitors = flag("showVisitors", true);
+  const showInventory = flag("showInventory", true);
+  // Only a comma-separated list of hex colours is accepted, so the value cannot
+  // smuggle arbitrary CSS into a style attribute.
+  const nameGradientRaw = text("nameGradient", "");
+  const nameGradient = /^#[0-9a-fA-F]{3,8}(,\s*#[0-9a-fA-F]{3,8})+$/.test(
+    nameGradientRaw,
+  )
+    ? nameGradientRaw
+    : "";
+  const bannerOverlay = Math.min(90, Math.max(0, number("bannerOverlay", 0)));
+
   // Member data: showcase + inventory.
   let showcaseBadges: BadgeRow[] = [];
   let ownedBadges: BadgeRow[] = [];
   let totalCatalog = 0;
   let inventoryVisible = false;
   if (profile) {
-    inventoryVisible = profile.inventory_public || isOwn;
+    inventoryVisible = (profile.inventory_public || isOwn) && showInventory;
     const [catalog, inventory] = await Promise.all([
       listBadges({ perPage: 12, sort: "rarity" }).catch(() => null),
       inventoryVisible ? getInventory(profile.id).catch(() => []) : Promise.resolve([]),
@@ -248,7 +283,15 @@ export default async function ProfilePage({ params }: PageProps) {
                 }
               : undefined
           }
-        />
+        >
+          {bannerOverlay > 0 ? (
+            <span
+              aria-hidden
+              className="block h-full w-full bg-background"
+              style={{ opacity: bannerOverlay / 100 }}
+            />
+          ) : null}
+        </div>
         <div className="flex flex-col gap-4 px-6 pb-6 sm:flex-row sm:items-end">
           <div className="-mt-10 shrink-0 rounded-full border-4 border-surface bg-surface">
             {avatar ? (
@@ -262,22 +305,41 @@ export default async function ProfilePage({ params }: PageProps) {
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-3">
-              {level && <LevelBadge level={level.level} size={64} />}
+              {level && showLevel && <LevelBadge level={level.level} size={64} />}
               <div className="min-w-0">
-                <h1 className="truncate text-2xl font-extrabold tracking-tight">
+                <h1
+                  className="truncate text-2xl font-extrabold tracking-tight"
+                  style={
+                    nameGradient
+                      ? {
+                          backgroundImage: `linear-gradient(90deg, ${nameGradient})`,
+                          WebkitBackgroundClip: "text",
+                          backgroundClip: "text",
+                          color: "transparent",
+                        }
+                      : undefined
+                  }
+                >
                   {displayName}
                 </h1>
                 <p className="text-sm text-muted">@{handle}</p>
               </div>
             </div>
-            {level && (
+            {level && showLevel && (
               <div className="mt-2 max-w-xs">
                 <div className="h-2 overflow-hidden rounded-full bg-surface-3">
                   <div className="h-full rounded-full bg-accent" style={{ width: `${Math.round(level.progress * 100)}%` }} />
                 </div>
                 <p className="mt-1 text-[0.6875rem] text-muted tabular-nums">
                   {t("level")} {level.level} · {level.xpIntoLevel}/{level.xpForNext || "∞"} XP
-                  {progress ? (<span> · <span className="inline-flex items-center gap-1">{progress.coins.toLocaleString(locale)} <Coin size={13} /></span></span>) : ""}
+                  {progress && showCoins ? (
+                    <span>
+                      {" · "}
+                      <span className="inline-flex items-center gap-1">
+                        {progress.coins.toLocaleString(locale)} <Coin size={13} />
+                      </span>
+                    </span>
+                  ) : null}
                 </p>
               </div>
             )}
@@ -325,7 +387,7 @@ export default async function ProfilePage({ params }: PageProps) {
       </section>
 
       {/* Stats */}
-      {profile && (
+      {profile && showStats && (
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="card stat-tile">
             <dd className="stat-value">{ownedBadges.length}</dd>
@@ -418,7 +480,7 @@ export default async function ProfilePage({ params }: PageProps) {
       )}
 
       {/* Latest visitors + view count */}
-      {profile && (
+      {profile && showVisitors && (
         <section className="card flex flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4">
           <span className="text-xs text-muted">
             <span className="font-black text-foreground tabular-nums">{profile.view_count ?? 0}</span> {t("views")}
