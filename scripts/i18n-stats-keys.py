@@ -1,4 +1,16 @@
 """Adds the new /stats dashboard keys to all 11 locale files (key-identical)."""
+
+# One-off migration: already applied. Re-running it would revert later
+# corrections — this file's values are a snapshot of a past state of
+# messages/*.json (see bugreports/verify-round20.md for the specifics). Set
+# ALLOW_ONE_OFF_MIGRATION=1 to run it deliberately.
+import os as _guard_os
+
+if _guard_os.environ.get("ALLOW_ONE_OFF_MIGRATION") != "1":
+    raise SystemExit(
+        "Refusing to re-run: this is a one-off migration and its values are a "
+        "snapshot of a past state. Set ALLOW_ONE_OFF_MIGRATION=1 to override."
+    )
 import json
 import io
 import os

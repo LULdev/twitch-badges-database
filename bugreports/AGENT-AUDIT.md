@@ -663,6 +663,35 @@ overreached, because `AGENTS.md:30` still says 125 — that is the deliberate,
 reported exception (it is the project's instruction file). And the four
 narration rows mention 125 on purpose.
 
+## Round 21 — the class, not the instance: one-off scripts get a guard
+
+The round-20 agent (`verify-round20.md`) went beyond the fix and audited **every**
+script that writes the message files or the database, answering the question this
+whole series kept raising: *is a re-run safe?* It found 2 medium and 3 low, all
+latent re-run hazards, no live defect.
+
+| ID | Finding | Fix |
+|---|---|---|
+| **v20-01 (medium)** | `i18n-remove-vendor-texts.py` would **re-add the three removed `profile.potat*` keys** to all 11 files on a re-run, and it writes them before its own abort — a direct regression of the objective's Phase-4 vendor-text removal | guarded |
+| **v20-02 (medium)** | `i18n-complete-translations.py` carries an English `games.blackjackTitle` while all nine live locales are localised; a re-run would revert them | guarded |
+| v20-03 / v20-04 | four Italian strings in `i18n-stats-keys.py` and `i18n-short-labels.py` no longer match live — which also makes my round-19 claim ("every value compared against live") too broad: I had compared only the one repaired array | guarded |
+| v20-05 | the seed scripts append another changelog row per run | guarded |
+
+**The fix is a guard, not six value patches.** These are one-off migrations whose
+content is a snapshot of a past state; patching the reported value would have left
+the next drift in place — the exact pattern that cost several rounds. **Six
+scripts** (four message writers, two seeds) now refuse to run unless
+`ALLOW_ONE_OFF_MIGRATION=1` is set, with a reason and a pointer to the report.
+Their values are inert, and a deliberate run for a fresh install stays possible.
+
+**Verified by actually running two of them:** both refuse, and the message files
+are byte-identical afterwards (working tree clean). The override path itself was
+**not** executed — running it would revert the very corrections the guard
+protects — and is verified by inspection only.
+
+**Agent's verdict on the rest:** every database writer (syncs, migrations) is safe
+to re-run, and none of these scripts is reachable from CI, cron or the app.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents

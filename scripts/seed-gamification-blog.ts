@@ -9,6 +9,16 @@ import { config } from "dotenv";
 
 config({ path: ".env.local" });
 
+// One-off seed: idempotent by slug, but every run appends another changelog row
+// for the same posts, and its copy is a snapshot of a past state. Refuse an
+// accidental re-run; set ALLOW_ONE_OFF_MIGRATION=1 to run it deliberately.
+if (process.env.ALLOW_ONE_OFF_MIGRATION !== "1") {
+  console.error(
+    "Refusing to re-run: this is a one-off seed. Set ALLOW_ONE_OFF_MIGRATION=1 to override.",
+  );
+  process.exit(1);
+}
+
 function w(text: string): number {
   return text.trim().split(/\s+/).length;
 }
