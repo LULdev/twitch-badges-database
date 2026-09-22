@@ -494,6 +494,35 @@ locales**, the subtitle renders the real count ("124 achievements…", "124
 Errungenschaften"), the retired tile is gone, `/stats` is free of
 `[object Object]`, and no placeholder is rendered as text.
 
+## Round 15 — verifying the achievements/sync batch
+
+The round-14 verification agent (`verify-round14.md`) reported 0 high, 2 medium
+and 7 low. Two of them were defects in my own previous repairs.
+
+| ID | Finding | Fix |
+|---|---|---|
+| **v14-02 (medium)** | my empty-listing guard **threw** while the listing was empty and confirmed-active rows existed. Only a successful run of that same sync can clear those flags, so a provider answering empty indefinitely meant an error on every tick with no way out | it **skips** the run instead: nothing is written, and the skip is reported in the summary (`skipped: "empty-listing"`) and the heartbeat |
+| **v14-01 (medium)** | my `k_sharer` repair was hollow — I pointed it at the same expression `visitorsCount` already used, so it duplicated `k_popular_25` and its "steal/share link" description stayed false | also retired. Nothing distinguishes arrival via a shared link. **123 of the original 125 achievements are active**, and because the subtitle is now templated the page states that number by itself (live: "123 achievements to hunt — 50 common, 48 creative, 25 truly unexpected") |
+| v14-03 / v14-04 | the guard read the deduplicated maps, and counted parsed cards | reads `allBadges`, so a row cannot hide behind two keys |
+| v14-05 | the tower's cash-out marker sat on the failed floor after a crash (`result.cashoutAt` discarded) | the marker uses the floor the round settled on |
+| v14-06 | the two **new** `profile_visits` reads had a bare limit with no order — the same truncation `f13-3` fixed elsewhere in the same commit | both page and order |
+| v14-07 | the exclusion set omitted the drop-window-owned columns, so an overlapping run could still revert them | `is_confirmed_active`, dates, `how_to_earn` added |
+| v14-08 | a member without a `user_progress` row lost the level badge, contradicting its "ALWAYS visible" comment | falls back to the level-1 display |
+| v14-09 | the retired achievement's placeholder query was still awaited on every evaluation | removed |
+
+**Verification of this round:** lint 0 errors, typecheck 0, build 227/227, 0
+`MISSING_MESSAGE`, 675 keys ×11 identical. Real runs: badgebase sync exit 0 with
+21 active cards / 41 enriched / 0 errors and **no skip**, global sync afterwards
+`updated 0` / `removed 0` — the ping-pong stays closed. Live: 30/30 routes, and
+`/en/profile/band1to` renders the level badge (`aria-label="Level 11"`).
+
+**A false alarm I caused and corrected:** I first probed profile pages for
+usernames taken from the leaderboards, which lists external collectors rather than
+app members, and concluded the level badge was missing. `/profile/band1to` — the
+only real member — renders it. The fallback path for a member without a progress
+row cannot be exercised live (the single member has a row) and is verified by
+inspection only; creating a row to test it would re-introduce `f13-4`.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents
