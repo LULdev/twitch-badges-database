@@ -17,6 +17,21 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   return output;
 }
 
+/**
+ * `navigator.serviceWorker.ready` never rejects when the worker cannot
+ * activate — a stale registration left over from an update can leave it
+ * pending forever. Without the race the enable button would sit on "enabling"
+ * with no way back; the timeout turns the hang into the normal failure path.
+ */
+function serviceWorkerReady(timeoutMs = 10_000): Promise<ServiceWorkerRegistration> {
+  return Promise.race([
+    navigator.serviceWorker.ready,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("service worker not ready")), timeoutMs),
+    ),
+  ]);
+}
+
 export default function PushToggle() {
   const t = useTranslations("notifications");
   const [state, setState] = useState<PushState>("off");
@@ -66,7 +81,7 @@ export default function PushToggle() {
         return;
       }
 
-      const registration = await navigator.serviceWorker.ready;
+      const registration = await serviceWorkerReady();
       let subscription = await registration.pushManager.getSubscription();
       if (!subscription) {
         subscription = await registration.pushManager.subscribe({
@@ -91,7 +106,7 @@ export default function PushToggle() {
 
   async function disable() {
     try {
-      const registration = await navigator.serviceWorker.ready;
+      const registration = await serviceWorkerReady();
       const subscription = await registration.pushManager.getSubscription();
       if (subscription) {
         // The server row and the browser subscription are two halves of one
@@ -110,20 +125,28 @@ export default function PushToggle() {
         }
         await subscription.unsubscribe();
       }
+    } catch (caught) {
+      console.warn("[push] disable failed", caught);
+      setError(true);
     } finally {
       setState("off");
     }
   }
 
   async function sendTest() {
-    const registration = await navigator.serviceWorker.ready;
-    await registration.showNotification("Twitch Badges Database", {
-      body: t("testSent"),
-      icon: "/icon-192.png",
-      tag: "tbd-test",
-    });
-    setTestSent(true);
-    setTimeout(() => setTestSent(false), 3000);
+    try {
+      const registration = await serviceWorkerReady();
+      await registration.showNotification("Twitch Badges Database", {
+        body: t("testSent"),
+        icon: "/icon-192.png",
+        tag: "tbd-test",
+      });
+      setTestSent(true);
+      setTimeout(() => setTestSent(false), 3000);
+    } catch (caught) {
+      console.warn("[push] test notification failed", caught);
+      setError(true);
+    }
   }
 
   return (

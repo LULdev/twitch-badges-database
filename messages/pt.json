@@ -78,7 +78,10 @@
     "empty": "Nada aqui ainda.",
     "setupHint": "O catálogo está vazio. Execute os scripts de sincronização ou aguarde a próxima execução do cron para populá-lo.",
     "filterStatus": "Filtro de status",
-    "filterPrice": "Filtro de preço"
+    "filterPrice": "Filtro de preço",
+    "errorTitle": "Algo deu errado",
+    "errorBody": "Não foi possível carregar a página. Normalmente é temporário — tente novamente.",
+    "errorRetry": "Tentar novamente"
   },
   "home": {
     "heroTitle": "Todas as insígnias da Twitch. Um só banco de dados.",
@@ -455,7 +458,8 @@
     "language": "Idioma",
     "notificationsSection": "Notificações",
     "loginRequired": "Entre com a Twitch para gerenciar suas configurações.",
-    "maxSix": "Até 6 insígnias"
+    "maxSix": "Até 6 insígnias",
+    "removeShowcase": "{name} — remover"
   },
   "login": {
     "title": "Entrar com a Twitch",

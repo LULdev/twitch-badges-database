@@ -78,7 +78,10 @@
     "empty": "Hier gibt es noch nichts.",
     "setupHint": "Der Katalog ist leer. Führe die Synchronisierungs-Skripte aus oder warte auf den nächsten Cron-Lauf, um ihn zu füllen.",
     "filterStatus": "Status-Filter",
-    "filterPrice": "Preis-Filter"
+    "filterPrice": "Preis-Filter",
+    "errorTitle": "Etwas ist schiefgelaufen",
+    "errorBody": "Die Seite konnte nicht geladen werden. Das ist meist vorübergehend — bitte versuche es erneut.",
+    "errorRetry": "Erneut versuchen"
   },
   "home": {
     "heroTitle": "Alle Twitch-Badges. Eine Datenbank.",
@@ -455,7 +458,8 @@
     "language": "Sprache",
     "notificationsSection": "Benachrichtigungen",
     "loginRequired": "Melde dich mit Twitch an, um deine Einstellungen zu verwalten.",
-    "maxSix": "Bis zu 6 Badges"
+    "maxSix": "Bis zu 6 Badges",
+    "removeShowcase": "{name} — entfernen"
   },
   "login": {
     "title": "Mit Twitch anmelden",

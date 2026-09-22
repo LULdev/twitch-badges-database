@@ -78,7 +78,10 @@
     "empty": "Nothing here yet.",
     "setupHint": "The catalog is empty. Run the sync scripts or wait for the next cron run to populate it.",
     "filterStatus": "Status filter",
-    "filterPrice": "Price filter"
+    "filterPrice": "Price filter",
+    "errorTitle": "Something went wrong",
+    "errorBody": "The page could not be loaded. This is usually temporary — please try again.",
+    "errorRetry": "Try again"
   },
   "home": {
     "heroTitle": "Every Twitch badge. One database.",
@@ -455,7 +458,8 @@
     "language": "Language",
     "notificationsSection": "Notifications",
     "loginRequired": "Log in with Twitch to manage your settings.",
-    "maxSix": "Up to 6 badges"
+    "maxSix": "Up to 6 badges",
+    "removeShowcase": "{name} — remove"
   },
   "login": {
     "title": "Log in with Twitch",

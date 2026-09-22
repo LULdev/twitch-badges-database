@@ -199,7 +199,7 @@ async function CompareResult({
                   className="badge-tile card-interactive rounded-[var(--radius-input)]"
                   title={row.title}
                 >
-                  <BadgeImage badge={row} size={36} />
+                  <BadgeImage badge={row} size={36} alt="" />
                   <p className="line-clamp-2 text-[0.625rem] font-semibold leading-tight">
                     {row.title}
                   </p>

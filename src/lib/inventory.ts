@@ -138,15 +138,24 @@ export async function syncUserInventory(
   if (stateError) throw stateError;
 
   // Keep profile Twitch metadata fresh (avatar / display name / creation).
-  await supabase
-    .from("profiles")
-    .update({
-      display_name: perfil.displayName,
-      avatar_url: perfil.profileImageURL,
-      twitch_id: perfil.id,
-      twitch_created_at: perfil.createdAt ?? null,
-    })
-    .eq("id", userId);
+  // Only fields the provider actually returned are written: an empty or null
+  // value used to overwrite a good one, so one thin response blanked the
+  // avatar and display name of a user who had both.
+  const profilePatch: Record<string, unknown> = {};
+  if (perfil.displayName) profilePatch.display_name = perfil.displayName;
+  if (perfil.profileImageURL) profilePatch.avatar_url = perfil.profileImageURL;
+  if (perfil.id) profilePatch.twitch_id = perfil.id;
+  if (perfil.createdAt) profilePatch.twitch_created_at = perfil.createdAt;
+  if (Object.keys(profilePatch).length > 0) {
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .update(profilePatch)
+      .eq("id", userId);
+    // Logged, not thrown: the badge inventory is what this sync exists for, and
+    // failing the whole run over a cosmetic profile field would mark the
+    // heartbeat as an error for something that self-heals on the next sync.
+    if (profileError) console.warn("[inventory] profile update failed:", profileError.message);
+  }
 
   // Best-effort potat.app enrichment: level, potatoes, first-seen, color and
   // cross-platform connections go straight onto the public profile.
@@ -154,16 +163,18 @@ export async function syncUserInventory(
   try {
     const potat = await fetchPotatUser(username, 0);
     if (potat) {
-      const { error: potatError } = await supabase
-        .from("profiles")
-        .update({
-          potat_level: potat.level,
-          potatoes: potat.potatoes,
-          potat_first_seen: potat.firstSeen,
-          potat_connections: potat.connections,
-        })
-        .eq("id", userId);
-      if (!potatError) potatEnriched = true;
+      const potatPatch: Record<string, unknown> = {};
+      if (potat.level !== null) potatPatch.potat_level = potat.level;
+      if (potat.potatoes !== null) potatPatch.potatoes = potat.potatoes;
+      if (potat.firstSeen !== null) potatPatch.potat_first_seen = potat.firstSeen;
+      if (potat.connections.length > 0) potatPatch.potat_connections = potat.connections;
+      if (Object.keys(potatPatch).length > 0) {
+        const { error: potatError } = await supabase
+          .from("profiles")
+          .update(potatPatch)
+          .eq("id", userId);
+        if (!potatError) potatEnriched = true;
+      }
     }
   } catch (error) {
     console.warn(

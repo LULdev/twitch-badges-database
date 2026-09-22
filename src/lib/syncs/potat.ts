@@ -189,7 +189,17 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
     }
   }
 
-  for (const batch of chunk(upsertRows, 200)) {
+  // Two distribution rows can resolve to the same catalog row: the byUuid
+  // fallback matches any version sharing one image UUID, and the feed can
+  // repeat a badge. Postgres rejects a batch that would update one conflict
+  // key twice (SQLSTATE 21000) and the whole sync dies after `distribution`
+  // already succeeded, so collapse to one row per key (last write wins).
+  const pendingByKey = new Map<string, Record<string, unknown>>();
+  for (const row of upsertRows) {
+    pendingByKey.set(`${String(row.set_id)}:${String(row.version)}`, row);
+  }
+
+  for (const batch of chunk([...pendingByKey.values()], 200)) {
     const { error } = await supabase
       .from("badges")
       .upsert(batch, { onConflict: "set_id,version" });

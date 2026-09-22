@@ -86,6 +86,12 @@ export async function fetchAllDistribution(): Promise<PotatBadgeDistribution[]> 
       : undefined;
     if (!cursor) break;
   }
+  // A still-pending cursor at the cap means pages 51+ were dropped on the
+  // floor; fail loudly rather than feed a silently truncated catalog to the
+  // sync (the missing badges would keep stale/null owner counts).
+  if (cursor) {
+    throw new Error("potat distribution exceeded 50 pages — refusing to truncate");
+  }
   return all;
 }
 
@@ -106,6 +112,9 @@ export async function fetchAllOwners(): Promise<PotatBadgeOwners[]> {
       ? page.pagination.cursor
       : undefined;
     if (!cursor) break;
+  }
+  if (cursor) {
+    throw new Error("potat owners exceeded 50 pages — refusing to truncate");
   }
   return all;
 }

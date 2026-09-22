@@ -516,17 +516,31 @@ export interface CatalogKeyRow {
   end_date: string | null;
 }
 
+const CATALOG_KEY_COLUMNS =
+  "id,slug,set_id,version,title,image_url_2x,category,is_paid,rarity_tier,rarity_score,status,end_date";
+
 export async function getCatalogKeys(): Promise<CatalogKeyRow[]> {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("badges")
-    .select(
-      "id,slug,set_id,version,title,image_url_2x,category,is_paid,rarity_tier,rarity_score,status,end_date",
-    )
-    .neq("status", "removed")
-    .order("rarity_score", { ascending: false })
-    .limit(3000);
-  return (data ?? []) as CatalogKeyRow[];
+  // pdat-7: `.limit(3000)` was a lie — PostgREST caps a single response at
+  // 1000 rows, so this silently returned (and matched against) a truncated
+  // catalog. Page with `.range()` until a short page proves the end. The `id`
+  // tiebreak keeps the window stable when many rows share a rarity_score.
+  const pageSize = 1000;
+  const rows: CatalogKeyRow[] = [];
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await supabase
+      .from("badges")
+      .select(CATALOG_KEY_COLUMNS)
+      .neq("status", "removed")
+      .order("rarity_score", { ascending: false })
+      .order("id", { ascending: true })
+      .range(from, from + pageSize - 1);
+    if (error) throw error;
+    const batch = (data ?? []) as CatalogKeyRow[];
+    rows.push(...batch);
+    if (batch.length < pageSize) break;
+  }
+  return rows;
 }
 
 export interface SiteStats {
@@ -576,11 +590,11 @@ export async function getSiteStats(): Promise<SiteStats> {
       .from("badges")
       .select("id", { count: "exact", head: true })
       .eq("is_paid", true),
-    supabase
-      .from("badges")
-      .select("rarity_tier")
-      .not("rarity_tier", "is", null),
-    supabase.from("badges").select("category"),
+    // pdat-7: aggregates come from SQL views, not a per-row select — a
+    // per-row response is capped at 1000 by PostgREST, which truncated the
+    // breakdowns once the catalog passed that size.
+    supabase.from("stats_catalog_rarity").select("rarity_tier, count"),
+    supabase.from("stats_catalog_categories").select("category, count"),
     supabase
       .from("badges")
       .select("*")
@@ -589,17 +603,19 @@ export async function getSiteStats(): Promise<SiteStats> {
   ]);
 
   const rarityDistribution: Record<string, number> = {};
-  for (const row of (rarityRes.data ?? []) as Array<{ rarity_tier: string }>) {
-    rarityDistribution[row.rarity_tier] =
-      (rarityDistribution[row.rarity_tier] ?? 0) + 1;
+  for (const row of (rarityRes.data ?? []) as Array<{
+    rarity_tier: string;
+    count: number | string;
+  }>) {
+    rarityDistribution[row.rarity_tier] = Number(row.count);
   }
 
   const categoryMap = new Map<string, number>();
-  for (const row of (categoryRes.data ?? []) as Array<{ category: string }>) {
-    categoryMap.set(
-      row.category,
-      (categoryMap.get(row.category) ?? 0) + 1,
-    );
+  for (const row of (categoryRes.data ?? []) as Array<{
+    category: string;
+    count: number | string;
+  }>) {
+    categoryMap.set(row.category, Number(row.count));
   }
 
   return {

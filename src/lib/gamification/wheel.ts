@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { award, logActivity, today } from "./xp";
+import { award, ensureProgress, logActivity, today } from "./xp";
 import { createFeaturePost } from "@/lib/blog";
 
 /**
@@ -40,6 +40,10 @@ export async function spinWheel(userId: string): Promise<
   { ok: false; reason: "already" } | { ok: true; result: SpinResult }
 > {
   const supabase = createAdminClient();
+
+  // The gate only UPDATEs, so a first-time user with no `user_progress` row
+  // would match 0 rows and be told the wheel was already spun today.
+  await ensureProgress(userId);
 
   // Atomic compare-and-set gate: exactly one of two parallel spins wins the
   // row (and with it the spin counter increment), so the daily spin cannot be

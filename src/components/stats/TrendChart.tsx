@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useLocale } from "next-intl";
 import { useChartTheme } from "./useChartTheme";
 
 export interface TrendSeries {
@@ -22,8 +23,10 @@ export interface TrendPoint {
   [key: string]: number | string | null;
 }
 
-function compact(value: number): string {
-  return new Intl.NumberFormat("en", { notation: "compact" }).format(value);
+// The locale is a parameter: a hardcoded "en" grouped numbers the English way
+// on the ten other locales ("1.2M" instead of "1,2 Mio.").
+function compact(value: number, locale: string): string {
+  return new Intl.NumberFormat(locale, { notation: "compact" }).format(value);
 }
 
 /** Animated multi-series area chart used for the 30-day trends. */
@@ -39,6 +42,7 @@ export default function TrendChart({
   height?: number;
 }) {
   const theme = useChartTheme();
+  const locale = useLocale();
 
   if (data.length === 0) return null;
 
@@ -78,7 +82,7 @@ export default function TrendChart({
             tickLine={false}
             axisLine={false}
             width={52}
-            tickFormatter={(value: number) => compact(value)}
+            tickFormatter={(value: number) => compact(value, locale)}
           />
           <Tooltip
             contentStyle={{
@@ -94,7 +98,7 @@ export default function TrendChart({
                 series.find((entry) => entry.key === String(name))?.label ??
                 String(name);
               return [
-                new Intl.NumberFormat("en").format(Number(value ?? 0)),
+                new Intl.NumberFormat(locale).format(Number(value ?? 0)),
                 label,
               ];
             }}

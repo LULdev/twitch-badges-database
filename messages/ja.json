@@ -78,7 +78,10 @@
     "empty": "まだ何もありません。",
     "setupHint": "カタログが空です。同期スクリプトを実行するか、次回のcron実行までお待ちください。",
     "filterStatus": "ステータス絞り込み",
-    "filterPrice": "価格絞り込み"
+    "filterPrice": "価格絞り込み",
+    "errorTitle": "問題が発生しました",
+    "errorBody": "ページを読み込めませんでした。多くは一時的なものです。もう一度お試しください。",
+    "errorRetry": "再試行"
   },
   "home": {
     "heroTitle": "Twitchの全バッジを、一つのデータベースに。",
@@ -455,7 +458,8 @@
     "language": "言語",
     "notificationsSection": "通知",
     "loginRequired": "Twitchでログインして設定を管理してください。",
-    "maxSix": "最大6個"
+    "maxSix": "最大6個",
+    "removeShowcase": "{name} — 削除"
   },
   "login": {
     "title": "Twitchでログイン",

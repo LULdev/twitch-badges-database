@@ -48,8 +48,37 @@ export async function POST(request: Request) {
       .slice(0, 6);
   }
   if (typeof body.mood === "string") patch.mood = body.mood.slice(0, 60) || null;
-  if (body.customization && typeof body.customization === "object") {
-    patch.customization = body.customization;
+  if (body.customization !== undefined) {
+    // sec-4: `customization` used to be stored verbatim, so any authenticated
+    // user could persist an arbitrarily large or malformed JSON blob that every
+    // profile read then re-parsed. Bound it at the boundary: it must be a plain
+    // object (arrays are rejected), at most 64 keys, and its serialized form at
+    // most 4096 characters. All keys the app reads (the ProfileCustomizer
+    // document) fit well inside those bounds. The DB carries the same limit in
+    // migration 0012 as a backstop.
+    const customization = body.customization;
+    if (
+      customization === null ||
+      typeof customization !== "object" ||
+      Array.isArray(customization)
+    ) {
+      return Response.json(
+        { error: "customization must be an object" },
+        { status: 400 },
+      );
+    }
+    const serialized = JSON.stringify(customization);
+    if (
+      Object.keys(customization).length > 64 ||
+      serialized === undefined ||
+      serialized.length > 4096
+    ) {
+      return Response.json(
+        { error: "customization is too large" },
+        { status: 400 },
+      );
+    }
+    patch.customization = customization;
   }
   if (typeof body.stealEnabled === "boolean") patch.steal_enabled = body.stealEnabled;
   if (typeof body.stealPrice === "number") {

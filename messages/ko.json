@@ -78,7 +78,10 @@
     "empty": "아직 아무것도 없습니다.",
     "setupHint": "카탈로그가 비어 있습니다. 동기화 스크립트를 실행하거나 다음 cron 실행을 기다려 주세요.",
     "filterStatus": "상태 필터",
-    "filterPrice": "가격 필터"
+    "filterPrice": "가격 필터",
+    "errorTitle": "문제가 발생했습니다",
+    "errorBody": "페이지를 불러올 수 없습니다. 대개 일시적인 문제이니 다시 시도해 주세요.",
+    "errorRetry": "다시 시도"
   },
   "home": {
     "heroTitle": "모든 Twitch 배지를 하나의 데이터베이스에서.",
@@ -455,7 +458,8 @@
     "language": "언어",
     "notificationsSection": "알림",
     "loginRequired": "Twitch로 로그인하여 설정을 관리하세요.",
-    "maxSix": "최대 6개"
+    "maxSix": "최대 6개",
+    "removeShowcase": "{name} — 제거"
   },
   "login": {
     "title": "Twitch로 로그인",

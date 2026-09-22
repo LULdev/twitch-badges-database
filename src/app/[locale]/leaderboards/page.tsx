@@ -131,7 +131,7 @@ export default async function LeaderboardsPage({
                   <span className="w-6 text-center text-xs font-bold tabular-nums text-muted">
                     {index + 1}
                   </span>
-                  <BadgeImage badge={badge} size={28} />
+                  <BadgeImage badge={badge} size={28} alt="" />
                   <span className="min-w-0 flex-1 truncate text-sm font-semibold">
                     {badge.title}
                   </span>
@@ -163,7 +163,7 @@ export default async function LeaderboardsPage({
                   <span className="w-6 text-center text-xs font-bold tabular-nums text-muted">
                     {index + 1}
                   </span>
-                  <BadgeImage badge={badge} size={28} />
+                  <BadgeImage badge={badge} size={28} alt="" />
                   <span className="min-w-0 flex-1 truncate text-sm font-semibold">
                     {badge.title}
                   </span>

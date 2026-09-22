@@ -78,7 +78,10 @@
     "empty": "لا يوجد شيء هنا بعد.",
     "setupHint": "الكتالوج فارغ. شغّل برامج المزامنة أو انتظر تشغيل cron التالي لتعبئته.",
     "filterStatus": "تصفية الحالة",
-    "filterPrice": "تصفية السعر"
+    "filterPrice": "تصفية السعر",
+    "errorTitle": "حدث خطأ ما",
+    "errorBody": "تعذّر تحميل الصفحة. غالبًا ما يكون ذلك مؤقتًا — يُرجى المحاولة مرة أخرى.",
+    "errorRetry": "إعادة المحاولة"
   },
   "home": {
     "heroTitle": "كل شارات Twitch. قاعدة بيانات واحدة.",
@@ -455,7 +458,8 @@
     "language": "اللغة",
     "notificationsSection": "الإشعارات",
     "loginRequired": "سجّل الدخول عبر Twitch لإدارة إعداداتك.",
-    "maxSix": "حتى 6 شارات"
+    "maxSix": "حتى 6 شارات",
+    "removeShowcase": "{name} — إزالة"
   },
   "login": {
     "title": "تسجيل الدخول عبر Twitch",

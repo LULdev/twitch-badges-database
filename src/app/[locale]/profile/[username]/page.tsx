@@ -26,7 +26,7 @@ import { levelFromXp } from "@/lib/gamification/levels";
 import { ACH_BY_ID } from "@/lib/gamification/achievements";
 import { recordProfileVisit } from "@/lib/gamification/visits";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { authUserId, visitorIpHash } from "@/lib/gamification/session";
+import { visitorIpHash } from "@/lib/gamification/session";
 import { localeAlternates } from "@/lib/seo";
 
 export const revalidate = 300;
@@ -472,7 +472,7 @@ export default async function ProfilePage({ params }: PageProps) {
                   href={`/badges/${badge.slug}`}
                   className="badge-tile card-interactive rounded-[var(--radius-card)]"
                 >
-                  <BadgeImage badge={badge} size={48} />
+                  <BadgeImage badge={badge} size={48} alt="" />
                   <p className="line-clamp-2 text-[0.6875rem] font-semibold leading-tight">
                     {badge.title}
                   </p>

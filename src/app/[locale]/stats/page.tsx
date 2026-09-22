@@ -206,6 +206,12 @@ export default async function StatsPage({
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+  // One-decimal formatter for percentages: `toFixed(1)` always emits "." and
+  // would show "12.3%" in locales whose separator is ",".
+  const decimal1 = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
 
   const game = platform.gamification;
   const uptime = platform.uptime;
@@ -249,7 +255,7 @@ export default async function StatsPage({
       key: `${from}`,
       label: `${from}–${to}`,
       value: inBucket.reduce((total, row) => total + row.players, 0),
-      hint: `${formatCompact(inBucket.reduce((total, row) => total + row.xp, 0))} XP`,
+      hint: `${formatCompact(inBucket.reduce((total, row) => total + row.xp, 0), locale)} XP`,
       color: levelTheme(Math.round((from + to) / 2)).glow,
     };
   });
@@ -261,7 +267,7 @@ export default async function StatsPage({
       key: row.game,
       label: meta?.title ?? row.game,
       value: row.rounds,
-      hint: `${winRate.toFixed(1)}%`,
+      hint: `${decimal1.format(winRate)}%`,
       color: PALETTE[row.game] ?? "#a970ff",
     };
   });
@@ -708,6 +714,7 @@ export default async function StatsPage({
                   <b>
                     {formatCompact(
                       platform.games.reduce((total, row) => total + row.wagered, 0),
+                      locale,
                     )}
                   </b>
                 </span>
@@ -716,6 +723,7 @@ export default async function StatsPage({
                   <b>
                     {formatCompact(
                       platform.games.reduce((total, row) => total + row.paid_out, 0),
+                      locale,
                     )}
                   </b>
                 </span>
@@ -727,6 +735,7 @@ export default async function StatsPage({
                         (peak, row) => Math.max(peak, row.biggest_win),
                         0,
                       ),
+                      locale,
                     )}
                   </b>
                 </span>
@@ -871,6 +880,7 @@ export default async function StatsPage({
                   caption="24h"
                   size={112}
                   stroke={9}
+                  locale={locale}
                 />
                 <UptimeGauge
                   value={uptime.availability7d}
@@ -878,6 +888,7 @@ export default async function StatsPage({
                   size={112}
                   stroke={9}
                   delay={120}
+                  locale={locale}
                 />
                 <UptimeGauge
                   value={uptime.availability30d}
@@ -885,6 +896,7 @@ export default async function StatsPage({
                   size={112}
                   stroke={9}
                   delay={240}
+                  locale={locale}
                 />
                 <UptimeGauge
                   value={uptime.availabilityAll}
@@ -892,6 +904,7 @@ export default async function StatsPage({
                   size={112}
                   stroke={9}
                   delay={360}
+                  locale={locale}
                 />
               </div>
               <div className="mt-4 border-t border-line pt-4">
@@ -1033,10 +1046,10 @@ export default async function StatsPage({
                         {number.format(source.checks_24h)}
                       </td>
                       <td className="tabular-nums font-semibold">
-                        {source.rate24h === null ? "—" : `${source.rate24h.toFixed(1)}%`}
+                        {source.rate24h === null ? "—" : `${decimal1.format(source.rate24h)}%`}
                       </td>
                       <td className="tabular-nums text-muted">
-                        {source.rate7d === null ? "—" : `${source.rate7d.toFixed(1)}%`}
+                        {source.rate7d === null ? "—" : `${decimal1.format(source.rate7d)}%`}
                       </td>
                     </tr>
                   ))

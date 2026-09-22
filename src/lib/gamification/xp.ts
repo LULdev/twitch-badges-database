@@ -121,6 +121,23 @@ export async function getProgress(userId: string): Promise<ProgressRow> {
   }) as ProgressRow;
 }
 
+/**
+ * Guarantees the `user_progress` row exists before a daily gate RPC runs.
+ *
+ * `claim_daily_gate` / `claim_wheel_gate` only UPDATE: with no row the update
+ * matches 0 rows and they report "already claimed" (`-1` / `false`), so a user
+ * whose first gamification action is the daily bonus or the wheel was denied
+ * the reward and told they had already collected it. ON CONFLICT DO NOTHING is
+ * idempotent, so this is safe on every path (and needs no new SQL).
+ */
+export async function ensureProgress(userId: string): Promise<void> {
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("user_progress")
+    .upsert({ user_id: userId }, { onConflict: "user_id", ignoreDuplicates: true });
+  if (error) throw error;
+}
+
 export interface AwardOptions {
   xp?: number;
   coins?: number;
@@ -160,6 +177,13 @@ export async function award(
 
   // The daily game cap is consumed under a row lock, so two rounds resolving at
   // the same moment cannot both spend the last of the 100 XP budget.
+  //
+  // Residual risk (deliberate): the spend is committed here, before
+  // apply_xp_coins grants the XP, so a hard failure of the next statement burns
+  // that much of the day's remaining budget without granting anything. Undoing
+  // it needs one consume+apply function in SQL, which cannot be added here; the
+  // ordering is kept because reserving the budget before applying is the only
+  // way the cap holds under concurrency.
   if (options.countsAsGameXp && xpAwarded > 0) {
     const consumed = await supabase.rpc("consume_game_xp", {
       p_user_id: userId,
@@ -244,11 +268,18 @@ export async function award(
   // Update, not upsert: the row is guaranteed to exist because getProgress()
   // above either read it or inserted it, and an upsert would re-write every
   // column that arrived in the payload.
+  //
+  // `level` is the ONLY column award() still owns, and it is derived purely from
+  // the xp apply_xp_coins already committed. A failure here therefore must not
+  // throw: the caller (a game round, a wheel spin) has already moved XP and
+  // coins, and reporting a 500 made the client retry and play a second round.
+  // The worst case is a cached level that lags until the next award recomputes
+  // it — which is exactly what a stale `level` was before.
   const { error } = await supabase
     .from("user_progress")
     .update(patch)
     .eq("user_id", userId);
-  if (error) throw error;
+  if (error) console.warn("[xp] derived level write failed:", error);
 
   if (options.feedTitle) {
     await logActivity({

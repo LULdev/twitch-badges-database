@@ -1216,6 +1216,13 @@ html {
   0%, 60% { transform: translateX(-100%); }
   100% { transform: translateX(220%); }
 }
+/* The bar's fill is mirrored for RTL, but translateX is physical: without this
+   the sheen kept sweeping left-to-right, i.e. against the reading direction. */
+[dir="rtl"] .grow-bar-fill::after { animation-name: grow-bar-shine-rtl; }
+@keyframes grow-bar-shine-rtl {
+  0%, 60% { transform: translateX(100%); }
+  100% { transform: translateX(-220%); }
+}
 
 /* Histogram columns */
 .histo {

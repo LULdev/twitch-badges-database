@@ -62,6 +62,15 @@ export interface PlayResult {
 
 const RATE_LIMIT_MS = 1000;
 
+/**
+ * Threshold for the post-insert race recheck. It is compared between two
+ * timestamps written by the DATABASE, while the pre-check above compares
+ * app-clock times — the 100 ms slack keeps a legitimate 1 Hz player (whose gap
+ * is >= 1000 ms by the app clock) from being voided by clock skew, while a
+ * parallel burst (a ~0 ms gap) is still caught.
+ */
+const RATE_RACE_MS = RATE_LIMIT_MS - 100;
+
 export async function playGame(
   userId: string,
   gameId: string,
@@ -107,20 +116,52 @@ export async function playGame(
 
   const result = { ...outcome.result, ...streakFlags };
 
-  const { error: roundError } = await supabase.from("game_rounds").insert({
-    user_id: userId,
-    game: gameId,
-    bet,
-    payout: outcome.payout,
-    won: outcome.payout > bet,
-    result,
-  });
+  const { data: round, error: roundError } = await supabase
+    .from("game_rounds")
+    .insert({
+      user_id: userId,
+      game: gameId,
+      bet,
+      payout: outcome.payout,
+      won: outcome.payout > bet,
+      result,
+    })
+    .select("id")
+    .maybeSingle();
   if (roundError) throw roundError;
+
+  // The 1/s flood check above reads the newest existing round and this insert
+  // happens after it, so two requests fired in parallel both passed. Re-reading
+  // the two newest rows now that ours is in closes that hole: a burst leaves a
+  // ~0 ms gap between them, so every racer but the first voids its own round —
+  // and nothing has moved yet (counters, coins and XP all come later). A truly
+  // atomic guard needs a unique index on (user_id, epoch second), which is not
+  // in the schema.
+  const { data: newest } = await supabase
+    .from("game_rounds")
+    .select("created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(2);
+  if (
+    newest &&
+    newest.length === 2 &&
+    new Date(String(newest[0].created_at)).getTime() -
+      new Date(String(newest[1].created_at)).getTime() <
+      RATE_RACE_MS
+  ) {
+    if (round?.id != null) {
+      await supabase.from("game_rounds").delete().eq("id", round.id);
+    }
+    return fail("Slow down — one round per second.");
+  }
 
   // Counters and balance move through atomic increments. Writing absolute
   // values computed from `progress` (read before the round resolved) lost one
-  // of two overlapping rounds — including the coin balance itself.
-  await supabase.rpc("bump_counters", {
+  // of two overlapping rounds — including the coin balance itself. Their errors
+  // are thrown: a failed counter used to leave games_played/coins_won behind
+  // while the balance and the round had already moved.
+  const { error: counterError } = await supabase.rpc("bump_counters", {
     p_user_id: userId,
     p_deltas: {
       games_played: 1,
@@ -129,6 +170,7 @@ export async function playGame(
       coins_lost: Math.max(0, -net),
     },
   });
+  if (counterError) throw counterError;
   if (net !== 0) {
     await bumpCoins(userId, net);
   }

@@ -6,6 +6,25 @@
 
 create extension if not exists pgcrypto;
 
+-- Explicit guard against a destructive replay (db-7). The `supabase_migrations`
+-- ledger already skips applied files, but that is one process's bookkeeping: a
+-- lost ledger, a hand-run psql replay or `supabase db push` against the wrong
+-- project would hit the unconditional `drop table ... cascade` below and wipe
+-- every badge, profile, inventory row and (through the FKs added in 0003) all
+-- XP/coins/levels. The file therefore refuses to run once the catalog holds
+-- rows. On a genuinely fresh database `public.badges` does not exist yet, so
+-- the first apply is unaffected.
+do $$
+begin
+  if to_regclass('public.badges') is not null then
+    if exists (select 1 from public.badges limit 1) then
+      raise exception
+        'Refusing to re-apply 0001_init.sql: public.badges already holds % row(s). This migration DROPs the schema CASCADE and would destroy all user data.',
+        (select count(*) from public.badges);
+    end if;
+  end if;
+end $$;
+
 -- Drop the previous prototype schema and this schema's own tables
 -- (idempotent re-runs).
 drop view if exists public.collector_stats;

@@ -175,9 +175,11 @@ export default function AccountSettings({
                   type="button"
                   onClick={() => toggleShowcase(slug)}
                   className="card card-interactive flex items-center gap-2 px-3 py-2"
-                  title={`${badge?.title ?? slug} — remove`}
+                  title={t("removeShowcase", { name: badge?.title ?? slug })}
                 >
-                  {badge ? <BadgeImage badge={badge} size={24} /> : null}
+                  {/* Decorative: the badge name is the text right beside it, so
+                      a non-empty alt made a screen reader announce it twice. */}
+                  {badge ? <BadgeImage badge={badge} size={24} alt="" /> : null}
                   <span className="max-w-40 truncate text-xs font-semibold">
                     {badge?.title ?? slug}
                   </span>
@@ -210,7 +212,7 @@ export default function AccountSettings({
                       }`}
                       aria-pressed={selected}
                     >
-                      <BadgeImage badge={badge} size={36} />
+                      <BadgeImage badge={badge} size={36} alt="" />
                       <p className="line-clamp-2 text-[0.625rem] font-semibold leading-tight">
                         {badge.title}
                       </p>

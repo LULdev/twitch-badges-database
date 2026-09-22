@@ -78,7 +78,10 @@
     "empty": "Ancora niente qui.",
     "setupHint": "Il catalogo è vuoto. Esegui gli script di sincronizzazione o attendi la prossima esecuzione del cron.",
     "filterStatus": "Filtro stato",
-    "filterPrice": "Filtro prezzo"
+    "filterPrice": "Filtro prezzo",
+    "errorTitle": "Qualcosa è andato storto",
+    "errorBody": "Non è stato possibile caricare la pagina. Di solito è temporaneo: riprova.",
+    "errorRetry": "Riprova"
   },
   "home": {
     "heroTitle": "Tutti i badge Twitch. Un solo database.",
@@ -455,7 +458,8 @@
     "language": "Lingua",
     "notificationsSection": "Notifiche",
     "loginRequired": "Accedi con Twitch per gestire le impostazioni.",
-    "maxSix": "Fino a 6 badge"
+    "maxSix": "Fino a 6 badge",
+    "removeShowcase": "{name} — rimuovi"
   },
   "login": {
     "title": "Accedi con Twitch",

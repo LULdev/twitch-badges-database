@@ -78,7 +78,10 @@
     "empty": "Aún no hay nada aquí.",
     "setupHint": "El catálogo está vacío. Ejecuta los scripts de sincronización o espera la próxima ejecución del cron para poblarlo.",
     "filterStatus": "Filtro de estado",
-    "filterPrice": "Filtro de precio"
+    "filterPrice": "Filtro de precio",
+    "errorTitle": "Algo ha salido mal",
+    "errorBody": "No se pudo cargar la página. Suele ser temporal: inténtalo de nuevo.",
+    "errorRetry": "Reintentar"
   },
   "home": {
     "heroTitle": "Todas las insignias de Twitch. Una sola base de datos.",
@@ -455,7 +458,8 @@
     "language": "Idioma",
     "notificationsSection": "Notificaciones",
     "loginRequired": "Inicia sesión con Twitch para gestionar tus ajustes.",
-    "maxSix": "Hasta 6 insignias"
+    "maxSix": "Hasta 6 insignias",
+    "removeShowcase": "{name} — quitar"
   },
   "login": {
     "title": "Iniciar sesión con Twitch",

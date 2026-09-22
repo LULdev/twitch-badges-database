@@ -39,7 +39,11 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
   const [paused, setPaused] = useState(false);
   const seenIds = useRef(new Set<number>((initialEvents ?? []).map((e) => e.id)));
 
-  const [nowTick, setNowTick] = useState(() => Date.now());
+  // Relative times are rendered only after mount: `Date.now()` during the
+  // first render made the server and the hydrating client disagree by the
+  // request latency, so any bucket boundary between the two clocks produced a
+  // hydration mismatch on the "Xs/Xm/Xh" text.
+  const [nowTick, setNowTick] = useState<number | null>(null);
 
   const poll = useCallback(async () => {
     try {
@@ -81,8 +85,8 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
     return () => clearInterval(interval);
   }, [paused, poll]);
 
-  function timeAgo(iso: string): string {
-    const seconds = Math.floor((nowTick - new Date(iso).getTime()) / 1000);
+  function timeAgo(iso: string, now: number): string {
+    const seconds = Math.floor((now - new Date(iso).getTime()) / 1000);
     if (seconds < 60) return `${seconds}s`;
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
     return `${Math.floor(seconds / 3600)}h`;
@@ -129,7 +133,7 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
               </p>
               <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted">
                 <span>{t(event.kind)}</span>
-                <span>· {timeAgo(event.created_at)}</span>
+                {nowTick !== null ? <span>· {timeAgo(event.created_at, nowTick)}</span> : null}
                 {event.xp_amount ? <span className="font-bold text-accent">+{event.xp_amount} XP</span> : null}
                 {event.coins_amount ? (
                   <span className={`inline-flex items-center gap-1 font-bold ${event.coins_amount > 0 ? "text-success" : "text-danger"}`}>

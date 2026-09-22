@@ -67,6 +67,12 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   const t = await getTranslations("badges");
   const tcd = await getTranslations("countdown");
   const tc = await getTranslations("common");
+  // Percentages with a locale-correct decimal separator; `toFixed` always
+  // emitted "." regardless of locale.
+  const percent = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   // Deliberately no .catch here: getBadgeBySlug returns null only for a missing
   // slug, so a real query error now surfaces instead of becoming a 404.
@@ -124,7 +130,7 @@ export default async function BadgeDetailPage({ params }: PageProps) {
       <section className="card overflow-hidden">
         <div className="flex flex-col items-center gap-6 p-6 sm:flex-row sm:items-start">
           <div className="shrink-0 rounded-2xl border border-line bg-surface-2 p-4">
-            <BadgeImage badge={badge} size={96} />
+            <BadgeImage badge={badge} size={96} alt="" />
           </div>
           <div className="min-w-0 flex-1 text-center sm:text-start">
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
@@ -239,7 +245,7 @@ export default async function BadgeDetailPage({ params }: PageProps) {
                 <dd className="font-semibold tabular-nums text-success">
                   {new Intl.NumberFormat(locale).format(live.userCount)}
                   {live.percentage !== null
-                    ? ` (${Number(live.percentage).toFixed(2)}%)`
+                    ? ` (${percent.format(Number(live.percentage))}%)`
                     : ""}
                 </dd>
               </div>
@@ -248,7 +254,7 @@ export default async function BadgeDetailPage({ params }: PageProps) {
               <div className="flex justify-between gap-4">
                 <dt className="text-muted">%</dt>
                 <dd className="font-semibold tabular-nums">
-                  {t("percentageOfUsers", { value: Number(badge.percentage).toFixed(2) })}
+                  {t("percentageOfUsers", { value: percent.format(Number(badge.percentage)) })}
                 </dd>
               </div>
             )}

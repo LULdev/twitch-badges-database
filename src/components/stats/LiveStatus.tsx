@@ -74,7 +74,13 @@ export default function LiveStatus({
     // Kick the first probe off asynchronously — a synchronous setState inside
     // the effect body would cascade renders (react-hooks/set-state-in-effect).
     const kickoff = window.setTimeout(() => void probe(), 0);
-    const timer = window.setInterval(() => void probe(), intervalMs);
+    // A hidden tab kept probing /api/health every 30 s (each probe also writes a
+    // server-side heartbeat) for a page nobody was looking at; it resumes on the
+    // next tick once the tab is visible again.
+    const timer = window.setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+      void probe();
+    }, intervalMs);
     return () => {
       mountedRef.current = false;
       window.clearTimeout(kickoff);

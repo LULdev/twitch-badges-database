@@ -1,6 +1,7 @@
 "use client";
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { useLocale } from "next-intl";
 import { useChartTheme } from "./useChartTheme";
 
 export interface DonutSlice {
@@ -25,6 +26,7 @@ export default function DonutChart({
   centerLabel?: string;
 }) {
   const theme = useChartTheme();
+  const locale = useLocale();
   const slices = data.filter((slice) => slice.value > 0);
   if (slices.length === 0) return null;
 
@@ -42,7 +44,7 @@ export default function DonutChart({
             }}
             labelStyle={{ color: theme.foreground, fontWeight: 600 }}
             formatter={(value, name) => [
-              new Intl.NumberFormat("en").format(Number(value ?? 0)),
+              new Intl.NumberFormat(locale).format(Number(value ?? 0)),
               String(name),
             ]}
           />

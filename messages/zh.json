@@ -78,7 +78,10 @@
     "empty": "这里还没有内容。",
     "setupHint": "目录为空。请运行同步脚本，或等待下一次定时任务填充数据。",
     "filterStatus": "状态筛选",
-    "filterPrice": "价格筛选"
+    "filterPrice": "价格筛选",
+    "errorTitle": "出错了",
+    "errorBody": "页面无法加载。通常是暂时性的，请重试。",
+    "errorRetry": "重试"
   },
   "home": {
     "heroTitle": "所有 Twitch 徽章，尽在一个数据库。",
@@ -455,7 +458,8 @@
     "language": "语言",
     "notificationsSection": "通知",
     "loginRequired": "通过 Twitch 登录以管理设置。",
-    "maxSix": "最多 6 个徽章"
+    "maxSix": "最多 6 个徽章",
+    "removeShowcase": "{name} — 移除"
   },
   "login": {
     "title": "通过 Twitch 登录",

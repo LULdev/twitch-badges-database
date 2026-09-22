@@ -11,6 +11,7 @@ export default function UptimeGauge({
   stroke = 10,
   color,
   delay = 0,
+  locale,
 }: {
   /** 0–100, or null when there is no data yet. */
   value: number | null;
@@ -19,6 +20,8 @@ export default function UptimeGauge({
   stroke?: number;
   color?: string;
   delay?: number;
+  /** Locale for the decimal separator; `toFixed` would always emit ".". */
+  locale: string;
 }) {
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -62,7 +65,12 @@ export default function UptimeGauge({
       </svg>
       <div className="gauge-center">
         <div className="gauge-value">
-          {value === null ? "—" : `${value.toFixed(clamped >= 99.95 ? 1 : 2)}%`}
+          {value === null
+            ? "—"
+            : `${new Intl.NumberFormat(locale, {
+                minimumFractionDigits: clamped >= 99.95 ? 1 : 2,
+                maximumFractionDigits: clamped >= 99.95 ? 1 : 2,
+              }).format(value)}%`}
         </div>
         <div className="gauge-caption">{caption}</div>
       </div>

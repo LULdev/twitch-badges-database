@@ -9,9 +9,14 @@ export async function GET(request: Request) {
   // parameters fall back to their defaults unless they are real numbers.
   const cursorRaw = Number(url.searchParams.get("cursor"));
   const cursor = Number.isFinite(cursorRaw) && cursorRaw > 0 ? cursorRaw : 0;
-  const limitRaw = Number(url.searchParams.get("limit"));
-  const limit = Number.isFinite(limitRaw)
-    ? Math.min(50, Math.max(5, Math.floor(limitRaw)))
+  // ind-4: an absent `limit` must fall back to the documented 30. `Number(null)`
+  // is 0 (a finite number), so the old clamp lifted an omitted parameter to 5 and
+  // the default was unreachable. Only a *provided* value is clamped; absent or
+  // non-numeric (`?limit=abc`) both take the default.
+  const limitParam = url.searchParams.get("limit");
+  const limitParsed = limitParam === null ? Number.NaN : Number(limitParam);
+  const limit = Number.isFinite(limitParsed)
+    ? Math.min(50, Math.max(5, Math.floor(limitParsed)))
     : 30;
   const supabase = createAdminClient();
 

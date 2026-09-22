@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { award, bumpCoins, getProgress, logActivity } from "./xp";
+import { award, bumpCoins, ensureProgress, getProgress, logActivity } from "./xp";
 import { evaluateAchievements } from "./achievements";
 
 /**
@@ -11,6 +11,11 @@ export async function claimDaily(userId: string): Promise<
 > {
   const supabase = createAdminClient();
   const todayStr = new Date().toISOString().slice(0, 10);
+
+  // The gate only UPDATEs, so a user with no `user_progress` row would match 0
+  // rows and be told today's bonus was already claimed on their first-ever
+  // claim. ON CONFLICT DO NOTHING makes the row exist without touching it.
+  await ensureProgress(userId);
 
   // Atomic compare-and-set gate: of two parallel claims exactly one wins the
   // row, so the bonus cannot be collected twice. Returns -1 when today's bonus
@@ -131,33 +136,68 @@ export async function attemptSteal(
   const stealable = Math.min(settings.maxAmount, Math.floor(victim.coins * 0.1), victim.coins);
   const stolen = success ? Math.max(1, Math.floor(stealable * (0.5 + Math.random() * 0.5))) : 0;
 
-  const { error: attemptError } = await supabase.from("steal_attempts").insert({
-    thief_id: thiefId,
-    victim_id: victimProfile.id,
-    cost: settings.price,
-    coins: stolen,
-    success,
-  });
+  const { data: attempt, error: attemptError } = await supabase
+    .from("steal_attempts")
+    .insert({
+      thief_id: thiefId,
+      victim_id: victimProfile.id,
+      cost: settings.price,
+      coins: stolen,
+      success,
+    })
+    .select("id")
+    .maybeSingle();
   if (attemptError) throw attemptError;
+
+  // Both flood checks above read BEFORE this row existed, so a parallel burst
+  // can make every request observe the same empty window. Counting again now
+  // that our row is in turns that into an optimistic guard: the losers undo
+  // their attempt before a single coin has moved. (A truly atomic guard needs a
+  // unique index on a time bucket, which is not in the schema.)
+  const { count: racedPair } = await supabase
+    .from("steal_attempts")
+    .select("id", { count: "exact", head: true })
+    .eq("thief_id", thiefId)
+    .eq("victim_id", victimProfile.id)
+    .gte("created_at", fiveMinAgo);
+  const { count: racedHour } = await supabase
+    .from("steal_attempts")
+    .select("id", { count: "exact", head: true })
+    .eq("thief_id", thiefId)
+    .gte("created_at", hourAgo);
+  if ((racedPair ?? 0) > 1 || (racedHour ?? 0) > 6) {
+    if (attempt?.id != null) {
+      await supabase.from("steal_attempts").delete().eq("id", attempt.id);
+    }
+    return { ok: false, error: "Flood check: too many attempts at once." };
+  }
 
   // Thief pays the attempt cost; the victim keeps it. Both coin moves are
   // atomic deltas — writing a balance read earlier would discard whatever the
   // players earned in the meantime — and the counters move in one statement
-  // for the same reason.
-  await bumpCoins(thiefId, -settings.price + stolen);
-  await supabase.rpc("bump_counters", {
+  // for the same reason. Their errors are inspected: the round used to report
+  // success while games_won/coins_won or the counter stayed behind.
+  const balance = await bumpCoins(thiefId, -settings.price + stolen);
+  const { error: thiefCounterError } = await supabase.rpc("bump_counters", {
     p_user_id: thiefId,
     p_deltas: {
       steals_successful: success ? 1 : 0,
       steals_failed: success ? 0 : 1,
     },
   });
+  if (thiefCounterError) throw thiefCounterError;
 
-  await bumpCoins(victimProfile.id, -stolen + (success ? 0 : settings.price));
-  await supabase.rpc("bump_counters", {
+  // The victim receives the attempt cost on BOTH outcomes — that is what the
+  // comment (and the anti-abuse design) means: paying to harass has to benefit
+  // the target. Only giving it back on a failure removed `price` from the
+  // economy on every successful heist, a deflationary sink the victim sized
+  // themselves via `steal_price`.
+  await bumpCoins(victimProfile.id, -stolen + settings.price);
+  const { error: victimCounterError } = await supabase.rpc("bump_counters", {
     p_user_id: victimProfile.id,
     p_deltas: { times_robbed: 1 },
   });
+  if (victimCounterError) throw victimCounterError;
 
   const thiefProfile = await supabase
     .from("profiles")
@@ -179,7 +219,9 @@ export async function attemptSteal(
   await evaluateAchievements(thiefId).catch(() => undefined);
   await evaluateAchievements(victimProfile.id).catch(() => undefined);
 
-  const balance = Math.max(0, thief.coins - settings.price + stolen);
+  // The RPC's returned balance, not one recomputed from the snapshot read
+  // before the flood checks: any award that landed in between made the number
+  // the UI shows wrong (and Math.max(0, …) masked it as zero).
   return { ok: true, success, stolen, cost: settings.price, chance, balance };
 }
 
@@ -206,6 +248,16 @@ export async function coinRain(
     .maybeSingle();
   if (!ownerProfile) return { ok: false };
 
+  // Nothing used to stop a signed-in user raining on their own profile for a
+  // free coin (the once-a-day key is the giver, so their own id matched, not
+  // the anonymous key).
+  if (giverId && giverId === profileOwnerId) return { ok: false };
+
+  // The dedup below is a read-then-write on `activity_events` (which has no
+  // unique constraint to make it a real gate), so a parallel burst of requests
+  // can each observe "no rain today" and each award a coin. Closing that needs
+  // a compare-and-set RPC or a unique index on (owner, giver, UTC day) — SQL
+  // this file cannot add — see the report.
   const since = new Date(Date.now() - 86_400_000).toISOString();
   const { count } = await supabase
     .from("activity_events")

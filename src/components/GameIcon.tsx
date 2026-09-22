@@ -96,6 +96,14 @@ const PATHS: Record<string, React.ReactNode> = {
       <path d="M3.5 12h17M12 3.5v17" />
     </>
   ),
+  // Neutral stand-in for an id with no icon. Previously the fallback was the
+  // shoot crosshair, so a newly added game silently rendered as the wrong game.
+  fallback: (
+    <>
+      <rect x="3.5" y="6" width="17" height="12" rx="3" />
+      <path d="M8 12h2.5M9.25 10.75v2.5M15 11.5h.01M17 13.5h.01" />
+    </>
+  ),
 };
 
 export default function GameIcon({
@@ -107,7 +115,7 @@ export default function GameIcon({
   size?: number;
   className?: string;
 }) {
-  const path = PATHS[id] ?? PATHS.shoot;
+  const path = PATHS[id] ?? PATHS.fallback;
   return (
     <svg
       width={size}

@@ -67,7 +67,10 @@ export default function Header({ user }: { user: HeaderUser | null }) {
   async function logout() {
     try {
       const supabase = createClient();
-      await supabase.auth.signOut();
+      // Scope `local` ends only this browser's session. The Supabase default is
+      // `global`, which revokes the refresh token on every device the user is
+      // signed in on — not what a per-device "Log out" menu action implies.
+      await supabase.auth.signOut({ scope: "local" });
     } catch (error) {
       console.error("[header] logout failed:", error);
     }

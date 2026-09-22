@@ -52,13 +52,15 @@ export interface AchStats {
   faqVisits: number;
   profilesVisited: number;
   customizationKeys: number;
+  /** Slots actually set in the profile's badge showcase (capped at 6). */
+  showcaseSlots: number;
   moodSet: boolean;
   activityCount: number;
   dailyCount: number;
   userCount: number;
   twitchBirthday: boolean;
   recentPerfectFlags: Record<string, boolean>;
-  recentResults: Array<{ game: string; won: boolean; bet: number; payout: number; hour: number; flags: Record<string, number | boolean> }>;
+  recentResults: Array<{ game: string; won: boolean; bet: number; payout: number; hour: number; at: number; flags: Record<string, number | boolean> }>;
 }
 
 type Ctor = (
@@ -84,6 +86,9 @@ const GAME_IDS = [
   "rps", "slots", "shoot", "memory", "quiz", "coinflip", "hilo",
   "roulette", "blackjack", "vault", "scratch", "tower", "catcher",
 ];
+
+/** The showcase has six slots (`showcase_slots` is capped at 6 when written). */
+const SHOWCASE_SLOTS = 6;
 
 function hasFlag(s: AchStats, game: string, flag: string): boolean {
   return s.recentResults.some((r) => r.game === game && !!r.flags?.[flag]);
@@ -125,7 +130,10 @@ export const ACHIEVEMENTS: Achievement[] = [
   COMMON("c_profile_customized", "Make It Yours", "Customize at least 5 profile settings.", (s) => s.customizationKeys >= 5),
   COMMON("c_views_10", "Getting Noticed", "10 profile views.", (s) => s.profileViews >= 10),
   COMMON("c_views_100", "Rising Star", "100 profile views.", (s) => s.profileViews >= 100, 200, 200),
-  COMMON("c_showcase_set", "Curator", "Fill your badge showcase.", (s) => s.customizationKeys >= 0 && s.badgesOwned >= 1),
+  // The showcase lives in `profiles.showcase_slots`, not in `customization`.
+  // It used to check `customizationKeys >= 0` — always true — so "Curator"
+  // fired on the first owned badge, duplicating c_sync_first.
+  COMMON("c_showcase_set", "Curator", "Fill your badge showcase.", (s) => s.showcaseSlots >= SHOWCASE_SLOTS),
   COMMON("c_bio_written", "Storyteller", "Write a profile bio.", (s) => s.moodSet || s.customizationKeys >= 1),
   COMMON("c_frame", "Framed", "Equip an avatar frame.", (s) => s.customizationKeys >= 3),
   COMMON("c_ach_1", "First Achievement", "Unlock 1 achievement.", () => false, 0, 0),
@@ -215,7 +223,20 @@ export const ACHIEVEMENTS: Achievement[] = [
   SPECIAL("s_sniper", "Sniper", "Steal 200+ coins in a single successful heist.", (s) => s.bestStealAmount >= 200),
   SPECIAL("s_slots_jackpot", "Ra's Jackpot", "Win 5,000+ coins in a single Badges of Ra spin.", (s) => s.recentResults.some((r) => r.game === "slots" && r.payout >= 5000)),
   SPECIAL("s_birthday", "Badge Birthday", "Log in on your Twitch account's creation anniversary.", (s) => s.twitchBirthday, 1000, 1000),
-  SPECIAL("s_hattrick", "Hat-Trick", "Win three different games within 10 minutes.", (s) => s.recentResults.filter((r) => r.won).length >= 3 && s.recentResults.length >= 3, 500, 500),
+  // The old check accepted ANY three wins among the last 60 rounds — the same
+  // game a week apart satisfied "different games within 10 minutes". The wins
+  // must now be three distinct games inside a real 10-minute span.
+  SPECIAL("s_hattrick", "Hat-Trick", "Win three different games within 10 minutes.",
+    (s) => {
+      const wins = s.recentResults.filter((r) => r.won).sort((a, b) => a.at - b.at);
+      return wins.some((start, i) => {
+        const games = new Set<string>();
+        for (let j = i; j < wins.length && wins[j].at - start.at <= 10 * 60_000; j += 1) {
+          games.add(wins[j].game);
+        }
+        return games.size >= 3;
+      });
+    }, 500, 500),
   SPECIAL("s_perfectionist_rps", "RPS Perfectionist", "Win 70%+ of 20+ RPS duels.", (s) => (s.gamesByType["rps"]?.played ?? 0) >= 20 && (s.gamesByType["rps"]?.won ?? 0) / Math.max(1, s.gamesByType["rps"]?.played ?? 1) >= 0.7),
   SPECIAL("s_ghost_town", "Ghost Town", "Have zero profile visitors in your first 7 days.", (s) => s.profileViews === 0 && s.activityCount > 0, 100, 100),
   SPECIAL("s_endgame", "Endgame Collector", "Own a badge with a 90+ rarity score.", (s) => s.bestBadgeScore >= 90),
@@ -258,7 +279,12 @@ export async function evaluateAchievements(userId: string): Promise<string[]> {
     if (passed) newly.push(ach.id);
   }
 
-  const totalUnlocked = unlocked.size + newly.length;
+  // Only REAL achievements count towards the meta thresholds. `unlocked`
+  // already contains the c_ach_* rows, so counting it let c_ach_10 unlock with
+  // 9 real achievements (+1 meta = 10), and each meta achievement inflated the
+  // next one's total by the same amount.
+  const totalUnlocked =
+    [...unlocked].filter((id) => !id.startsWith("c_ach_")).length + newly.length;
   for (const meta of META_ACHIEVEMENTS) {
     if (!unlocked.has(meta.id) && totalUnlocked >= meta.at) newly.push(meta.id);
   }
@@ -266,19 +292,26 @@ export async function evaluateAchievements(userId: string): Promise<string[]> {
   for (const id of newly) {
     const ach = ACH_BY_ID.get(id);
     if (!ach) continue;
+    // Plain INSERT, not an upsert: `ON CONFLICT DO UPDATE` matches an existing
+    // row without raising, so a second concurrent evaluation would carry on and
+    // pay ach.xp/ach.coins/ach.points a second time. 23505 (a parallel run
+    // unlocked it first) means the reward was already paid — skip it.
     const { error } = await supabase
       .from("user_achievements")
-      .upsert({ user_id: userId, achievement_id: id }, { onConflict: "user_id,achievement_id" });
+      .insert({ user_id: userId, achievement_id: id });
     if (error) continue;
 
     // Atomic increment: two unlocks resolving together used to overwrite each
-    // other's points because the total came from a stale read.
-    await supabase
-      .rpc("bump_counters", {
-        p_user_id: userId,
-        p_deltas: { achievements_points: ach.points },
-      })
-      .then(() => undefined, () => undefined);
+    // other's points because the total came from a stale read. A failure here
+    // cannot be retried (the row above is in, so this id never comes round
+    // again), so surface it rather than pretending the points moved.
+    const { error: pointsError } = await supabase.rpc("bump_counters", {
+      p_user_id: userId,
+      p_deltas: { achievements_points: ach.points },
+    });
+    if (pointsError) {
+      console.warn("[achievements] achievements_points bump failed:", pointsError);
+    }
 
     await logActivity({
       userId,
@@ -314,14 +347,15 @@ async function buildStats(userId: string): Promise<AchStats> {
   const progress = await getProgress(userId);
 
   const [badgesRes, gamesRes, roundsRes, wheelRes, turboRes, profileRes,
-    rainRes, stealRes, reactRes, faqRes, visitsRes, usersRes, achRes, visitorsRes] =
+    rainRes, stealRes, reactRes, faqRes, visitsRes, usersRes, achRes, visitorsRes,
+    maxBetRes] =
     await Promise.all([
       supabase.from("user_inventory").select("badges(rarity_tier,status,set_id,first_seen_at,rarity_score)").eq("user_id", userId),
       supabase.from("game_rounds").select("game,won").eq("user_id", userId),
       supabase.from("game_rounds").select("game,won,bet,payout,result,created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(60),
       supabase.from("activity_events").select("xp_amount").eq("user_id", userId).eq("kind", "wheel"),
       supabase.from("turbo_wins").select("id", { count: "exact", head: true }).eq("user_id", userId),
-      supabase.from("profiles").select("view_count, customization, mood, twitch_created_at").eq("id", userId).maybeSingle(),
+      supabase.from("profiles").select("view_count, customization, mood, twitch_created_at, showcase_slots").eq("id", userId).maybeSingle(),
       supabase.from("activity_events").select("payload").eq("kind", "coin_rain").eq("user_id", userId),
       supabase.from("steal_attempts").select("thief_id,victim_id,coins,cost,success").or(`thief_id.eq.${userId},victim_id.eq.${userId}`),
       supabase.from("blog_reactions").select("id", { count: "exact", head: true }).eq("user_id", userId),
@@ -330,6 +364,10 @@ async function buildStats(userId: string): Promise<AchStats> {
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("activity_events").select("kind").eq("user_id", userId),
       supabase.from("profile_visits").select("ip_hash").eq("profile_id", userId).limit(1000),
+      // Lifetime maximum bet in ONE row: the recent-round window above cannot
+      // answer "never bet more than 10 coins", and an unfiltered round list is
+      // capped by PostgREST. Ordering server-side returns the true maximum.
+      supabase.from("game_rounds").select("bet").eq("user_id", userId).order("bet", { ascending: false }).limit(1).maybeSingle(),
     ]);
 
   const badges = ((badgesRes.data ?? []) as Array<Record<string, unknown>>).map((b) => b.badges as Record<string, unknown>).filter(Boolean);
@@ -355,6 +393,9 @@ async function buildStats(userId: string): Promise<AchStats> {
     bet: Number(r.bet ?? 0),
     payout: Number(r.payout ?? 0),
     hour: new Date(String(r.created_at)).getUTCHours(),
+    // Millisecond timestamp: s_hattrick needs real elapsed time, and `hour`
+    // alone cannot tell two wins 1 minute apart from two 59 minutes apart.
+    at: new Date(String(r.created_at)).getTime(),
     flags: ((r.result ?? {}) as Record<string, number | boolean>),
   }));
 
@@ -422,7 +463,10 @@ async function buildStats(userId: string): Promise<AchStats> {
     gamesByType,
     roundsToday,
     distinctHoursToday: hoursToday,
-    maxBet: Math.max(0, ...recentRounds.map((r) => r.bet)),
+    // Lifetime maximum, not the 60-round window: k_cautious ("never bet more
+    // than 10 coins") was satisfied by 60 small bets after a history of
+    // 5,000-coin bets, and k_high_roller was missed by an old big bet.
+    maxBet: Number(maxBetRes.data?.bet ?? 0),
     winStreak,
     lossStreak,
     wheelBest,
@@ -441,6 +485,9 @@ async function buildStats(userId: string): Promise<AchStats> {
     faqVisits: faqRes.count ?? 0,
     profilesVisited: visitPayloads.filter((v) => v.payload?.page === "profile").length,
     customizationKeys: Object.keys(customization).length,
+    showcaseSlots: Array.isArray(profileRes.data?.showcase_slots)
+      ? profileRes.data.showcase_slots.length
+      : 0,
     moodSet: Boolean(profileRes.data?.mood),
     activityCount: (achRes.data ?? []).length,
     dailyCount: (achRes.data ?? []).filter((k) => (k as { kind?: string }).kind === "daily").length,

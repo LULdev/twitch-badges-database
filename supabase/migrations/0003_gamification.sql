@@ -158,25 +158,39 @@ alter table public.blog_reactions enable row level security;
 alter table public.turbo_wins enable row level security;
 
 -- Public reads: the feed, leaderboards and profiles are open.
+-- `drop policy if exists` before each `create policy` makes this file
+-- re-runnable (db-6): every table above is created with `if not exists`, so a
+-- replay previously aborted at the first policy with
+-- `policy ... already exists` and left the grants below unapplied.
+drop policy if exists "progress_public_read" on public.user_progress;
 create policy "progress_public_read" on public.user_progress
   for select using (true);
+drop policy if exists "activity_public_read" on public.activity_events;
 create policy "activity_public_read" on public.activity_events
   for select using (true);
+drop policy if exists "user_achievements_public_read" on public.user_achievements;
 create policy "user_achievements_public_read" on public.user_achievements
   for select using (true);
+drop policy if exists "game_rounds_public_read" on public.game_rounds;
 create policy "game_rounds_public_read" on public.game_rounds
   for select using (true);
+drop policy if exists "steals_public_read" on public.steal_attempts;
 create policy "steals_public_read" on public.steal_attempts
   for select using (true);
+drop policy if exists "profile_visits_owner_read" on public.profile_visits;
 create policy "profile_visits_owner_read" on public.profile_visits
   for select using (profile_id = auth.uid());
+drop policy if exists "turbo_wins_public_read" on public.turbo_wins;
 create policy "turbo_wins_public_read" on public.turbo_wins
   for select using (true);
 
+drop policy if exists "blog_reactions_insert" on public.blog_reactions;
 create policy "blog_reactions_insert" on public.blog_reactions
   for insert with check (true);
+drop policy if exists "blog_reactions_delete_own" on public.blog_reactions;
 create policy "blog_reactions_delete_own" on public.blog_reactions
   for delete using (user_id = auth.uid());
+drop policy if exists "blog_views_insert" on public.blog_views;
 create policy "blog_views_insert" on public.blog_views
   for insert with check (true);
 
@@ -191,10 +205,16 @@ revoke insert, update, delete on public.blog_views from anon, authenticated;
 revoke delete on public.blog_reactions from anon;
 revoke insert, update, delete on public.turbo_wins from anon, authenticated;
 
--- Seed changelog entry for the feature drop.
-insert into public.changelog (kind, title, body, payload) values (
+-- Seed changelog entry for the feature drop. Guarded so a replay does not
+-- duplicate the launch entry (db-6).
+insert into public.changelog (kind, title, body, payload)
+select
   'feature',
   'Gamification launch: XP, coins, levels, games and achievements',
   'Level 1–100 XP system with sparkle level badges, coin economy, public live activity feed, daily Wheel of Fortune (Twitch Turbo jackpot at 1:100,000,000), 125 achievements, 13 badge-themed games, coin stealing, profile customization and profile visitors.',
   '{"version": "gamification-1.0"}'::jsonb
+where not exists (
+  select 1 from public.changelog
+  where kind = 'feature'
+    and payload = '{"version": "gamification-1.0"}'::jsonb
 );

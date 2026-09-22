@@ -133,10 +133,13 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
 
     if (existing) {
       const patch: Record<string, unknown> = {};
-      if (startDate && startDate !== existing.start_date)
-        patch.start_date = startDate;
-      if (endDate && endDate !== existing.end_date) patch.end_date = endDate;
-      if (releaseDate && releaseDate !== existing.release_date)
+      // Compare against the stored value directly, null included: when a
+      // detail page stops publishing a date (window extended, bogus end
+      // removed) the stale value must be cleared, or the row keeps expiring on
+      // a date upstream no longer publishes.
+      if (startDate !== existing.start_date) patch.start_date = startDate;
+      if (endDate !== existing.end_date) patch.end_date = endDate;
+      if (releaseDate !== existing.release_date)
         patch.release_date = releaseDate;
       if (isPaid !== null && isPaid !== existing.is_paid)
         patch.is_paid = isPaid;
@@ -155,8 +158,10 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
         ? "active"
         : resolveStatus(
             {
-              start_date: (startDate ?? existing.start_date) as string | null,
-              end_date: (endDate ?? existing.end_date) as string | null,
+              // The patch above owns these values now (null included), so the
+              // status must resolve from the same values the row will carry.
+              start_date: startDate,
+              end_date: endDate,
               is_confirmed_active: confirmedActive,
             },
             now,
@@ -281,6 +286,15 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
     },
     supabase,
   );
+
+  // A resolved summary is recorded as a healthy heartbeat, so a total detail
+  // outage — every card's fetch failed, no badge got a real claim window —
+  // would show green. Surface it as a failure instead.
+  if (capped.length > 0 && errors === capped.length) {
+    throw new Error(
+      `badgebase: all ${errors} detail fetches failed — treating the run as failed`,
+    );
+  }
 
   return {
     activeCards: activeCards.length,

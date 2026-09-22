@@ -25,7 +25,12 @@ export async function POST() {
 
   try {
     const result = await syncUserInventory(user.id, username);
-    return Response.json({ ok: true, result });
+    // pdat-5: `ok: true` used to be unconditional even when the potat
+    // enrichment had failed (potatEnriched: false) — a partial sync looked
+    // identical to a complete one. Surface the real outcome: a degraded sync is
+    // still HTTP 200 (the badge list did sync), but the body says so.
+    const degraded = !result.potatEnriched;
+    return Response.json({ ok: !degraded, degraded, result });
   } catch (error) {
     return Response.json(
       { ok: false, error: error instanceof Error ? error.message : "failed" },
