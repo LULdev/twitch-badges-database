@@ -190,6 +190,8 @@ TR = {
     ],
     "achTitle": ["Achievements", "Errungenschaften", "Logros", "Succès", "Conquistas", "Obiettivi", "Достижения", "成就", "実績", "업적", "الإنجازات"],
     "achSubtitle": [
+        "{total} goals across three tiers",
+        "{total} Ziele in drei Stufen",
         "{total} objetivos en tres niveles",
         "{total} objectifs en trois paliers",
         "{total} objetivos em três níveis",

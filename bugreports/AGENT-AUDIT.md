@@ -636,6 +636,33 @@ message files, any text column of the row) found the remainder in one pass. The
 same applies to the checks themselves: my round-17 regex was case-sensitive and
 missed six titles.
 
+## Round 20 — my script fix broke the script
+
+The round-19 agent confirmed the data-side sweep (`verify-round19.md`) and found
+**1 medium, 0 high, 0 low**:
+
+| ID | Finding | Fix |
+|---|---|---|
+| **v19-01 (medium)** | my round-18 rewrite of `scripts/i18n-stats-keys.py` used a **9-locale** list while that script declares **11** and guards every array against it — so the fix broke the script (`SystemExit: translation length mismatch`) and dropped the en/de values the commit claimed to have taken from the message files | restored to 11 wide in the script's own order with en/de filled in, and this time **validated structurally**: the file is parsed, its own width and mapping check is executed without running the writes, and every value is compared against the live message file |
+
+The same structural check was applied to the two other scripts I had edited in
+earlier rounds: one is 9-wide as it declares, the other's placeholders are
+complete — **both match live**. Round 18 had checked only their *content* and
+missed the *width*.
+
+**Confirmed by the agent:** the exhaustiveness claim held on the data side — all
+11 message files, all ten i18n writers, all 302 changelog rows including
+`payload`, every `blog_posts` text column, and all 46 tables/views including
+`profiles.customization` are clean; the four narration rows (292, 296, 300, 301)
+are genuine narration and none asserts 125 as current. The real catalog was
+verified independently by executing the module: **125 definitions, 123 active =
+50 common / 48 creative / 25 special**, and the live pages render exactly that.
+
+**Two limitations it named, both accepted:** my phrase "the whole source tree"
+overreached, because `AGENTS.md:30` still says 125 — that is the deliberate,
+reported exception (it is the project's instruction file). And the four
+narration rows mention 125 on purpose.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents
