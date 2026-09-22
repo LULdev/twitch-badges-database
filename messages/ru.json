@@ -229,7 +229,10 @@
     "twitchSince": "В Twitch с",
     "viewOnTwitch": "Открыть на Twitch",
     "views": "просм.",
-    "shareTitle": "{name} — коллекция значков"
+    "shareTitle": "{name} — коллекция значков",
+    "greeting": "Добро пожаловать в коллекцию значков {name}",
+    "socialTwitterLabel": "Профиль Twitter/X",
+    "socialDiscordLabel": "Профиль Discord"
   },
   "inventory": {
     "title": "Мои значки",

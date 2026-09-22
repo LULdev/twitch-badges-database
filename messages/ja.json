@@ -229,7 +229,10 @@
     "twitchSince": "Twitch歴",
     "viewOnTwitch": "Twitchで見る",
     "views": "閲覧",
-    "shareTitle": "{name} — バッジコレクション"
+    "shareTitle": "{name} — バッジコレクション",
+    "greeting": "{name} のバッジコレクションへようこそ",
+    "socialTwitterLabel": "Twitter/X プロフィール",
+    "socialDiscordLabel": "Discord プロフィール"
   },
   "inventory": {
     "title": "マイバッジ",

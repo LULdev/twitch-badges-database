@@ -22,6 +22,7 @@ import CoinRainButton from "@/components/CoinRainButton";
 import Coin from "@/components/Coin";
 import StealPanel from "@/components/StealPanel";
 import { readProgress } from "@/lib/gamification/xp";
+import { ProfileAutoRain, ProfileParticles, ProfileTilt } from "@/components/profile/ProfileEffects";
 import { levelFromXp } from "@/lib/gamification/levels";
 import { ACH_BY_ID } from "@/lib/gamification/achievements";
 import { recordProfileVisit } from "@/lib/gamification/visits";
@@ -168,40 +169,86 @@ export default async function ProfilePage({ params }: PageProps) {
   const avatar = profile?.avatar_url ?? liveAvatar;
   const handle = profile?.username ?? decodeURIComponent(username).toLowerCase();
 
-  // The customizer stores its settings in `profiles.customization`, and until now
-  // the public profile applied NONE of them — a member could hide their coins,
-  // their level or their visitors and nothing changed. The functional toggles and
-  // the two value-only cosmetics are honoured here; the rest are effect and
-  // animation settings that need their own CSS (listed in FIXES.md).
+  // The customizer stores ~35 settings in `profiles.customization`; until fp-3
+  // the public profile applied NONE of them. Every one is honoured now. The
+  // defaults mirror the customizer's own DEFAULTS, so a member who never opened
+  // it sees exactly the un-customized look.
   const customization = (profile?.customization ?? {}) as Record<string, unknown>;
   const flag = (key: string, fallback: boolean) =>
     typeof customization[key] === "boolean"
       ? (customization[key] as boolean)
       : fallback;
-  const text = (key: string, fallback: string) =>
+  const text = (key: string, fallback = "") =>
     typeof customization[key] === "string" && (customization[key] as string).trim()
       ? (customization[key] as string)
       : fallback;
-  const number = (key: string, fallback: number) =>
+  const num = (key: string, fallback: number) =>
     typeof customization[key] === "number" &&
     Number.isFinite(customization[key] as number)
       ? (customization[key] as number)
       : fallback;
+  const one = <T extends string>(key: string, allowed: readonly T[], fallback: T): T => {
+    const value = customization[key];
+    return typeof value === "string" && (allowed as readonly string[]).includes(value)
+      ? (value as T)
+      : fallback;
+  };
+  const hex = (value: string, fallback: string) =>
+    /^#[0-9a-fA-F]{6}$/.test(value) ? value : fallback;
 
+  const showStats = flag("showStats", true);
+  const showInventory = flag("showInventory", true);
   const showLevel = flag("showLevel", true);
   const showCoins = flag("showCoins", true);
-  const showStats = flag("showStats", true);
   const showVisitors = flag("showVisitors", true);
-  const showInventory = flag("showInventory", true);
   // Only a comma-separated list of hex colours is accepted, so the value cannot
   // smuggle arbitrary CSS into a style attribute.
-  const nameGradientRaw = text("nameGradient", "");
+  const nameGradientRaw = text("nameGradient");
   const nameGradient = /^#[0-9a-fA-F]{3,8}(,\s*#[0-9a-fA-F]{3,8})+$/.test(
     nameGradientRaw,
   )
     ? nameGradientRaw
     : "";
-  const bannerOverlay = Math.min(90, Math.max(0, number("bannerOverlay", 0)));
+  const bannerOverlay = Math.min(90, Math.max(0, num("bannerOverlay", 0)));
+  const customColor = hex(text("color"), "#a970ff");
+  const accent2 = hex(text("accent2"), "#60a5fa");
+  const font = one("font", ["sans", "serif", "mono", "rounded"] as const, "sans");
+  const cardStyle = one("cardStyle", ["glass", "solid", "outline"] as const, "glass");
+  const radius = one("radius", ["sharp", "soft", "round"] as const, "soft");
+  const avatarFrame = one("avatarFrame", ["none", "ring", "double", "glow", "crown"] as const, "none");
+  const showcaseLayout = one("showcaseLayout", ["grid", "row", "carousel"] as const, "grid");
+  const density = one("density", ["cozy", "compact"] as const, "cozy");
+  const profileTheme = one("profileTheme", ["auto", "violet", "emerald", "sapphire", "gold"] as const, "auto");
+  const effectsIntensity = one("effectsIntensity", ["off", "subtle", "full"] as const, "subtle");
+  const aura = flag("aura", false);
+  const particles = flag("particles", false);
+  const nameRainbow = flag("nameRainbow", false);
+  const bannerShine = flag("bannerShine", true);
+  const tilt3d = flag("tilt3d", false);
+  const pixelAvatar = flag("pixelAvatar", false);
+  const achievementTicker = flag("achievementTicker", true);
+  const greetingBanner = flag("greetingBanner", true);
+  const levelHalo = hex(text("levelHalo"), "#a970ff");
+  const cursorBadge = flag("cursorBadge", false);
+  const statusBubble = text("statusBubble").slice(0, 120);
+  const coinRainAuto = flag("coinRainAuto", false);
+  const visitorMarquee = flag("visitorMarquee", true);
+  const memberTitle = text("title").slice(0, 64);
+  const socialTwitter = text("socialTwitter").replace(/[^A-Za-z0-9_]/g, "").slice(0, 32);
+  const socialDiscord = text("socialDiscord").replace(/[^A-Za-z0-9._]/g, "").slice(0, 32);
+
+  // The theme only re-maps the accent inside the profile; "auto" keeps the
+  // member's own custom colour as the accent when they set one.
+  const themeClass =
+    profileTheme === "auto"
+      ? customColor !== "#a970ff"
+        ? ""
+        : ""
+      : `pf-theme-${profileTheme}`;
+  const rootAccentVars =
+    profileTheme === "auto"
+      ? { "--pf-accent": customColor, "--pf-accent-2": accent2 }
+      : undefined;
 
   // Member data: showcase + inventory.
   let showcaseBadges: BadgeRow[] = [];
@@ -271,11 +318,25 @@ export default async function ProfilePage({ params }: PageProps) {
   }
 
   return (
-    <div className="space-y-8">
+    <div
+      className={[
+        "space-y-8",
+        font !== "sans" ? `pf-font-${font}` : "",
+        cardStyle !== "glass" ? `pf-cards-${cardStyle}` : "",
+        radius !== "soft" ? `pf-radius-${radius}` : "",
+        density === "compact" ? "pf-density-compact" : "",
+        themeClass,
+        effectsIntensity !== "subtle" ? `pf-fx-${effectsIntensity}` : "pf-fx-subtle",
+        cursorBadge ? "pf-cursor-badge" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      style={rootAccentVars as React.CSSProperties | undefined}
+    >
       {/* Banner + identity */}
       <section className="card overflow-hidden">
         <div
-          className="h-28 bg-accent-soft sm:h-36"
+          className={`h-28 bg-accent-soft sm:h-36 ${bannerShine ? "pf-banner-shine" : ""}`}
           style={
             profile?.banner_url
               ? {
@@ -293,9 +354,21 @@ export default async function ProfilePage({ params }: PageProps) {
               style={{ opacity: bannerOverlay / 100 }}
             />
           ) : null}
+          {particles ? <ProfileParticles accent={customColor} /> : null}
+          {coinRainAuto ? <ProfileAutoRain accent={customColor} /> : null}
         </div>
+        <ProfileTilt enabled={tilt3d}>
         <div className="flex flex-col gap-4 px-6 pb-6 sm:flex-row sm:items-end">
-          <div className="-mt-10 shrink-0 rounded-full border-4 border-surface bg-surface">
+          <div
+            className={[
+              "-mt-10 shrink-0 rounded-full border-4 border-surface bg-surface",
+              avatarFrame !== "none" ? `pf-avatar-${avatarFrame}` : "",
+              aura ? "pf-aura" : "",
+              pixelAvatar ? "pf-avatar-pixel" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
             {avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={avatar} alt={handle} width={88} height={88} className="rounded-full" />
@@ -307,12 +380,16 @@ export default async function ProfilePage({ params }: PageProps) {
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-3">
-              {level && showLevel && <LevelBadge level={level.level} size={64} />}
+              {level && showLevel && (
+                <span style={{ "--level-halo": `${levelHalo}66` } as React.CSSProperties}>
+                  <LevelBadge level={level.level} size={64} />
+                </span>
+              )}
               <div className="min-w-0">
                 <h1
-                  className="truncate text-2xl font-extrabold tracking-tight"
+                  className={`truncate text-2xl font-extrabold tracking-tight ${nameRainbow ? "pf-name-rainbow" : ""}`}
                   style={
-                    nameGradient
+                    nameGradient && !nameRainbow
                       ? {
                           backgroundImage: `linear-gradient(90deg, ${nameGradient})`,
                           WebkitBackgroundClip: "text",
@@ -324,7 +401,43 @@ export default async function ProfilePage({ params }: PageProps) {
                 >
                   {displayName}
                 </h1>
-                <p className="text-sm text-muted">@{handle}</p>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <p className="text-sm text-muted">@{handle}</p>
+                  {memberTitle && (
+                    <p className="text-xs font-semibold" style={{ color: "var(--pf-accent, var(--accent))" }}>
+                      {memberTitle}
+                    </p>
+                  )}
+                  {socialTwitter && (
+                    <a
+                      href={`https://x.com/${socialTwitter}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-muted hover:text-foreground"
+                      aria-label={`${t("socialTwitterLabel")}: @${socialTwitter}`}
+                      title={`@${socialTwitter}`}
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden focusable="false">
+                        <path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L1.6 2H8l4.4 5.9L18.9 2zm-1.1 18h1.7L7.1 3.8H5.3L17.8 20z" />
+                      </svg>
+                    </a>
+                  )}
+                  {socialDiscord && (
+                    <a
+                      href={`https://discord.com/users/${socialDiscord}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-muted hover:text-foreground"
+                      aria-label={`${t("socialDiscordLabel")}: ${socialDiscord}`}
+                      title={socialDiscord}
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden focusable="false">
+                        <path d="M20.3 4.4A19.8 19.8 0 0 0 15.9 3l-.6 1.2a16 16 0 0 0-6.6 0L8.1 3a19.8 19.8 0 0 0-4.4 1.4C.9 9.1.3 13.7.6 18.2a20 20 0 0 0 6 3l1.2-2a12.9 12.9 0 0 1-2-1l.5-.4a14.2 14.2 0 0 0 11.4 0l.5.4a12.9 12.9 0 0 1-2 1l1.2 2a20 20 0 0 0 6-3c.4-5.2-.6-9.7-3.1-13.8zM8.7 15.5c-1.2 0-2.1-1-2.1-2.3s.9-2.3 2.1-2.3 2.2 1 2.2 2.3-1 2.3-2.2 2.3zm6.6 0c-1.2 0-2.1-1-2.1-2.3s.9-2.3 2.1-2.3 2.2 1 2.2 2.3-1 2.3-2.2 2.3z" />
+                      </svg>
+                    </a>
+                  )}
+                </div>
+                {statusBubble && <p className="pf-status-bubble">{statusBubble}</p>}
               </div>
             </div>
             {level && showLevel && (
@@ -393,7 +506,38 @@ export default async function ProfilePage({ params }: PageProps) {
             {profile && !isOwn && <CoinRainButton profileId={profile.id} />}
           </div>
         </div>
+        </ProfileTilt>
       </section>
+
+      {profile && greetingBanner && (
+        <div className="pf-greeting">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden focusable="false" style={{ color: "var(--pf-accent, var(--accent))" }}>
+            <path d="M12 3l1.9 5.6L19.5 10l-4.4 3.4L16.5 19 12 16l-4.5 3 1.4-5.6L4.5 10l5.6-1.4z" strokeLinejoin="round" />
+          </svg>
+          <span>{t("greeting", { name: displayName })}</span>
+        </div>
+      )}
+
+      {profile && achievementTicker && unlockedAchievements.length > 1 && (
+        <div className="pf-ticker" aria-label={t("achievements")}>
+          <div className="pf-ticker-track">
+            {[0, 1].map((pass) => (
+              <div key={pass} className="flex shrink-0 items-center gap-4" aria-hidden={pass === 1}>
+                {unlockedAchievements.slice(0, 10).map((entry) => {
+                  const achievement = ACH_BY_ID.get(entry.achievement_id);
+                  if (!achievement) return null;
+                  return (
+                    <span key={`${pass}-${entry.achievement_id}`} className="flex items-center gap-1.5 text-xs font-semibold text-muted">
+                      <AchievementBadge title={achievement.title} category={achievement.category} size={22} />
+                      <span className="whitespace-nowrap">{achievement.title}</span>
+                    </span>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Stats. The first three tiles describe the inventory: without it the
           counts are zero, which would publish a false "0 owned / N missing". */}
@@ -495,13 +639,14 @@ export default async function ProfilePage({ params }: PageProps) {
 
       {/* Latest visitors + view count */}
       {profile && showVisitors && (
-        <section className="card flex flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4">
+        <section className={`card flex flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4 ${visitorMarquee ? "pf-marquee" : ""}`}>
           <span className="text-xs text-muted">
             <span className="font-black text-foreground tabular-nums">{profile.view_count ?? 0}</span> {t("views")}
           </span>
           {latestVisitors.length > 0 && (
             <span className="flex items-center gap-1.5">
               <span className="text-xs text-muted">{t("latestVisitors")}:</span>
+              <span className={visitorMarquee ? "pf-marquee-track" : "flex items-center gap-1.5"}>
               {latestVisitors.slice(0, 8).map((visitor, index) =>
                 visitor.username ? (
                   <Link
@@ -521,6 +666,7 @@ export default async function ProfilePage({ params }: PageProps) {
                   </Link>
                 ) : null,
               )}
+              </span>
             </span>
           )}
         </section>
@@ -543,7 +689,15 @@ export default async function ProfilePage({ params }: PageProps) {
             <h2 id="showcase">{t("showcase")}</h2>
           </div>
           {showcaseBadges.length > 0 ? (
-            <div className="card grid grid-cols-3 gap-3 p-5 sm:grid-cols-6">
+            <div
+              className={[
+                "card grid grid-cols-3 gap-3 p-5 sm:grid-cols-6",
+                showcaseLayout === "row" ? "pf-showcase-row" : "",
+                showcaseLayout === "carousel" ? "pf-showcase-carousel" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
               {showcaseBadges.map((badge) => (
                 <Link
                   key={badge.id}

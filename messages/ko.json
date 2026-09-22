@@ -229,7 +229,10 @@
     "twitchSince": "Twitch 시작일",
     "viewOnTwitch": "Twitch에서 보기",
     "views": "조회",
-    "shareTitle": "{name} — 배지 컬렉션"
+    "shareTitle": "{name} — 배지 컬렉션",
+    "greeting": "{name}의 배지 컬렉션에 오신 것을 환영합니다",
+    "socialTwitterLabel": "Twitter/X 프로필",
+    "socialDiscordLabel": "Discord 프로필"
   },
   "inventory": {
     "title": "내 배지",

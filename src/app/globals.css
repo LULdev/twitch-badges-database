@@ -1755,3 +1755,200 @@ html {
     transform: none;
   }
 }
+
+/* ============================================================
+   Profile customization (fp-3). Every class here is applied by
+   the profile page from `profiles.customization`; the defaults
+   reproduce the un-customized look, so a member who never
+   opened the customizer sees exactly what they saw before.
+   ============================================================ */
+
+/* Themes re-map the accent inside the profile root only. */
+.pf-theme-violet  { --pf-accent: #a970ff; --pf-accent-2: #60a5fa; }
+.pf-theme-emerald { --pf-accent: #34d399; --pf-accent-2: #60a5fa; }
+.pf-theme-sapphire{ --pf-accent: #60a5fa; --pf-accent-2: #a970ff; }
+.pf-theme-gold    { --pf-accent: #fbbf24; --pf-accent-2: #f87171; }
+
+/* Typography */
+.pf-font-serif  { font-family: Georgia, "Times New Roman", serif; }
+.pf-font-mono   { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.pf-font-rounded{ font-family: ui-rounded, "Segoe UI", Nunito, system-ui, sans-serif; }
+
+/* Density */
+.pf-density-compact { --pf-gap: 0.75rem; }
+.pf-density-compact .card { padding: 0.75rem; }
+.pf-density-compact section { margin-top: 0; }
+
+/* Card style variants (the profile root scopes them to .card) */
+.pf-cards-solid   .card { background: var(--surface); backdrop-filter: none; }
+.pf-cards-outline .card { background: transparent; border: 1px solid var(--line-strong); box-shadow: none; }
+
+/* Radius */
+.pf-radius-sharp { --radius-input: 2px; --radius-card: 4px; --radius-panel: 6px; }
+.pf-radius-round { --radius-input: 999px; --radius-card: 22px; --radius-panel: 28px; }
+
+/* Avatar frames */
+.pf-avatar-ring   { box-shadow: 0 0 0 3px var(--pf-accent, var(--accent)); }
+.pf-avatar-double { box-shadow: 0 0 0 3px var(--pf-accent, var(--accent)), 0 0 0 7px var(--surface), 0 0 0 9px var(--pf-accent-2, var(--info)); }
+.pf-avatar-glow   { box-shadow: 0 0 18px 2px var(--pf-accent, var(--accent)); animation: pf-avatar-pulse 3s ease-in-out infinite; }
+.pf-avatar-crown  { position: relative; }
+.pf-avatar-crown::before {
+  content: "";
+  position: absolute;
+  inset: -1.35rem auto auto 50%;
+  translate: -50% 0;
+  width: 2.2rem;
+  height: 1.25rem;
+  background: linear-gradient(180deg, #fde68a, #f59e0b);
+  clip-path: polygon(0 100%, 0 35%, 22% 62%, 35% 8%, 50% 55%, 65% 8%, 78% 62%, 100% 35%, 100% 100%);
+  z-index: 2;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+}
+@keyframes pf-avatar-pulse { 50% { box-shadow: 0 0 30px 5px var(--pf-accent, var(--accent)); } }
+
+/* Pixel avatar */
+.pf-avatar-pixel img { image-rendering: pixelated; }
+
+/* Aura behind the avatar */
+.pf-aura { position: relative; }
+.pf-aura::after {
+  content: "";
+  position: absolute;
+  inset: -14px;
+  border-radius: inherit;
+  background: radial-gradient(circle, color-mix(in srgb, var(--pf-accent, var(--accent)) 45%, transparent) 0%, transparent 70%);
+  filter: blur(10px);
+  opacity: var(--pf-fx-strength, 0.55);
+  animation: pf-aura-breathe 4.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+@keyframes pf-aura-breathe { 50% { transform: scale(1.08); opacity: calc(var(--pf-fx-strength, 0.55) * 0.7); } }
+
+/* Rainbow name */
+.pf-name-rainbow {
+  background-image: linear-gradient(90deg, #f87171, #fbbf24, #34d399, #60a5fa, #a970ff, #f87171);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: pf-rainbow-shift 8s linear infinite;
+}
+@keyframes pf-rainbow-shift { to { background-position: 300% 0; } }
+
+/* Banner shine sweep */
+.pf-banner-shine { position: relative; overflow: hidden; }
+.pf-banner-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.22) 50%, transparent 60%);
+  transform: translateX(-100%);
+  animation: pf-shine-sweep 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes pf-shine-sweep { 0%, 55% { transform: translateX(-100%); } 85%, 100% { transform: translateX(100%); } }
+
+/* 3D tilt (the transform itself is set by the client wrapper) */
+.pf-tilt { transform-style: preserve-3d; transition: transform 0.15s ease-out; will-change: transform; }
+
+/* Particles */
+.pf-particles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.pf-particle {
+  position: absolute;
+  bottom: -12px;
+  border-radius: 999px;
+  background: var(--pf-accent, var(--accent));
+  opacity: var(--pf-fx-strength, 0.5);
+  animation: pf-particle-rise linear infinite;
+}
+@keyframes pf-particle-rise {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  12% { opacity: var(--pf-fx-strength, 0.5); }
+  100% { transform: translateY(-42vh) scale(0.4); opacity: 0; }
+}
+
+/* Greeting banner */
+.pf-greeting {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--pf-accent, var(--accent)) 35%, transparent);
+  background: color-mix(in srgb, var(--pf-accent, var(--accent)) 9%, transparent);
+  border-radius: var(--radius-input);
+  font-size: 0.8125rem;
+}
+
+/* Status bubble */
+.pf-status-bubble {
+  position: relative;
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  font-size: 0.75rem;
+  font-weight: 600;
+  animation: pf-bubble-bob 3.2s ease-in-out infinite;
+}
+.pf-status-bubble::after {
+  content: "";
+  position: absolute;
+  top: -0.4rem;
+  left: 1.1rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  rotate: 45deg;
+  background: var(--surface-2);
+  border-left: 1px solid var(--line-strong);
+  border-top: 1px solid var(--line-strong);
+}
+@keyframes pf-bubble-bob { 50% { transform: translateY(-3px); } }
+
+/* Achievement ticker + visitor marquee */
+.pf-ticker, .pf-marquee { overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+.pf-ticker-track, .pf-marquee-track {
+  display: flex;
+  gap: 1.25rem;
+  width: max-content;
+  animation: pf-scroll 30s linear infinite;
+}
+.pf-marquee:hover .pf-marquee-track, .pf-ticker:hover .pf-ticker-track { animation-play-state: paused; }
+@keyframes pf-scroll { to { transform: translateX(-50%); } }
+
+/* Cursor badge: a small badge-shaped cursor, scoped to the profile */
+.pf-cursor-badge, .pf-cursor-badge * { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M4 3l7 18 2.5-7L21 11z' fill='%23a970ff' stroke='%23fff' stroke-width='1.5'/%3E%3C/svg%3E") 4 2, auto; }
+
+/* Level halo (color comes from the setting via --pf-level-halo) */
+.pf-level-halo .level-badge { --level-halo: var(--pf-level-halo, rgba(169, 112, 255, 0.45)); }
+
+/* Showcase layouts */
+.pf-showcase-row { display: flex !important; gap: 0.75rem; overflow-x: auto; padding-bottom: 0.5rem; scroll-snap-type: x mandatory; }
+.pf-showcase-row > * { scroll-snap-align: start; flex: 0 0 auto; }
+.pf-showcase-carousel { display: flex !important; gap: 0.75rem; overflow: hidden; }
+.pf-showcase-carousel > * { flex: 0 0 auto; animation: pf-scroll 26s linear infinite; }
+.pf-showcase-carousel:hover > * { animation-play-state: paused; }
+
+/* Effects intensity: off kills every decoration, full strengthens it. */
+.pf-fx-off .pf-aura::after,
+.pf-fx-off .pf-banner-shine::after,
+.pf-fx-off .pf-particles,
+.pf-fx-off .pf-name-rainbow,
+.pf-fx-off .pf-status-bubble,
+.pf-fx-off .pf-ticker-track,
+.pf-fx-off .pf-marquee-track { animation: none !important; }
+.pf-fx-off .pf-particles { display: none; }
+.pf-fx-subtle { --pf-fx-strength: 0.3; }
+.pf-fx-full   { --pf-fx-strength: 0.85; }
+
+/* Auto coin rain (decorative only — no coins move) */
+.pf-auto-rain { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.pf-auto-rain .bcoin { position: absolute; top: -2rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-aura::after, .pf-banner-shine::after, .pf-particle, .pf-name-rainbow,
+  .pf-status-bubble, .pf-ticker-track, .pf-marquee-track,
+  .pf-showcase-carousel > *, .pf-avatar-glow { animation: none !important; }
+}

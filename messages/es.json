@@ -229,7 +229,10 @@
     "twitchSince": "En Twitch desde",
     "viewOnTwitch": "Ver en Twitch",
     "views": "visitas",
-    "shareTitle": "{name} — colección de insignias"
+    "shareTitle": "{name} — colección de insignias",
+    "greeting": "Bienvenido a la colección de insignias de {name}",
+    "socialTwitterLabel": "Perfil de Twitter/X",
+    "socialDiscordLabel": "Perfil de Discord"
   },
   "inventory": {
     "title": "Mis insignias",

@@ -229,7 +229,10 @@
     "twitchSince": "Na Twitch desde",
     "viewOnTwitch": "Ver na Twitch",
     "views": "visitas",
-    "shareTitle": "{name} — coleção de selos"
+    "shareTitle": "{name} — coleção de selos",
+    "greeting": "Bem-vindo à coleção de selos de {name}",
+    "socialTwitterLabel": "Perfil no Twitter/X",
+    "socialDiscordLabel": "Perfil no Discord"
   },
   "inventory": {
     "title": "Minhas insígnias",

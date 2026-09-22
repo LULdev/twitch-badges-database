@@ -229,7 +229,10 @@
     "twitchSince": "على Twitch منذ",
     "viewOnTwitch": "عرض على Twitch",
     "views": "مشاهدة",
-    "shareTitle": "{name} — مجموعة الشارات"
+    "shareTitle": "{name} — مجموعة الشارات",
+    "greeting": "مرحبًا بك في مجموعة شارات {name}",
+    "socialTwitterLabel": "ملف Twitter/X",
+    "socialDiscordLabel": "ملف Discord"
   },
   "inventory": {
     "title": "شاراتي",

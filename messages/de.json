@@ -229,7 +229,10 @@
     "twitchSince": "Auf Twitch seit",
     "viewOnTwitch": "Auf Twitch ansehen",
     "views": "Aufrufe",
-    "shareTitle": "{name} — Badge-Sammlung"
+    "shareTitle": "{name} — Badge-Sammlung",
+    "greeting": "Willkommen in {name}s Badge-Sammlung",
+    "socialTwitterLabel": "Twitter/X-Profil",
+    "socialDiscordLabel": "Discord-Profil"
   },
   "inventory": {
     "title": "Meine Badges",

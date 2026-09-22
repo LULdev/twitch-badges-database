@@ -229,7 +229,10 @@
     "twitchSince": "Twitch 注册于",
     "viewOnTwitch": "在 Twitch 上查看",
     "views": "浏览",
-    "shareTitle": "{name} — 徽章收藏"
+    "shareTitle": "{name} — 徽章收藏",
+    "greeting": "欢迎来到 {name} 的徽章收藏",
+    "socialTwitterLabel": "Twitter/X 主页",
+    "socialDiscordLabel": "Discord 主页"
   },
   "inventory": {
     "title": "我的徽章",
