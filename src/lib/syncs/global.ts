@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { fetchGlobalBadgeCatalog } from "@/lib/twitch/catalog";
 import {
   badgeSlug,
+  extractBadgeUuid,
   guessCategory,
   isStatusSetId,
   resolveStatus,
@@ -86,8 +87,18 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
 
   const now = new Date();
   const incomingKeys = new Set(incoming.map((v) => `${v.setId}:${v.version}`));
+  const incomingUuids = new Set<string>();
+  for (const v of incoming) {
+    const uuid = extractBadgeUuid(v.imageUrl1x) ?? extractBadgeUuid(v.imageUrl2x);
+    if (uuid) incomingUuids.add(uuid);
+  }
 
   const addedTitles: string[] = [];
+  // The slugs inserted by THIS run. Re-selecting by set_id matched the whole
+  // live catalog, so the "newest N+10" rows were handed to the badge_events
+  // and blog fan-out below — duplicating history entries and posting about
+  // up to ten pre-existing badges that simply had no drop post yet.
+  const newSlugs: string[] = [];
   let updated = 0;
   let statusChanged = 0;
 
@@ -120,6 +131,7 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
         first_seen_at: now.toISOString(),
         last_seen_at: now.toISOString(),
       });
+      newSlugs.push(slug);
       addedTitles.push(v.title?.trim() || v.setId);
       continue;
     }
@@ -163,9 +175,16 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
   // Badges missing from the live catalog are marked removed.
   const removed: Array<{ id: string; title: string }> = [];
   for (const [key, ex] of existing) {
-    if (!incomingKeys.has(key) && ex.status !== "removed") {
-      removed.push({ id: ex.id, title: ex.title });
-    }
+    if (incomingKeys.has(key) || ex.status === "removed") continue;
+    // A badgebase-inserted row carries a badgebase slug as its set_id, so its
+    // key never appears in incomingKeys. Twitch still publishes the same
+    // artwork — match on the image UUID (the cross-source identity) before
+    // concluding the badge is gone.
+    const uuid =
+      extractBadgeUuid(ex.image_url_1x as string | null) ??
+      extractBadgeUuid(ex.image_url_2x as string | null);
+    if (uuid && incomingUuids.has(uuid)) continue;
+    removed.push({ id: ex.id, title: ex.title });
   }
 
   for (const batch of chunk(upserts, 200)) {
@@ -196,14 +215,19 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
   // seed, not as a drop wave (no per-badge blog posts, no push blast).
   const isInitialSeed = existing.size === 0 && addedTitles.length > 0;
   if (addedTitles.length > 0) {
-    const { data: fresh } = await supabase
-      .from("badges")
-      .select(
-        "id,slug,title,set_id,image_url_2x,category,is_paid,how_to_earn,start_date,end_date,rarity_tier,rarity_score",
-      )
-      .in("set_id", incoming.map((v) => v.setId))
-      .order("first_seen_at", { ascending: false })
-      .limit(addedTitles.length + 10);
+    // Look the inserted rows up by their deterministic slug
+    // (badgeSlug(setId, version)) — the same value written into the row above.
+    const freshBatches: Array<Record<string, unknown>> = [];
+    for (const batch of chunk(newSlugs, 200)) {
+      const { data } = await supabase
+        .from("badges")
+        .select(
+          "id,slug,title,set_id,image_url_2x,category,is_paid,how_to_earn,start_date,end_date,rarity_tier,rarity_score",
+        )
+        .in("slug", batch);
+      freshBatches.push(...((data ?? []) as Array<Record<string, unknown>>));
+    }
+    const fresh = freshBatches;
 
     const freshRows = (fresh ?? []) as Array<{
       id: string;

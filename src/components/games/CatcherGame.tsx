@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, RoundOutcome } from "./useGame";
 
 interface Falling {
   id: number;
@@ -14,7 +14,7 @@ interface Falling {
 
 /** Drops Catcher — catch falling badges, dodge the bombs. */
 export default function CatcherGame() {
-  const { bet, setBet, busy, error, play, t } = useGame("catcher");
+  const { bet, setBet, busy, error, last, balance, play, t } = useGame("catcher");
   const [running, setRunning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
   const [items, setItems] = useState<Falling[]>([]);
@@ -121,8 +121,9 @@ export default function CatcherGame() {
 
   return (
     <div className="space-y-4">
-      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={null} />
+      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={balance} />
       <GameError error={error} />
+      <RoundOutcome last={last} />
       <div
         ref={areaRef}
         onMouseMove={move}

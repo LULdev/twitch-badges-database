@@ -5,8 +5,14 @@ export const dynamic = "force-dynamic";
 /** Public live feed: latest activities across all users. */
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const cursor = Number(url.searchParams.get("cursor") ?? "0") || 0;
-  const limit = Math.min(50, Math.max(5, Number(url.searchParams.get("limit") ?? "30")));
+  // `?limit=abc` used to produce NaN and fail the query with a 500; both
+  // parameters fall back to their defaults unless they are real numbers.
+  const cursorRaw = Number(url.searchParams.get("cursor"));
+  const cursor = Number.isFinite(cursorRaw) && cursorRaw > 0 ? cursorRaw : 0;
+  const limitRaw = Number(url.searchParams.get("limit"));
+  const limit = Number.isFinite(limitRaw)
+    ? Math.min(50, Math.max(5, Math.floor(limitRaw)))
+    : 30;
   const supabase = createAdminClient();
 
   let query = supabase

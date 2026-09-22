@@ -362,13 +362,25 @@ export async function getProfileByUsername(
     .replace(/%/g, "\\%")
     .replace(/_/g, "\\_");
   const supabase = await createClient();
+  // Explicit column list: the public role is granted SELECT per column, and
+  // `twitch_id` is deliberately not among them. `select("*")` would be refused.
   const { data } = await supabase
     .from("profiles")
-    .select("*")
+    .select(PROFILE_PUBLIC_COLUMNS)
     .ilike("username", pattern)
     .maybeSingle();
   return (data as ProfileRow | null) ?? null;
 }
+
+/**
+ * The columns the public API role may read from `profiles` (migration 0009/0010
+ * grant SELECT per column). `twitch_id` is intentionally absent.
+ */
+export const PROFILE_PUBLIC_COLUMNS =
+  "id, username, display_name, avatar_url, bio, color, banner_url, theme, " +
+  "showcase_slots, inventory_public, created_at, updated_at, customization, " +
+  "view_count, steal_enabled, steal_price, steal_max, mood, potat_level, " +
+  "potatoes, potat_first_seen, potat_connections, twitch_created_at";
 
 export interface InventoryItem {
   acquired_at: string;

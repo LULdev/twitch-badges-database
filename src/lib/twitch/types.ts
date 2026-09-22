@@ -92,6 +92,21 @@ export function badgeSlug(setId: string, version: string | number): string {
   return `${clean || "badge"}-v${String(version).replace(/[^a-z0-9]+/gi, "-") || "1"}`;
 }
 
+const BADGE_UUID = /badges\/v1\/([0-9a-f-]{36})/i;
+
+/**
+ * Extract the badge image UUID from a static-cdn.jtvnw.net badge URL.
+ *
+ * It is the only identity shared by the Twitch catalog and badgebase-inserted
+ * rows, whose `set_id` is a badgebase slug rather than Twitch's set id — which
+ * is why a key-based existence check wrongly concludes "removed".
+ */
+export function extractBadgeUuid(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const match = BADGE_UUID.exec(url);
+  return match ? match[1] : null;
+}
+
 export function badgeStatus(
   badge: { start_date: string | null; end_date: string | null },
   now: Date = new Date(),

@@ -37,10 +37,18 @@ async function potatFetch(path: string, revalidate = 0): Promise<Response> {
     const retryAfter = Number(res.headers.get("retry-after") ?? "60");
     if (Number.isFinite(retryAfter) && retryAfter > 0 && retryAfter <= 65) {
       await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000));
-      return fetch(url, {
+      // The retry can be rate limited again (or fail otherwise) — its status
+      // must be checked, or the caller parses an error body as data.
+      const retried = await fetch(url, {
         headers: { accept: "application/json" },
         next: { revalidate: 0 },
       });
+      if (!retried.ok) {
+        throw new Error(
+          `potat.app ${path} still failing after retry: ${retried.status} ${retried.statusText}`,
+        );
+      }
+      return retried;
     }
     throw new Error(`potat.app rate limited (Retry-After ${retryAfter}s)`);
   }

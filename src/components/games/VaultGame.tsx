@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, RoundOutcome } from "./useGame";
 
 /** Crack the Vault: stop three rotating needles inside the green zone. */
 export default function VaultGame() {
-  const { bet, setBet, busy, error, play, t } = useGame("vault");
+  const { bet, setBet, busy, error, last, balance, play, t } = useGame("vault");
   const [phase, setPhase] = useState<"idle" | "dial1" | "dial2" | "dial3" | "done">("idle");
   const [angles, setAngles] = useState([0, 0, 0]);
   const [matches, setMatches] = useState(0);
@@ -54,8 +54,9 @@ export default function VaultGame() {
 
   return (
     <div className="space-y-4">
-      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={null} />
+      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={balance} />
       <GameError error={error} />
+      <RoundOutcome last={last} />
       <div className="card space-y-4 p-6">
         <div className="flex justify-center gap-6">
           {angles.map((angle, index) => (

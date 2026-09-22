@@ -161,7 +161,13 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
             },
             now,
           );
-      if (status !== existing.status && existing.status !== "removed") {
+      if (existing.status === "removed") {
+        // The /active listing is the authoritative activity source: a card
+        // still listed here was never really gone — the global key-based sweep
+        // removed it because its set_id is a badgebase slug, not Twitch's.
+        patch.status = status;
+        patch.removed_at = null;
+      } else if (status !== existing.status) {
         patch.status = status;
       }
       if (Object.keys(patch).length > 0) {
@@ -211,12 +217,24 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
   // live window is demoted to 'expired' (permanent badges included).
   const sweepRows: Array<Record<string, unknown>> = [];
   for (const row of allBadges) {
-    if (row.status === "removed") continue;
     const keyUuid = extractUuid(row.image_url_1x as string | null) ??
       extractUuid(row.image_url_2x as string | null);
     const onActiveList =
       activeKeys.has(row.set_id as string) ||
       (keyUuid ? activeKeys.has(keyUuid) : false);
+
+    if (row.status === "removed") {
+      // Only resurrect what the /active listing vouches for; a genuinely gone
+      // badge stays removed. This also recovers rows outside the detail cap.
+      if (!onActiveList) continue;
+      sweepRows.push({
+        ...row,
+        is_confirmed_active: true,
+        status: "active",
+        removed_at: null,
+      });
+      continue;
+    }
     if (onActiveList) continue;
 
     const confirmed = false;

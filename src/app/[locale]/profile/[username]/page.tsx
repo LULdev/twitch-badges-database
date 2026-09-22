@@ -84,18 +84,26 @@ export default async function ProfilePage({ params }: PageProps) {
   let latestVisitors: Array<{ username: string | null; avatar_url: string | null }> = [];
   if (profile) {
     const [ipHash] = await Promise.all([visitorIpHash()]);
-    await recordProfileVisit(profile.id, viewer?.id ?? null, ipHash).catch(() => false);
-    const admin = createAdminClient();
-    const { data: visitorRows } = await admin
-      .from("profile_visits")
-      .select("visitor:profiles(username, avatar_url)")
-      .eq("profile_id", profile.id)
-      .not("visitor_id", "is", null)
-      .order("created_at", { ascending: false })
-      .limit(12);
-    latestVisitors = (visitorRows ?? []).map(
-      (row) => (Array.isArray(row?.visitor) ? row.visitor[0] : row?.visitor),
-    ) as typeof latestVisitors;
+    // Your own view of someone else's profile must not be counted, and the
+    // visitor list is only shown to the profile owner: `profile_visits` is
+    // owner-only under RLS, and reading it through the admin client for every
+    // visitor published who had looked at whom.
+    if (!isOwn) {
+      await recordProfileVisit(profile.id, viewer?.id ?? null, ipHash).catch(() => false);
+    }
+    if (isOwn) {
+      const admin = createAdminClient();
+      const { data: visitorRows } = await admin
+        .from("profile_visits")
+        .select("visitor:profiles(username, avatar_url)")
+        .eq("profile_id", profile.id)
+        .not("visitor_id", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(12);
+      latestVisitors = (visitorRows ?? []).map(
+        (row) => (Array.isArray(row?.visitor) ? row.visitor[0] : row?.visitor),
+      ) as typeof latestVisitors;
+    }
   }
 
   // Resolved live for non-member profiles (ephemeral view + claim CTA).

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, RoundOutcome } from "./useGame";
 
 interface Card {
   key: number;
@@ -13,7 +13,7 @@ interface Card {
 
 /** Badge Memory — find all 6 pairs; speed and precision pay out. */
 export default function MemoryGame() {
-  const { bet, setBet, busy, error, play, t } = useGame("memory");
+  const { bet, setBet, busy, error, last, balance, play, t } = useGame("memory");
   const [cards, setCards] = useState<Card[]>([]);
   const [busyCards, setBusyCards] = useState(false);
   const [misses, setMisses] = useState(0);
@@ -85,8 +85,9 @@ export default function MemoryGame() {
 
   return (
     <div className="space-y-4">
-      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={null} />
+      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={balance} />
       <GameError error={error} />
+      <RoundOutcome last={last} />
       <div className="card space-y-4 p-6">
         <div className="mx-auto grid max-w-md grid-cols-4 gap-2">
           {cards.map((card, index) => (

@@ -47,6 +47,14 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
       const fresh = (data.events ?? []).filter((event) => !seenIds.current.has(event.id));
       if (fresh.length > 0) {
         for (const event of fresh) seenIds.current.add(event.id);
+        // The set exists only to de-duplicate incoming events; without a cap it
+        // grows for as long as the page stays open.
+        if (seenIds.current.size > 500) {
+          const recent = new Set(
+            (data.events ?? []).map((event) => event.id),
+          );
+          seenIds.current = recent;
+        }
         setEvents((prev) => [...fresh, ...prev].slice(0, 60));
       }
     } catch {
@@ -62,6 +70,10 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
   useEffect(() => {
     if (paused) return;
     const interval = setInterval(() => {
+      // A background tab kept polling every 5s, burning requests and battery
+      // for a feed nobody was looking at; it now resumes on the next tick
+      // after the tab becomes visible again.
+      if (document.hidden) return;
       setNowTick(Date.now());
       void poll();
     }, 5000);

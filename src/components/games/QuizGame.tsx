@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, RoundOutcome } from "./useGame";
 
 export interface QuizBadge {
   slug: string;
@@ -11,7 +11,7 @@ export interface QuizBadge {
 
 /** Badge Quiz — name the badge from its image; 10 questions per round. */
 export default function QuizGame({ badges }: { badges: QuizBadge[] }) {
-  const { bet, setBet, busy, error, play, t } = useGame("quiz");
+  const { bet, setBet, busy, error, last, balance, play, t } = useGame("quiz");
   const [index, setIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [choice, setChoice] = useState<string | null>(null);
@@ -58,8 +58,9 @@ export default function QuizGame({ badges }: { badges: QuizBadge[] }) {
 
   return (
     <div className="space-y-4">
-      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={null} />
+      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={balance} />
       <GameError error={error} />
+      <RoundOutcome last={last} />
       <div className="card space-y-4 p-6">
         {round ? (
           <>

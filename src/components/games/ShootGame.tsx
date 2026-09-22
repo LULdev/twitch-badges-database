@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, RoundOutcome } from "./useGame";
 
 interface Target {
   id: number;
@@ -14,7 +14,7 @@ interface Target {
 
 /** Shoot the Badges — Moorhuhn-style 30-second badge hunt. */
 export default function ShootGame() {
-  const { bet, setBet, busy, error, play, t } = useGame("shoot");
+  const { bet, setBet, busy, error, last, balance, play, t } = useGame("shoot");
   const [running, setRunning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
   const [hits, setHits] = useState(0);
@@ -122,8 +122,9 @@ export default function ShootGame() {
 
   return (
     <div className="space-y-4">
-      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={null} />
+      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={balance} />
       <GameError error={error} />
+      <RoundOutcome last={last} />
       <div
         ref={areaRef}
         onClick={shoot}
