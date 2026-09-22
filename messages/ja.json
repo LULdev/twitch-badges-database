@@ -616,7 +616,7 @@
   },
   "achievements": {
     "title": "実績",
-    "subtitle": "追いかける実績は125種 — コモン50、クリエイティブ50、まさかのスペシャル25。",
+    "subtitle": "追いかける実績は{total}種 — コモン{common}、クリエイティブ{creative}、まさかのスペシャル{special}。",
     "unlocked": "解除済み",
     "points": "ポイント",
     "common": "コモン",

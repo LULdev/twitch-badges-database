@@ -616,7 +616,7 @@
   },
   "achievements": {
     "title": "업적",
-    "subtitle": "사냥할 업적 125개 — 일반 50, 창의 50, 진짜 예상 밖의 특별 25.",
+    "subtitle": "사냥할 업적 {total}개 — 일반 {common}, 창의 {creative}, 진짜 예상 밖의 특별 {special}.",
     "unlocked": "해금됨",
     "points": "포인트",
     "common": "일반",

@@ -20,7 +20,12 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "achievements" });
   return {
     title: t("title"),
-    description: t("subtitle"),
+    description: t("subtitle", {
+      total: ACTIVE_ACHIEVEMENTS.length,
+      common: ACTIVE_ACHIEVEMENTS.filter((a) => a.category === "common").length,
+      creative: ACTIVE_ACHIEVEMENTS.filter((a) => a.category === "creative").length,
+      special: ACTIVE_ACHIEVEMENTS.filter((a) => a.category === "special").length,
+    }),
     alternates: {
       canonical: `/${locale}/achievements`,
       languages: localeAlternates("/achievements"),
@@ -62,7 +67,14 @@ export default async function AchievementsPage({
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">{t("title")}</h1>
-          <p className="mt-1 text-sm text-muted">{t("subtitle")}</p>
+          <p className="mt-1 text-sm text-muted">
+            {t("subtitle", {
+              total: ACTIVE_ACHIEVEMENTS.length,
+              common: ACTIVE_ACHIEVEMENTS.filter((a) => a.category === "common").length,
+              creative: ACTIVE_ACHIEVEMENTS.filter((a) => a.category === "creative").length,
+              special: ACTIVE_ACHIEVEMENTS.filter((a) => a.category === "special").length,
+            })}
+          </p>
         </div>
         {userId ? (
           <div className="flex gap-3">

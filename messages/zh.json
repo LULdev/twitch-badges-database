@@ -616,7 +616,7 @@
   },
   "achievements": {
     "title": "成就",
-    "subtitle": "125 个待解锁的成就——50 个普通、50 个创意、25 个真正意想不到的。",
+    "subtitle": "{total} 个待解锁的成就——{common} 个普通、{creative} 个创意、{special} 个真正意想不到的。",
     "unlocked": "已解锁",
     "points": "积分",
     "common": "普通",

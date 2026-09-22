@@ -616,7 +616,7 @@
   },
   "achievements": {
     "title": "Obiettivi",
-    "subtitle": "125 obiettivi da cacciare — 50 comuni, 50 creativi, 25 davvero inaspettati.",
+    "subtitle": "{total} obiettivi da cacciare — {common} comuni, {creative} creativi, {special} davvero inaspettati.",
     "unlocked": "Sbloccato",
     "points": "Punti",
     "common": "Comuni",

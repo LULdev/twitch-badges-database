@@ -616,7 +616,7 @@
   },
   "achievements": {
     "title": "Errungenschaften",
-    "subtitle": "125 Errungenschaften zum Jagen — 50 gewöhnliche, 50 kreative, 25 völlig unerwartete.",
+    "subtitle": "{total} Errungenschaften zum Jagen — {common} gewöhnliche, {creative} kreative, {special} völlig unerwartete.",
     "unlocked": "Freigeschaltet",
     "points": "Punkte",
     "common": "Gewöhnlich",

@@ -616,7 +616,7 @@
   },
   "achievements": {
     "title": "Succès",
-    "subtitle": "125 succès à chasser — 50 communs, 50 créatifs, 25 vraiment inattendus.",
+    "subtitle": "{total} succès à chasser — {common} communs, {creative} créatifs, {special} vraiment inattendus.",
     "unlocked": "Débloqué",
     "points": "Points",
     "common": "Communs",

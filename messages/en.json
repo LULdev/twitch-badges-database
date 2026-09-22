@@ -616,7 +616,7 @@
   },
   "achievements": {
     "title": "Achievements",
-    "subtitle": "125 achievements to hunt — 50 common, 50 creative, 25 truly unexpected.",
+    "subtitle": "{total} achievements to hunt — {common} common, {creative} creative, {special} truly unexpected.",
     "unlocked": "Unlocked",
     "points": "Points",
     "common": "Common",

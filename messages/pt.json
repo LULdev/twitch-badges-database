@@ -616,7 +616,7 @@
   },
   "achievements": {
     "title": "Conquistas",
-    "subtitle": "125 conquistas para caçar — 50 comuns, 50 criativas, 25 realmente inesperadas.",
+    "subtitle": "{total} conquistas para caçar — {common} comuns, {creative} criativas, {special} realmente inesperadas.",
     "unlocked": "Desbloqueada",
     "points": "Pontos",
     "common": "Comuns",

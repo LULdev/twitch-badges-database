@@ -616,7 +616,7 @@
   },
   "achievements": {
     "title": "Logros",
-    "subtitle": "125 logros que cazar — 50 comunes, 50 creativos, 25 realmente inesperados.",
+    "subtitle": "{total} logros que cazar — {common} comunes, {creative} creativos, {special} realmente inesperados.",
     "unlocked": "Desbloqueado",
     "points": "Puntos",
     "common": "Comunes",
