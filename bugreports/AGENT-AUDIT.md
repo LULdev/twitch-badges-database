@@ -157,3 +157,30 @@ uncacheable ranking fetch (`Failed to set Next.js data cache … items over 2MB`
 
 The "no bugs remain" bar is therefore still **not** met — this round removed the
 five High findings, the count of open findings is lower but not zero.
+
+---
+
+## Round 3 — games cluster, catalog sort, fetch hardening
+
+| ID | Fix | Verification |
+|---|---|---|
+| cat-3 | the "ending soon" sort FILTERED rows (`.not("end_date","is",null)`), and /active defaults to it — live badges without an end date vanished from the page. Sorts now only order, rows without a date sort last | `/de/active` lists **23** badges instead of 22 |
+| games-b-1 | the vault marker sat at 0° while the judged zone was 30/130/230°, making dials 2–3 unaimable | marker rotates onto its real zone |
+| games-b-2 | a second stop-click advanced two dials and could pay two rounds | ref guard |
+| games-b-3/4/5 | memory, quiz, shoot and catcher kept their start control live during a round | busy gates |
+| games-b-8/9/10/12 | tower blind cast + hidden balance, shoot summary claimed accuracy instead of the verdict, quiz timer outlived unmount, tautological ternary | typed guards, server verdict, cleanup |
+| sync-4 | none of the 11 third-party fetches had a timeout; a hanging provider stalled the sync into the 60 s limit | 15 s AbortSignal everywhere; real badgebase sync exit 0, errors 0 |
+| ranking | the ~13 MB ranking response exceeded Next's 2 MB cache limit, so it was re-downloaded on every leaderboard render | fetched without the data cache, slimmed to 200 rows, 6 h per instance |
+
+A second **fix-proposal agent** (`bugreports/fixproposal-games.md`) prepared the
+games patch set; I reviewed and applied it.
+
+### Still open
+
+`games-b-6` (impure state updaters in catcher/shoot — the proposal is on file and
+apply-ready), `cat-1`/`cat-2`/`cat-4`…`cat-9` (explorer swallowing DB errors,
+unclamped `?page=`, wrong 404 on transient errors, and six low findings), and the
+medium/low findings listed above. Six audit scopes have still not run as agents
+(stats, i18n, SEO, cron/health, UI shell, remaining pages); fourteen have.
+
+The "no bugs remain" bar is still **not** met.
