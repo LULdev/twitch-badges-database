@@ -416,7 +416,15 @@
     "xpSources": "مصادر XP",
     "xpSourcesSub": "حصة XP حسب نوع النشاط",
     "xpTrend": "XP و BadgesCoins يوميًا",
-    "xpTrendSub": "آخر 30 يومًا، جميع الجامعين"
+    "xpTrendSub": "آخر 30 يومًا، جميع الجامعين",
+    "sourceCronGlobal": "مزامنة الفهرس",
+    "sourceCronEnrichment": "إثراء نوافذ الاستلام",
+    "sourceCronOwners": "إحصاءات المالكين",
+    "sourceSyncCatalog": "فروق الفهرس",
+    "sourceSyncEnrichment": "إثراء نوافذ الاستلام",
+    "sourceSyncOwners": "إحصاءات المالكين",
+    "sourceWeb": "طلبات الويب",
+    "sourceOther": "مصدر آخر"
   },
   "notifications": {
     "title": "الإشعارات",

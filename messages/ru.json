@@ -416,7 +416,15 @@
     "xpSources": "Источники XP",
     "xpSourcesSub": "Доля XP по типам активности",
     "xpTrend": "XP и BadgesCoins за день",
-    "xpTrendSub": "Последние 30 дней, все коллекционеры"
+    "xpTrendSub": "Последние 30 дней, все коллекционеры",
+    "sourceCronGlobal": "Синхронизация каталога",
+    "sourceCronEnrichment": "Обогащение окон",
+    "sourceCronOwners": "Статистика владельцев",
+    "sourceSyncCatalog": "Диф каталога",
+    "sourceSyncEnrichment": "Обогащение окон",
+    "sourceSyncOwners": "Статистика владельцев",
+    "sourceWeb": "Веб-запросы",
+    "sourceOther": "Другой источник"
   },
   "notifications": {
     "title": "Уведомления",

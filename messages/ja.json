@@ -416,7 +416,15 @@
     "xpSources": "XPの獲得源",
     "xpSourcesSub": "アクティビティ別XP割合",
     "xpTrend": "1日あたりのXPとBadgesCoins",
-    "xpTrendSub": "過去30日・全コレクター合計"
+    "xpTrendSub": "過去30日・全コレクター合計",
+    "sourceCronGlobal": "カタログ同期",
+    "sourceCronEnrichment": "受取期間の補完",
+    "sourceCronOwners": "所有者統計",
+    "sourceSyncCatalog": "カタログ差分",
+    "sourceSyncEnrichment": "受取期間の補完",
+    "sourceSyncOwners": "所有者統計",
+    "sourceWeb": "Web リクエスト",
+    "sourceOther": "その他のソース"
   },
   "notifications": {
     "title": "通知",

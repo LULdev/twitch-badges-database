@@ -319,6 +319,22 @@ export default async function StatsPage({
     },
   ];
 
+  // Internal heartbeat ids key the uptime aggregation and must stay as they are,
+  // but the table used to print them verbatim — publishing provider names on a
+  // public page. Display goes through neutral, localized labels instead, and an
+  // id with no label falls back to a generic one rather than to the raw internal
+  // name, so adding a source cannot leak a provider name by accident.
+  const SOURCE_LABELS: Record<string, string> = {
+    "cron/global": t("sourceCronGlobal"),
+    "cron/badgebase": t("sourceCronEnrichment"),
+    "cron/potat": t("sourceCronOwners"),
+    "sync/global": t("sourceSyncCatalog"),
+    "sync/badgebase": t("sourceSyncEnrichment"),
+    "sync/potat": t("sourceSyncOwners"),
+    web: t("sourceWeb"),
+  };
+  const sourceLabel = (id: string) => SOURCE_LABELS[id] ?? t("sourceOther");
+
   const uptimeSources = uptime.sources.map((source) => ({
     ...source,
     rate24h: source.checks_24h > 0 ? (source.ok_24h / source.checks_24h) * 100 : null,
@@ -1009,8 +1025,8 @@ export default async function StatsPage({
                 ) : (
                   uptimeSources.map((source) => (
                     <tr key={source.source}>
-                      <td className="font-mono text-[11px] font-semibold">
-                        {source.source}
+                      <td className="text-[11px] font-semibold">
+                        {sourceLabel(source.source)}
                       </td>
                       <td className="text-muted">{relativeTime(source.last_at, locale)}</td>
                       <td>

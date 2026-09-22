@@ -416,7 +416,15 @@
     "xpSources": "XP 획득 경로",
     "xpSourcesSub": "활동 유형별 XP 비중",
     "xpTrend": "일별 XP와 BadgesCoins",
-    "xpTrendSub": "지난 30일, 모든 수집가 합계"
+    "xpTrendSub": "지난 30일, 모든 수집가 합계",
+    "sourceCronGlobal": "카탈로그 동기화",
+    "sourceCronEnrichment": "수령 기간 보강",
+    "sourceCronOwners": "보유자 통계",
+    "sourceSyncCatalog": "카탈로그 차이",
+    "sourceSyncEnrichment": "수령 기간 보강",
+    "sourceSyncOwners": "보유자 통계",
+    "sourceWeb": "웹 요청",
+    "sourceOther": "기타 소스"
   },
   "notifications": {
     "title": "알림",

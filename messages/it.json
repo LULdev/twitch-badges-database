@@ -416,7 +416,15 @@
     "xpSources": "Fonti di XP",
     "xpSourcesSub": "Quota di XP per attività",
     "xpTrend": "XP e BadgesCoins al giorno",
-    "xpTrendSub": "Ultimi 30 giorni, tutti i collezionisti"
+    "xpTrendSub": "Ultimi 30 giorni, tutti i collezionisti",
+    "sourceCronGlobal": "Sincronizzazione catalogo",
+    "sourceCronEnrichment": "Arricchimento finestre",
+    "sourceCronOwners": "Statistiche proprietari",
+    "sourceSyncCatalog": "Diff catalogo",
+    "sourceSyncEnrichment": "Arricchimento finestre",
+    "sourceSyncOwners": "Statistiche proprietari",
+    "sourceWeb": "Richieste web",
+    "sourceOther": "Altra fonte"
   },
   "notifications": {
     "title": "Notifiche",

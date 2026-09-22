@@ -416,7 +416,15 @@
     "xpSources": "XP 来源",
     "xpSourcesSub": "各活动类型的 XP 占比",
     "xpTrend": "每日 XP 与 BadgesCoins",
-    "xpTrendSub": "最近 30 天，全部收藏者"
+    "xpTrendSub": "最近 30 天，全部收藏者",
+    "sourceCronGlobal": "目录同步",
+    "sourceCronEnrichment": "领取窗口补全",
+    "sourceCronOwners": "拥有者统计",
+    "sourceSyncCatalog": "目录差异",
+    "sourceSyncEnrichment": "领取窗口补全",
+    "sourceSyncOwners": "拥有者统计",
+    "sourceWeb": "网页请求",
+    "sourceOther": "其他来源"
   },
   "notifications": {
     "title": "通知",
