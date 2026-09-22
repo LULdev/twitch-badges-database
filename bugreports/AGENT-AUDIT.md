@@ -210,3 +210,23 @@ All twenty audit scopes now have an agent report (`bugreports/agent-01..20.md`).
 from rounds 1–3.
 
 The "no bugs remain" bar is still **not** met.
+
+---
+
+## Round 5 — SEO, stats and two more idea agents
+
+| ID | Fix | Verification |
+|---|---|---|
+| seo-2 | the sitemap used raw locale ids (`pt`, `zh`) while the pages declare `pt-BR`/`zh-Hans`, and had no x-default | `localeAlternates` reused; live sitemap carries pt-BR/zh-Hans/x-default 5 808× each, no raw codes |
+| seo-3 | every static entry carried `lastModified: new Date()` — a signal search engines ignore | static entries now use the newest real catalog timestamp, detail pages their own `updated_at` |
+| seo-4 | `/faq`, `/games`, `/achievements`, `/wheel`, `/feed` and all thirteen game pages were absent | 5 808 urls instead of 5 610 (+198 = 5 pages + 13 games, ×11 locales) |
+| stats-2 | the uptime table's last three headers read 24h/7d/30d while the cells held a check count and two success rates | headers now read "checks 24h", "24h %", "7d %" |
+
+The idea-agent group is now four (`agent-idea-01..04.md`, 48 ideas), bringing the
+collected total to 10 optimisation areas and 98 feature ideas.
+
+### Still open
+
+`i18n-3..6`, `cron-2..6`, `ui-2`, `ui-4..9`, `cat-4..9`, `pg-3..8`, plus the
+older medium/low findings from rounds 1–3. The "no bugs remain" bar is still
+**not** met.
