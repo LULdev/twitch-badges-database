@@ -36,6 +36,7 @@ export async function syncUserInventory(
       .from("badges")
       .select("id,set_id,version,slug,title")
       .neq("status", "removed")
+      .order("id")
       .range(offset, offset + PAGE - 1);
     if (error) throw error;
     const page = (data ?? []) as Array<{

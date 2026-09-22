@@ -69,15 +69,6 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
     fetchBadgebaseListing("/active"),
     fetchBadgebaseListing("/upcoming/"),
   ]);
-  // The /active listing is the authority for "currently redeemable". An empty
-  // listing — a provider hiccup, not a real state of the world — would clear
-  // is_confirmed_active on every row and demote every dateless badge to expired.
-  if (activeCards.length === 0) {
-    throw new Error(
-      "drop-window listing is empty — refusing to clear confirmations and demote badges",
-    );
-  }
-
   const cards = [...activeCards, ...upcomingCards].filter(
     (card) => !isStatusSetId(card.slug),
   );
@@ -102,6 +93,19 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
     const uuid = extractUuid(row.image_url_1x as string | null) ??
       extractUuid(row.image_url_2x as string | null);
     if (uuid) byUuid.set(uuid, row);
+
+  // The /active listing is the authority for "currently redeemable": an empty
+  // one would clear is_confirmed_active everywhere and demote every dateless
+  // badge. It is only an incident when we currently HAVE confirmed-active rows —
+  // a genuinely empty window must not block this sync forever. Placed after the
+  // catalog load so it can tell those apart, and still before every write.
+  if (activeCards.length === 0 && [...byUuid.values(), ...bySetId.values()].some(
+    (row) => row.is_confirmed_active === true,
+  )) {
+    throw new Error(
+      "drop-window listing is empty while confirmed-active badges exist — refusing to clear confirmations and demote badges",
+    );
+  }
     if (!bySetId.has(row.set_id as string)) bySetId.set(row.set_id as string, row);
   }
 

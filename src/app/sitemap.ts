@@ -43,6 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .from("badges")
         .select("slug, updated_at")
         .neq("status", "removed")
+        .order("id")
         .range(offset, offset + PAGE - 1);
       if (error) throw error;
       badges.push(...((data ?? []) as typeof badges));
@@ -53,6 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .from("blog_posts")
         .select("slug, updated_at")
         .eq("status", "published")
+        .order("id")
         .range(offset, offset + PAGE - 1);
       if (error) throw error;
       posts.push(...((data ?? []) as typeof posts));

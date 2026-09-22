@@ -52,25 +52,6 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     .flatMap((set) => set.versions)
     .filter((version) => !isStatusSetId(version.setId));
 
-  // Role/status badges (moderator, VIP, partner, …) are permanent account
-  // states, not collectible drops — remove any that exist in the catalog.
-  const { data: deletedStatus, error: statusDeleteError } = await supabase
-    .from("badges")
-    .delete()
-    .eq("category", "status")
-    .select("id");
-  if (statusDeleteError) throw statusDeleteError;
-  if ((deletedStatus ?? []).length > 0) {
-    await logChange(
-      {
-        kind: "badge_removed",
-        title: `${deletedStatus!.length} status badges removed from the catalog`,
-        body: "Role badges (moderator, VIP, partner, …) are permanent account states and no longer tracked.",
-      },
-      supabase,
-    );
-  }
-
   // Load the full current catalog (paginated).
   const existing = new Map<string, ExistingBadge>();
   for (let offset = 0; ; offset += 1000) {
@@ -96,15 +77,42 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
   // A provider incident must not read as a mass deletion. The sweep below marks
   // every badge missing from the live catalog as removed, so an empty or
   // truncated feed — a 200 with no payload, a changed response shape — used to
-  // wipe the whole catalog while the heartbeat still reported ok. Refuse before
-  // anything is written and fail loudly instead.
+  // wipe the whole catalog while the heartbeat still reported ok.
+  //
+  // This runs before EVERY write in this function, including the status-badge
+  // cleanup that used to sit above it. The ratio counts only rows the sweep can
+  // actually act on: `existing` also holds already-removed rows, which are never
+  // deleted, so comparing against its raw size tightened the threshold a little
+  // more on every run until a legitimate sync could be blocked forever.
   const MIN_INCOMING = 50;
+  const liveExisting = [...existing.values()].filter(
+    (row) => row.status !== "removed",
+  ).length;
   const suspicious =
     incoming.length < MIN_INCOMING ||
-    (existing.size > 20 && incoming.length < existing.size * 0.5);
+    (liveExisting > 20 && incoming.length < liveExisting * 0.5);
   if (suspicious) {
     throw new Error(
-      `catalog feed returned ${incoming.length} badges against ${existing.size} known — refusing to sweep, treating this as a provider incident`,
+      `catalog feed returned ${incoming.length} badges against ${liveExisting} live — refusing to sweep, treating this as a provider incident`,
+    );
+  }
+
+  // Role/status badges (moderator, VIP, partner, …) are permanent account
+  // states, not collectible drops — remove any that exist in the catalog.
+  const { data: deletedStatus, error: statusDeleteError } = await supabase
+    .from("badges")
+    .delete()
+    .eq("category", "status")
+    .select("id");
+  if (statusDeleteError) throw statusDeleteError;
+  if ((deletedStatus ?? []).length > 0) {
+    await logChange(
+      {
+        kind: "badge_removed",
+        title: `${deletedStatus!.length} status badges removed from the catalog`,
+        body: "Role badges (moderator, VIP, partner, …) are permanent account states and no longer tracked.",
+      },
+      supabase,
     );
   }
 
@@ -118,7 +126,13 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
   let statusChanged = 0;
 
   type UpsertRow = Record<string, unknown>;
-  const upserts: UpsertRow[] = [];
+  // New and existing badges are written in SEPARATE upserts. PostgREST takes
+  // the union of the keys in one batch and fills the missing ones with NULL, so
+  // mixing a row that carries `id`/`slug` with one that does not made the
+  // smaller row violate a not-null constraint — the catalog could not grow at
+  // all as soon as a run contained a new badge AND an existing one.
+  const upsertsNew: UpsertRow[] = [];
+  const upsertsExisting: UpsertRow[] = [];
 
   for (const v of incoming) {
     const key = `${v.setId}:${v.version}`;
@@ -129,7 +143,7 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     // listing sync confirms them as currently redeemable.
     const status = resolveStatus({ is_confirmed_active: false });
       const slug = badgeSlug(v.setId, v.version);
-      upserts.push({
+      upsertsNew.push({
         set_id: v.setId,
         version: v.version,
         slug,
@@ -184,7 +198,13 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
       statusChanged += 1;
     }
 
-    upserts.push({ ...ex, ...patch });
+    // The whole row except `id`: every row in this batch must carry the same
+    // key set, because PostgREST fills any key it sees in one row with NULL in
+    // the others. `id` is omitted because the row is updated in place through
+    // the (set_id, version) conflict target and its value never changes.
+    const { id: _existingId, ...existingWithoutId } = ex;
+    void _existingId;
+    upsertsExisting.push({ ...existingWithoutId, ...patch });
   }
 
   // Badges missing from the live catalog are marked removed.
@@ -202,7 +222,13 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     removed.push({ id: ex.id, title: ex.title });
   }
 
-  for (const batch of chunk(upserts, 200)) {
+  for (const batch of chunk(upsertsNew, 200)) {
+    const { error } = await supabase
+      .from("badges")
+      .upsert(batch, { onConflict: "set_id,version" });
+    if (error) throw error;
+  }
+  for (const batch of chunk(upsertsExisting, 200)) {
     const { error } = await supabase
       .from("badges")
       .upsert(batch, { onConflict: "set_id,version" });

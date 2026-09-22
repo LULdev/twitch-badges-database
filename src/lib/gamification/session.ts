@@ -45,8 +45,14 @@ function hashIp(ip: string): string {
   const salt =
     process.env.IP_HASH_SALT ??
     process.env.SUPABASE_SERVICE_ROLE_KEY ??
-    process.env.CRON_SECRET ??
-    "tbd";
+    process.env.CRON_SECRET;
+  if (!salt) {
+    // No silent literal fallback: a guessable salt makes the "pseudonymous" hash
+    // reversible, which is the whole thing this is meant to prevent.
+    throw new Error(
+      "No IP hash salt available — set IP_HASH_SALT (or provide a service-role key).",
+    );
+  }
   return createHash("sha256")
     .update(`${ip}:${salt}`)
     .digest("hex")
