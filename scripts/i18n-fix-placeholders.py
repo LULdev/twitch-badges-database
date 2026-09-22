@@ -4,6 +4,17 @@ StealPanel calls t("success", { coins }) / t("failed", { coins }), but the
 rename rewrote the ICU variable `{coins}` into `{BadgesCoins}` in all 11
 locales — so the steal result message could not be formatted.
 """
+
+# One-off migration: already applied. Re-running it would rewrite all 11 message
+# files (and re-sort the live `steal` object), so it refuses unless the override
+# is set explicitly — the same guard the other one-off scripts carry.
+import os as _guard_os
+
+if _guard_os.environ.get("ALLOW_ONE_OFF_MIGRATION") != "1":
+    raise SystemExit(
+        "Refusing to re-run: this is a one-off migration. "
+        "Set ALLOW_ONE_OFF_MIGRATION=1 to override."
+    )
 import json
 import io
 import os

@@ -5,6 +5,17 @@
 replacement keeps the same meaning without naming them (needed for phase 4 of
 the same request, so en/de are updated here as well).
 """
+
+# One-off migration: already applied. Its values are a snapshot of a past state
+# of messages/*.json — they match live today, which is exactly the coincidence
+# that must not be relied on. Set ALLOW_ONE_OFF_MIGRATION=1 to run deliberately.
+import os as _guard_os
+
+if _guard_os.environ.get("ALLOW_ONE_OFF_MIGRATION") != "1":
+    raise SystemExit(
+        "Refusing to re-run: this is a one-off migration. "
+        "Set ALLOW_ONE_OFF_MIGRATION=1 to override."
+    )
 import json
 import io
 import os

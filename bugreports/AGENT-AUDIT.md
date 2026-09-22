@@ -692,6 +692,36 @@ protects — and is verified by inspection only.
 **Agent's verdict on the rest:** every database writer (syncs, migrations) is safe
 to re-run, and none of these scripts is reachable from CI, cron or the app.
 
+## Round 22 — the class is closed: no unguarded message writer left
+
+The round-21 agent (`verify-round21.md`) **ran all six guards** and reported
+**0 high, 0 medium, 1 low, 2 info — and no live defect** in the commit's scope.
+Every guard fires before every write, the message files stayed byte-identical,
+the working tree stayed clean, and none of the guarded files is referenced from
+`package.json`, CI, cron, `src/` or another script.
+
+| ID | Finding | Fix |
+|---|---|---|
+| v21-01 (low) | a **seventh** one-off script (`i18n-fix-placeholders.py`) still wrote all 11 message files unguarded, and re-sorted the live `steal` object | guarded; verified by running it — it refuses and the file is unchanged |
+| v21-02 / v21-03 (info) | the guards are import-time exits, and nothing imports the files, so they cannot fire accidentally; the override variable appears nowhere in `.env.local`, `.env.example` or any config | no change needed |
+
+**Then I closed the class properly instead of stopping at the reported file.**
+A full classification of every script that writes `messages/*.json` found **five
+more unguarded writers**. Their values match live today, so a re-run would
+currently be a no-op — but that is exactly the coincidence that bit this project
+across several rounds: agreement that holds *right now* is not a guarantee. All
+five are guarded, and the closing check reports **no unguarded message writer**.
+
+**Deliberately left unguarded:** `scripts/verify-atomic-economy.ts`, which writes
+to the database as part of its test and restores the state exactly — it *must*
+stay runnable because it is part of the verification ritual. The database writers
+(syncs, migrations) also stay freely repeatable: they are idempotent, and the
+ledger already prevents a second migration run.
+
+**Verification:** lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`,
+atomicity 16/16, Python syntax of all eleven changed scripts checked, and three
+guards verified by actual execution (all refuse, all message files unchanged).
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents
