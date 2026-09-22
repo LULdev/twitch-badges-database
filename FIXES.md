@@ -170,17 +170,19 @@ searchable.
 
 These are documented rather than fixed, and none is a defect in the narrow sense:
 
-1. **`fp-3` — partially closed.** The five visibility toggles
-   (`showLevel`, `showCoins`, `showStats`, `showVisitors`, `showInventory`) and
-   the two value-only cosmetics (`nameGradient`, `bannerOverlay`) are applied on
-   the public profile now; the gradient is validated as a comma-separated hex
-   list so it cannot smuggle CSS. Still open: the effect and animation settings
-   (`aura`, `particles`, `nameRainbow`, `bannerShine`, `tilt3d`, `pixelAvatar`,
-   `achievementTicker`, `greetingBanner`, `levelHalo`, `cursorBadge`,
-   `statusBubble`, `effectsIntensity`, `coinRainAuto`, `visitorMarquee`) plus the
-   layout/typography ones (`font`, `cardStyle`, `radius`, `density`,
-   `profileTheme`, `avatarFrame`, `showcaseLayout`, `accent2`, `title`,
-   `socialTwitter`, `socialDiscord`) — those need their own CSS, i.e. design work.
+1. ~~`fp-3`~~ — **fully closed.** All ~35 settings in `profiles.customization`
+   are applied on the public profile: the five visibility toggles, both cosmetics,
+   the layout and typography set (font, cardStyle, radius, density,
+   showcaseLayout grid/row/carousel, profileTheme, accent2, title, socials) and
+   all fifteen creative effects (aura, particles, nameRainbow, bannerShine,
+   tilt3d, pixelAvatar, achievementTicker, greetingBanner, levelHalo,
+   cursorBadge, statusBubble, effectsIntensity off/subtle/full, coinRainAuto,
+   visitorMarquee). Defaults mirror the customizer's own DEFAULTS, colours are
+   hex-validated, usernames sanitised, `prefers-reduced-motion` disables all
+   animation, and every default-true effect (banner shine, greeting, ticker)
+   therefore now shows on profiles that never set it — by the customizer's
+   definition. Verified live against a real profile with a 22-value test
+   document, then restored.
 2. ~~Daily XP-budget refund~~ — **closed.** Migration 0017 adds
    `consume_and_apply_game_xp`, which clamps the cap and applies the XP and coins
    in one statement under the same row lock. Verified in a rolled-back
