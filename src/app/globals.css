@@ -1356,6 +1356,13 @@ html {
   animation-delay: var(--d, 0ms);
   min-height: 4px;
 }
+/* Directional glyphs are physical too: under RTL the arrow must mirror, or
+   "next" and "view all" point backwards in Arabic. */
+[dir="rtl"] .dir-arrow {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
 /* RTL: `transform-origin` and physical translate have no logical equivalent,
    so Arabic would otherwise run these intro animations from the inline-end. */
 [dir="rtl"] .grow-bar-fill { transform-origin: right center; }

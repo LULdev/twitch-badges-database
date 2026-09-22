@@ -661,7 +661,7 @@ export default async function StatsPage({
                   href="/leaderboards"
                   className="text-xs font-semibold text-accent hover:underline"
                 >
-                  {t("allLeaderboards")} →
+                  {t("allLeaderboards")} <span className="dir-arrow" aria-hidden>→</span>
                 </Link>
               </div>
               {platform.topPlayers.length === 0 ? (
@@ -713,7 +713,7 @@ export default async function StatsPage({
       <section id="games" className="scroll-mt-24 space-y-4">
         <SectionHead id="games-head" title={t("gamesTitle")} subtitle={t("gamesSubtitle")}>
           <Link href="/games" className="text-xs font-semibold text-accent hover:underline">
-            {t("playNow")} →
+            {t("playNow")} <span className="dir-arrow" aria-hidden>→</span>
           </Link>
         </SectionHead>
 
@@ -818,7 +818,7 @@ export default async function StatsPage({
             href="/achievements"
             className="text-xs font-semibold text-accent hover:underline"
           >
-            {t("allAchievements")} →
+            {t("allAchievements")} <span className="dir-arrow" aria-hidden>→</span>
           </Link>
         </SectionHead>
 
@@ -1293,7 +1293,7 @@ export default async function StatsPage({
                   href="/badges"
                   className="text-xs font-semibold text-accent hover:underline"
                 >
-                  {t("badges")} →
+                  {t("badges")} <span className="dir-arrow" aria-hidden>→</span>
                 </Link>
               </div>
               <BadgeGrid badges={catalog.newestBadges} showCountdown={false} />

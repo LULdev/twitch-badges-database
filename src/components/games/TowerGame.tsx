@@ -51,7 +51,16 @@ export default function TowerGame() {
                 <span>
                   {t("floor")} {floor}
                 </span>
-                <span>{isCashout ? `← ${t("cashout")}` : `×${(1 + floor * 0.22).toFixed(2)}`}</span>
+                <span>
+                  {isCashout ? (
+                    <>
+                      <span className="dir-arrow" aria-hidden>←</span>{" "}
+                      {t("cashout")}
+                    </>
+                  ) : (
+                    `×${(1 + floor * 0.22).toFixed(2)}`
+                  )}
+                </span>
               </div>
             );
           })}

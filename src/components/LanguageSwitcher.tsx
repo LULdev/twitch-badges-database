@@ -157,6 +157,7 @@ export default function LanguageSwitcher() {
         onKeyDown={onKeyDown}
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-controls="lang-listbox"
         aria-label={`${t("language")}: ${localeNames[locale as Locale] ?? locale}`}
         disabled={isPending}
       >
@@ -165,7 +166,7 @@ export default function LanguageSwitcher() {
       </button>
 
       {open ? (
-        <div className="lang-panel" role="listbox" aria-label={t("language")}>
+        <div id="lang-listbox" className="lang-panel" role="listbox" aria-label={t("language")}>
           <div className="lang-panel-head">
             <span className="lang-panel-title">{t("language")}</span>
             <span className="lang-panel-count">{routing.locales.length}</span>
@@ -179,6 +180,7 @@ export default function LanguageSwitcher() {
                   style={{ "--d": `${index * 28}ms` } as CSSProperties}
                 >
                   <button
+                    id={`lang-opt-${code}`}
                     type="button"
                     role="option"
                     aria-selected={active}

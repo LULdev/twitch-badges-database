@@ -74,7 +74,7 @@ export default async function HomePage({
           <div className="section-title">
             <h2 id="ending-soon">{t("endingSoonTitle")}</h2>
             <Link href="/active?sort=ending" className="text-xs font-semibold text-accent hover:underline">
-              {tc("viewAll")} →
+              {tc("viewAll")} <span className="dir-arrow" aria-hidden>→</span>
             </Link>
           </div>
           <BadgeGrid badges={data.endingSoon} />
@@ -87,7 +87,7 @@ export default async function HomePage({
           <div className="section-title">
             <h2 id="upcoming">{t("upcomingTitle")}</h2>
             <Link href="/upcoming" className="text-xs font-semibold text-accent hover:underline">
-              {tc("viewAll")} →
+              {tc("viewAll")} <span className="dir-arrow" aria-hidden>→</span>
             </Link>
           </div>
           <BadgeGrid badges={data.upcoming} showCountdown={false} />
@@ -100,7 +100,7 @@ export default async function HomePage({
           <div className="section-title">
             <h2 id="newest">{t("newestTitle")}</h2>
             <Link href="/badges" className="text-xs font-semibold text-accent hover:underline">
-              {tc("viewAll")} →
+              {tc("viewAll")} <span className="dir-arrow" aria-hidden>→</span>
             </Link>
           </div>
           <BadgeGrid badges={data.newest} showCountdown={false} />
@@ -113,7 +113,7 @@ export default async function HomePage({
           <div className="section-title">
             <h2 id="rarest">{t("rarestTitle")}</h2>
             <Link href="/leaderboards" className="text-xs font-semibold text-accent hover:underline">
-              {tc("viewAll")} →
+              {tc("viewAll")} <span className="dir-arrow" aria-hidden>→</span>
             </Link>
           </div>
           <BadgeGrid badges={data.rarest} showCountdown={false} />
@@ -128,7 +128,7 @@ export default async function HomePage({
               <div className="section-title">
                 <h2>{t("fromChangelog")}</h2>
                 <Link href="/changelog" className="text-xs font-semibold text-accent hover:underline">
-                  →
+                  <span className="dir-arrow" aria-hidden>→</span>
                 </Link>
               </div>
               <ul className="space-y-3">
@@ -151,7 +151,7 @@ export default async function HomePage({
               <div className="section-title">
                 <h2>{t("fromBlog")}</h2>
                 <Link href="/blog" className="text-xs font-semibold text-accent hover:underline">
-                  →
+                  <span className="dir-arrow" aria-hidden>→</span>
                 </Link>
               </div>
               <ul className="space-y-3">

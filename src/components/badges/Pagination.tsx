@@ -38,7 +38,7 @@ export default function Pagination({
     >
       {page > 1 ? (
         <Link href={href(page - 1)} className="btn btn-secondary text-xs">
-          ← {t("prev")}
+          <span className="dir-arrow" aria-hidden>←</span> {t("prev")}
         </Link>
       ) : null}
       {windowed.map((p, index) => (
@@ -57,7 +57,7 @@ export default function Pagination({
       ))}
       {page < pages ? (
         <Link href={href(page + 1)} className="btn btn-secondary text-xs">
-          {t("next")} →
+          {t("next")} <span className="dir-arrow" aria-hidden>→</span>
         </Link>
       ) : null}
     </nav>
