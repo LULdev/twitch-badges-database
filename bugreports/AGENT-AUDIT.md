@@ -523,6 +523,29 @@ only real member — renders it. The fallback path for a member without a progre
 row cannot be exercised live (the single member has a row) and is verified by
 inspection only; creating a row to test it would re-introduce `f13-4`.
 
+## Round 16 — verifying the round-14 fixes
+
+The round-15 agent (`verify-round15.md`) reported 0 high, 2 medium and 2 low —
+and both mediums were defects in my own previous repairs.
+
+| ID | Finding | Fix |
+|---|---|---|
+| **v15-01 (medium)** | my skip was invisible: `withHeartbeat` was called without `summarize`, so `skipped` never reached the heartbeat payload and nothing was logged — the uptime would have stayed green through a provider or parser incident, which is precisely the invisibility the guard exists to prevent | the summary is passed through to the heartbeat, the cron marks a skip as `degraded` with its own message and response field, and the sync writes a **changelog entry** so a skip is publicly visible |
+| **v15-02 (medium)** | I had templated only **one of three** places: `/stats` ("125 goals across three tiers") and `/faq` ("125: 50 common…") still claimed 125 in all 11 locales, and three published posts did too | both strings are templated and fed from the active list. The FAQ renders answers through a **dynamic** key list, so the counts are supplied at both render sites — including the `FAQPage` JSON-LD — or the placeholders would have been printed as text. The four post occurrences are corrected; slugs unchanged so links keep working |
+| v15-03 (low) | retiring `k_sharer` by **deleting** its definition left `RETIRED_ACHIEVEMENT_IDS` naming an id present in no list, so an unlock already stored in the database could not be rendered while the counters counted it | restored with an unreachable condition, like `k_faq_scholar` |
+| v15-04 (low) | my tower repair was a **regression**: the server's `cashoutAt` is the *requested* target, not the floor reached, so after a crash the marker described floors never played | uses the reached floor again; the redundant field is gone |
+
+**Verification of this round:** lint 0 errors, typecheck 0, build 227/227, 0
+`MISSING_MESSAGE`, 675 keys ×11 identical. Real run: badgebase exit 0 with 21
+active cards / 41 enriched / 0 errors / no skip. Live: **36/36 routes**, `/stats`
+reads "123 Achievements" and "123 Errungenschaften", no visible placeholder on
+`/faq` or `/stats`, and **no message string in any locale contains 125** any more.
+
+**A second false alarm I caused and corrected:** a naive `!/125/` test on the FAQ
+page reported a remaining claim. All 16 hits were Tailwind arbitrary values such
+as `text-[0.8125rem]` — the digits live in CSS, not in copy. Worth recording
+because the same naive test would flag any page.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents
