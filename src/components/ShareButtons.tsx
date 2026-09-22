@@ -1,11 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
 export default function ShareButtons({ path, title }: { path: string; title: string }) {
   const t = useTranslations("common");
   const [copied, setCopied] = useState(false);
+  // Computed after mount: deriving it during render produced "" on the server
+  // and the real URL on the client, which is a hydration mismatch on every
+  // share link's href.
+  const [shareUrl, setShareUrl] = useState("");
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setShareUrl(new URL(path, window.location.origin).toString());
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [path]);
 
   async function copy() {
     const url =
@@ -25,11 +36,6 @@ export default function ShareButtons({ path, title }: { path: string; title: str
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   }
-
-  const shareUrl =
-    typeof window === "undefined"
-      ? ""
-      : new URL(path, window.location.origin).toString();
 
   return (
     <div className="flex flex-wrap items-center gap-1.5">

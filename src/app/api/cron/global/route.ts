@@ -1,4 +1,4 @@
-import { envOrNull } from "@/lib/env";
+import { isAuthorizedCron } from "@/lib/cron-auth";
 import { runGlobalSync } from "@/lib/syncs/global";
 import { runBadgebaseSync } from "@/lib/syncs/badgebase";
 import { pruneHeartbeats, recordHeartbeat, withHeartbeat } from "@/lib/health";
@@ -7,9 +7,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 export async function GET(request: Request) {
-  const secret = envOrNull("CRON_SECRET");
-  const auth = request.headers.get("authorization");
-  if (!secret || auth !== `Bearer ${secret}`) {
+  if (!isAuthorizedCron(request)) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
