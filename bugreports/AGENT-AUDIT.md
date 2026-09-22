@@ -855,6 +855,28 @@ medium/high — no live defect** (`verify-round27.md`):
 atomicity 17/17 with exit 0 and an exact restore, economy 13/13 (worst 0.9884),
 replay 22/22 in two configurations, no function reachable by anon/authenticated.
 
+## Round 29 — the customization feature under attack
+
+The round-29 agent verified `cea8e44` (fp-3) and `54a17b6` (`verify-round29.md`):
+**3 medium, 4 low, 4 info**, and it confirmed the feature's substance — all 35
+defaults match the customizer's DEFAULTS exactly, and every injection vector was
+rejected live.
+
+| ID | Finding | Fix |
+|---|---|---|
+| **v29-01 (medium)** | `levelHalo` never applied: LevelBadge's own **inline** `--level-halo` shadowed any wrapper value, so the setting was parsed, passed and dead (live-proven in the HTML) | LevelBadge takes a `halo` prop that sets the inline variable directly; the dead `.pf-level-halo` CSS is gone |
+| **v29-02 (medium)** | `coinRainAuto` was a visual no-op: script set the coins to opacity 0 and never recovered them, and they had no width/height | the fall is a keyframe now (`.pf-rain-coin`, own size/duration/rotation) |
+| **v29-03 (medium)** | `profiles.color` was a split-brain picker: the account page writes the column AND the document, the profile read only the document, so a colour set before/outside the customizer never showed | the column wins, the document is the fallback |
+| v29-04 (low) | the carousel animated each tile by half its own width | it loops over a duplicated track, like the ticker |
+| v29-05 (low) | ticker/marquee/carousel scrolled the wrong way under RTL | `[dir="rtl"]` reverses the scroll direction |
+| v29-06 (low) | `effectsIntensity: "off"` overrode nothing — carousel tiles, avatar glow and the rain kept running | a real master switch: the code gates aura/particles/tilt/rain, the CSS kills the rest |
+| v29-07 (low) | the effect layers lost their containing block when the banner did not shine | the banner is always `pf-banner-root` |
+| v29-08–11 (info) | dead `--pf-gap`, dead `themeClass` ternary, ticker loop seam, always-on tilt wrapper | first three cleaned; the wrapper stays on purpose (it only listens when enabled) |
+
+**Verification:** lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`,
+atomicity 17/17 exit 0 exact restore. Live: 16/16 routes, the default profile
+carries the always-on containing block and no rain/particles.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents
