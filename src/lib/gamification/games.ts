@@ -98,7 +98,12 @@ export async function playGame(
   const outcome = await resolveGame(userId, gameId, bet, input, supabase);
 
   const net = outcome.payout - bet;
-  const streakFlags = await currentStreakFlags(supabase, userId, gameId);
+  const streakFlags = await currentStreakFlags(
+    supabase,
+    userId,
+    gameId,
+    outcome.payout > bet,
+  );
 
   const result = { ...outcome.result, ...streakFlags };
 
@@ -156,10 +161,16 @@ function fail(message: string): PlayResult {
   return { ok: false, error: message, bet: 0, payout: 0, won: false, balance: 0, result: {} };
 }
 
+/**
+ * Streak achievements. This runs BEFORE the current round is inserted, so the
+ * round being played is passed in explicitly — otherwise a loss could still
+ * complete the streak, and the win that actually completed it was not counted.
+ */
 async function currentStreakFlags(
   supabase: ReturnType<typeof createAdminClient>,
   userId: string,
   gameId: string,
+  currentWon: boolean,
 ): Promise<Record<string, unknown>> {
   const { data } = await supabase
     .from("game_rounds")
@@ -167,20 +178,28 @@ async function currentStreakFlags(
     .eq("user_id", userId)
     .eq("game", gameId)
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(10);
   const rounds = (data ?? []) as Array<{ won: boolean }>;
   let streak = 0;
   for (const row of rounds) {
     if (row.won) streak += 1;
     else break;
   }
-  if (gameId === "rps" || gameId === "blackjack") {
-    return streak >= 4 ? { [`streak5`]: true } : {};
+  if (!currentWon) return {};
+  const total = streak + 1;
+
+  if ((gameId === "rps" || gameId === "blackjack") && total >= 5) {
+    return { streak5: true };
+  }
+  // k_hilo_10 "Predict 10 higher/lower rounds in a row" was unreachable before:
+  // the resolver hardcoded streak10:false and this branch did not exist.
+  if (gameId === "hilo" && total >= 10) {
+    return { streak10: true };
   }
   return {};
 }
 
-async function resolveGame(
+export async function resolveGame(
   userId: string,
   gameId: string,
   bet: number,
@@ -193,9 +212,12 @@ async function resolveGame(
       const player = choices.includes(String(input.choice)) ? String(input.choice) : "rock";
       const bot = choices[Math.floor(Math.random() * 3)];
       const beats: Record<string, string> = { rock: "scissors", paper: "rock", scissors: "paper" };
+      // A refunded tie plus a 2x win makes the expected value exactly 1.0 —
+      // break-even, which a bot can grind indefinitely. 1.9x keeps the game
+      // fair-feeling with a small house edge, like hilo (1.95x) and coinflip.
       if (player === bot) return { payout: bet, result: { player, bot, tie: true } };
       const won = beats[player] === bot;
-      return { payout: won ? bet * 2 : 0, result: { player, bot, tie: false, won } };
+      return { payout: won ? Math.floor(bet * 1.9) : 0, result: { player, bot, tie: false, won } };
     }
 
     case "slots": {
@@ -238,23 +260,31 @@ async function resolveGame(
       const hits = clampInt(input.hits, 0, 300);
       const shots = clampInt(input.shots, hits, 600);
       const accuracy = shots > 0 ? hits / shots : 0;
-      const mult = clamp(accuracy * 2.2 - 0.8, -1, 1.2);
-      const net = Math.floor(bet * mult);
+      const outcome = skillPayout(bet, accuracy, 0.10);
       return {
-        payout: Math.max(0, bet + net),
-        result: { hits, shots, accuracy: Number(accuracy.toFixed(3)), sharp: accuracy >= 0.9 },
+        payout: outcome.payout,
+        result: {
+          hits, shots,
+          accuracy: Number(accuracy.toFixed(3)),
+          chance: Number(outcome.chance.toFixed(3)),
+          won: outcome.won,
+          sharp: accuracy >= 0.9,
+        },
       };
     }
 
     case "memory": {
       const timeMs = clampInt(input.timeMs, 5000, 600000);
       const misses = clampInt(input.misses, 0, 100);
-      const mult = clamp(1.6 - timeMs / 90000 - misses * 0.06, -1, 1.2);
-      const net = Math.floor(bet * mult);
+      const speed = 1 - Math.min(1, timeMs / 120000);
+      const clean = 1 - Math.min(1, misses / 12);
+      const outcome = skillPayout(bet, (speed * 0.5 + clean * 0.5), 0.10);
       return {
-        payout: Math.max(0, bet + net),
+        payout: outcome.payout,
         result: {
           timeMs, misses,
+          chance: Number(outcome.chance.toFixed(3)),
+          won: outcome.won,
           perfect: misses === 0,
           fast: timeMs <= 30000,
         },
@@ -265,11 +295,17 @@ async function resolveGame(
       const total = clampInt(input.total, 1, 20);
       const correct = clampInt(input.correct, 0, total);
       const ratio = correct / total;
-      const mult = clamp(ratio * 2.1 - 0.8, -1, 1.2);
-      const net = Math.floor(bet * mult);
+      const outcome = skillPayout(bet, ratio, 0.05);
       return {
-        payout: Math.max(0, bet + net),
-        result: { correct, total, streak10: correct === total && total >= 10 },
+        payout: outcome.payout,
+        result: {
+          total, correct, ratio: Number(ratio.toFixed(2)),
+          chance: Number(outcome.chance.toFixed(3)),
+          won: outcome.won,
+          // "10 correct answers in a row" is a single perfect long round here,
+          // which is what the achievement description means.
+          streak10: correct === total && total >= 10,
+        },
       };
     }
 
@@ -309,7 +345,7 @@ async function resolveGame(
       const won = actual === guess;
       return {
         payout: won ? Math.floor(bet * 1.95) : 0,
-        result: { currentScore, nextScore, guess, actual, won, streak10: false },
+        result: { currentScore, nextScore, guess, actual, won },
       };
     }
 
@@ -350,12 +386,15 @@ async function resolveGame(
     }
 
     case "vault": {
+      // The pin positions are rendered in the browser, so `matches` is a client
+      // claim. It now sets the win chance instead of the payout multiplier:
+      // 0.45 x 2x = 0.90 at a forged perfect run.
       const matches = clampInt(input.matches, 0, 3);
-      const mult = [0, 0.5, 1.5, 3][matches];
-      const payout = Math.floor(bet * mult);
+      const chance = [0.05, 0.15, 0.29, 0.45][matches];
+      const won = Math.random() < chance;
       return {
-        payout,
-        result: { matches, mult, perfect: matches === 3 },
+        payout: won ? bet * 2 : 0,
+        result: { matches, chance, won, perfect: matches === 3 },
       };
     }
 
@@ -367,12 +406,14 @@ async function resolveGame(
       const counts = new Map<string, number>();
       cells.forEach((c) => counts.set(c, (counts.get(c) ?? 0) + 1));
       let mult = 0;
-      for (const count of counts.values()) {
-        if (count >= 3) mult = Math.max(mult, count === 3 ? 2 : 6);
+      for (const [symbol, count] of counts) {
+        if (count >= 3) {
+          // 3 / 4 / 5+ of a kind — tuned so the total EV stays below 1.
+          const base = count === 3 ? 0.7 : count === 4 ? 2 : 5;
+          mult = Math.max(mult, symbol === "jackpot" ? Math.min(20, base * 2) : base);
+        }
       }
-      // Rare jackpot triple: three dedicated jackpot symbols
       const jackpot = (counts.get("jackpot") ?? 0) >= 3;
-      if (jackpot) mult = 20;
       return { payout: Math.floor(bet * mult), result: { cells, mult, jackpot } };
     }
 
@@ -382,7 +423,7 @@ async function resolveGame(
       let survived = true;
       while (floor < cashoutAt) {
         floor += 1;
-        const failChance = 0.08 + floor * 0.055;
+        const failChance = 0.20 + floor * 0.06;
         if (Math.random() < failChance) {
           survived = false;
           break;
@@ -395,11 +436,17 @@ async function resolveGame(
     case "catcher": {
       const caught = clampInt(input.caught, 0, 400);
       const missed = clampInt(input.missed, 0, 400);
-      const mult = clamp(caught * 0.012 - missed * 0.02, -1, 1.5);
-      const net = Math.floor(bet * mult);
+      const net = caught - missed * 2;
+      const ratio = Math.max(0, Math.min(1, net / 120));
+      const outcome = skillPayout(bet, ratio, 0.08);
       return {
-        payout: Math.max(0, bet + net),
-        result: { caught, missed, hundred: caught >= 100 },
+        payout: outcome.payout,
+        result: {
+          caught, missed,
+          chance: Number(outcome.chance.toFixed(3)),
+          won: outcome.won,
+          hundred: caught >= 100,
+        },
       };
     }
 
@@ -408,15 +455,48 @@ async function resolveGame(
   }
 }
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
-
 function clampInt(value: unknown, min: number, max: number): number {
   const num = Math.floor(Number(value));
   if (!Number.isFinite(num)) return min;
   return Math.min(max, Math.max(min, num));
 }
+
+/**
+ * Coin payout for the five browser-rendered skill games.
+ *
+ * Their score is produced in the client and cannot be verified server-side, so
+ * paying out a multiplier of that score let anyone POST `hits: 300, shots: 300`
+ * (or `matches: 3`) and collect a guaranteed +120 % … +200 % per round.
+ *
+ * Instead the score now only raises the WIN CHANCE, against a fixed 2x payout,
+ * and the chance is capped so that even a forged perfect score stays below
+ * break-even:
+ *
+ *   max chance 0.45 x 2x = 0.90 expected value per coin staked
+ *
+ * An honest perfect run therefore reaches the same ceiling — skill still pays,
+ * exploiting pays no better. `ratio` is 0..1.
+ */
+function skillPayout(bet: number, ratio: number, floorChance: number) {
+  const chance = Math.min(0.45, floorChance + Math.max(0, Math.min(1, ratio)) * 0.35);
+  const won = Math.random() < chance;
+  return { payout: won ? bet * 2 : 0, chance, won };
+}
+
+/**
+ * Weighted scratch symbol: the jackpot symbol is deliberately rare. With a
+ * uniform 1-in-7 pool the "three jackpot symbols" event landed ~12.6 % of the
+ * time, so the 20x jackpot alone paid 2.5x the stake on average.
+ */
+const SCRATCH_SYMBOLS: Array<{ id: string; weight: number }> = [
+  { id: "premium", weight: 16 },
+  { id: "turbo", weight: 16 },
+  { id: "bits", weight: 16 },
+  { id: "founder", weight: 16 },
+  { id: "subtember", weight: 15 },
+  { id: "wsci", weight: 15 },
+  { id: "jackpot", weight: 6 },
+];
 
 /** Deterministic symbol pool for slots/quiz/memory (real badge images). */
 export interface SlotSymbol {
@@ -450,6 +530,22 @@ export async function slotSymbols(
     weight: [30, 24, 20, 16, 12, 8][index] ?? 10,
     value: [1, 1.2, 1.4, 1.6, 2, 2.5][index] ?? 1,
   }));
+  // A failed DB lookup used to leave the pool holding only the scatter, so
+  // every reel showed the scatter and the 25x cap was won on every spin.
+  if (pool.length < 2) {
+    const fallback: Array<{ id: string; label: string; value: number }> = [
+      { id: "premium", label: "Premium Badge", value: 1 },
+      { id: "turbo", label: "Turbo Badge", value: 1.2 },
+      { id: "bits", label: "Bits Badge", value: 1.4 },
+      { id: "founder", label: "Founder Badge", value: 1.6 },
+      { id: "subtember", label: "Subtember Badge", value: 2 },
+      { id: "wsci", label: "WSCI Badge", value: 2.5 },
+    ];
+    pool.length = 0;
+    for (const entry of fallback) {
+      pool.push({ ...entry, image: null, weight: 20 });
+    }
+  }
   pool.push({ id: "scatter", label: "Book of Badges", image: null, weight: 6, value: 1 });
   symbolCache = pool;
   return pool;
@@ -466,6 +562,11 @@ function weightedSymbol(symbols: SlotSymbol[]): string {
 }
 
 function scratchSymbol(): string {
-  const symbols = ["premium", "turbo", "bits", "founder", "subtember", "wsci", "jackpot"];
-  return symbols[Math.floor(Math.random() * symbols.length)];
+  const total = SCRATCH_SYMBOLS.reduce((sum, s) => sum + s.weight, 0);
+  let roll = Math.random() * total;
+  for (const symbol of SCRATCH_SYMBOLS) {
+    roll -= symbol.weight;
+    if (roll <= 0) return symbol.id;
+  }
+  return SCRATCH_SYMBOLS[0].id;
 }

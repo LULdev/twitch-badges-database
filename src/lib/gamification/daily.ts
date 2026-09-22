@@ -187,6 +187,12 @@ export async function attemptSteal(
 export async function coinRain(
   giverId: string | null,
   profileOwnerId: string,
+  /**
+   * Identifies an anonymous giver. Without it every logged-out visitor shared
+   * the single key "anonymous", so the first gift of the day locked out all
+   * other visitors (and one person could gift every profile once).
+   */
+  anonymousKey?: string,
 ): Promise<{ ok: boolean; already?: boolean }> {
   const supabase = createAdminClient();
 
@@ -207,7 +213,7 @@ export async function coinRain(
     .eq("kind", "coin_rain")
     .eq("user_id", profileOwnerId)
     .gte("created_at", since)
-    .contains("payload", { giver: giverId ?? "anonymous" });
+    .contains("payload", { giver: giverId ?? anonymousKey ?? "anonymous" });
   if ((count ?? 0) > 0) return { ok: false, already: true };
 
   // Atomic +1: an absolute write would discard any award that landed between

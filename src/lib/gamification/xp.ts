@@ -81,11 +81,15 @@ export async function logActivity(entry: {
 
 export async function getProgress(userId: string): Promise<ProgressRow> {
   const supabase = createAdminClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("user_progress")
     .select("*")
     .eq("user_id", userId)
     .maybeSingle();
+  // A transient read failure must NOT be mistaken for "no row yet". Returning
+  // zeroed defaults makes every caller believe the account is empty — award()
+  // then writes those zeros back and wipes the player's XP and coins.
+  if (error) throw error;
   if (data) return data as ProgressRow;
   const inserted = await supabase
     .from("user_progress")
@@ -93,6 +97,7 @@ export async function getProgress(userId: string): Promise<ProgressRow> {
     .select("*")
     .eq("user_id", userId)
     .maybeSingle();
+  if (inserted.error) throw inserted.error;
   return (inserted.data ?? {
     user_id: userId,
     xp: 0,
@@ -186,32 +191,63 @@ export async function award(
   );
   const after = levelFromXp(newXp).level;
 
-  // The remaining row patch must not carry any field the RPCs above own:
-  // xp, coins and the daily game-XP bookkeeping are stripped from the spread
-  // so this write cannot undo an atomic increment.
+  // The remaining row patch must not carry ANY column that an atomic RPC owns.
+  // Migrations 0006/0007 move xp, coins, the daily game-XP bookkeeping, every
+  // counter and every daily gate through SQL increments; writing the snapshot
+  // back would undo an increment that landed between the read and this write
+  // (a cross-request race, e.g. a game settlement while a wheel spin resolves).
+  // What is left for award() to own is the derived level.
   const {
-    xp: _previousXp,
-    coins: _previousCoins,
-    game_xp_today: _previousGameXp,
-    game_xp_day: _previousGameXpDay,
-    ...currentWithoutBalance
+    xp: _xp,
+    coins: _coins,
+    game_xp_today: _gameXpToday,
+    game_xp_day: _gameXpDay,
+    games_played: _gamesPlayed,
+    games_won: _gamesWon,
+    coins_won: _coinsWon,
+    coins_lost: _coinsLost,
+    wheel_spins: _wheelSpins,
+    steals_successful: _stealsOk,
+    steals_failed: _stealsFailed,
+    times_robbed: _robbed,
+    achievements_points: _achPoints,
+    login_streak: _streak,
+    best_login_streak: _bestStreak,
+    last_login_date: _lastLogin,
+    last_wheel_date: _lastWheel,
+    ...rest
   } = current;
-  void _previousXp;
-  void _previousCoins;
-  void _previousGameXp;
-  void _previousGameXpDay;
+  void _xp;
+  void _coins;
+  void _gameXpToday;
+  void _gameXpDay;
+  void _gamesPlayed;
+  void _gamesWon;
+  void _coinsWon;
+  void _coinsLost;
+  void _wheelSpins;
+  void _stealsOk;
+  void _stealsFailed;
+  void _robbed;
+  void _achPoints;
+  void _streak;
+  void _bestStreak;
+  void _lastLogin;
+  void _lastWheel;
 
   const patch: Record<string, unknown> = {
+    ...rest,
     level: after,
     updated_at: new Date().toISOString(),
   };
 
+  // Update, not upsert: the row is guaranteed to exist because getProgress()
+  // above either read it or inserted it, and an upsert would re-write every
+  // column that arrived in the payload.
   const { error } = await supabase
     .from("user_progress")
-    .upsert(
-      { ...currentWithoutBalance, ...patch },
-      { onConflict: "user_id" },
-    );
+    .update(patch)
+    .eq("user_id", userId);
   if (error) throw error;
 
   if (options.feedTitle) {

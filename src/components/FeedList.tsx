@@ -7,7 +7,6 @@ import Coin from "@/components/Coin";
 
 export interface FeedEvent {
   id: number;
-  user_id: string | null;
   username: string | null;
   avatar_url: string | null;
   kind: string;

@@ -39,13 +39,19 @@ function chunk<T>(items: T[], size: number): T[][] {
 export async function runPotatSync(): Promise<PotatSyncSummary> {
   const supabase = createAdminClient();
 
-  const [distribution, owners] = await Promise.all([
+  // The owners feed can fail without failing the whole sync. That must NOT be
+  // mistaken for "nobody owns anything": writing null over every owner_count
+  // destroys the catalog's statistics and feeds the rarity index.
+  const [distribution, ownersResult] = await Promise.all([
     fetchAllDistribution(),
-    fetchAllOwners().catch(() => []),
+    fetchAllOwners()
+      .then((rows) => ({ ok: true as const, rows }))
+      .catch(() => ({ ok: false as const, rows: [] })),
   ]);
+  const ownersOk = ownersResult.ok;
 
   const ownersByBadge = new Map<string, number>();
-  for (const row of owners) {
+  for (const row of ownersResult.rows) {
     ownersByBadge.set(`${row.badge}:${row.version}`, row.total_owners);
   }
 
@@ -112,7 +118,9 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
     if (!badge) continue;
     matched += 1;
 
-    const totalOwners = ownersByBadge.get(`${row.badge}:${row.version}`) ?? null;
+    const totalOwners = ownersOk
+      ? (ownersByBadge.get(`${row.badge}:${row.version}`) ?? null)
+      : (badge.owner_count as number | null);
     const activeUsers = row.user_count ?? null;
     const percentage = row.percentage ?? null;
 
@@ -198,10 +206,11 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
     {
       kind: "data_sync",
       title: "Stats sync completed",
-      body: `${distribution.length} potat rows fetched, ${matched} badges matched, ${statsInserted} stats points appended, ${statusSweeps} status sweeps, rarity recomputed.`,
+      body: `${distribution.length} potat rows fetched, ${matched} badges matched, ${statsInserted} stats points appended, ${statusSweeps} status sweeps, rarity recomputed.${ownersOk ? "" : " Owner feed unavailable — existing owner counts were kept."}`,
       payload: {
         distribution: distribution.length,
-        owners: owners.length,
+        owners: ownersResult.rows.length,
+        ownersFeedOk: ownersOk,
         matched,
         statsInserted,
         statusSweeps,
@@ -213,7 +222,7 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
 
   return {
     distribution: distribution.length,
-    owners: owners.length,
+    owners: ownersResult.rows.length,
     matched,
     statsInserted,
     rarityUpdated,

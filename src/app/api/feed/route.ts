@@ -11,7 +11,9 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from("activity_events")
-    .select("id,user_id,username,avatar_url,kind,title,body,xp_amount,coins_amount,payload,created_at")
+    // Public endpoint: the internal user id and the raw payload blob are
+    // not needed by the feed UI and must not be exposed.
+    .select("id,username,avatar_url,kind,title,body,xp_amount,coins_amount,created_at")
     .order("id", { ascending: false })
     .limit(limit);
   if (cursor > 0) query = query.lt("id", cursor);

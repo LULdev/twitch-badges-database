@@ -59,6 +59,17 @@ export async function syncUserInventory(
     (current ?? []).map((row) => (row as { badge_id: string }).badge_id),
   );
 
+  // A failed or empty upstream response must not clear the inventory: an empty
+  // badge list is far more likely to be a broken fetch than a collector who
+  // owns nothing, and Twitch badges are never revoked from an account.
+  // Only destructive when rows would actually be removed: a brand-new
+  // collector whose badges are all channel-scoped legitimately owns none.
+  if (ownedIds.size === 0 && currentIds.size > 0) {
+    throw new Error(
+      "perfil returned no owned badges — refusing to clear the inventory",
+    );
+  }
+
   const toAdd = [...ownedIds].filter((id) => !currentIds.has(id));
   const toRemove = [...currentIds].filter((id) => !ownedIds.has(id));
 

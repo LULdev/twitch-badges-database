@@ -3,6 +3,28 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
+/** Only public HTTPS push-service endpoints are accepted. */
+function isAllowedPushEndpoint(endpoint: string): boolean {
+  let url: URL;
+  try {
+    url = new URL(endpoint);
+  } catch {
+    return false;
+  }
+  if (url.protocol !== "https:") return false;
+  const host = url.hostname.toLowerCase();
+  if (
+    host === "localhost" ||
+    host.endsWith(".localhost") ||
+    host.endsWith(".internal") ||
+    /^\d+(\.\d+){3}$/.test(host) ||
+    host.startsWith("[")
+  ) {
+    return false;
+  }
+  return host.includes(".");
+}
+
 interface SubscriptionPayload {
   endpoint?: string;
   keys?: { p256dh?: string; auth?: string };
@@ -21,6 +43,13 @@ export async function POST(request: Request) {
     return Response.json({ error: "invalid subscription" }, { status: 400 });
   }
 
+  // The endpoint is later fetched by the push service server-side, so it must
+  // be a real public HTTPS URL — not an internal host, a redirector or an
+  // unbounded string (SSRF / storage abuse).
+  if (endpoint.length > 512 || !isAllowedPushEndpoint(endpoint)) {
+    return Response.json({ error: "invalid endpoint" }, { status: 400 });
+  }
+
   // Attach to the logged-in profile when present (anonymous opt-in allowed).
   const supabase = await createClient();
   const {
@@ -28,6 +57,17 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   const admin = createAdminClient();
+
+  // An anonymous request must not be able to detach someone else's browser:
+  // re-registering an owned endpoint without a session is refused.
+  const { data: existing } = await admin
+    .from("push_subscriptions")
+    .select("user_id")
+    .eq("endpoint", endpoint)
+    .maybeSingle();
+  if (existing?.user_id && existing.user_id !== user?.id) {
+    return Response.json({ error: "endpoint already registered" }, { status: 409 });
+  }
   const { error } = await admin.from("push_subscriptions").upsert(
     {
       user_id: user?.id ?? null,
