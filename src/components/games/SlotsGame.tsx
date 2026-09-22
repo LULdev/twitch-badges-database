@@ -13,7 +13,7 @@ interface Symbol {
 
 /** Badges of Ra 6 Deluxe — 5 reels × 3 rows, real Twitch badge symbols. */
 export default function SlotsGame() {
-  const { bet, setBet, busy, error, play, t } = useGame("slots");
+  const { bet, setBet, busy, error, balance, play, t } = useGame("slots");
   const locale = useLocale();
   const [symbols, setSymbols] = useState<Symbol[]>([]);
   const [reels, setReels] = useState<string[][]>(
@@ -70,7 +70,7 @@ export default function SlotsGame() {
 
   return (
     <div className="space-y-4">
-      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy || spinning} balance={null} />
+      <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy || spinning} balance={balance} />
       <GameError error={error} />
       <div className="card overflow-hidden">
         <div className="border-b border-line bg-surface-2 px-4 py-2 text-center text-xs font-black uppercase tracking-[0.2em] text-warning">

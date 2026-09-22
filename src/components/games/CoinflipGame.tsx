@@ -5,20 +5,27 @@ import { useLocale } from "next-intl";
 import { useGame, BetBar, GameError } from "./useGame";
 
 export default function CoinflipGame() {
-  const { bet, setBet, busy, error, play, t } = useGame("coinflip");
+  const { bet, setBet, busy, error, balance, play, t } = useGame("coinflip");
   const locale = useLocale();
   const [side, setSide] = useState<"heads" | "tails">("heads");
   const [target, setTarget] = useState(3);
   const [flips, setFlips] = useState<string[] | null>(null);
+  // The side the displayed round was actually played with. Colouring the result
+  // against the live `side` re-coloured the whole history after toggling, so a
+  // past win could suddenly render as a loss.
+  const [playedSide, setPlayedSide] = useState<"heads" | "tails">("heads");
 
   async function go() {
     const result = await play({ choice: side, target });
-    if (result) setFlips((result.result.flips as string[]) ?? []);
+    if (!result) return;
+    const reported = result.result.side;
+    setPlayedSide(reported === "tails" ? "tails" : "heads");
+    setFlips((result.result.flips as string[]) ?? []);
   }
 
   return (
     <div className="space-y-4">
-      <BetBar bet={bet} setBet={setBet} min={10} max={5000} busy={busy} balance={null} />
+      <BetBar bet={bet} setBet={setBet} min={10} max={5000} busy={busy} balance={balance} />
       <GameError error={error} />
       <div className="card space-y-4 p-5">
         <div className="flex justify-center gap-2">
@@ -51,7 +58,7 @@ export default function CoinflipGame() {
               <span
                 key={index}
                 className={`grid size-10 place-items-center rounded-full border text-xs font-black ${
-                  flip === side
+                  flip === playedSide
                     ? "border-success bg-success/15 text-success"
                     : "border-danger bg-danger/15 text-danger"
                 }`}

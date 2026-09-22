@@ -10,7 +10,7 @@ const ICONS: Record<string, string> = {
 };
 
 export default function RpsGame() {
-  const { bet, setBet, busy, error, play, t } = useGame("rps");
+  const { bet, setBet, busy, error, balance, play, t } = useGame("rps");
   const [last, setLast] = useState<{ player: string; bot: string; tie: boolean; won: boolean } | null>(null);
 
   async function choose(choice: string) {
@@ -20,7 +20,7 @@ export default function RpsGame() {
 
   return (
     <div className="space-y-4">
-      <BetBar bet={bet} setBet={setBet} min={10} max={5000} busy={busy} balance={null} />
+      <BetBar bet={bet} setBet={setBet} min={10} max={5000} busy={busy} balance={balance} />
       <GameError error={error} />
       <div className="grid grid-cols-3 gap-3">
         {["rock", "paper", "scissors"].map((choice) => (

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useGame, BetBar, GameError } from "./useGame";
 
 export default function RouletteGame() {
-  const { bet, setBet, busy, error, play, t } = useGame("roulette");
+  const { bet, setBet, busy, error, balance, play, t } = useGame("roulette");
   const [history, setHistory] = useState<Array<{ number: number; color: string; won: boolean }>>([]);
 
   async function pick(choice: string) {
@@ -16,7 +16,7 @@ export default function RouletteGame() {
 
   return (
     <div className="space-y-4">
-      <BetBar bet={bet} setBet={setBet} min={10} max={5000} busy={busy} balance={null} />
+      <BetBar bet={bet} setBet={setBet} min={10} max={5000} busy={busy} balance={balance} />
       <GameError error={error} />
       <div className="card space-y-5 p-6">
         <div className="flex justify-center gap-3">

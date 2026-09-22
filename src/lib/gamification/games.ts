@@ -341,11 +341,14 @@ export async function resolveGame(
       );
       const nextScore = 5 + Math.floor(Math.random() * 91);
       const guess = input.choice === "lower" ? "lower" : "higher";
-      const actual = nextScore === currentScore ? "equal" : nextScore > currentScore ? "higher" : "lower";
-      const won = actual === guess;
+      const tie = nextScore === currentScore;
+      const actual = tie ? "equal" : nextScore > currentScore ? "higher" : "lower";
+      // A tie used to be neither "higher" nor "lower", so it silently counted
+      // as a full loss with no explanation. It now refunds the stake.
+      const won = !tie && actual === guess;
       return {
-        payout: won ? Math.floor(bet * 1.95) : 0,
-        result: { currentScore, nextScore, guess, actual, won },
+        payout: won ? Math.floor(bet * 1.95) : tie ? bet : 0,
+        result: { currentScore, nextScore, guess, actual, won, tie },
       };
     }
 

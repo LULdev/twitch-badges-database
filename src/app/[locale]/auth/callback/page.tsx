@@ -22,6 +22,11 @@ function goToInventory() {
 function CallbackInner() {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
+  // Twitch/Supabase report a refused or failed authorization as query params
+  // rather than a code. Ignoring them showed the generic "no code" page and
+  // hid the actual reason (e.g. the user pressed cancel).
+  const providerError =
+    searchParams.get("error_description") ?? searchParams.get("error");
   const [error, setError] = useState<string | null>(null);
   // Guard against double exchange: StrictMode re-runs the effect, and a second
   // exchangeCodeForSession call with the same code would fail.
@@ -52,6 +57,18 @@ function CallbackInner() {
   }, [code]);
 
   const t = useTranslations("login");
+
+  if (providerError) {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-24 text-center">
+        <h1 className="text-2xl font-bold tracking-tight">{t("failed")}</h1>
+        <p className="mt-3 text-sm text-muted">{providerError}</p>
+        <Link href="/login" className="btn btn-primary mt-6">
+          {t("retry")}
+        </Link>
+      </div>
+    );
+  }
 
   if (!code) {
     return (

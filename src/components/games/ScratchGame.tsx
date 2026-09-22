@@ -14,7 +14,7 @@ const LABELS: Record<string, string> = {
 };
 
 export default function ScratchGame() {
-  const { bet, setBet, busy, error, play, t } = useGame("scratch");
+  const { bet, setBet, busy, error, balance, play, t } = useGame("scratch");
   const [cells, setCells] = useState<string[] | null>(null);
   const [revealed, setRevealed] = useState<boolean[]>(Array(9).fill(false));
 
@@ -27,7 +27,7 @@ export default function ScratchGame() {
 
   return (
     <div className="space-y-4">
-      <BetBar bet={bet} setBet={setBet} min={10} max={1000} busy={busy} balance={null} />
+      <BetBar bet={bet} setBet={setBet} min={10} max={1000} busy={busy} balance={balance} />
       <GameError error={error} />
       <div className="card space-y-4 p-6">
         <div className="mx-auto grid max-w-sm grid-cols-3 gap-2">

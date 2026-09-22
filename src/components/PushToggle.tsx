@@ -94,11 +94,20 @@ export default function PushToggle() {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
       if (subscription) {
-        await fetch("/api/push/subscribe", {
-          method: "DELETE",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(subscription.toJSON()),
-        });
+        // The server row and the browser subscription are two halves of one
+        // switch. The DELETE used to gate the local unsubscribe, so a rejected
+        // or failing request left a live subscription receiving pushes while
+        // the UI already reported "off" — the worse of the two states.
+        try {
+          await fetch("/api/push/subscribe", {
+            method: "DELETE",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(subscription.toJSON()),
+          });
+        } catch {
+          // Best effort: the local subscription is removed below regardless, and
+          // the push service's next 410 lets the server prune the stale row.
+        }
         await subscription.unsubscribe();
       }
     } finally {

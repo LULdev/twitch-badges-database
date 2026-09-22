@@ -13,6 +13,11 @@ export async function POST(request: Request) {
   if (!body?.game || typeof body.bet !== "number") {
     return Response.json({ error: "invalid payload" }, { status: 400 });
   }
+  // Defence in depth: the game library already rejects these, but NaN/Infinity
+  // and negative values should not reach it from the route layer at all.
+  if (!Number.isFinite(body.bet) || body.bet <= 0) {
+    return Response.json({ error: "invalid bet" }, { status: 400 });
+  }
   const result = await playGame(userId, body.game, body.bet, body.input ?? {});
   return Response.json(result, { status: result.ok ? 200 : 400 });
 }

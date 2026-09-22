@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useGame, BetBar, GameError } from "./useGame";
 
 export default function BlackjackGame() {
-  const { bet, setBet, busy, error, play, t } = useGame("blackjack");
+  const { bet, setBet, busy, error, balance, play, t } = useGame("blackjack");
   const [stopAt, setStopAt] = useState(17);
   const [last, setLast] = useState<{
     playerCards: number[];
@@ -21,7 +21,7 @@ export default function BlackjackGame() {
 
   return (
     <div className="space-y-4">
-      <BetBar bet={bet} setBet={setBet} min={10} max={5000} busy={busy} balance={null} />
+      <BetBar bet={bet} setBet={setBet} min={10} max={5000} busy={busy} balance={balance} />
       <GameError error={error} />
       <div className="card space-y-4 p-6">
         <label className="block text-center text-sm">
