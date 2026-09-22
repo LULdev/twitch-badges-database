@@ -21,6 +21,7 @@ export default function PushToggle() {
   const t = useTranslations("notifications");
   const [state, setState] = useState<PushState>("off");
   const [testSent, setTestSent] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -46,6 +47,7 @@ export default function PushToggle() {
   async function enable() {
     if (state === "unsupported" || state === "enabling") return;
     setState("enabling");
+    setError(false);
     try {
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
@@ -60,7 +62,7 @@ export default function PushToggle() {
       };
       if (!vapid.configured || !vapid.publicKey) {
         setState("off");
-        alert(t("pushFailed"));
+        setError(true);
         return;
       }
 
@@ -80,10 +82,10 @@ export default function PushToggle() {
       });
       if (!res.ok) throw new Error(`subscribe failed: ${res.status}`);
       setState("on");
-    } catch (error) {
-      console.warn("[push] enable failed", error);
+    } catch (caught) {
+      console.warn("[push] enable failed", caught);
       setState("off");
-      alert(t("pushFailed"));
+      setError(true);
     }
   }
 
@@ -144,6 +146,11 @@ export default function PushToggle() {
           {state === "enabling" ? t("enabling") : t("enable")}
         </button>
       )}
+      {error ? (
+        <p className="w-full text-xs text-danger" role="alert">
+          {t("pushFailed")}
+        </p>
+      ) : null}
     </div>
   );
 }

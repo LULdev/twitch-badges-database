@@ -601,10 +601,10 @@
     "loginHint": "Melde dich an, um deinen Fortschritt zu verfolgen."
   },
   "steal": {
-    "hint": "Versuch kostet {price} BadgesCoins (bei Misserfolg an das Opfer). Max-Beute: {max} BadgesCoins. Chance hängt vom Level-Unterschied ab.",
     "attempt": "Überfall starten",
-    "success": "Überfall erfolgreich: +{BadgesCoins} BadgesCoins!",
-    "failed": "Abgewehrt! Der Versuch kostete dich {BadgesCoins} BadgesCoins."
+    "failed": "Abgewehrt! Der Versuch kostete dich {coins} BadgesCoins.",
+    "hint": "Versuch kostet {price} BadgesCoins (bei Misserfolg an das Opfer). Max-Beute: {max} BadgesCoins. Chance hängt vom Level-Unterschied ab.",
+    "success": "Überfall erfolgreich: +{coins} BadgesCoins!"
   },
   "faq": {
     "achievementsA": "125: 50 gewöhnliche Meilensteine, 50 kreative Herausforderungen und 25 völlig unerwartete Spezielle. Jede bringt XP, BadgesCoins und Punkte plus ein Funkel-Badge in der Errungenschaften-Vitrine deines Profils.",
@@ -617,7 +617,7 @@
     "coinsQ": "Wofür brauche ich BadgesCoins?",
     "dailyA": "Einmal täglich im Arcade-Hub abholen: +10 XP und +50 BadgesCoins. Aufeinanderfolgende Tage bauen eine Serie auf, die bis zu +50 Bonus-XP und +250 Bonus-BadgesCoins pro Tag bringt.",
     "dailyQ": "Wie funktioniert der Tagesbonus?",
-    "dataA": "Badges stammen aus dem offiziellen Twitch-Katalog; Besitzer-Statistiken von potat.app; deine eigenen Badges werden über badges.blog aufgelöst. BadgesCoins und XP sind die spielerische Eigenwährung dieser Seite und haben keinen Geldwert.",
+    "dataA": "Badges werden aus dem offiziellen Twitch-Katalog synchronisiert, Besitzer-Statistiken stammen aus öffentlichen Community-Trackern, und deine eigenen Badges werden live aus deinem öffentlichen Twitch-Profil ermittelt. BadgesCoins und XP sind die eigene spielerische Wirtschaft dieser Seite und haben keinen Geldwert.",
     "dataQ": "Woher kommen meine Daten?",
     "fairA": "Ja, und das System ist darauf ausgelegt, es zu bleiben. Jedes Spielergebnis wird auf dem Server entschieden, nie in deinem Browser. Spiele sind auf 100 XP pro Tag begrenzt, damit niemand XP in einer Schleife farmt, View-Zähler ignorieren wiederholte Aufrufe derselben IP für fünf Minuten, und beim Stehlen gibt es sowohl eine Sperre pro Opfer als auch ein Stundenlimit. Die gesamte Wirtschaft ist auf der Statistikseite öffentlich, du kannst die Zahlen also jederzeit selbst prüfen.",
     "fairQ": "Ist das XP- und BadgesCoins-System fair?",

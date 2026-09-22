@@ -28,13 +28,14 @@ export async function recordProfileVisit(
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("view_count")
+    .select("id")
     .eq("id", profileId)
     .maybeSingle();
-  await supabase
-    .from("profiles")
-    .update({ view_count: (profile?.view_count ?? 0) + 1 })
-    .eq("id", profileId);
+  if (!profile) return false;
+
+  // Atomic increment: reading view_count and writing it back lost one
+  // increment whenever two visitors arrived inside the same window.
+  await supabase.rpc("bump_view_count", { p_profile_id: profileId });
   return true;
 }
 

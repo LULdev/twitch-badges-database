@@ -160,15 +160,40 @@ export async function award(
     xpAwarded = Math.min(xpAwarded, cap);
   }
 
-  const newXp = current.xp + xpAwarded;
-  const newCoins = Math.max(0, current.coins + coinsAwarded);
   const before = levelFromXp(current.xp).level;
-  const after = levelFromXp(newXp).level;
   const today = new Date().toISOString().slice(0, 10);
 
+  // XP and coins move through an atomic SQL increment. Writing absolute
+  // values read from `current` lost one of two overlapping awards (e.g. a
+  // game round resolving while a wheel spin lands), silently deleting XP.
+  const applied = await supabase.rpc("apply_xp_coins", {
+    p_user_id: userId,
+    p_xp: xpAwarded,
+    p_coins: coinsAwarded,
+  });
+  if (applied.error) throw applied.error;
+  const appliedRow = Array.isArray(applied.data) ? applied.data[0] : applied.data;
+  const newXp = Number(
+    (appliedRow as { xp?: number } | null)?.xp ?? current.xp + xpAwarded,
+  );
+  const newCoins = Number(
+    (appliedRow as { coins?: number } | null)?.coins ??
+      Math.max(0, current.coins + coinsAwarded),
+  );
+  const after = levelFromXp(newXp).level;
+
+  // Everything else (level, daily game-XP bookkeeping, set-style fields) is
+  // still written as a row patch — but xp/coins are dropped from the spread
+  // so this write cannot undo the atomic increment above.
+  const {
+    xp: _previousXp,
+    coins: _previousCoins,
+    ...currentWithoutBalance
+  } = current;
+  void _previousXp;
+  void _previousCoins;
+
   const patch: Record<string, unknown> = {
-    xp: newXp,
-    coins: newCoins,
     level: after,
     updated_at: new Date().toISOString(),
   };
@@ -181,7 +206,7 @@ export async function award(
   const { error } = await supabase
     .from("user_progress")
     .upsert(
-      { ...current, ...patch },
+      { ...currentWithoutBalance, ...patch },
       { onConflict: "user_id" },
     );
   if (error) throw error;
@@ -225,19 +250,34 @@ export async function award(
   };
 }
 
+/**
+ * Atomic coin deltas. Never write an absolute balance computed from a read —
+ * that silently discards any award that landed in between.
+ */
+export async function bumpCoins(userId: string, delta: number): Promise<number> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.rpc("add_coins", {
+    p_user_id: userId,
+    p_amount: Math.floor(delta),
+  });
+  if (error) throw error;
+  return Number(data ?? 0);
+}
+
 export async function adjustCoins(
   userId: string,
   delta: number,
   extra: Partial<Record<string, unknown>> = {},
 ): Promise<number> {
   const supabase = createAdminClient();
-  const current = await getProgress(userId);
-  const newCoins = Math.max(0, current.coins + Math.floor(delta));
-  const { error } = await supabase
-    .from("user_progress")
-    .update({ coins: newCoins, ...extra, updated_at: new Date().toISOString() })
-    .eq("user_id", userId);
-  if (error) throw error;
+  const newCoins = await bumpCoins(userId, delta);
+  if (Object.keys(extra).length > 0) {
+    const { error } = await supabase
+      .from("user_progress")
+      .update({ ...extra, updated_at: new Date().toISOString() })
+      .eq("user_id", userId);
+    if (error) throw error;
+  }
   return newCoins;
 }
 

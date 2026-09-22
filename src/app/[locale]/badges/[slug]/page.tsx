@@ -11,6 +11,7 @@ import { BadgeImage } from "@/components/badges/BadgeImage";
 import RarityChip from "@/components/badges/RarityChip";
 import Countdown from "@/components/badges/Countdown";
 import { StatusChip } from "@/components/badges/BadgeCard";
+import { jsonLdScript } from "@/lib/jsonld";
 import BadgeGrid from "@/components/badges/BadgeGrid";
 import OwnersChart from "@/components/charts/OwnersChart";
 import ShareButtons from "@/components/ShareButtons";
@@ -102,7 +103,7 @@ export default async function BadgeDetailPage({ params }: PageProps) {
       <LiveRefresher intervalMs={120_000} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
 
       <nav className="text-xs text-muted" aria-label="Breadcrumb">

@@ -353,11 +353,19 @@ export async function getCategories(): Promise<string[]> {
 export async function getProfileByUsername(
   username: string,
 ): Promise<ProfileRow | null> {
+  // The username comes from the URL path and is used as a LIKE pattern, so its
+  // wildcards must be escaped — `%` would otherwise match an arbitrary profile
+  // and make maybeSingle() error on multiple rows.
+  const pattern = username
+    .trim()
+    .replace(/\\/g, "\\\\")
+    .replace(/%/g, "\\%")
+    .replace(/_/g, "\\_");
   const supabase = await createClient();
   const { data } = await supabase
     .from("profiles")
     .select("*")
-    .ilike("username", username)
+    .ilike("username", pattern)
     .maybeSingle();
   return (data as ProfileRow | null) ?? null;
 }

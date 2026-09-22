@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { award, getProgress, logActivity } from "./xp";
+import { award, bumpCoins, getProgress, logActivity } from "./xp";
 import { evaluateAchievements } from "./achievements";
 
 /**
@@ -78,10 +78,18 @@ export async function attemptSteal(
 > {
   const supabase = createAdminClient();
 
+  // The username arrives from the client and is used as a LIKE pattern, so the
+  // wildcards `%` and `_` must be escaped — otherwise `%` (or `_`) matches an
+  // arbitrary victim instead of the one the caller named.
+  const victimPattern = victimUsername
+    .trim()
+    .replace(/\\/g, "\\\\")
+    .replace(/%/g, "\\%")
+    .replace(/_/g, "\\_");
   const { data: victimProfile } = await supabase
     .from("profiles")
     .select("id, username, steal_enabled, steal_price, steal_max")
-    .ilike("username", victimUsername.trim())
+    .ilike("username", victimPattern)
     .maybeSingle();
   if (!victimProfile || !victimProfile.id) return { ok: false, error: "Victim not found." };
   if (victimProfile.id === thiefId) return { ok: false, error: "You cannot steal from yourself." };
@@ -138,20 +146,23 @@ export async function attemptSteal(
   });
   if (attemptError) throw attemptError;
 
-  // Thief pays the attempt cost; the victim keeps it.
+  // Thief pays the attempt cost; the victim keeps it. Both coin moves are
+  // atomic deltas — writing a balance read earlier would discard whatever the
+  // players earned in the meantime.
+  await bumpCoins(thiefId, -settings.price + stolen);
   await supabase
     .from("user_progress")
     .update({
-      coins: Math.max(0, thief.coins - settings.price + stolen),
       steals_successful: thief.steals_successful + (success ? 1 : 0),
       steals_failed: thief.steals_failed + (success ? 0 : 1),
       updated_at: new Date().toISOString(),
     })
     .eq("user_id", thiefId);
+
+  await bumpCoins(victimProfile.id, -stolen + (success ? 0 : settings.price));
   await supabase
     .from("user_progress")
     .update({
-      coins: Math.max(0, victim.coins - stolen + (success ? 0 : settings.price)),
       times_robbed: victim.times_robbed + 1,
       updated_at: new Date().toISOString(),
     })
@@ -187,7 +198,17 @@ export async function coinRain(
   profileOwnerId: string,
 ): Promise<{ ok: boolean; already?: boolean }> {
   const supabase = createAdminClient();
-  const todayStr = new Date().toISOString().slice(0, 10);
+
+  // The id arrives from the client — verify it is a real profile before it
+  // reaches getProgress(), which would try to upsert user_progress against the
+  // foreign key and turn a bad request into a 500.
+  const { data: ownerProfile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", profileOwnerId)
+    .maybeSingle();
+  if (!ownerProfile) return { ok: false };
+
   const since = new Date(Date.now() - 86_400_000).toISOString();
   const { count } = await supabase
     .from("activity_events")
@@ -198,11 +219,9 @@ export async function coinRain(
     .contains("payload", { giver: giverId ?? "anonymous" });
   if ((count ?? 0) > 0) return { ok: false, already: true };
 
-  const owner = await getProgress(profileOwnerId);
-  await supabase
-    .from("user_progress")
-    .update({ coins: owner.coins + 1, updated_at: new Date().toISOString() })
-    .eq("user_id", profileOwnerId);
+  // Atomic +1: an absolute write would discard any award that landed between
+  // the read and the write.
+  await bumpCoins(profileOwnerId, 1);
 
   await logActivity({
     userId: profileOwnerId,

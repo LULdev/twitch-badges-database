@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getPostBySlug } from "@/lib/queries";
 import { renderMarkdown } from "@/lib/markdown";
+import { jsonLdScript } from "@/lib/jsonld";
 import ShareButtons from "@/components/ShareButtons";
 import { localeAlternates } from "@/lib/seo";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -84,7 +85,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     <article className="mx-auto max-w-3xl space-y-6">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
 
       <nav className="text-xs text-muted" aria-label="Breadcrumb">

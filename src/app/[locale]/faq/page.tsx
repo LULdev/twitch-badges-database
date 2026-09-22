@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { localeAlternates } from "@/lib/seo";
+import { jsonLdScript } from "@/lib/jsonld";
 
 export const revalidate = 3600;
 
@@ -67,7 +68,7 @@ export default async function FaqPage({
     <div className="mx-auto max-w-3xl space-y-6">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <header>
         <h1 className="text-2xl font-extrabold tracking-tight">{t("title")}</h1>

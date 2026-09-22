@@ -601,10 +601,10 @@
     "loginHint": "Log in to track your achievement progress."
   },
   "steal": {
-    "hint": "Attempt costs {price} BadgesCoins (paid to the victim on failure). Max haul: {max} BadgesCoins. Chance depends on level difference.",
     "attempt": "Attempt heist",
-    "success": "Heist successful: +{BadgesCoins} BadgesCoins!",
-    "failed": "Defended! The attempt cost you {BadgesCoins} BadgesCoins."
+    "failed": "Defended! The attempt cost you {coins} BadgesCoins.",
+    "hint": "Attempt costs {price} BadgesCoins (paid to the victim on failure). Max haul: {max} BadgesCoins. Chance depends on level difference.",
+    "success": "Heist successful: +{coins} BadgesCoins!"
   },
   "faq": {
     "achievementsA": "125: 50 common milestones, 50 creative challenges and 25 truly unexpected specials. Each one awards XP, BadgesCoins and points, plus a sparkle badge in your profile's achievement showcase.",
@@ -617,7 +617,7 @@
     "coinsQ": "What do I do with BadgesCoins?",
     "dailyA": "Claim it once per day in the arcade hub or your inventory page: +10 XP and +50 BadgesCoins. Consecutive days build a streak that adds up to +50 bonus XP and +250 bonus BadgesCoins per day.",
     "dailyQ": "How does the daily login bonus work?",
-    "dataA": "Badges sync from the official Twitch catalog; owner stats from potat.app; your owned badges resolve via badges.blog. BadgesCoins and XP are this site's own playful economy and have no monetary value.",
+    "dataA": "Badges sync from the official Twitch catalog, owner statistics come from public community trackers, and the badges you own are resolved live from your public Twitch profile. BadgesCoins and XP are this site's own playful economy and have no monetary value.",
     "dataQ": "Where does my data come from?",
     "fairA": "Yes, and it is built to stay that way. Every game outcome is decided on the server, never in your browser. Games are capped at 100 XP per day so nobody can farm XP in a loop, view counters ignore repeat reloads from the same IP for five minutes, and stealing has both a per-victim cooldown and an hourly limit. The whole economy is public on the statistics page, so you can always check the numbers yourself.",
     "fairQ": "Is the XP and BadgesCoin system fair?",

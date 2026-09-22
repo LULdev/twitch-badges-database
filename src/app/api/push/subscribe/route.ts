@@ -58,14 +58,17 @@ export async function DELETE(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // The admin client bypasses the push_self_delete RLS policy, so the
+  // ownership check has to happen here: a signed-in caller may only remove
+  // their own subscription, an anonymous caller only an unowned one. Deleting
+  // by endpoint alone would let anyone who learns another browser's endpoint
+  // URL unsubscribe it.
   const admin = createAdminClient();
-  const { error } = await admin
-    .from("push_subscriptions")
-    .delete()
-    .eq("endpoint", endpoint);
+  let query = admin.from("push_subscriptions").delete().eq("endpoint", endpoint);
+  query = user ? query.eq("user_id", user.id) : query.is("user_id", null);
+  const { error } = await query;
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-  void user;
   return Response.json({ ok: true });
 }
