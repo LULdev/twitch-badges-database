@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { listNotifications } from "@/lib/queries";
 import PushToggle from "@/components/PushToggle";
+import { localeAlternates } from "@/lib/seo";
 
 export const revalidate = 60;
 
@@ -13,7 +14,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "notifications" });
-  return { title: t("title"), robots: { index: false } };
+  return {
+    alternates: {
+      canonical: `/${locale}/notifications`,
+      languages: localeAlternates("/notifications"),
+    }, title: t("title"), robots: { index: false } };
 }
 
 export default async function NotificationsPage({

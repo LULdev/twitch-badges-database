@@ -116,7 +116,11 @@ export default function LanguageSwitcher() {
     triggerRef.current?.focus();
     if (next === locale) return;
     startTransition(() => {
-      router.replace(pathname, { locale: next });
+      // Preserve the current query string: switching the language used to drop
+      // active filters, the page number and the compare selection.
+      const search =
+        typeof window === "undefined" ? "" : window.location.search;
+      router.replace(`${pathname}${search}`, { locale: next });
     });
   }
 

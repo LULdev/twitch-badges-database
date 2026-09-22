@@ -6,6 +6,7 @@ import { fetchUserBadges } from "@/lib/twitch/perfil";
 import CompareForm from "@/components/compare/CompareForm";
 import { BadgeImage } from "@/components/badges/BadgeImage";
 import RarityChip from "@/components/badges/RarityChip";
+import { localeAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "compare" });
-  return { title: t("title"), description: t("subtitle") };
+  return {
+    alternates: {
+      canonical: `/${locale}/compare`,
+      languages: localeAlternates("/compare"),
+    }, title: t("title"), description: t("subtitle") };
 }
 
 function resolveOwned(

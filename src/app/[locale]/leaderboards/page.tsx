@@ -13,6 +13,7 @@ import {
 import { BadgeImage } from "@/components/badges/BadgeImage";
 import RarityChip from "@/components/badges/RarityChip";
 import { formatCompact } from "@/components/badges/BadgeCard";
+import { localeAlternates } from "@/lib/seo";
 
 export const revalidate = 3600;
 
@@ -23,7 +24,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "leaderboards" });
-  return { title: t("title"), description: t("subtitle") };
+  return {
+    alternates: {
+      canonical: `/${locale}/leaderboards`,
+      languages: localeAlternates("/leaderboards"),
+    }, title: t("title"), description: t("subtitle") };
 }
 
 function Avatar({ src, name }: { src: string | null; name: string }) {
@@ -131,7 +136,7 @@ export default async function LeaderboardsPage({
                     {badge.title}
                   </span>
                   <span className="text-xs tabular-nums text-muted">
-                    {formatCompact(badge.owner_count)}
+                    {formatCompact(badge.owner_count, locale)}
                   </span>
                 </Link>
               </li>

@@ -3,6 +3,7 @@ import { type Metadata } from "next";
 import BadgeExplorer, {
   type ExplorerSearchParams,
 } from "@/components/badges/BadgeExplorer";
+import { localeAlternates } from "@/lib/seo";
 
 export const revalidate = 300;
 
@@ -13,7 +14,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "badges" });
-  return { title: t("upcomingTitle"), description: t("upcomingSubtitle") };
+  return {
+    alternates: {
+      canonical: `/${locale}/upcoming`,
+      languages: localeAlternates("/upcoming"),
+    }, title: t("upcomingTitle"), description: t("upcomingSubtitle") };
 }
 
 export default async function UpcomingPage({

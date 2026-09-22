@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { listChangelog, type ChangelogRow } from "@/lib/queries";
+import { localeAlternates } from "@/lib/seo";
 
 export const revalidate = 60;
 
@@ -12,7 +13,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "changelog" });
-  return { title: t("title"), description: t("subtitle") };
+  return {
+    alternates: {
+      canonical: `/${locale}/changelog`,
+      languages: localeAlternates("/changelog"),
+    }, title: t("title"), description: t("subtitle") };
 }
 
 const KIND_COLORS: Record<string, string> = {

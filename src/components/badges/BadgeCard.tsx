@@ -1,14 +1,25 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import type { BadgeRow } from "@/lib/queries";
 import { BadgeImage } from "./BadgeImage";
 import RarityChip from "./RarityChip";
 import Countdown from "./Countdown";
 import { Link } from "@/i18n/navigation";
 
-export function formatCompact(value: number | null | undefined): string {
+/**
+ * Compact number for owner counts. The locale is a parameter: hardcoding "en"
+ * rendered English-grouped numbers in all ten other locales (1.2M instead of
+ * 1,2 Mio.).
+ */
+export function formatCompact(
+  value: number | null | undefined,
+  locale = "en",
+): string {
   if (value === null || value === undefined || !Number.isFinite(value))
     return "—";
-  return new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(value);
+  return new Intl.NumberFormat(locale, {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value);
 }
 
 export async function StatusChip({ status }: { status: BadgeRow["status"] }) {
@@ -41,6 +52,7 @@ export default async function BadgeCard({
   showCountdown?: boolean;
 }) {
   const t = await getTranslations("badges");
+  const locale = await getLocale();
   // "NEW" marker is computed against request time; catalog pages revalidate
   // on a short ISR window so this stays acceptably fresh.
   // eslint-disable-next-line react-hooks/purity -- async server component
@@ -76,7 +88,7 @@ export default async function BadgeCard({
         )}
         {badge.owner_count !== null && (
           <p className="mt-2 text-[0.6875rem] text-muted">
-            {formatCompact(badge.owner_count)} {t("owners")}
+            {formatCompact(badge.owner_count, locale)} {t("owners")}
           </p>
         )}
       </div>

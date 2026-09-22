@@ -18,6 +18,7 @@ import ShootGame from "@/components/games/ShootGame";
 import MemoryGame from "@/components/games/MemoryGame";
 import QuizGame from "@/components/games/QuizGame";
 import CatcherGame from "@/components/games/CatcherGame";
+import { localeAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,11 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, game } = await params;
-  if (!GAMES.some((g) => g.id === game)) return {};
+  if (!GAMES.some((g) => g.id === game)) return {
+    alternates: {
+      canonical: `/${locale}/games/${game}`,
+      languages: localeAlternates(`/games/${game}`),
+    },};
   const t = await getTranslations({ locale, namespace: "games" });
   return { title: t(`${game}Title`), description: t(`${game}Desc`) };
 }

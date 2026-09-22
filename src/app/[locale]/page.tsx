@@ -61,7 +61,7 @@ export default async function HomePage({
         <dl className="mx-auto mt-10 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
           {stats.map((stat) => (
             <div key={stat.label} className="card stat-tile">
-              <dd className="stat-value">{formatCompact(stat.value)}</dd>
+              <dd className="stat-value">{formatCompact(stat.value, locale)}</dd>
               <dt className="stat-label">{stat.label}</dt>
             </div>
           ))}

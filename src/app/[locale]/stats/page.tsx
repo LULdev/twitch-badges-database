@@ -22,6 +22,7 @@ import UptimeGauge from "@/components/stats/UptimeGauge";
 import UptimeCalendar from "@/components/stats/UptimeCalendar";
 import AvailabilityStrip from "@/components/stats/AvailabilityStrip";
 import LiveStatus from "@/components/stats/LiveStatus";
+import { localeAlternates } from "@/lib/seo";
 
 export const revalidate = 300;
 
@@ -32,7 +33,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "stats" });
-  return { title: t("title"), description: t("subtitle") };
+  return {
+    alternates: {
+      canonical: `/${locale}/stats`,
+      languages: localeAlternates("/stats"),
+    }, title: t("title"), description: t("subtitle") };
 }
 
 /** Solid palette for SVG charts (presentation attributes cannot resolve var()). */
@@ -531,7 +536,7 @@ export default async function StatsPage({
               <DonutChart
                 data={donutSlices}
                 ariaLabel={t("xpSources")}
-                centerValue={formatCompact(game?.totalXp ?? 0)}
+                centerValue={formatCompact(game?.totalXp ?? 0, locale)}
                 centerLabel={t("legendXp")}
               />
               <ul className="mt-3 space-y-1.5">
@@ -578,7 +583,7 @@ export default async function StatsPage({
           <Kpi
             label={t("badgeClaims")}
             value={platform.claims?.claims ?? 0}
-            hint={`${formatCompact(platform.claims?.claim_xp ?? 0)} XP`}
+            hint={`${formatCompact(platform.claims?.claim_xp ?? 0, locale)} XP`}
             locale={locale}
           />
           <Kpi
@@ -657,10 +662,10 @@ export default async function StatsPage({
                       </Link>
                       <span className="text-[11px] text-muted">L{player.level}</span>
                       <span className="w-16 text-end text-xs font-bold tabular-nums">
-                        {formatCompact(player.xp)}
+                        {formatCompact(player.xp, locale)}
                       </span>
                       <span className="hidden w-16 text-end text-[11px] tabular-nums text-muted sm:block">
-                        {formatCompact(player.coins)}
+                        {formatCompact(player.coins, locale)}
                       </span>
                     </li>
                   ))}
@@ -759,7 +764,7 @@ export default async function StatsPage({
                       </span>
                       <span className="flex w-20 items-center justify-end gap-1 text-xs font-bold tabular-nums text-warning">
                         <Coin size={11} />
-                        {formatCompact(win.payout)}
+                        {formatCompact(win.payout, locale)}
                       </span>
                     </li>
                   ))}
