@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { award, getProgress } from "./xp";
+import { award, bumpCoins, getProgress } from "./xp";
 import { evaluateAchievements } from "./achievements";
 
 /**
@@ -112,17 +112,21 @@ export async function playGame(
   });
   if (roundError) throw roundError;
 
-  await supabase
-    .from("user_progress")
-    .update({
-      games_played: progress.games_played + 1,
-      games_won: progress.games_won + (outcome.payout > bet ? 1 : 0),
-      coins_won: progress.coins_won + Math.max(0, net),
-      coins_lost: progress.coins_lost + Math.max(0, -net),
-      coins: Math.max(0, progress.coins + net),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", userId);
+  // Counters and balance move through atomic increments. Writing absolute
+  // values computed from `progress` (read before the round resolved) lost one
+  // of two overlapping rounds — including the coin balance itself.
+  await supabase.rpc("bump_counters", {
+    p_user_id: userId,
+    p_deltas: {
+      games_played: 1,
+      games_won: outcome.payout > bet ? 1 : 0,
+      coins_won: Math.max(0, net),
+      coins_lost: Math.max(0, -net),
+    },
+  });
+  if (net !== 0) {
+    await bumpCoins(userId, net);
+  }
 
   const awardResult = await award(userId, {
     xp: outcome.payout > bet ? 10 : 2,

@@ -104,6 +104,95 @@ async function main() {
 
     // 4) the balance never drops below zero
     check("negative guard", await adjustCoins(profile.id, -1_000_000), 0);
+
+    // ---------------------------------------------------------------
+    // Migration 0007: counters and daily gates
+    // ---------------------------------------------------------------
+
+    // 5) five concurrent counter bumps must all land
+    const countersBefore = await getProgress(profile.id);
+    await Promise.all(
+      Array.from({ length: 5 }, () =>
+        supabase.rpc("bump_counters", {
+          p_user_id: profile.id,
+          p_deltas: { games_played: 1, times_robbed: 1 },
+        }),
+      ),
+    );
+    const countersAfter = await getProgress(profile.id);
+    check(
+      "5 concurrent games_played bumps",
+      Number(countersAfter.games_played) - Number(countersBefore.games_played),
+      5,
+    );
+    check(
+      "5 concurrent times_robbed bumps",
+      Number(countersAfter.times_robbed) - Number(countersBefore.times_robbed),
+      5,
+    );
+
+    // 6) the daily login gate must be won by exactly one of two callers.
+    //    The gate columns are cleared first, otherwise the account's real
+    //    claim for today makes both callers legitimately lose.
+    await supabase
+      .from("user_progress")
+      .update({ last_login_date: null, login_streak: 0, last_wheel_date: null })
+      .eq("user_id", profile.id);
+    const dailyToday = new Date().toISOString().slice(0, 10);
+    const [gateA, gateB] = await Promise.all([
+      supabase.rpc("claim_daily_gate", { p_user_id: profile.id, p_today: dailyToday }),
+      supabase.rpc("claim_daily_gate", { p_user_id: profile.id, p_today: dailyToday }),
+    ]);
+    const gateResults = [Number(gateA.data ?? -1), Number(gateB.data ?? -1)];
+    const winners = gateResults.filter((value) => value >= 0).length;
+    check("daily gate: exactly one winner", winners, 1);
+    console.log("  gate results:", gateResults.join(" / "));
+    const dailyAfter = await getProgress(profile.id);
+    check("daily gate: winner got streak 1", Number(dailyAfter.login_streak), 1);
+    check(
+      "daily gate: last_login_date stamped",
+      dailyAfter.last_login_date === dailyToday ? 1 : 0,
+      1,
+    );
+    // a second round of two callers must now both lose
+    const [againA, againB] = await Promise.all([
+      supabase.rpc("claim_daily_gate", { p_user_id: profile.id, p_today: dailyToday }),
+      supabase.rpc("claim_daily_gate", { p_user_id: profile.id, p_today: dailyToday }),
+    ]);
+    check(
+      "daily gate: nobody wins twice",
+      [Number(againA.data ?? -1), Number(againB.data ?? -1)].filter((v) => v >= 0).length,
+      0,
+    );
+
+    // 7) the wheel gate must also be won exactly once
+    const [wheelA, wheelB] = await Promise.all([
+      supabase.rpc("claim_wheel_gate", { p_user_id: profile.id, p_today: dailyToday }),
+      supabase.rpc("claim_wheel_gate", { p_user_id: profile.id, p_today: dailyToday }),
+    ]);
+    const wheelWins = [wheelA.data, wheelB.data].filter(Boolean).length;
+    check("wheel gate: exactly one winner", wheelWins, 1);
+
+    // 8) the 100 XP/day game budget cannot be overshot
+    await supabase
+      .from("user_progress")
+      .update({ game_xp_day: null, game_xp_today: 0 })
+      .eq("user_id", profile.id);
+    const [first, second] = await Promise.all([
+      supabase.rpc("consume_game_xp", {
+        p_user_id: profile.id,
+        p_today: dailyToday,
+        p_requested: 80,
+      }),
+      supabase.rpc("consume_game_xp", {
+        p_user_id: profile.id,
+        p_today: dailyToday,
+        p_requested: 80,
+      }),
+    ]);
+    const granted = Number(first.data ?? 0) + Number(second.data ?? 0);
+    check("game XP budget capped at 100", granted, 100);
+    console.log("  granted:", first.data, "+", second.data);
   } finally {
     // restore every column of the progress row
     const {

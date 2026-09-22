@@ -336,7 +336,7 @@ export default async function ProfilePage({ params }: PageProps) {
           {profile.potat_level !== null && (
             <div className="card stat-tile">
               <dd className="stat-value">{profile.potat_level}</dd>
-              <dt className="stat-label">{t("potatLevel")}</dt>
+              <dt className="stat-label">{t("communityLevel")}</dt>
             </div>
           )}
           {profile.potatoes !== null && (
@@ -344,7 +344,7 @@ export default async function ProfilePage({ params }: PageProps) {
               <dd className="stat-value">
                 {new Intl.NumberFormat(locale).format(profile.potatoes)}
               </dd>
-              <dt className="stat-label">{t("potatoes")}</dt>
+              <dt className="stat-label">{t("communityPoints")}</dt>
             </div>
           )}
         </section>
@@ -356,7 +356,7 @@ export default async function ProfilePage({ params }: PageProps) {
         <section className="card flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4 text-xs text-muted">
           {profile.potat_first_seen && (
             <span>
-              {t("potatSince")}:{" "}
+              {t("communitySince")}:{" "}
               {new Date(profile.potat_first_seen).toLocaleDateString(locale, {
                 dateStyle: "medium",
               })}

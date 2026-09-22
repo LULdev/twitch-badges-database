@@ -151,17 +151,21 @@ export async function award(
 
   let xpAwarded = Math.max(0, Math.floor(options.xp ?? 0));
   const coinsAwarded = Math.floor(options.coins ?? 0);
+  const today = new Date().toISOString().slice(0, 10);
 
+  // The daily game cap is consumed under a row lock, so two rounds resolving at
+  // the same moment cannot both spend the last of the 100 XP budget.
   if (options.countsAsGameXp && xpAwarded > 0) {
-    const today = new Date().toISOString().slice(0, 10);
-    const spentToday =
-      current.game_xp_day === today ? current.game_xp_today : 0;
-    const cap = Math.max(0, 100 - spentToday);
-    xpAwarded = Math.min(xpAwarded, cap);
+    const consumed = await supabase.rpc("consume_game_xp", {
+      p_user_id: userId,
+      p_today: today,
+      p_requested: xpAwarded,
+    });
+    if (consumed.error) throw consumed.error;
+    xpAwarded = Number(consumed.data ?? 0);
   }
 
   const before = levelFromXp(current.xp).level;
-  const today = new Date().toISOString().slice(0, 10);
 
   // XP and coins move through an atomic SQL increment. Writing absolute
   // values read from `current` lost one of two overlapping awards (e.g. a
@@ -182,26 +186,25 @@ export async function award(
   );
   const after = levelFromXp(newXp).level;
 
-  // Everything else (level, daily game-XP bookkeeping, set-style fields) is
-  // still written as a row patch — but xp/coins are dropped from the spread
-  // so this write cannot undo the atomic increment above.
+  // The remaining row patch must not carry any field the RPCs above own:
+  // xp, coins and the daily game-XP bookkeeping are stripped from the spread
+  // so this write cannot undo an atomic increment.
   const {
     xp: _previousXp,
     coins: _previousCoins,
+    game_xp_today: _previousGameXp,
+    game_xp_day: _previousGameXpDay,
     ...currentWithoutBalance
   } = current;
   void _previousXp;
   void _previousCoins;
+  void _previousGameXp;
+  void _previousGameXpDay;
 
   const patch: Record<string, unknown> = {
     level: after,
     updated_at: new Date().toISOString(),
   };
-  if (options.countsAsGameXp && xpAwarded > 0) {
-    patch.game_xp_day = today;
-    patch.game_xp_today =
-      (current.game_xp_day === today ? current.game_xp_today : 0) + xpAwarded;
-  }
 
   const { error } = await supabase
     .from("user_progress")

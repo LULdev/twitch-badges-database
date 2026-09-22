@@ -10,28 +10,22 @@ export async function claimDaily(userId: string): Promise<
   { ok: false; reason: "already" } | { ok: true; xp: number; coins: number; streak: number }
 > {
   const supabase = createAdminClient();
-  const progress = await getProgress(userId);
   const todayStr = new Date().toISOString().slice(0, 10);
-  if (progress.last_login_date === todayStr) return { ok: false, reason: "already" };
 
-  const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
-  const streak = progress.last_login_date === yesterday
-    ? progress.login_streak + 1
-    : 1;
+  // Atomic compare-and-set gate: of two parallel claims exactly one wins the
+  // row, so the bonus cannot be collected twice. Returns -1 when today's bonus
+  // was already taken, otherwise the new streak length.
+  const claimed = await supabase.rpc("claim_daily_gate", {
+    p_user_id: userId,
+    p_today: todayStr,
+  });
+  if (claimed.error) throw claimed.error;
+  const streak = Number(claimed.data ?? -1);
+  if (streak < 0) return { ok: false, reason: "already" };
+
   const bonus = Math.min(50, (streak - 1) * 5);
   const xp = 10 + bonus;
   const coins = 50 + Math.min(250, (streak - 1) * 25);
-
-  const { error } = await supabase
-    .from("user_progress")
-    .update({
-      last_login_date: todayStr,
-      login_streak: streak,
-      best_login_streak: Math.max(progress.best_login_streak, streak),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", userId);
-  if (error) throw error;
 
   await award(userId, {
     xp,
@@ -148,25 +142,22 @@ export async function attemptSteal(
 
   // Thief pays the attempt cost; the victim keeps it. Both coin moves are
   // atomic deltas — writing a balance read earlier would discard whatever the
-  // players earned in the meantime.
+  // players earned in the meantime — and the counters move in one statement
+  // for the same reason.
   await bumpCoins(thiefId, -settings.price + stolen);
-  await supabase
-    .from("user_progress")
-    .update({
-      steals_successful: thief.steals_successful + (success ? 1 : 0),
-      steals_failed: thief.steals_failed + (success ? 0 : 1),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", thiefId);
+  await supabase.rpc("bump_counters", {
+    p_user_id: thiefId,
+    p_deltas: {
+      steals_successful: success ? 1 : 0,
+      steals_failed: success ? 0 : 1,
+    },
+  });
 
   await bumpCoins(victimProfile.id, -stolen + (success ? 0 : settings.price));
-  await supabase
-    .from("user_progress")
-    .update({
-      times_robbed: victim.times_robbed + 1,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", victimProfile.id);
+  await supabase.rpc("bump_counters", {
+    p_user_id: victimProfile.id,
+    p_deltas: { times_robbed: 1 },
+  });
 
   const thiefProfile = await supabase
     .from("profiles")

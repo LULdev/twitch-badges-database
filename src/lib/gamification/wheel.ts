@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { award, getProgress, logActivity, today } from "./xp";
+import { award, logActivity, today } from "./xp";
 import { createFeaturePost } from "@/lib/blog";
 
 /**
@@ -40,8 +40,16 @@ export async function spinWheel(userId: string): Promise<
   { ok: false; reason: "already" } | { ok: true; result: SpinResult }
 > {
   const supabase = createAdminClient();
-  const progress = await getProgress(userId);
-  if (progress.last_wheel_date === today()) {
+
+  // Atomic compare-and-set gate: exactly one of two parallel spins wins the
+  // row (and with it the spin counter increment), so the daily spin cannot be
+  // claimed twice.
+  const gate = await supabase.rpc("claim_wheel_gate", {
+    p_user_id: userId,
+    p_today: today(),
+  });
+  if (gate.error) throw gate.error;
+  if (!gate.data) {
     return { ok: false, reason: "already" };
   }
 
@@ -50,16 +58,6 @@ export async function spinWheel(userId: string): Promise<
   const slot = turboWon
     ? WHEEL_SLOTS[WHEEL_SLOTS.length - 1]
     : weightedPick(WHEEL_SLOTS.slice(0, -1));
-
-  const { error: progressError } = await supabase
-    .from("user_progress")
-    .update({
-      last_wheel_date: today(),
-      wheel_spins: progress.wheel_spins + 1,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", userId);
-  if (progressError) throw progressError;
 
   await award(userId, {
     xp: slot.xp,

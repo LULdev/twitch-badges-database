@@ -271,15 +271,13 @@ export async function evaluateAchievements(userId: string): Promise<string[]> {
       .upsert({ user_id: userId, achievement_id: id }, { onConflict: "user_id,achievement_id" });
     if (error) continue;
 
+    // Atomic increment: two unlocks resolving together used to overwrite each
+    // other's points because the total came from a stale read.
     await supabase
-      .from("user_progress")
-      .upsert(
-        {
-          user_id: userId,
-          achievements_points: (stats.progress.achievements_points ?? 0) + ach.points,
-        },
-        { onConflict: "user_id", ignoreDuplicates: false },
-      )
+      .rpc("bump_counters", {
+        p_user_id: userId,
+        p_deltas: { achievements_points: ach.points },
+      })
       .then(() => undefined, () => undefined);
 
     await logActivity({

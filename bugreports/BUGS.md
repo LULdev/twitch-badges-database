@@ -211,6 +211,62 @@ A third pass (`bugreports/audit-static.mjs`, `audit-i18n.mjs`, plus greps for
 `process.env[`, `.ilike(`, `alert(`, `dangerouslySetInnerHTML` and
 timer/cleanup mismatches) produced no further findings.
 
+## Third pass — three more defects, found by re-reading the fix sites
+
+## B13 — `playGame` still wrote the coin balance as read-modify-write
+
+- **Severity**: high (currency corruption)
+- **Side**: server
+- **File**: `src/lib/gamification/games.ts` (round settlement)
+- **Evidence**: `.update({ … games_played: progress.games_played + 1, coins:
+  Math.max(0, progress.coins + net) })` where `progress` was read before the
+  round resolved.
+- **Why it is a bug**: the same class as B10 but on the coin balance itself —
+  a round settling while any other award lands overwrites the balance with the
+  stale value, destroying the other award (and the round's own counters).
+  The 1-round/second flood check does not serialise the settlement.
+- **Confidence**: confirmed
+- **Fix direction**: `bump_counters` for the counters + `bumpCoins` for the
+  balance (applied).
+
+## B14 — Counter columns written as read-modify-write
+
+- **Severity**: medium
+- **Side**: server
+- **File**: `games.ts`, `daily.ts` (steal), `wheel.ts`, `achievements.ts`
+- **Evidence**: every counter update computed `field + delta` from a value read
+  earlier in the request.
+- **Why it is a bug**: overlapping writes lose one increment, so a collector's
+  statistics drift below reality permanently.
+- **Confidence**: confirmed
+- **Fix direction**: migration 0007 adds `bump_counters(uuid, jsonb)`; all
+  callers use it (applied).
+
+## B15 — The once-per-day gates were check-then-write
+
+- **Severity**: high (reward duplication)
+- **Side**: server
+- **File**: `daily.ts` (`claimDaily`), `wheel.ts` (`spinWheel`), `xp.ts` (game XP cap)
+- **Evidence**: e.g. `if (progress.last_login_date === todayStr) return …` then a
+  separate `update({ last_login_date: todayStr })`; the wheel and the 100 XP/day
+  cap followed the same shape.
+- **Why it is a bug**: two parallel requests both read "not claimed yet" and both
+  proceed, so the daily bonus and the spin could be collected twice, and the
+  daily game-XP budget could be spent twice (200 XP instead of 100).
+- **Confidence**: confirmed
+- **Fix direction**: migration 0007 adds `claim_daily_gate` and
+  `claim_wheel_gate` (compare-and-set on the date column, exactly one caller
+  wins) and `consume_game_xp` (`SELECT … FOR UPDATE`, so the budget is shared
+  correctly); the module-level date checks are gone.
+
+## Fourth pass — nothing new
+
+Re-ran the static, i18n and grep audits after the 0007 work plus the full
+concurrency suite: **16/16 assertions pass**
+(`scripts/verify-atomic-economy.ts`), including five concurrent counter bumps
+landing exactly, the daily and wheel gates producing exactly one winner under
+`Promise.all`, and the game-XP budget being capped at exactly 100.
+
 ## What was fixed
 
 | Bug | Status | Evidence |
@@ -227,22 +283,20 @@ timer/cleanup mismatches) produced no further findings.
 | B10 award() lost update | fixed | atomic `apply_xp_coins`; verified by `scripts/verify-atomic-economy.ts` (two parallel awards sum correctly, 5 concurrent view bumps = +5, account restored exactly) |
 | B11 broken `{BadgesCoins}` placeholder | fixed | `{coins}` restored in all 11 locales |
 | B12 LIKE wildcards (profile route) | fixed | escaped pattern |
+| B13 playGame coin balance | fixed | `bumpCoins` for the balance, `bump_counters` for the statistics |
+| B14 counter columns | fixed | migration 0007 `bump_counters`; 5 concurrent bumps verified = +5 |
+| B15 daily gates + XP cap | fixed | `claim_daily_gate` / `claim_wheel_gate` / `consume_game_xp`; verified exactly one winner and a hard 100 XP cap |
+| vendor-named message keys | fixed | `profile.potatLevel/potatoes/potatSince` renamed to `communityLevel/communityPoints/communitySince` in all 11 locales (database columns and their sync untouched) |
 
 ### Known residual, deliberately not changed
 
-- Three **message key names** still contain the word `potat`
-  (`profile.potatLevel`, `profile.potatoes`, `profile.potatSince`). They are
-  internal identifiers, their visible values are neutral, and renaming them
-  touches code — which the "text only" instruction excluded.
 - 22 translation entries equal their English value because the target word is
   the same (French "Notifications", "Total", "badges"; Italian "Account",
   "Database"). Verified individually, not gaps.
-- Per-user **counter** fields (`games_played`, `games_won`, `coins_won`,
-  `coins_lost`, `steals_*`, `times_robbed`, `wheel_spins`) are still written as
-  read-modify-write in a few places. The currency itself (XP, coins) and the
-  view counter are atomic now; these counters are display statistics and drift
-  only under same-user concurrency. Listed as an optimisation in
-  `IMPROVEMENTS.md`.
+- The **database columns** `potat_level`, `potatoes` and `potat_first_seen`
+  keep their names: they are data plumbing owned by the sync functions, and the
+  instruction was to remove public *text* only. Their rendered labels are
+  neutral.
 - The changelog keeps its historical entries naming a vendor, because it is an
   append-only log of what happened; only user-facing pages were cleaned.
 
