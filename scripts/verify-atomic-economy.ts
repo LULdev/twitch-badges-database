@@ -253,7 +253,14 @@ async function main() {
     if (!exact) failures += 1;
   }
 
-  console.log(failures === 0 ? "ALL CHECKS PASSED" : `${failures} CHECK(S) FAILED`);
+  if (failures > 0) {
+    // Exit non-zero: a check that only prints is not a gate, and this script is
+    // part of the verification ritual. verify-game-economy.ts already did this.
+    console.error(`${failures} CHECK(S) FAILED`);
+    process.exitCode = 1;
+    return;
+  }
+  console.log("ALL CHECKS PASSED");
 }
 
 main().catch((error) => {

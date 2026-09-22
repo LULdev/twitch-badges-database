@@ -43,6 +43,10 @@ revoke all on function public.apply_pair_deltas(uuid, bigint, uuid, bigint) from
 revoke all on function public.apply_pair_deltas(uuid, bigint, uuid, bigint) from anon, authenticated;
 grant execute on function public.apply_pair_deltas(uuid, bigint, uuid, bigint) to service_role;
 
+-- The constraint is added, not replaced: a replay aborts with 42710 without this.
+alter table public.coin_rain_gate
+  drop constraint if exists coin_rain_gate_giver_key_len;
+
 alter table public.coin_rain_gate
   add constraint coin_rain_gate_giver_key_len
   check (length(giver_key) between 8 and 128);

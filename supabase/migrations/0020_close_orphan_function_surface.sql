@@ -24,35 +24,37 @@
 -- ("function does not exist") and blocks every later migration — the documented
 -- `npm run db:apply` path would never complete. Each revoke is therefore guarded
 -- by a existence check, which is a no-op on a fresh database.
+-- v26-02: the first version guarded each revoke with
+-- `to_regprocedure('public.name(args)')`, which is signature-specific and fails
+-- OPEN — if a signature ever changed, the guard returned null and the revoke was
+-- silently skipped. This loops over every overload of each named function and
+-- revokes them all, so a signature change cannot quietly leave one exposed.
 do $$
+declare
+  target text;
+  sig record;
 begin
-  if to_regprocedure('public.latest_badge_stats(integer)') is not null then
-    revoke all on function public.latest_badge_stats(integer) from public, anon, authenticated;
-    grant execute on function public.latest_badge_stats(integer) to service_role;
-  end if;
-
-  if to_regprocedure('public.get_own_profile_email()') is not null then
-    revoke all on function public.get_own_profile_email() from public, anon, authenticated;
-    grant execute on function public.get_own_profile_email() to service_role;
-  end if;
-
-  -- Trigger functions. They exist on every install (0001 creates them), but the
-  -- same guard costs nothing and keeps this file uniform.
-  if to_regprocedure('public.handle_new_user()') is not null then
-    revoke all on function public.handle_new_user() from public, anon, authenticated;
-  end if;
-  if to_regprocedure('public.touch_updated_at()') is not null then
-    revoke all on function public.touch_updated_at() from public, anon, authenticated;
-  end if;
-  if to_regprocedure('public.touch_badges_updated_at()') is not null then
-    revoke all on function public.touch_badges_updated_at() from public, anon, authenticated;
-  end if;
-  -- v25-02: this one was missed by the first sweep and was still executable by
-  -- anon and authenticated (a direct call fails with 0A000, so it was never
-  -- exploitable, but the claim that nothing was reachable was wrong).
-  if to_regprocedure('public.protect_profile_columns()') is not null then
-    revoke all on function public.protect_profile_columns() from public, anon, authenticated;
-  end if;
+  foreach target in array array[
+    'latest_badge_stats',
+    'get_own_profile_email',
+    'handle_new_user',
+    'touch_updated_at',
+    'touch_badges_updated_at',
+    'protect_profile_columns'
+  ]
+  loop
+    for sig in
+      select p.oid::regprocedure as s
+        from pg_proc p
+        join pg_namespace n on n.oid = p.pronamespace
+       where n.nspname = 'public' and p.proname = target
+    loop
+      execute format(
+        'revoke all on function %s from public, anon, authenticated', sig.s
+      );
+      execute format('grant execute on function %s to service_role', sig.s);
+    end loop;
+  end loop;
 end $$;
 
 insert into public.changelog (kind, title, body, payload) values (

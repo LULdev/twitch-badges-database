@@ -812,6 +812,26 @@ and reports 0. The same too-greedy-pattern mistake I made once before with the
 atomicity 17/17 with an exact restore (6 feed and 4 achievement rows removed),
 function surface 0 of 16 reachable.
 
+## Round 27 — a fresh install was replayed end to end
+
+The round-26 agent produced the most valuable single result of this series: it
+**replayed all 21 migrations into a throwaway database** (`zbr26_replay`) —
+**21/21 OK in two configurations**, with the pre-fix `0020` as a control failing
+`42883` exactly as predicted. The database was dropped afterwards and production
+was untouched. So the portability defect from round 26 is closed and verified by
+execution, not by reasoning.
+
+| ID | Finding | Fix |
+|---|---|---|
+| v26-01 (low) | `verify-atomic-economy.ts` counted failures, printed them and **always exited 0** — it was a report, not a gate, although the ritual relies on it | exits non-zero now, **proven** by running a copy with a deliberately wrong expectation: exit 1 and `FAIL single award xp: got 3, expected 999`. The real script exits 0 |
+| v26-04 (low) | three migrations were **not replayable**: `0011` (policies) and `0015` (CHECK constraint) abort with 42710, `0017` with 42P13 because `0018` changes its return type — so a lost-ledger restore halted at `0011` | each gained the right precondition (`drop policy/constraint/function if exists`); every file was applied **twice** inside a rolled-back transaction, all three clean |
+| v26-02 (info) | my `to_regprocedure('name(args)')` guard is **signature-specific and fails open** — a changed signature returns null and the revoke is silently skipped | the block now loops over **every overload** of each named function, so a signature change cannot leave one exposed |
+| v26-03 (info) | production carries `public.follows` (RLS on, four policies, 0 rows) that no migration creates and no code uses, with grants letting an authenticated client insert/update/delete in a table nothing reads | migration 0022 revokes the write grants and anon's SELECT, keeps the read path its policies allowed, and is a no-op on a fresh install. Verified: the table reads `authenticated=r` and an anon select returns 401 |
+
+**Verification:** lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`,
+atomicity 17/17 **with exit 0** and an exact restore, economy 13/13 below the stake
+(worst 0.9886), fresh-install replay 21/21.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents

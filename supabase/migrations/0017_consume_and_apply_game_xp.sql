@@ -12,6 +12,11 @@
 -- `consume_game_xp` and `apply_xp_coins` stay for the paths that do not count
 -- against the cap.
 
+-- 0018 replaces this function with different OUT names, so a replay that runs
+-- 0017 again would hit 42P13 ("cannot change return type"). Dropping first makes
+-- the file replayable.
+drop function if exists public.consume_and_apply_game_xp(uuid, date, int, bigint);
+
 create or replace function public.consume_and_apply_game_xp(
   p_user_id uuid,
   p_today date,

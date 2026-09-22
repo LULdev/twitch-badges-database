@@ -12,9 +12,12 @@
 -- server client; `ip_hash` and `id` stay unreachable from the public API.
 -- (The ledger row itself is written by scripts/db-apply.ts.)
 
+-- `drop … if exists` first: a lost-ledger replay would otherwise abort with 42710.
+drop policy if exists "blog_views_public_read" on public.blog_views;
 create policy "blog_views_public_read" on public.blog_views
   for select using (true);
 
+drop policy if exists "blog_reactions_public_read" on public.blog_reactions;
 create policy "blog_reactions_public_read" on public.blog_reactions
   for select using (true);
 
