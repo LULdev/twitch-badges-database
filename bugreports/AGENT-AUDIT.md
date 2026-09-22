@@ -772,6 +772,23 @@ page predates the `showLevel` toggle, so it no longer describes the intent.
 **Verification:** lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`,
 atomicity 16/16 with an exact restore, economy 13/13 below the stake (worst 0.9844).
 
+## Round 25 — an incomplete fix and a false claim of my own
+
+The round-24 agent reported **3 low, 2 info, 0 medium/high/critical — and no live
+defect** (`verify-round24.md`), with the full 16-function ACL table confirming all
+three economy RPCs are service-role only.
+
+| ID | Finding | Fix |
+|---|---|---|
+| v24-01 (low) | my `v23-02` fix was **half applied**: the inventory itself was gated, but the `owned`/`missing`/`completion` tiles and the section heading were not, so a hidden inventory still published "0 owned / N missing / 0 %" — the very false claim I said I had prevented | the three inventory-dependent tiles and the heading are gated too; the showcase tile stays independent (it does not depend on `inventory_public`) |
+| v24-02 (info) | **my commit `2f43059` claimed** the atomicity script "exercises the full award path including the achievement evaluation". It does not — all three `award()` calls pass `skipAchievements: true` on purpose, so the two new signals had **no coverage at all** | the claim is corrected here, and the coverage now exists: the script runs the evaluation inside its own snapshot/restore envelope. Live run: 123 evaluated, 4 unlocked for the test profile, restore exact, 4 created rows removed |
+| v24-03 (low) | `s_top_percent`'s ranking has no coin floor, so with fewer coin holders than places a 0-coin member was "top 3" by default | requires a balance above 0 as well as the rank |
+| v24-05 (info) | the public function surface was larger than known: two read RPCs that **no migration creates and no code calls** (`latest_badge_stats` reachable by anon, `get_own_profile_email` by authenticated) plus three trigger functions carrying the default PUBLIC grant | migration 0020 revokes the public grants on all five. The two orphans are **not dropped** — I did not create them and cannot see whether an external client uses them — so their exposure is closed and the production/migration divergence is recorded instead. Live: no function is reachable by anon/authenticated, both RPCs return 401, and the triggers still work (verified in a rolled-back transaction: a no-op update keeps `updated_at`, a `last_seen_at`-only update keeps it, a real change moves it) |
+
+**Verification:** lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`,
+atomicity **17/17** with an exact restore, economy 13/13 below the stake (worst
+0.9851).
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents

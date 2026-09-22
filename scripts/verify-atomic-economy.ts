@@ -13,6 +13,9 @@ config({ path: ".env.local" });
 async function main() {
   const { createAdminClient } = await import("@/lib/supabase/admin");
   const { award, adjustCoins, getProgress } = await import("@/lib/gamification/xp");
+  const { evaluateAchievements, ACTIVE_ACHIEVEMENTS } = await import(
+    "@/lib/gamification/achievements"
+  );
 
   const supabase = createAdminClient();
 
@@ -193,6 +196,20 @@ async function main() {
     const granted = Number(first.data ?? 0) + Number(second.data ?? 0);
     check("game XP budget capped at 100", granted, 100);
     console.log("  granted:", first.data, "+", second.data);
+
+    // The award calls above pass skipAchievements, so the evaluation itself had
+    // no coverage — and that is where the two newest signals live
+    // (accountAgeDays from profiles.created_at, isTopCoinHolder from a ranked
+    // user_progress query). Running it here also proves the whole path still
+    // evaluates without throwing; the restore below deletes whatever it unlocks.
+    const unlocked = await evaluateAchievements(profile.id);
+    check("achievement evaluation returns a list", Array.isArray(unlocked) ? 1 : 0, 1);
+    console.log(
+      "  achievements evaluated:",
+      ACTIVE_ACHIEVEMENTS.length,
+      "| unlocked for this profile:",
+      unlocked.length,
+    );
   } finally {
     // restore every column of the progress row
     const {

@@ -213,7 +213,9 @@ export const ACHIEVEMENTS: Achievement[] = [
   SPECIAL("s_midas", "Midas Touch", "Win 10 games in a row.", (s) => s.winStreak >= 10),
   SPECIAL("s_cursed", "Properly Cursed", "Lose 20 games in a row.", (s) => s.lossStreak >= 20, 1000, 500),
   SPECIAL("s_owl_gambler", "3 AM Gambler", "Win a game between 3 and 4 AM UTC.", (s) => s.recentResults.some((r) => r.won && r.hour === 3)),
-  SPECIAL("s_top_percent", "The 1%", "Be among the top 3 coin holders.", (s) => s.userCount >= 20 && s.isTopCoinHolder),
+  // The ranking alone is not enough: with fewer coin holders than places, a
+  // 0-coin member was "top 3" by default. The floor keeps the claim honest.
+  SPECIAL("s_top_percent", "The 1%", "Be among the top 3 coin holders.", (s) => s.userCount >= 20 && s.isTopCoinHolder && s.progress.coins > 0),
   SPECIAL("s_broke", "Rock Bottom", "Hit exactly 0 coins after playing 10+ games.", (s) => s.progress.coins === 0 && s.progress.games_played >= 10, 500, 250),
   SPECIAL("s_lazy_week", "Zen Week", "Keep a 7-day login streak with fewer than 7 games played.", (s) => s.progress.login_streak >= 7 && s.progress.games_played < 7),
   SPECIAL("s_generous", "Charitable", "Pay 1,000+ coins in failed steal attempts.", (s) => s.stealCostPaid >= 1000, 750, 0),

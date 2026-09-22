@@ -395,21 +395,26 @@ export default async function ProfilePage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* Stats */}
+      {/* Stats. The first three tiles describe the inventory: without it the
+          counts are zero, which would publish a false "0 owned / N missing". */}
       {profile && showStats && (
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="card stat-tile">
-            <dd className="stat-value">{ownedBadges.length}</dd>
-            <dt className="stat-label">{t("owned")}</dt>
-          </div>
-          <div className="card stat-tile">
-            <dd className="stat-value">{Math.max(0, totalCatalog - ownedBadges.length)}</dd>
-            <dt className="stat-label">{t("missing")}</dt>
-          </div>
-          <div className="card stat-tile">
-            <dd className="stat-value">{percent}%</dd>
-            <dt className="stat-label">{t("completion")}</dt>
-          </div>
+          {inventoryVisible && (
+            <>
+              <div className="card stat-tile">
+                <dd className="stat-value">{ownedBadges.length}</dd>
+                <dt className="stat-label">{t("owned")}</dt>
+              </div>
+              <div className="card stat-tile">
+                <dd className="stat-value">{Math.max(0, totalCatalog - ownedBadges.length)}</dd>
+                <dt className="stat-label">{t("missing")}</dt>
+              </div>
+              <div className="card stat-tile">
+                <dd className="stat-value">{percent}%</dd>
+                <dt className="stat-label">{t("completion")}</dt>
+              </div>
+            </>
+          )}
           <div className="card stat-tile">
             <dd className="stat-value">{showcaseBadges.length}</dd>
             <dt className="stat-label">{t("showcase")}</dt>
@@ -561,8 +566,9 @@ export default async function ProfilePage({ params }: PageProps) {
         </section>
       )}
 
-      {/* Owned badges */}
-      {profile && (
+      {/* Owned badges. The heading shows the count, so it is part of the same
+          gate — otherwise it read "Owned (0)" above an empty section. */}
+      {profile && inventoryVisible && (
         <section aria-labelledby="profile-owned">
           <div className="section-title">
             <h2 id="profile-owned">
