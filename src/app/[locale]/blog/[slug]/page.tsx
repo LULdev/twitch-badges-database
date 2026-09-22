@@ -60,7 +60,9 @@ export default async function BlogPostPage({ params }: PageProps) {
     const admin = createAdminClient();
     const [viewsRes, reactionsRes] = await Promise.all([
       admin.from("blog_views").select("id", { count: "exact", head: true }).eq("post_id", post.id),
-      admin.from("blog_reactions").select("emoji"),
+      // Without the post filter this counted every reaction on the whole blog,
+      // so all posts displayed identical totals.
+      admin.from("blog_reactions").select("emoji").eq("post_id", post.id),
     ]);
     viewCount = viewsRes.count ?? 0;
     for (const row of (reactionsRes.data ?? []) as Array<{ emoji: string }>) {

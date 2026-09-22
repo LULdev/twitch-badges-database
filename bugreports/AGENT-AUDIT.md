@@ -184,3 +184,29 @@ medium/low findings listed above. Six audit scopes have still not run as agents
 (stats, i18n, SEO, cron/health, UI shell, remaining pages); fourteen have.
 
 The "no bugs remain" bar is still **not** met.
+
+---
+
+## Round 4 — the last scopes (stats, i18n, SEO, cron, UI shell, pages)
+
+All twenty audit scopes now have an agent report (`bugreports/agent-01..20.md`).
+
+| ID | Fix | Verification |
+|---|---|---|
+| seo-1 | eleven pages had no `alternates` of their own and inherited the layout canonical — every one declared the homepage as its canonical URL, so search engines saw duplicates of `/en` | live: `/en/badges`, `/en/stats`, `/en/changelog` each emit their own canonical |
+| games-b-6 | catcher and shoot ran their loop inside the `setState` updater (moves, collisions, spawn, ref writes, `Math.random()`); React double-invokes updaters, so the posted score could differ from the visible one | lists mirrored in refs, decisions outside the updater |
+| cat-1 / cat-2 | `?page=9999` was a dead end — PostgREST rejects a window past the end with an error, which the explorer swallowed into "catalog is empty" | live: `page=11` and `page=9999` render the 43 tiles of the last page, `page=2` the normal 48 |
+| stats-1 / stats-3 | both growth charts read zero (views expose `signups`/`badges`, the code read `count`); the availability KPI claimed 0.00 % where there was no data | values map correctly; "—" is rendered |
+| i18n-1 / i18n-2 | the language switch dropped the query string; `formatCompact` hardcoded `en`, so ten locales showed English numbers | query preserved; all 12 call sites pass the locale |
+| cron-1 | public `/api/health` wrote a heartbeat row per request (flood → unbounded table + skewed uptime) | at most one row per minute per instance |
+| ui-1 / ui-3 | every level badge shared the SVG gradient id `lg-shield`, so all but the first took the first colour; the 13-item nav appeared at 1024 px while the hamburger was hidden there, overflowing the bar on laptop widths | per-level id; nav switches at 1280 px |
+| pg-1 / pg-2 | blog reactions were counted across the whole blog (every post showed identical totals); a failed reaction request decremented the count and flipped the button | query scoped to the post; failures are ignored |
+
+### Still open (from the newest reports)
+
+`stats-2` (uptime table header/cell misalignment), `stats-4/5`, `i18n-3..6`,
+`seo-2..4` (sitemap hreflang codes + lastModified + missing routes), `cron-2..6`,
+`ui-2/4/5/6/7/8/9`, `cat-4..9`, `pg-3..8` — plus the older medium/low findings
+from rounds 1–3.
+
+The "no bugs remain" bar is still **not** met.

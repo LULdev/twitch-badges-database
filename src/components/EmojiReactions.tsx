@@ -34,7 +34,12 @@ export default function EmojiReactions({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ slug, emoji }),
       });
+      // A failed request returns an error body, which used to be treated as a
+      // removal: the count dropped by one and the button flipped state even
+      // though nothing changed server-side.
+      if (!res.ok) return;
       const data = (await res.json()) as { added?: boolean; removed?: boolean };
+      if (!data.added && !data.removed) return;
       setCounts((prev) => ({
         ...prev,
         [emoji]: Math.max(0, (prev[emoji] ?? 0) + (data.added ? 1 : -1)),
