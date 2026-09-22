@@ -99,7 +99,7 @@ thousand eighty-one translations were added; the language switch dropped the
 query string; `formatCompact` and nine components hardcoded `en`, so ten locales
 showed English numbers; the uptime calendar formatted UTC midnight in the local
 zone and showed the previous day; three message keys were later added for the new
-error boundary. All 11 locale files are verified **key-identical** (664 keys) by a
+error boundary. All 11 locale files are verified **key-identical** (675 keys) by a
 flat-key diff, and the build is grepped for `MISSING_MESSAGE`.
 
 ## 8. Accessibility and UI
@@ -137,8 +137,10 @@ npm run lint        → 0 errors (7 warnings, all pre-existing)
 npm run typecheck   → 0
 npm run build       → 227/227 pages, 0 MISSING_MESSAGE
 verify-atomic-economy.ts → 16/16 ALL CHECKS PASSED
-verify-game-economy.ts   → 13/13 games below the stake (worst 0.9873)
-live smoke          → 165/165 routes across 11 locales
+verify-game-economy.ts   → 13/13 games below the stake (worst 0.9842)
+locale parity       → 675 keys x 11 locales, identical
+live smoke          → 132/132 routes across 11 locales
+vendor-text scan    → 0 of 132 rendered pages name a provider
 ```
 
 ## Idea collection
@@ -162,3 +164,11 @@ These are documented rather than fixed, and none is a defect in the narrow sense
 4. **0012's validating CHECKs** run against pre-existing rows, so an environment
    holding a legacy oversized blob would block that migration. It applied
    cleanly here (one profile, `{}`) and is already applied.
+5. **`apply_pair_deltas` runtime proof** (migration 0015) is pending: the database
+   pooler became unresolvable from the build machine while the REST API stayed
+   healthy. The function exists, is service-role-only (REST returns 401 for
+   `anon`) and mirrors `add_coins`, but the balance/zero-sum/clamping test could
+   not run.
+6. **Two client nits**: RTL arrow glyphs are not mirrored at the remaining sites,
+   and the language listbox lacks `aria-activedescendant`. A real 3-D card flip in
+   the memory game is a design task, not a defect.

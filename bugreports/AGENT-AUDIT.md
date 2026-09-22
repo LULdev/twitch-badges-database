@@ -364,6 +364,51 @@ cap in stats aggregations), `auth-4/7` (double cookie refresh, global
 
 ---
 
+## Round 12 — three parallel verification agents
+
+Three agents ran concurrently on the state after `2350cbf`: one on the newest
+commits (`verify-round11.md`), one on the server side (`verify-server.md`), one
+on the client side (`verify-client.md`). Together: **2 high, 2 medium, 13 low**.
+
+| ID | Finding | Fix |
+|---|---|---|
+| **srv-1 (high)** | the global sync marks every badge missing from the live catalog as `removed`, so a provider answering 200 with an empty or truncated list wiped the whole catalog — and the heartbeat still said ok | refuses before any write when fewer than 50 badges arrive or fewer than half the known catalog, naming the incident |
+| **cli-1 (high)** | the vault game was unplayable after dial 1: the double-click guard was a boolean reset only in `start()`, which no later phase reaches, so dials 2–3 could never be stopped, `play()` never fired and only a reload escaped | the guard tracks the dial |
+| srv-2 (medium) | an owners feed that **resolved empty** counted as success, emptied the lookup map and wrote `null` over every owner count — the pdat-1 guard only covered the thrown case | an empty result behaves like a failure: stored numbers stay, `ownersFeedOk` false |
+| srv-3 (medium) | `getBadgeStatsHistory` ordered ascending with `limit(250)`, i.e. returned the **oldest** points, so badge charts stopped updating | newest-first, reversed for the chart |
+| v11-1 | the coin-rain gate row was inserted before `add_coins`, which is a silent no-op without a progress row → `ok:true` for a coin that never existed | `ensureProgress` before the gate |
+| v11-2 | both steal balances moved in two separate `add_coins` calls | migration 0015 `apply_pair_deltas` books both in one statement |
+| v11-4 / v11-5 | the gate grew one row per (profile, giver, day) forever; `giver_key` accepted `''` | daily prune; length CHECK |
+| v11-3 + vendor texts | `/stats` printed the internal heartbeat ids and the stored `message` verbatim; the changelog page renders its own bodies — **43 rows** named a provider | neutral, localized labels in 11 locales; neutral wording at every writer; the 43 rows rewritten with nothing deleted (row count unchanged) |
+| srv-4 | the IP-hash salt was a `NEXT_PUBLIC_*` value, so the "pseudonymous" hash was brute-forceable over the IPv4 space | server-only secret |
+| srv-5 | an empty drop-window listing cleared every confirmation and demoted dateless badges | refuses |
+| srv-6 | `sitemap.ts` and `inventory.ts` capped at PostgREST's 1000-row response limit | both page with `.range()` |
+| cli-2/3/4/5/6/7/8/9 | RTL arrow glyphs not mirrored; the chart theme ignored the light/dark toggle; `CountUp` froze on its first value; a dead `rotateY` tautology; hardcoded `Level N` and German `Tag N`; the share text read "View all"; the manifest pinned `/en`; the language listbox lacked `aria-activedescendant` | theme observer, rewritten `CountUp`, dead style removed, three new locale keys, `start_url: "/"`; the RTL glyph mirroring and `aria-activedescendant` are **still open** |
+
+### Verification of this round
+
+lint 0 errors, typecheck 0, build 227/227, 0 `MISSING_MESSAGE`, 675 keys ×11
+identical, atomicity **16/16**, economy 13/13 (worst hilo 0.9842). Migration 0015
+applied; over REST, `anon` gets **401 permission denied for
+function apply_pair_deltas** and the gate table stays unreadable.
+Live vendor scan across 11 locales × 12 paths: **132/132 routes 200, 0 pages
+containing a provider name**, and both the changelog page and its RSS feed are
+clean.
+
+**Blocked, reported as such:** the full transaction test of `apply_pair_deltas`
+(balance movement, zero-sum, clamping) could not run — the database pooler became
+unresolvable from this machine (`nxdomain` / `CONNECT_TIMEOUT`) while the REST API
+stayed reachable. The function's existence, its service-role-only grant and its
+arithmetic (it mirrors `add_coins`) are verified; the runtime proof is pending.
+
+### Still open
+
+`cli-2` (RTL arrow glyphs at the remaining sites), `cli-9`
+(`aria-activedescendant`), a real 3-D card flip in the memory game, `fp-3` (most
+`ProfileCustomizer` settings are stored but never applied), the daily-XP-budget
+refund, the 19 historical `blog_views` rows, 0012's CHECK hazard for other
+environments, and the pending `apply_pair_deltas` runtime proof.
+
 ## Phase 3 completion — the ten idea sub-agents
 
 All ten idea scopes ran as real read-only sub-agents
