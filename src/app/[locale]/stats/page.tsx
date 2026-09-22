@@ -126,7 +126,7 @@ function Kpi({
   coin,
 }: {
   label: string;
-  value: number;
+  value: number | null;
   hint?: string;
   decimals?: number;
   locale: string;
@@ -138,7 +138,11 @@ function Kpi({
     <div className="kpi">
       <div className="flex items-start justify-between gap-2">
         <div className="kpi-value" style={accent ? { color: accent } : undefined}>
-          <CountUp value={value} locale={locale} decimals={decimals} />
+          {value === null ? (
+            "—"
+          ) : (
+            <CountUp value={value} locale={locale} decimals={decimals} />
+          )}
           {coin ? <Coin size={14} className="ms-1.5" /> : null}
         </div>
         {icon ? <span className="kpi-icon">{icon}</span> : null}
@@ -457,7 +461,8 @@ export default async function StatsPage({
           />
           <Kpi
             label={t("availabilityAll")}
-            value={uptime.availabilityAll ?? 0}
+            // No data must read as "—", not as a 0.00 % outage.
+            value={uptime.availabilityAll}
             decimals={2}
             hint={`${number.format(
               uptime.sources.reduce((total, source) => total + source.checks_total, 0),

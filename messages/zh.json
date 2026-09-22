@@ -133,7 +133,8 @@
     "title": "全部徽章",
     "upcomingSubtitle": "上线前的预览",
     "upcomingTitle": "即将推出的徽章",
-    "version": "版本"
+    "version": "版本",
+    "loadFailed": "目录暂时无法加载，请稍后再试。"
   },
   "countdown": {
     "expiresIn": "剩余时间",

@@ -24,6 +24,12 @@ export default function CatcherGame() {
   const areaRef = useRef<HTMLDivElement>(null);
   const raf = useRef<number>(0);
   const stateRef = useRef({ caught: 0, missed: 0, basketX: 50 });
+  // The falling items are mirrored in a ref so the animation loop can resolve
+  // collisions OUTSIDE the setState updater. React invokes updaters twice in
+  // development, and an updater containing ref writes, nested setState calls
+  // and Math.random() made the score posted to the server differ from the one
+  // the player saw.
+  const itemsRef = useRef<Falling[]>([]);
 
   const images = useRef<string[]>([]);
   useEffect(() => {
@@ -38,46 +44,50 @@ export default function CatcherGame() {
   useEffect(() => {
     if (!running) return;
     const tick = () => {
-      setItems((prev) => {
-        const width = areaRef.current?.clientWidth ?? 600;
-        const height = areaRef.current?.clientHeight ?? 320;
-        const basketPx = (stateRef.current.basketX / 100) * width;
-        const next: Falling[] = [];
-        for (const item of prev) {
-          const y = item.y + item.speed;
-          if (y >= height - 36 && Math.abs(item.x - basketPx) < 42) {
-            if (item.bomb) {
-              stateRef.current.caught = Math.max(0, stateRef.current.caught - 3);
-              setCaught((c) => Math.max(0, c - 3));
-            } else {
-              stateRef.current.caught += 1;
-              setCaught((c) => c + 1);
-            }
-            continue;
-          }
-          if (y > height) {
-            if (!item.bomb) {
-              stateRef.current.missed += 1;
-              setMissed((m) => m + 1);
-            }
-            continue;
-          }
-          next.push({ ...item, y });
+      const width = areaRef.current?.clientWidth ?? 600;
+      const height = areaRef.current?.clientHeight ?? 320;
+      const basketPx = (stateRef.current.basketX / 100) * width;
+      const next: Falling[] = [];
+      let caughtNext = stateRef.current.caught;
+      let missedNext = stateRef.current.missed;
+
+      for (const item of itemsRef.current) {
+        const y = item.y + item.speed;
+        if (y >= height - 36 && Math.abs(item.x - basketPx) < 42) {
+          if (item.bomb) caughtNext = Math.max(0, caughtNext - 3);
+          else caughtNext += 1;
+          continue;
         }
-        if (Math.random() < 0.045) {
-          next.push({
-            id: Math.random(),
-            x: 20 + Math.random() * (width - 60),
-            y: -20,
-            speed: 1.4 + Math.random() * 2.2,
-            image: images.current.length
-              ? images.current[Math.floor(Math.random() * images.current.length)]
-              : "",
-            bomb: Math.random() < 0.18,
-          });
+        if (y > height) {
+          if (!item.bomb) missedNext += 1;
+          continue;
         }
-        return next;
-      });
+        next.push({ ...item, y });
+      }
+
+      if (Math.random() < 0.045) {
+        next.push({
+          id: Math.random(),
+          x: 20 + Math.random() * (width - 60),
+          y: -20,
+          speed: 1.4 + Math.random() * 2.2,
+          image: images.current.length
+            ? images.current[Math.floor(Math.random() * images.current.length)]
+            : "",
+          bomb: Math.random() < 0.18,
+        });
+      }
+
+      itemsRef.current = next;
+      setItems(next);
+      if (caughtNext !== stateRef.current.caught) {
+        stateRef.current.caught = caughtNext;
+        setCaught(caughtNext);
+      }
+      if (missedNext !== stateRef.current.missed) {
+        stateRef.current.missed = missedNext;
+        setMissed(missedNext);
+      }
       raf.current = requestAnimationFrame(tick);
     };
     const start = requestAnimationFrame(tick);
@@ -112,6 +122,7 @@ export default function CatcherGame() {
 
   function start() {
     stateRef.current = { caught: 0, missed: 0, basketX: 50 };
+    itemsRef.current = [];
     setCaught(0);
     setMissed(0);
     setItems([]);

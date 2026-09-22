@@ -133,7 +133,8 @@
     "title": "Todas las insignias",
     "upcomingSubtitle": "Vista previa de insignias antes de su lanzamiento",
     "upcomingTitle": "Próximas insignias",
-    "version": "Versión"
+    "version": "Versión",
+    "loadFailed": "El catálogo no se pudo cargar ahora mismo. Inténtalo de nuevo en un momento."
   },
   "countdown": {
     "expiresIn": "Expira en",

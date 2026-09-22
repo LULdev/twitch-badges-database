@@ -133,7 +133,8 @@
     "title": "Todas as insígnias",
     "upcomingSubtitle": "Prévia das insígnias antes do lançamento",
     "upcomingTitle": "Próximas insígnias",
-    "version": "Versão"
+    "version": "Versão",
+    "loadFailed": "O catálogo não pôde ser carregado agora. Tente novamente em instantes."
   },
   "countdown": {
     "expiresIn": "Expira em",

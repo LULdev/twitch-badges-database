@@ -133,7 +133,8 @@
     "title": "All badges",
     "upcomingSubtitle": "Preview of badges before their release",
     "upcomingTitle": "Upcoming badges",
-    "version": "Version"
+    "version": "Version",
+    "loadFailed": "The catalog could not be loaded right now. Please try again in a moment."
   },
   "countdown": {
     "expiresIn": "Expires in",

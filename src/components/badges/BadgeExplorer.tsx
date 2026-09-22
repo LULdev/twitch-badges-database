@@ -45,13 +45,17 @@ export default async function BadgeExplorer({
 
   let result = null;
   let categories: string[] = [];
+  let loadFailed = false;
   try {
     [result, categories] = await Promise.all([
       listBadges(filters),
       getCategories(),
     ]);
-  } catch {
-    // DB not ready
+  } catch (error) {
+    // This used to be swallowed: a real database error rendered the
+    // "catalog is empty" setup hint, which reads as "there are no badges".
+    loadFailed = true;
+    console.warn("[badges] catalog load failed:", error);
   }
 
   return (
@@ -85,6 +89,10 @@ export default async function BadgeExplorer({
             params={searchParams as Record<string, string | undefined>}
           />
         </>
+      ) : loadFailed ? (
+        <div className="card border-danger/40 bg-danger/10 p-10 text-center text-sm text-danger">
+          {t("loadFailed")}
+        </div>
       ) : (
         <div className="card p-10 text-center text-sm text-muted">
           {tc("setupHint")}

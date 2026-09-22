@@ -415,13 +415,15 @@ export async function getPlatformStats(): Promise<PlatformStats> {
     claims: claims ? (claims as ClaimStats) : null,
     traffic: traffic ? (traffic as TrafficStats) : null,
     system: system ? (system as SystemStats) : null,
-    dailyUsers: (dailyUsers as DailyCountRow[]).map((row) => ({
+    // The views name these columns `signups` / `badges`; reading `count` here
+    // made both growth charts render as a flat zero line.
+    dailyUsers: (dailyUsers as Array<Record<string, unknown>>).map((row) => ({
       day: String(row.day),
-      count: num(row.count),
+      count: num(row.signups),
     })),
-    dailyBadges: (dailyBadges as DailyCountRow[]).map((row) => ({
+    dailyBadges: (dailyBadges as Array<Record<string, unknown>>).map((row) => ({
       day: String(row.day),
-      count: num(row.count),
+      count: num(row.badges),
     })),
     uptime: {
       sources,

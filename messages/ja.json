@@ -133,7 +133,8 @@
     "title": "すべてのバッジ",
     "upcomingSubtitle": "リリース前のプレビュー",
     "upcomingTitle": "開催予定のバッジ",
-    "version": "バージョン"
+    "version": "バージョン",
+    "loadFailed": "カタログを読み込めませんでした。しばらくしてからもう一度お試しください。"
   },
   "countdown": {
     "expiresIn": "終了まで",

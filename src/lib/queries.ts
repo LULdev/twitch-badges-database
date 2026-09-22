@@ -208,9 +208,40 @@ export async function listBadges(
   query = query.range((page - 1) * perPage, page * perPage - 1);
 
   const { data, error, count } = await query;
-  if (error) throw error;
+
+  if (error) {
+    // PostgREST rejects a window that starts past the end of the result set
+    // (416 / PGRST103) rather than returning an empty page. That is what made a
+    // stale `?page=` a hard failure — previously swallowed into the "catalog is
+    // empty" hint. Treat it as "past the end" and serve the last real page.
+    if (page > 1) {
+      const first = await listBadges({ ...filters, page: 1 });
+      if (first.total > 0) {
+        return listBadges({ ...filters, page: Math.min(page, first.pages) });
+      }
+    }
+    throw error;
+  }
 
   const total = count ?? 0;
+  const pages = Math.max(1, Math.ceil(total / perPage));
+
+  // A stale or hand-edited `?page=` beyond the range used to render an empty
+  // page with no pagination at all — a dead end with no way back. Clamp to the
+  // last page instead (the recursive call cannot loop: pages <= page then).
+  if (page > pages && total > 0) {
+    // The window is beyond the filtered set: serve the last real page instead
+    // of a dead end (the recursion terminates because pages <= page there).
+    return listBadges({ ...filters, page: pages });
+  }
+  if (page > 1 && (data ?? []).length === 0) {
+    // PostgREST can report a zero count for a window beyond the data, so an
+    // empty page needs one cheap first-page query to tell "past the end" from
+    // "these filters match nothing".
+    const first = await listBadges({ ...filters, page: 1 });
+    if (first.total > 0) return listBadges({ ...filters, page: first.pages });
+  }
+
   return {
     items: (data ?? []) as BadgeRow[],
     total,

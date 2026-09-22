@@ -133,7 +133,8 @@
     "title": "Tutti i badge",
     "upcomingSubtitle": "Anteprima dei badge prima del lancio",
     "upcomingTitle": "Badge in arrivo",
-    "version": "Versione"
+    "version": "Versione",
+    "loadFailed": "Il catalogo non può essere caricato in questo momento. Riprova tra poco."
   },
   "countdown": {
     "expiresIn": "Scade tra",

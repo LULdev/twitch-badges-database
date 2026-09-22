@@ -24,6 +24,7 @@ export default function ShootGame() {
   const areaRef = useRef<HTMLDivElement>(null);
   const raf = useRef<number>(0);
   const stateRef = useRef({ hits: 0, shots: 0 });
+  const targetsRef = useRef<Target[]>([]);
 
   const images = useRef<string[]>([]);
   useEffect(() => {
@@ -55,18 +56,17 @@ export default function ShootGame() {
     const tick = (now: number) => {
       const dt = (now - last) / 16.7;
       last = now;
-      setTargets((prev) => {
-        const width = areaRef.current?.clientWidth ?? 600;
-        const next = prev
-          .map((target) => ({
-            ...target,
-            x: target.x + target.vx * dt,
-            y: target.y + target.vy * dt,
-          }))
-          .filter((target) => target.y > -40 && target.x > -40 && target.x < width + 40);
-        if (next.length < 6 && Math.random() < 0.06) next.push(spawn());
-        return next;
-      });
+      const width = areaRef.current?.clientWidth ?? 600;
+      const next = targetsRef.current
+        .map((target) => ({
+          ...target,
+          x: target.x + target.vx * dt,
+          y: target.y + target.vy * dt,
+        }))
+        .filter((target) => target.y > -40 && target.x > -40 && target.x < width + 40);
+      if (next.length < 6 && Math.random() < 0.06) next.push(spawn());
+      targetsRef.current = next;
+      setTargets(next);
       raf.current = requestAnimationFrame(tick);
     };
     raf.current = requestAnimationFrame(tick);
@@ -102,7 +102,9 @@ export default function ShootGame() {
     setShots(0);
     setSummary(null);
     setTimeLeft(30);
-    setTargets(Array.from({ length: 4 }, () => spawn()));
+    const initial = Array.from({ length: 4 }, () => spawn());
+    targetsRef.current = initial;
+    setTargets(initial);
     setRunning(true);
   }
 
@@ -113,17 +115,17 @@ export default function ShootGame() {
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    setTargets((prev) => {
-      const hitIndex = prev.findIndex(
-        (target) => Math.hypot(target.x + 22 - x, target.y + 22 - y) < 30,
-      );
-      if (hitIndex === -1) return prev;
-      const next = [...prev];
+    const hitIndex = targetsRef.current.findIndex(
+      (target) => Math.hypot(target.x + 22 - x, target.y + 22 - y) < 30,
+    );
+    if (hitIndex !== -1) {
+      const next = [...targetsRef.current];
       next.splice(hitIndex, 1);
+      targetsRef.current = next;
       stateRef.current.hits += 1;
-      setHits((prevHits) => prevHits + 1);
-      return next;
-    });
+      setHits(stateRef.current.hits);
+      setTargets(next);
+    }
   }
 
   return (
