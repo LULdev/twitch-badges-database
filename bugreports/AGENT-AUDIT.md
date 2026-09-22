@@ -230,3 +230,34 @@ collected total to 10 optimisation areas and 98 feature ideas.
 `i18n-3..6`, `cron-2..6`, `ui-2`, `ui-4..9`, `cat-4..9`, `pg-3..8`, plus the
 older medium/low findings from rounds 1–3. The "no bugs remain" bar is still
 **not** met.
+
+---
+
+## Round 6 — i18n, cron and remaining UI/catalog/page findings
+
+| ID | Fix | Verification |
+|---|---|---|
+| i18n-3 | nine components/pages formatted numbers with a hardcoded English locale | all use the active locale; smoke-tested the games hub, tower, slots, achievements, feed, stats |
+| i18n-5 | the stats live card formatted its time without a locale | locale passed |
+| i18n-6 | the changelog filter had no chip for the `blog`/`push` kinds | both chips added |
+| cron-3 | heartbeat retention sat after the early return, so a failing catalog sync also stopped the trim | prune runs on both paths |
+| cron-4 | `db-apply` ran a migration and its ledger row as two statements — a crash between them could re-apply a destructive migration | one transaction; verified the wrapper and an unchanged ledger |
+| cron-5 | the three cron routes compared the Authorization header with `!==` | `isAuthorizedCron()` with a constant-time digest compare; verified 401 for missing/wrong/short and 200 with the real secret |
+| ui-5 | ShareButtons derived its URL during render → SSR/hydration mismatch on every share href | resolved after mount |
+| cat-5 | the catalog search field is uncontrolled, so Clear left the text behind | input keyed on the active query |
+| ui-2 | the special achievement tier's inline background overrode its CSS ring + pulse | inline style only for the other tiers |
+| pg-3 | the inventory's "+N more — sorted by rarity" was hardcoded English | new key in 11 locales |
+| ui-9 | the two nav aria-labels were hardcoded English | translated |
+
+**Refuted this round:** `i18n-4` (`profile_visit`/`steal_visit` are only read as
+filters, never written as feed kinds, so no `t(kind)` can miss a key) and
+`pg-7` (the auto blog post is an English document; its links intentionally point
+at the English badge pages).
+
+### Still open
+
+`cron-2`, `cron-6`, `ui-4`, `ui-6`, `ui-7`, `ui-8`, `cat-4`, `cat-6`, `cat-7`,
+`cat-8`, `cat-9`, `pg-4`, `pg-5`, `pg-6`, `pg-8`, `stats-4`, `stats-5`, and the
+older medium/low findings from rounds 1–3.
+
+The "no bugs remain" bar is still **not** met.
