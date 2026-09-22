@@ -129,23 +129,82 @@ function parseHowTo(html: string): string | null {
   return null;
 }
 
+interface TemporalSchema {
+  "@type"?: string;
+  temporalCoverage?: string;
+  datePublished?: string;
+}
+
+/**
+ * Read the badge's real claim window from the page's schema.org ItemPage
+ * JSON-LD:
+ *   "temporalCoverage": "<start>/<end>"   (ISO 8601 interval)
+ *   "datePublished":    "<release date>"
+ *
+ * `data-reset` must NOT be used: it belongs to the site's channel-points /
+ * giveaway overlay (`.qlog-reset`, always the next midnight). Using it
+ * poisoned every badge with an identical bogus end date and made
+ * confirmed-active badges expire.
+ */
+function parseTemporalCoverage(html: string): {
+  start: string | null;
+  end: string | null;
+  published: string | null;
+} {
+  const empty = { start: null, end: null, published: null };
+  const blocks = html.match(
+    /<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi,
+  );
+  if (!blocks) return empty;
+
+  for (const block of blocks) {
+    const jsonText = block.replace(/<[^>]+>/g, "");
+    let parsed: TemporalSchema | TemporalSchema[];
+    try {
+      parsed = JSON.parse(jsonText) as TemporalSchema | TemporalSchema[];
+    } catch {
+      continue;
+    }
+    const entries = Array.isArray(parsed) ? parsed : [parsed];
+    for (const entry of entries) {
+      // Accept any entry that carries the fields — badgebase emits ItemPage,
+      // but staying type-agnostic survives a schema tweak on their side.
+      const coverage = entry.temporalCoverage?.trim();
+      if (!coverage) continue;
+      const [start, end] = coverage.split("/");
+      return {
+        start: start ? normalizeDate(start) : null,
+        end: end ? normalizeDate(end) : null,
+        published: entry.datePublished ? normalizeDate(entry.datePublished) : null,
+      };
+    }
+  }
+  return empty;
+}
+
+/** Coerce an ISO 8601 value to a valid UTC ISO string, or null. */
+function normalizeDate(value: string): string | null {
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
 export async function fetchBadgebaseDetail(
   slugPath: string,
 ): Promise<BadgebaseDetail> {
   const html = await fetchHtml(slugPath);
 
-  const endMatch = /data-reset="(\d+)"/.exec(html);
   const tsMatch = /data-ts="(\d+)"/.exec(html);
   const tagsMatch = /data-tags="([^"]*)"/.exec(html);
   const descMatch = /<meta name="description" content="([^"]*)"/i.exec(html);
 
+  const { start, end, published } = parseTemporalCoverage(html);
+
   return {
-    endDate: endMatch
-      ? new Date(Number(endMatch[1]) * 1000).toISOString()
-      : null,
-    startDate: tsMatch
-      ? new Date(Number(tsMatch[1]) * 1000).toISOString()
-      : null,
+    endDate: end,
+    startDate:
+      start ??
+      published ??
+      (tsMatch ? new Date(Number(tsMatch[1]) * 1000).toISOString() : null),
     tags: tagsMatch
       ? tagsMatch[1]
           .split(",")

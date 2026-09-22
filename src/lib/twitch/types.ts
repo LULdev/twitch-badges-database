@@ -107,12 +107,17 @@ export function badgeStatus(
 }
 
 /**
- * Authoritative status resolution. A badge is 'active' ONLY if
- *  - it has a claim window and `now` is inside it, or
- *  - it has no window but is on badgebase's curated /active list
- *    (is_confirmed_active, maintained by the badgebase listing sync).
- * Dateless, unconfirmed badges (subscriber, bits, turbo, …) count as
- * 'expired' — they are permanent states, not currently-redeemable drops.
+ * Authoritative status resolution. A badge is 'active' if
+ *  - badgebase's curated /active list confirms it (is_confirmed_active), or
+ *  - it has a claim window and `now` is inside it.
+ * A confirmed-active badge still only counts as 'upcoming' while its start
+ * date lies in the future. Dateless, unconfirmed badges (subscriber, bits,
+ * turbo, …) count as 'expired' — they are permanent states, not
+ * currently-redeemable drops.
+ *
+ * The confirmed flag deliberately WINS over an elapsed end date: badgebase's
+ * listing is the authority, and a stale/derived date in our own row must
+ * never demote a badge that is currently redeemable.
  */
 export function resolveStatus(
   badge: {
@@ -122,15 +127,17 @@ export function resolveStatus(
   },
   now: Date = new Date(),
 ): "active" | "upcoming" | "expired" {
+  const startInFuture =
+    !!badge.start_date &&
+    new Date(badge.start_date).getTime() > now.getTime();
+
+  if (badge.is_confirmed_active) return startInFuture ? "upcoming" : "active";
+
   if (badge.end_date && new Date(badge.end_date).getTime() < now.getTime())
     return "expired";
-  if (
-    badge.start_date &&
-    new Date(badge.start_date).getTime() > now.getTime()
-  )
-    return "upcoming";
+  if (startInFuture) return "upcoming";
   if (badge.start_date || badge.end_date) return "active";
-  return badge.is_confirmed_active ? "active" : "expired";
+  return "expired";
 }
 
 const CATEGORY_RULES: Array<[RegExp, string]> = [

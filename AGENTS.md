@@ -13,10 +13,16 @@ Read `README.md` for data sources and setup; read this file before editing.
   catalog (`isStatusSetId` in types.ts; global sync deletes any that exist).
   badgebase sync is the AUTHORITATIVE activity source: badges on /active get
   `is_confirmed_active` + status 'active'; everything else without a live
-  window is demoted to 'expired' (sweep in runBadgebaseSync). Detail pages
-  provide end date (`data-reset`) and HowTo JSON-LD. potat: /users/{login}
-  enriches profiles after login; /twitch/badges?badge={id} feeds the live
-  count on badge pages; the badge_momentum view feeds rarity momentum.
+  window is demoted to 'expired' (sweep in runBadgebaseSync). Listing cards
+  carry only `data-ts` (start) + `data-status`/`data-tags`/`data-count`; the
+  **real claim window comes from the detail page's schema.org JSON-LD**
+  (`temporalCoverage: "<start>/<end>"`, `datePublished` as fallback).
+  **Never parse `data-reset`** — that attribute belongs to the site's channel-
+  points/giveaway overlay (`.qlog-reset`) and always points at the next
+  midnight; reading it once expired every redeemable badge.
+  potat: /users/{login} enriches profiles after login;
+  /twitch/badges?badge={id} feeds the live count on badge pages; the
+  badge_momentum view feeds rarity momentum.
 - `src/lib/syncs/` — sync engines shared by `scripts/*.ts` AND `/api/cron/*`
 - `src/lib/` — queries.ts (DB reads via server client), rarity.ts (TBRI),
   changelog.ts, inventory.ts, push.ts, markdown.ts, seo.ts, health.ts
