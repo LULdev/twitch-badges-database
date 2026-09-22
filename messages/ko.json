@@ -281,7 +281,7 @@
   "stats": {
     "achCategories": "단계별 해금",
     "achCategoriesSub": "단계별 해금 수, 회색은 전체 수",
-    "achSubtitle": "3단계 125개 목표",
+    "achSubtitle": "3단계 {total}개 목표",
     "achTitle": "업적",
     "achievementsTotal": "업적",
     "achievementsUnlocked": "해금한 업적",
@@ -632,7 +632,7 @@
     "disabled": "이 수집가는 코인 훔치기를 꺼두었습니다."
   },
   "faq": {
-    "achievementsA": "125개: 일반 이정표 50, 창의적 도전 50, 진짜 예상 밖의 특별 25. 각각 XP, BadgesCoins, 포인트를 주고 프로필 업적 쇼케이스에 반짝이는 배지가 표시됩니다.",
+    "achievementsA": "{total}개: 일반 이정표 {common}, 창의적 도전 {creative}, 진짜 예상 밖의 특별 {special}. 각각 XP, BadgesCoins, 포인트를 주고 프로필 업적 쇼케이스에 반짝이는 배지가 표시됩니다.",
     "achievementsQ": "업적은 몇 개인가요?",
     "badgesA": "네! 로그인 후 배지를 동기화하면 새로 해금한 배지마다 +1,000 XP와 +500 BadgesCoins가 지급되고 실시간 피드에 표시됩니다.",
     "badgesQ": "Twitch 배지로 XP를 받나요?",

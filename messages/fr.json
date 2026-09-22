@@ -281,7 +281,7 @@
   "stats": {
     "achCategories": "Déblocages par palier",
     "achCategoriesSub": "Déblocages par palier, taille du catalogue en gris",
-    "achSubtitle": "125 objectifs en trois paliers",
+    "achSubtitle": "{total} objectifs en trois paliers",
     "achTitle": "Succès",
     "achievementsTotal": "Succès",
     "achievementsUnlocked": "Succès débloqués",
@@ -632,7 +632,7 @@
     "disabled": "Ce collectionneur a désactivé le vol de pièces."
   },
   "faq": {
-    "achievementsA": "125 : 50 jalons communs, 50 défis créatifs et 25 spéciaux vraiment inattendus. Chacun donne de l'XP, des BadgesCoins et des points, plus un badge scintillant dans la vitrine de succès de ton profil.",
+    "achievementsA": "{total} : {common} jalons communs, {creative} défis créatifs et {special} spéciaux vraiment inattendus. Chacun donne de l'XP, des BadgesCoins et des points, plus un badge scintillant dans la vitrine de succès de ton profil.",
     "achievementsQ": "Combien de succès existe-t-il ?",
     "badgesA": "Oui ! Synchronise tes badges après connexion — chaque badge débloqué paie +1 000 XP et +500 BadgesCoins et apparaît dans le fil en direct.",
     "badgesQ": "Mes badges Twitch rapportent-ils de l'XP ?",

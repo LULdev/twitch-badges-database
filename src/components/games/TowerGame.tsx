@@ -13,7 +13,6 @@ export default function TowerGame() {
     floor: number;
     survived: boolean;
     payout: number;
-    cashoutAt?: number;
   } | null>(null);
 
   async function climb() {
@@ -26,9 +25,6 @@ export default function TowerGame() {
       floor: typeof raw.floor === "number" ? raw.floor : 0,
       survived: raw.survived === true,
       payout: res.payout,
-      // The floor the round actually settled on. Without it a crashed round left
-      // the "cash out" marker on the failed floor.
-      cashoutAt: typeof raw.cashoutAt === "number" ? raw.cashoutAt : undefined,
     });
   }
 
@@ -41,8 +37,10 @@ export default function TowerGame() {
           {Array.from({ length: 10 }, (_, index) => {
             const floor = index + 1;
             // After a round the marker must describe the floor that was played,
-            // not wherever the live slider happens to sit now.
-            const playedFloor = last ? (last.cashoutAt ?? last.floor) : cashoutAt;
+            // not wherever the live slider happens to sit now. On a crash that is
+            // the floor the round died on; the server's cashoutAt is only the
+            // requested target.
+            const playedFloor = last ? last.floor : cashoutAt;
             const reached = floor <= playedFloor;
             const survived = last ? last.survived : true;
             const isCashout = floor === playedFloor;

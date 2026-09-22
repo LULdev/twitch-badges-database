@@ -281,7 +281,7 @@
   "stats": {
     "achCategories": "Unlocks by tier",
     "achCategoriesSub": "Total unlocks per tier, catalog size in grey",
-    "achSubtitle": "125 goals across three tiers",
+    "achSubtitle": "{total} goals across three tiers",
     "achTitle": "Achievements",
     "achievementsTotal": "Achievements",
     "achievementsUnlocked": "Achievements unlocked",
@@ -632,7 +632,7 @@
     "disabled": "This collector turned coin stealing off."
   },
   "faq": {
-    "achievementsA": "125: 50 common milestones, 50 creative challenges and 25 truly unexpected specials. Each one awards XP, BadgesCoins and points, plus a sparkle badge in your profile's achievement showcase.",
+    "achievementsA": "{total}: {common} common milestones, {creative} creative challenges and {special} truly unexpected specials. Each one awards XP, BadgesCoins and points, plus a sparkle badge in your profile's achievement showcase.",
     "achievementsQ": "How many achievements are there?",
     "badgesA": "Yes! Sync your badges after logging in — every newly unlocked badge pays +1,000 XP and +500 BadgesCoins and appears in the live feed.",
     "badgesQ": "Do my Twitch badges give XP?",

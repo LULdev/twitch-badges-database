@@ -42,9 +42,19 @@ export async function GET(request: Request) {
   // as a failure and pollute the uptime view with false "degraded" rows.
   let badgebase: unknown = null;
   let badgebaseFailed = false;
+  let badgebaseSkipped = false;
   let badgebaseError: string | null = null;
   try {
-    badgebase = await withHeartbeat("sync/badgebase", () => runBadgebaseSync());
+    // The summary is passed through to the heartbeat: a run that deliberately
+    // did nothing is not a success, and without this the payload carried no
+    // trace of it.
+    badgebase = await withHeartbeat(
+      "sync/badgebase",
+      () => runBadgebaseSync(),
+      (summary) => summary as unknown as Record<string, unknown>,
+    );
+    badgebaseSkipped =
+      typeof (badgebase as { skipped?: string }).skipped === "string";
   } catch (error) {
     console.error("[cron/badgebase]", error);
     badgebaseFailed = true;
@@ -59,12 +69,19 @@ export async function GET(request: Request) {
   const durationMs = Date.now() - started;
   await recordHeartbeat({
     source: "cron/global",
-    status: badgebaseFailed ? "degraded" : "ok",
+    status: badgebaseFailed || badgebaseSkipped ? "degraded" : "ok",
     durationMs,
     message: badgebaseFailed
       ? (badgebaseError ?? "drop-window enrichment failed")
-      : null,
-    payload: { prunedHeartbeats: pruned, prunedRainGate, badgebaseFailed },
+      : badgebaseSkipped
+        ? "drop-window enrichment skipped: empty listing"
+        : null,
+    payload: {
+      prunedHeartbeats: pruned,
+      prunedRainGate,
+      badgebaseFailed,
+      badgebaseSkipped,
+    },
   });
 
   // 207 signals a partial success: the catalog diff succeeded but the
@@ -75,6 +92,7 @@ export async function GET(request: Request) {
     summary,
     badgebase,
     badgebaseFailed,
+    badgebaseSkipped,
     durationMs,
     pruned,
     prunedRainGate,

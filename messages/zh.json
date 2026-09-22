@@ -281,7 +281,7 @@
   "stats": {
     "achCategories": "各层级解锁数",
     "achCategoriesSub": "各层级解锁总数，灰色为目录数量",
-    "achSubtitle": "三个层级的 125 个目标",
+    "achSubtitle": "三个层级的 {total} 个目标",
     "achTitle": "成就",
     "achievementsTotal": "成就",
     "achievementsUnlocked": "已解锁成就",
@@ -632,7 +632,7 @@
     "disabled": "该收藏者已关闭硬币偷取。"
   },
   "faq": {
-    "achievementsA": "125 个：50 个普通里程碑、50 个创意挑战和 25 个真正意想不到的特殊成就。每个都奖励 XP、BadgesCoins 和积分，并在主页成就展柜中显示一枚闪亮徽章。",
+    "achievementsA": "{total} 个：{common} 个普通里程碑、{creative} 个创意挑战和 {special} 个真正意想不到的特殊成就。每个都奖励 XP、BadgesCoins 和积分，并在主页成就展柜中显示一枚闪亮徽章。",
     "achievementsQ": "有多少个成就？",
     "badgesA": "是的！登录后同步你的徽章——每枚新解锁的徽章支付 +1,000 XP 与 +500 BadgesCoins，并出现在实时动态中。",
     "badgesQ": "我的 Twitch 徽章能给 XP 吗？",

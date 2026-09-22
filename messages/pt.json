@@ -281,7 +281,7 @@
   "stats": {
     "achCategories": "Desbloqueios por nível",
     "achCategoriesSub": "Desbloqueios por nível, tamanho do catálogo em cinza",
-    "achSubtitle": "125 objetivos em três níveis",
+    "achSubtitle": "{total} objetivos em três níveis",
     "achTitle": "Conquistas",
     "achievementsTotal": "Conquistas",
     "achievementsUnlocked": "Conquistas desbloqueadas",
@@ -632,7 +632,7 @@
     "disabled": "Este colecionador desativou o roubo de moedas."
   },
   "faq": {
-    "achievementsA": "125: 50 marcos comuns, 50 desafios criativos e 25 especiais realmente inesperados. Cada um dá XP, BadgesCoins e pontos, além de um emblema brilhante na vitrine de conquistas do seu perfil.",
+    "achievementsA": "{total}: {common} marcos comuns, {creative} desafios criativos e {special} especiais realmente inesperados. Cada um dá XP, BadgesCoins e pontos, além de um emblema brilhante na vitrine de conquistas do seu perfil.",
     "achievementsQ": "Quantas conquistas existem?",
     "badgesA": "Sim! Sincronize seus emblemas após o login — cada emblema recém-desbloqueado paga +1.000 XP e +500 BadgesCoins e aparece no feed ao vivo.",
     "badgesQ": "Meus emblemas da Twitch dão XP?",

@@ -281,7 +281,7 @@
   "stats": {
     "achCategories": "Freischaltungen nach Stufe",
     "achCategoriesSub": "Freischaltungen je Stufe, Kataloggröße in Grau",
-    "achSubtitle": "125 Ziele in drei Stufen",
+    "achSubtitle": "{total} Ziele in drei Stufen",
     "achTitle": "Errungenschaften",
     "achievementsTotal": "Errungenschaften",
     "achievementsUnlocked": "Errungenschaften freigeschaltet",
@@ -632,7 +632,7 @@
     "disabled": "Dieser Sammler hat das Stehlen von Coins deaktiviert."
   },
   "faq": {
-    "achievementsA": "125: 50 gewöhnliche Meilensteine, 50 kreative Herausforderungen und 25 völlig unerwartete Spezielle. Jede bringt XP, BadgesCoins und Punkte plus ein Funkel-Badge in der Errungenschaften-Vitrine deines Profils.",
+    "achievementsA": "{total}: {common} gewöhnliche Meilensteine, {creative} kreative Herausforderungen und {special} völlig unerwartete Spezielle. Jede bringt XP, BadgesCoins und Punkte plus ein Funkel-Badge in der Errungenschaften-Vitrine deines Profils.",
     "achievementsQ": "Wie viele Errungenschaften gibt es?",
     "badgesA": "Ja! Synchronisiere deine Badges nach dem Login — jedes neu freigeschaltete Badge bringt +1.000 XP und +500 BadgesCoins und erscheint im Live-Feed.",
     "badgesQ": "Bringen meine Twitch-Badges XP?",

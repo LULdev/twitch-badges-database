@@ -281,7 +281,7 @@
   "stats": {
     "achCategories": "Desbloqueos por nivel",
     "achCategoriesSub": "Desbloqueos por nivel, tamaño del catálogo en gris",
-    "achSubtitle": "125 objetivos en tres niveles",
+    "achSubtitle": "{total} objetivos en tres niveles",
     "achTitle": "Logros",
     "achievementsTotal": "Logros",
     "achievementsUnlocked": "Logros desbloqueados",
@@ -632,7 +632,7 @@
     "disabled": "Este coleccionista ha desactivado el robo de monedas."
   },
   "faq": {
-    "achievementsA": "125: 50 hitos comunes, 50 retos creativos y 25 especiales realmente inesperados. Cada uno otorga XP, BadgesCoins y puntos, además de una insignia brillante en la vitrina de logros de tu perfil.",
+    "achievementsA": "{total}: {common} hitos comunes, {creative} retos creativos y {special} especiales realmente inesperados. Cada uno otorga XP, BadgesCoins y puntos, además de una insignia brillante en la vitrina de logros de tu perfil.",
     "achievementsQ": "¿Cuántos logros hay?",
     "badgesA": "¡Sí! Sincroniza tus insignias tras iniciar sesión — cada insignia recién desbloqueada paga +1.000 XP y +500 BadgesCoins y aparece en el feed en vivo.",
     "badgesQ": "¿Mis insignias de Twitch dan XP?",

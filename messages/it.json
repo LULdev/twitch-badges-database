@@ -281,7 +281,7 @@
   "stats": {
     "achCategories": "Sblocchi per livello",
     "achCategoriesSub": "Sblocchi per livello, dimensione catalogo in grigio",
-    "achSubtitle": "125 obiettivi su tre livelli",
+    "achSubtitle": "{total} obiettivi su tre livelli",
     "achTitle": "Obiettivi",
     "achievementsTotal": "Obiettivi",
     "achievementsUnlocked": "Obiettivi sbloccati",
@@ -632,7 +632,7 @@
     "disabled": "Questo collezionista ha disattivato il furto di monete."
   },
   "faq": {
-    "achievementsA": "125: 50 traguardi comuni, 50 sfide creative e 25 speciali davvero inaspettati. Ognuno dà XP, BadgesCoins e punti, più un badge scintillante nella vetrina obiettivi del profilo.",
+    "achievementsA": "{total}: {common} traguardi comuni, {creative} sfide creative e {special} speciali davvero inaspettati. Ognuno dà XP, BadgesCoins e punti, più un badge scintillante nella vetrina obiettivi del profilo.",
     "achievementsQ": "Quanti obiettivi ci sono?",
     "badgesA": "Sì! Sincronizza i tuoi badge dopo l'accesso — ogni badge appena sbloccato paga +1.000 XP e +500 BadgesCoins e compare nel feed in diretta.",
     "badgesQ": "I miei badge Twitch danno XP?",

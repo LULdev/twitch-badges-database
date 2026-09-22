@@ -193,10 +193,12 @@ export const ACHIEVEMENTS: Achievement[] = [
   CREATIVE("k_catcher_100", "Golden Gloves", "Catch 100 badges in one Drops Catcher run.", (s) => hasFlag(s, "catcher", "hundred")),
   CREATIVE("k_shoot_500", "Badge Hunter", "Play 50 rounds of Shoot the Badges.", (s) => (s.gamesByType["shoot"]?.played ?? 0) >= 50),
   CREATIVE("k_reactor", "Reactor", "React to 5 blog posts.", (s) => s.reactionsGiven >= 5),
-  // Retired (see RETIRED_ACHIEVEMENT_IDS): the condition is unreachable on
-  // purpose, because the signal it describes is recorded nowhere. Filtering
-  // happens in one place; this line only keeps the entry's metadata.
+  // Retired (see RETIRED_ACHIEVEMENT_IDS): the conditions are unreachable on
+  // purpose, because the signals they describe are recorded nowhere. Filtering
+  // happens in one place; these lines keep the entries' metadata so an unlock
+  // already stored in the database can still be rendered.
   CREATIVE("k_faq_scholar", "FAQ Scholar", "Read the FAQ 5 times.", () => false),
+  CREATIVE("k_sharer", "Influencer", "Get 10 visits through your steal/share link.", () => false),
   CREATIVE("k_big_spender", "Big Spender", "Wager 10,000+ coins in total losses.", (s) => s.progress.coins_lost >= 10000),
   CREATIVE("k_profiteer", "Profiteer", "Win 10,000+ coins in total winnings.", (s) => s.progress.coins_won >= 10000),
   CREATIVE("k_xp_100k", "Six Figures", "Earn 100,000 lifetime XP.", (s) => s.progress.xp >= 100000, 1000, 1000),

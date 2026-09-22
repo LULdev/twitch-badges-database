@@ -281,7 +281,7 @@
   "stats": {
     "achCategories": "段階別解除数",
     "achCategoriesSub": "段階別の解除数、グレーは総数",
-    "achSubtitle": "3段階・125の目標",
+    "achSubtitle": "3段階・{total}の目標",
     "achTitle": "実績",
     "achievementsTotal": "実績",
     "achievementsUnlocked": "解除した実績",
@@ -632,7 +632,7 @@
     "disabled": "このコレクターはコイン強奪を無効にしています。"
   },
   "faq": {
-    "achievementsA": "125種：コモンの節目50、クリエイティブな挑戦50、まさかのスペシャル25。それぞれXP・BadgesCoins・ポイントがもらえ、プロフィールの実績ショーケースにキラキラバッジが並びます。",
+    "achievementsA": "{total}種：コモンの節目{common}、クリエイティブな挑戦{creative}、まさかのスペシャル{special}。それぞれXP・BadgesCoins・ポイントがもらえ、プロフィールの実績ショーケースにキラキラバッジが並びます。",
     "achievementsQ": "実績はいくつある？",
     "badgesA": "はい！ログイン後にバッジを同期すると、新たに解除したバッジ1つにつき+1,000 XPと+500 BadgesCoinsが支払われ、ライブフィードに表示されます。",
     "badgesQ": "TwitchバッジでXPはもらえる？",

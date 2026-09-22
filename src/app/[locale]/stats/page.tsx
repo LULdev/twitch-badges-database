@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { CSSProperties, ReactNode } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { ACTIVE_ACHIEVEMENTS } from "@/lib/gamification/achievements";
 import { getSiteStats } from "@/lib/queries";
 import { daySeries, getPlatformStats } from "@/lib/stats";
 import { ACH_BY_ID } from "@/lib/gamification/achievements";
@@ -813,7 +814,13 @@ export default async function StatsPage({
 
       {/* ---------------------------------------------------- achievements */}
       <section id="achievements" className="scroll-mt-24 space-y-4">
-        <SectionHead id="achievements-head" title={t("achTitle")} subtitle={t("achSubtitle")}>
+        <SectionHead
+          id="achievements-head"
+          title={t("achTitle")}
+          subtitle={t("achSubtitle", {
+            total: ACTIVE_ACHIEVEMENTS.length,
+          })}
+        >
           <Link
             href="/achievements"
             className="text-xs font-semibold text-accent hover:underline"

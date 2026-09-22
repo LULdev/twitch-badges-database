@@ -115,6 +115,18 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
     console.warn(
       "[badgebase] /active listing is empty while confirmed-active badges exist — skipping this run",
     );
+    // Recorded, not just returned: a silent skip looks identical to a healthy
+    // run on the uptime view, which is exactly the failure this guard exists to
+    // make visible.
+    await logChange(
+      {
+        kind: "data_sync",
+        title: "Drop-window sync skipped: the listing came back empty",
+        body: "The /active listing returned no cards while the catalog still holds confirmed-active badges. Nothing was written — clearing those flags on a provider incident would have demoted every dateless badge.",
+        payload: { skipped: "empty-listing", confirmedActiveKept: true },
+      },
+      supabase,
+    );
     return {
       activeCards: 0,
       upcomingCards: upcomingCards.length,

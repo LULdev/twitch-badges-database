@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { localeAlternates } from "@/lib/seo";
 import { jsonLdScript } from "@/lib/jsonld";
+import { ACTIVE_ACHIEVEMENTS } from "@/lib/gamification/achievements";
 
 export const revalidate = 3600;
 
@@ -54,13 +55,28 @@ export default async function FaqPage({
   setRequestLocale(locale);
   const t = await getTranslations("faq");
 
+  // The achievement counts are templated so the copy cannot drift from the
+  // catalog (it claimed 125 after two entries were retired). Answers are looked
+  // up through a dynamic key list, so the values have to be supplied per key
+  // here instead of at one call site.
+  const achievementCounts = {
+    total: ACTIVE_ACHIEVEMENTS.length,
+    common: ACTIVE_ACHIEVEMENTS.filter((a) => a.category === "common").length,
+    creative: ACTIVE_ACHIEVEMENTS.filter((a) => a.category === "creative").length,
+    special: ACTIVE_ACHIEVEMENTS.filter((a) => a.category === "special").length,
+  };
+  const answerFor = (key: string) =>
+    key === "achievements"
+      ? t(`${key}A`, achievementCounts)
+      : t(`${key}A`);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: FAQ_KEYS.map((key) => ({
       "@type": "Question",
       name: t(`${key}Q`),
-      acceptedAnswer: { "@type": "Answer", text: t(`${key}A`) },
+      acceptedAnswer: { "@type": "Answer", text: answerFor(key) },
     })),
   };
 
@@ -87,7 +103,7 @@ export default async function FaqPage({
                 +
               </span>
             </summary>
-            <p className="px-5 pb-4 text-sm leading-relaxed text-muted">{t(`${key}A`)}</p>
+            <p className="px-5 pb-4 text-sm leading-relaxed text-muted">{answerFor(key)}</p>
           </details>
         ))}
       </div>
