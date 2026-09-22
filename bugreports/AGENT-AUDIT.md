@@ -125,3 +125,35 @@ roughly 60 issues, ~22 are fixed and verified above, and the list above is still
 open. The mechanism the objective asked for (agents that only collect, send
 findings to me, and let me verify and implement) did run this time — with ten
 scopes, because the platform only allowed two agents concurrently.
+
+---
+
+## Round 2 — the open High findings, fixed
+
+Driven by the same agent reports, with the sync patch prepared by a dedicated
+**fix-proposal agent** (`bugreports/fixproposal-sync.md`) that I reviewed and
+implemented myself.
+
+| ID | Fix | Verification |
+|---|---|---|
+| sync-2 | the removal sweep matches the image UUID too (`extractBadgeUuid`); badgebase may restore a `/active` row out of `removed`; the demotion sweep resurrects it with `removed_at = null` | a real global sync run reports `removed: 0` (previously it expired the badgebase rows); the badgebase run reports `demotedToExpired: 0, errors: 0` |
+| sync-1 | the "fresh rows" lookup records the slugs this run inserted and loads exactly those, instead of the newest N+10 catalog rows | code path now fans out only real new badges |
+| auth-1 | the proxy refreshes the session for `/api` too (rotated refresh tokens were dropped → silent logout); skipped entirely when no session cookie exists | all API and page routes still return 200 locally |
+| fp-2 / fp-1 | the visitor list is owner-only (it was read through the admin client, bypassing the owner-only RLS policy); your own view of a foreign profile is no longer logged | page renders; visitors only for the owner |
+| api-4 | `?limit=abc` falls back instead of producing NaN → 500 | — |
+| api-2 / fp-4 | the feed's seen-id set is capped at 500 and the poll pauses on a hidden tab | — |
+| pdat-3 | the potat 429 retry re-checks the response status | — |
+| db-3 / db-5 / db-8 | migration 0009: CHECK constraints, the two missing indexes, and column-level SELECT grants so `twitch_id` is unreachable from the public API (0010 keeps `potat_connections`, which the profile renders) | live: `select=id,twitch_id` → **401**, `select=id,username` → **200** |
+| games-b-7 / regression | my own game-economy change had left every skill game without a verdict and every game hiding the balance; a shared `RoundOutcome` component renders the server's win/loss + payout and the real balance is passed to the bet bar | — |
+
+### Still open from the agent reports
+
+The remaining items in the list above are unchanged, plus the new findings from
+the games-B report (`games-b-1` vault hit-zone geometry, `games-b-2` vault
+double-click advancing two dials, `games-b-3/4/5` missing busy gates,
+`games-b-6` impure state updaters, `games-b-8` tower casts the result blindly,
+`games-b-9/10/11/12` display and cleanup nits) and the newly noticed 13 MB
+uncacheable ranking fetch (`Failed to set Next.js data cache … items over 2MB`).
+
+The "no bugs remain" bar is therefore still **not** met — this round removed the
+five High findings, the count of open findings is lower but not zero.
