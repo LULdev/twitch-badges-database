@@ -173,8 +173,9 @@ export const ACHIEVEMENTS: Achievement[] = [
   // The seven below used to read CLIENT-ASSERTED flags (`perfect`, `sharp`,
   // `fast`, `hundred`, `top`, `streak10` on quiz/memory) that the resolver set
   // from numbers the payload supplied. The flag was gated on the round's own
-  // coin-flip win, so a forged payload — "hits 300, shots 300" — fired it on
-  // ~45% of attempts and paid 250 coins + 500 XP for a ~1-coin round: cheaper to
+  // was gated on the round's coin-flip win, so a forged payload — "hits 300,
+  // shots 300" — fired it on EVERY attempt (the old conditions read the raw
+  // numbers, not the outcome) and paid 250 coins + 500 XP for a ~1-coin round:
   // forge than to earn. They now count rounds the SERVER graded as won
   // (game_rounds.won, aggregated per game over ALL rounds — `gamesByType` is a
   // paged read, not the 60-row window, so the counts are lifetime and the
@@ -188,7 +189,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   CREATIVE("k_blackjack_5", "Card Shark", "Win 5 Blackjack hands in a row.", (s) => hasFlag(s, "blackjack", "streak5")),
   CREATIVE("k_tower_top", "Tower Climber", "Win 10 rounds of Tower of Badges.",
     (s) => (s.gamesByType["tower"]?.won ?? 0) >= 10),
-  // See the note above: this counted a client-asserted `perfect` flag.
+  // See the note above. This one was worse than forgeable: its predicate read a
+  // `perfect3` flag while the resolver emitted `perfect`, so it was unreachable.
   CREATIVE("k_vault_master", "Vault Cracker", "Crack the vault three times.",
     (s) => (s.gamesByType["vault"]?.won ?? 0) >= 3),
   CREATIVE("k_scratch_jackpot", "Golden Scratch", "Win a 10× payout on a scratch card.", (s) => hasFlag(s, "scratch", "jackpot")),

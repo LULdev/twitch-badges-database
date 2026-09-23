@@ -123,7 +123,7 @@ export async function playGame(
   const net = outcome.payout - bet;
   // ONE grading decision, used everywhere below. A resolver that reports its own
   // `won` knows better than the payout does: hilo pays by the odds, so a correct
-  // call at the edges returns slightly less than the stake (0.99x) while still
+  // call at the edges returns slightly less than the stake (0.981x worst) while still
   // being a win. Previously only the streak flag honoured that — the persisted
   // row, the `games_won` counter, the win XP, the feed line and the response all
   // graded on `payout > bet`, so such a round was still recorded as a loss.
@@ -286,7 +286,7 @@ export async function resolveGame(
       const beats: Record<string, string> = { rock: "scissors", paper: "rock", scissors: "paper" };
       // A refunded tie plus a 2x win makes the expected value exactly 1.0 —
       // break-even, which a bot can grind indefinitely. 1.9x keeps the game
-      // fair-feeling with a small house edge, like hilo (1.95x) and coinflip.
+      // fair-feeling with a small house edge, like coinflip.
       if (player === bot) return { payout: bet, result: { player, bot, tie: true } };
       const won = beats[player] === bot;
       return { payout: won ? Math.floor(bet * 1.9) : 0, result: { player, bot, tie: false, won } };
@@ -432,7 +432,7 @@ export async function resolveGame(
 
       // The player can SEE `currentScore` — the client renders it and carries it
       // from the previous round — so the guess is informed, and a flat payout is
-      // beatable: picking the likelier side wins up to 89 of 91 values (0.989),
+      // beatable: picking the likelier side won 90 of the 91 values (0.989),
       // which against 1.95x was ~1.93x EV per bet. The committed economy harness
       // never caught it because it always sends `choice: "higher"` (a blind coin
       // flip). Pay by the odds instead, so the payout matches the probability the

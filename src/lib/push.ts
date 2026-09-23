@@ -58,30 +58,52 @@ export async function sendPushToAll(payload: PushPayload): Promise<PushResult> {
   let failed = 0;
   const deadEndpoints: string[] = [];
 
-  await Promise.allSettled(
-    subscriptions.map(async (sub) => {
-      try {
-        await webpush.sendNotification(
-          {
-            endpoint: sub.endpoint,
-            keys: { p256dh: sub.p256dh, auth: sub.auth },
-          },
-          JSON.stringify(payload),
-          { TTL: 3600, urgency: "normal" },
-        );
-        sent += 1;
-      } catch (err) {
-        failed += 1;
-        const statusCode = (err as { statusCode?: number }).statusCode;
-        if (statusCode === 404 || statusCode === 410) {
-          deadEndpoints.push(sub.endpoint);
+  // Bounded, because this runs inside the 60 s global cron BEFORE the badgebase
+  // half: every subscription used to be hit at once with no timeout, so one
+  // endpoint that accepts the connection and never answers would hold the whole
+  // invocation until the platform killed it — and the day's authoritative
+  // activity sync would never run. A per-request timeout plus batches keeps the
+  // fan-out inside its share of the budget.
+  const BATCH = 50;
+  const TIMEOUT_MS = 5_000;
+  for (let i = 0; i < subscriptions.length; i += BATCH) {
+    await Promise.allSettled(
+      subscriptions.slice(i, i + BATCH).map(async (sub) => {
+        try {
+          await webpush.sendNotification(
+            {
+              endpoint: sub.endpoint,
+              keys: { p256dh: sub.p256dh, auth: sub.auth },
+            },
+            JSON.stringify(payload),
+            { TTL: 3600, urgency: "normal", timeout: TIMEOUT_MS },
+          );
+          sent += 1;
+        } catch (err) {
+          failed += 1;
+          const statusCode = (err as { statusCode?: number }).statusCode;
+          if (statusCode === 404 || statusCode === 410) {
+            deadEndpoints.push(sub.endpoint);
+          }
         }
-      }
-    }),
-  );
+      }),
+    );
+  }
 
   if (deadEndpoints.length > 0) {
-    await supabase.from("push_subscriptions").delete().in("endpoint", deadEndpoints);
+    // Chunked and checked: the endpoints are 100-200 character URLs, so one
+    // `.in()` list for a mass notification builds a multi-KB query string the
+    // gateway rejects — and the failure was invisible, so the dead rows survived
+    // and were re-attempted and re-counted as failed on every later broadcast.
+    for (let i = 0; i < deadEndpoints.length; i += 200) {
+      const { error: pruneError } = await supabase
+        .from("push_subscriptions")
+        .delete()
+        .in("endpoint", deadEndpoints.slice(i, i + 200));
+      if (pruneError) {
+        console.warn("[push] could not prune dead endpoints:", pruneError.message);
+      }
+    }
   }
 
   return { sent, failed, configured: true };

@@ -172,15 +172,31 @@ export async function sendDraft(ctx: AdminContext, id: number): Promise<SendResu
     if (wantsEmail && process.env.RESEND_API_KEY) {
       result = await sendEmail(subject, body);
     } else if (wantsPush && pushConfigured()) {
-      const push = await sendPushToAll({ title: subject, body, url: "/" });
-      await recordNotification({ kind: "newsletter", title: subject, body, url: "/" });
+      // The in-app row is recorded BEFORE the fan-out: with the push first, a
+      // failure in this insert released the claim, so the operator's retry
+      // re-sent the identical push to everyone who had already received it — the
+      // notification row is not the push, and neither channel has a dedup key.
+      // A per-broadcast tag, because the service worker's default tag is one
+      // constant: without it a second newsletter silently replaced the first in
+      // every notification tray while `/notifications` still listed both.
+      const tag = `newsletter-${id}`;
+      await recordNotification({ kind: "newsletter", title: subject, body, url: "/", tag });
+      const push = await sendPushToAll({ title: subject, body, url: "/", tag });
+      // The note is built from the OUTCOME. It used to be a fixed string, so a
+      // broadcast that failed for every subscriber (an over-4 KB body, an outage)
+      // still read "sent as a web push to subscribed browsers" beside `sent: 0`.
+      const base = wantsEmail
+        ? "sent as a web push: no RESEND_API_KEY is configured, so no mail could be sent"
+        : "sent as a web push to subscribed browsers";
+      const pushed = push.sent ?? 0;
       result = {
         channel: "push",
-        sent: push.sent ?? 0,
+        sent: pushed,
         failed: push.failed ?? 0,
-        note: wantsEmail
-          ? "sent as a web push: no RESEND_API_KEY is configured, so no mail could be sent"
-          : "sent as a web push to subscribed browsers",
+        note:
+          pushed > 0
+            ? base
+            : `nothing reached a browser: all ${push.failed ?? 0} push deliveries failed`,
       };
     } else {
       result = {
