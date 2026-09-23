@@ -12,9 +12,28 @@ export async function GET(request: Request) {
 
   const started = Date.now();
   try {
-    const summary = await withHeartbeat("sync/potat", () => runPotatSync());
+    // runPotatSync deliberately survives an owners-feed outage and resolves
+    // normally, so the summary is passed through and a degraded outcome derived
+    // from it — the same shape /api/cron/global and /api/cron/badgebase use.
+    const summary = await withHeartbeat(
+      "sync/potat",
+      () => runPotatSync(),
+      (result) => result as unknown as Record<string, unknown>,
+      (result) =>
+        result.ownersFeedOk === false
+          ? { status: "degraded" as const, message: "owner feed unavailable" }
+          : { status: "ok" as const },
+    );
     const durationMs = Date.now() - started;
-    await recordHeartbeat({ source: "cron/potat", status: "ok", durationMs });
+    const degraded = summary.ownersFeedOk === false;
+    await recordHeartbeat({
+      source: "cron/potat",
+      status: degraded ? "degraded" : "ok",
+      durationMs,
+      message: degraded ? "owner feed unavailable" : null,
+    });
+    // Still 200: the run completed and kept the stored counts, and the GitHub
+    // Actions workflow that calls this route asserts a 200.
     return Response.json({ ok: true, summary, durationMs });
   } catch (error) {
     const durationMs = Date.now() - started;

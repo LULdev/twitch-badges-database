@@ -32,7 +32,8 @@
     "faqNav": "FAQ",
     "wheel": "フォーチュンホイール",
     "mainNav": "メインナビゲーション",
-    "mobileNav": "モバイルナビゲーション"
+    "mobileNav": "モバイルナビゲーション",
+    "acp": "管理パネル"
   },
   "common": {
     "search": "バッジを検索…",
@@ -82,7 +83,8 @@
     "errorTitle": "問題が発生しました",
     "errorBody": "ページを読み込めませんでした。多くは一時的なものです。もう一度お試しください。",
     "errorRetry": "再試行",
-    "levelAria": "レベル {level}"
+    "levelAria": "レベル {level}",
+    "breadcrumb": "パンくずリスト"
   },
   "home": {
     "heroTitle": "Twitchの全バッジを、一つのデータベースに。",
@@ -262,7 +264,14 @@
     "empty": "記事はまだありません。",
     "autoTag": "自動生成",
     "notFound": "この記事は存在しません。",
-    "react": "リアクション"
+    "react": "リアクション",
+    "reactions": {
+      "like": "いいね",
+      "love": "ラブ",
+      "laugh": "笑い",
+      "fire": "炎",
+      "wow": "びっくり"
+    }
   },
   "changelog": {
     "title": "変更履歴",
@@ -429,7 +438,19 @@
     "sourceSyncEnrichment": "受取期間の補完",
     "sourceSyncOwners": "所有者統計",
     "sourceWeb": "Web リクエスト",
-    "sourceOther": "その他のソース"
+    "sourceOther": "その他のソース",
+    "navVisitors": "訪問者",
+    "visitorsTitle": "訪問者",
+    "visitorsSubtitle": "匿名のページビュー。IPアドレスも Cookie も使いません。",
+    "visitorsOnline": "現在オンライン",
+    "visitorsOnlineHint": "直近5分間のユニーク訪問者",
+    "visitorsTotal": "総ページビュー",
+    "visitorsTotalHint": "計測開始以降",
+    "visitors24h": "24時間の閲覧",
+    "visitors7d": "7日間の閲覧",
+    "visitors30d": "30日間の閲覧",
+    "visitorsUnique": "ユニーク訪問者",
+    "visitorsPrivacy": "IPアドレス・Cookie・完全な参照元URLは保存しません。Do Not Track を送る訪問者はページビューとしてのみ数えます。"
   },
   "notifications": {
     "title": "通知",
@@ -518,7 +539,7 @@
     "currentRarity": "現在のレアリティスコア",
     "higher": "ハイ",
     "lower": "ロー",
-    "hiloHint": "次のバッジのレアリティスコアは高いか低いか？的中で1.95倍。",
+    "hiloHint": "次のバッジのレア度スコアは高い？低い？配当はオッズに応じて変わります——本命なら小さく、大穴なら最大 20x。引き分けは賭け金を返却します。",
     "red": "赤",
     "black": "黒",
     "green": "緑",
@@ -529,8 +550,8 @@
     "stop": "STOP",
     "again": "もう一度プレイ",
     "newCard": "新しいカード",
-    "scratchHint": "9マスを削る — 同じシンボル3つで当たり。トリプルジャックポットは20倍。",
-    "vaultHint": "各針をグリーンゾーンで止めよう：倍率 0/0.5倍、1/1.5倍、2/3倍、3/3倍。",
+    "scratchHint": "9マスすべてを削ろう——同じ絵柄3つで当たり。ジャックポットの3つ揃いは最大 10x。",
+    "vaultHint": "緑ゾーンに入った針が多いほど（0/1/2/3）勝率が上がります。勝利の配当は 2x。",
     "floor": "階",
     "cashout": "キャッシュアウト",
     "cashoutAt": "キャッシュアウト：",
@@ -557,7 +578,7 @@
     "dailyComeBack": "明日また戻って次のボーナスを受け取ろう。",
     "streak": "連続",
     "rpsTitle": "じゃんけん",
-    "rpsDesc": "ボットとの定番対決。毎ラウンド倍かゼロか。",
+    "rpsDesc": "ボットとの定番の対決。勝利の配当は 1.9x、引き分けは賭け金を返却します。",
     "slotsTitle": "Badges of Ra 6 Deluxe",
     "slotsDesc": "5リール・3列、本物のバッジシンボルとスキャッタージャックポット。",
     "shootTitle": "Shoot the Badges",
@@ -569,21 +590,25 @@
     "coinflipTitle": "BadgesCoinsラダー",
     "coinflipDesc": "7段のはしごで表か裏か — 1段ごとに賞金が倍に。",
     "hiloTitle": "ハイアー・オア・ロウアー",
-    "hiloDesc": "次のバッジのレアリティスコアに賭けよう — 的中で1.95倍。",
+    "hiloDesc": "次のバッジのレア度スコアに賭けよう。配当は選んだ方向のオッズに応じて変わります（最大 20x）。引き分けは賭け金を返却します。",
     "rouletteTitle": "バッジルーレット",
     "rouletteDesc": "赤・黒・緑のゼロは14倍。37ポケットの緊張感。",
     "blackjackTitle": "バッジブラックジャック",
     "blackjackDesc": "ディーラー相手に21 — 戦略を選んで配ろう。",
     "vaultTitle": "金庫破り",
-    "vaultDesc": "3本の針をグリーンゾーンで止めよう。3回パーフェクトで3倍。",
+    "vaultDesc": "3本の針を緑ゾーンで止めよう——針が多いほど勝率が上がり、勝利の配当は 2x。",
     "scratchTitle": "Scratch the Badge",
-    "scratchDesc": "9マスを削る — 同じシンボル3つで最大20倍。",
+    "scratchDesc": "9マスを削ろう——同じ絵柄3つで最大 10x。",
     "towerTitle": "バッジの塔",
     "towerDesc": "リスクが増す10階を登る — 警備員に捕まる前にキャッシュアウト。",
     "catcherTitle": "バッジキャッチャー",
     "catcherDesc": "落ちてくるバッジをカゴで受け、爆弾は避けよう。",
     "notEnoughBadges": "カタログにバッジがまだ足りないため、クイズを作成できません。",
-    "streakDay": "{streak} 日目"
+    "streakDay": "{streak} 日目",
+    "disabled": "ゲームコーナーは現在停止中です。しばらくしてからお越しください。",
+    "scatter": "SCATTER!",
+    "scratchFounder": "ファウンダー",
+    "scratchJackpot": "ジャックポット"
   },
   "wheel": {
     "title": "フォーチュンホイール",
@@ -655,7 +680,7 @@
     "freeQ": "これはすべて無料？",
     "gamesA": "運要素の結果（スロット、ルーレット、ホイール、コイントス、ブラックジャック、スクラッチ、タワー）はすべてサーバーで生成され、操作できません。スキル系（シューティング、記憶、キャッチ）はスコアをサーバー側で上限付きで検証します。",
     "gamesQ": "ゲームは公平ですか？",
-    "levelsA": "レベル1は0 XPから。各レベルに100 + (レベル-1) x 50 XPが必要で、レベル100の合計は254,900 XP。各レベルにはキラキラ動く専用バッジがプロフィールに表示され、常に表示され隠せません。",
+    "levelsA": "レベル1は0 XPから。各レベルに100 + (レベル-1) x 50 XPが必要で、レベル100の合計は252,450 XP。各レベルにはキラキラ動く専用バッジがプロフィールに表示され、常に表示され隠せません。",
     "levelsQ": "レベル1〜100の仕組みは？",
     "profileA": "設定は35項目：一般20（色、フォント、バナー、カードスタイル、フレーム、プライバシー、SNSリンク）とクリエイティブ15（オーラ、パーティクル背景、レインボーネーム、3Dチルト、ピクセルアバター、実績ティッカーなど）。",
     "profileQ": "プロフィールはどこまでカスタマイズできる？",
@@ -727,6 +752,480 @@
     "stealHint": "価格が高いほど気軽な泥棒を抑えられます。失敗時は価格があなたに支払われます。",
     "saving": "保存中…",
     "saved": "保存しました！",
-    "save": "変更を保存"
+    "save": "変更を保存",
+    "titlePlaceholder": "バッジハンター",
+    "usernamePlaceholder": "ユーザー名",
+    "statusBubblePlaceholder": "SUBtember を狙ってます…",
+    "options": {
+      "font": {
+        "sans": "サンセリフ",
+        "serif": "セリフ",
+        "mono": "等幅",
+        "rounded": "丸ゴシック"
+      },
+      "cardStyle": {
+        "glass": "ガラス",
+        "solid": "ソリッド",
+        "outline": "アウトライン"
+      },
+      "radius": {
+        "sharp": "シャープ",
+        "soft": "ソフト",
+        "round": "ラウンド"
+      },
+      "avatarFrame": {
+        "none": "なし",
+        "ring": "リング",
+        "double": "二重",
+        "glow": "グロー",
+        "crown": "クラウン"
+      },
+      "showcaseLayout": {
+        "grid": "グリッド",
+        "row": "リスト",
+        "carousel": "カルーセル"
+      },
+      "density": {
+        "cozy": "ゆったり",
+        "compact": "コンパクト"
+      },
+      "profileTheme": {
+        "auto": "自動",
+        "violet": "バイオレット",
+        "emerald": "エメラルド",
+        "sapphire": "サファイア",
+        "gold": "ゴールド"
+      },
+      "effectsIntensity": {
+        "off": "オフ",
+        "subtle": "控えめ",
+        "full": "フル"
+      }
+    }
+  },
+  "admin": {
+    "title": "管理パネル",
+    "common": {
+      "working": "処理中…"
+    },
+    "gate": {
+      "title": "管理者アクセス",
+      "intro": "オーナーはまだ登録されていません。ブートストラップパスコードを入力してインストールを引き継いでください。",
+      "passcodeLabel": "パスコード",
+      "submit": "ロック解除",
+      "hint": "オーナーが登録されると、この入口は永久に閉じます。",
+      "invalid": "パスコードが正しくありません。",
+      "throttled": "試行回数が多すぎます。数分後に再試行してください。",
+      "closed": "パスコードの入口は閉じています — オーナーは既に存在します。",
+      "network": "ネットワークエラーです。もう一度お試しください。"
+    },
+    "setup": {
+      "title": "オーナーを登録",
+      "intro": "ここで指定したプロフィールがオーナーとなり、すべてを管理できます。",
+      "usernameLabel": "Twitch ユーザー名",
+      "twitchIdLabel": "Twitch ユーザー ID（任意）",
+      "twitchIdPlaceholder": "数値 ID — 推奨",
+      "submit": "オーナーを登録",
+      "notFound": "その名前のプロフィールがありません — 一度 Twitch でログインしてから再試行してください。",
+      "failed": "登録に失敗しました。",
+      "doneTitle": "オーナーを登録しました",
+      "doneBody": "ブートストラップパスコードは無効になりました。再読み込みしてダッシュボードを開いてください。"
+    },
+    "dashboard": {
+      "title": "管理コントロールセンター",
+      "signedInAs": "{role} としてサインイン中。",
+      "intro": "モジュールは段階的に公開されます — ユーザー、コンテンツ、同期、設定、統計などは今後のフェーズで追加されます。"
+    },
+    "forbidden": {
+      "title": "利用できません",
+      "body": "管理パネルはオーナーと管理者のみ利用できます。"
+    },
+    "tabs": {
+      "label": "セクション",
+      "users": "ユーザー",
+      "content": "コンテンツ",
+      "sync": "同期",
+      "settings": "設定",
+      "stats": "統計",
+      "status": "ステータス",
+      "newsletter": "ニュースレター",
+      "brainstorm": "アイデア",
+      "audit": "監査ログ",
+      "soon": "このセクションは後のフェーズで追加されます。",
+      "badges": "バッジ"
+    },
+    "users": {
+      "searchLabel": "検索",
+      "searchPlaceholder": "ユーザー名、表示名、Twitch ID",
+      "bannedOnly": "BANのみ",
+      "count": "{count} 人のメンバー",
+      "loadFailed": "リストを読み込めませんでした。",
+      "loading": "読み込み中…",
+      "empty": "この検索に一致するメンバーはいません。",
+      "actionFailed": "操作に失敗しました。",
+      "saved": "プロフィールを保存しました。",
+      "progressSaved": "進行状況を保存しました。",
+      "roleSaved": "ロールを更新しました。",
+      "close": "閉じる",
+      "banned": "BAN中",
+      "active": "有効",
+      "cols": {
+        "user": "メンバー",
+        "role": "ロール",
+        "level": "レベル",
+        "xp": "XP",
+        "coins": "コイン",
+        "status": "状態",
+        "joined": "登録"
+      },
+      "profile": {
+        "title": "プロフィール",
+        "save": "プロフィールを保存"
+      },
+      "field": {
+        "username": "ユーザー名",
+        "display_name": "表示名",
+        "bio": "自己紹介",
+        "color": "カラー",
+        "banner_url": "バナーURL",
+        "theme": "テーマ",
+        "mood": "気分",
+        "steal_price": "奪取価格",
+        "steal_max": "奪取上限",
+        "inventory_public": "インベントリ公開",
+        "steal_enabled": "奪取を有効化"
+      },
+      "progress": {
+        "title": "進行状況",
+        "xp": "XP",
+        "coins": "コイン",
+        "level": "レベル",
+        "login_streak": "ログイン連続日数",
+        "save": "進行状況を保存"
+      },
+      "role": {
+        "title": "ロール",
+        "apply": "ロールを適用"
+      },
+      "ban": {
+        "title": "BAN",
+        "reason": "理由",
+        "days": "日数",
+        "apply": "BANする",
+        "lift": "BANを解除",
+        "hint": "0日は永久BANを意味します。",
+        "active": "BAN中: {reason} — {until} まで",
+        "noReason": "理由なし",
+        "permanent": "永久",
+        "saved": "BANを適用しました。",
+        "removed": "BANを解除しました。",
+        "confirmPermanent": "{username} を永久にBANしますか？このBANに期限はありません。"
+      },
+      "achievements": {
+        "title": "実績",
+        "grant": "付与",
+        "revoke": "取消",
+        "granted": "実績を付与しました。",
+        "revoked": "実績を取り消しました。"
+      },
+      "danger": {
+        "title": "危険な操作",
+        "delete": "メンバーを削除",
+        "confirm": "{username} とそのすべてのデータを削除しますか？元に戻せません。",
+        "deleted": "メンバーを削除しました。"
+      }
+    },
+    "content": {
+      "tabs": {
+        "blog": "ブログ",
+        "changelog": "更新履歴"
+      },
+      "search": "検索",
+      "new": "新規エントリ",
+      "edit": "編集",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "confirmDelete": "このエントリを削除しますか？元に戻せません。",
+      "saved": "保存しました。",
+      "deleted": "削除しました。",
+      "saveFailed": "保存できませんでした。",
+      "loadFailed": "読み込めませんでした。",
+      "loading": "読み込み中…",
+      "empty": "まだ何もありません。",
+      "auto": "自動",
+      "badJson": "ペイロードが有効な JSON ではありません。",
+      "col": {
+        "title": "タイトル",
+        "slug": "スラッグ",
+        "status": "状態",
+        "date": "日付"
+      },
+      "field": {
+        "title": "タイトル",
+        "slug": "スラッグ",
+        "slugHint": "空欄ならタイトルから生成",
+        "author": "著者",
+        "locale": "言語",
+        "status": "状態",
+        "cover": "カバー画像URL",
+        "tags": "タグ",
+        "tagsHint": "カンマ区切り",
+        "excerpt": "抜粋",
+        "content": "本文",
+        "contentHint": "Markdown に対応"
+      },
+      "changelog": {
+        "kind": "種類",
+        "body": "説明",
+        "payload": "ペイロード（JSON）"
+      }
+    },
+    "badges": {
+      "search": "検索",
+      "searchPlaceholder": "タイトル、セットID、スラッグ",
+      "customOnly": "カスタムのみ",
+      "hint": "手動で作成したエントリはカタログ同期から保護されます。同期が上書きや削除をすることはなく、セットIDとバージョンが衝突する提供元バッジは代わりにスキップされます。",
+      "edit": "編集",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "confirmDelete": "このバッジを削除しますか？元に戻せません。",
+      "saved": "バッジを保存しました。",
+      "deleted": "バッジを削除しました。",
+      "saveFailed": "バッジを保存できませんでした。",
+      "loadFailed": "バッジを読み込めませんでした。",
+      "empty": "バッジが見つかりません。",
+      "providerHint": "このエントリは提供元からのものです。タイトルと画像は同期のたびに更新され、削除できるのは手動で作成したエントリだけです。",
+      "col": {
+        "badge": "バッジ",
+        "setId": "セット / バージョン",
+        "category": "カテゴリ",
+        "status": "状態",
+        "source": "ソース"
+      },
+      "field": {
+        "setId": "セットID",
+        "version": "バージョン",
+        "title": "タイトル",
+        "category": "カテゴリ",
+        "status": "状態",
+        "start": "開始",
+        "end": "終了",
+        "image": "画像URL",
+        "clickUrl": "クリックURL",
+        "description": "説明",
+        "howToEarn": "入手方法",
+        "paid": "有料またはサブスクのバッジ"
+      },
+      "new": "新しいバッジ"
+    },
+    "sync": {
+      "intro": "これらのボタンは毎日の cron ジョブと同じエンジンを、手動で即座に実行します。手動実行は稼働履歴に独立した行として記録されるため、予定された実行の欠落を覆い隠すことはありません。",
+      "run": "今すぐ実行",
+      "running": "実行中…",
+      "results": "最近の実行",
+      "ok": "正常",
+      "failed": "同期を開始できませんでした。",
+      "global": {
+        "title": "カタログ差分",
+        "hint": "Twitch のライブカタログとデータベースを比較し、新しいバッジを追加、変更されたものを更新、消えたものを削除済みとしてマークします。"
+      },
+      "badgebase": {
+        "title": "ドロップ期間",
+        "hint": "badges.blog の開催中・開催予定リストを読み、現在入手可能なバッジを確認して開始日と終了日を設定します。"
+      },
+      "potat": {
+        "title": "所有者統計",
+        "hint": "potat から所有者数、レア度スコア、ステータスのスイープを更新します。"
+      }
+    },
+    "settings": {
+      "loading": "設定を読み込み中…",
+      "loadFailed": "設定を読み込めませんでした。",
+      "saved": "設定を保存しました。",
+      "saveFailed": "設定を保存できませんでした。",
+      "save": "保存",
+      "features": {
+        "title": "機能フラグ",
+        "hint": "オフにした機能はナビゲーションから消え、対応するエンドポイントもその操作を拒否します。",
+        "feed": "ライブフィード",
+        "wheel": "ルーレット",
+        "steals": "コインの奪取",
+        "coinRain": "コインの雨",
+        "compare": "バッジ比較",
+        "games": "ゲームコーナー"
+      },
+      "economy": {
+        "title": "経済",
+        "hint": "これらの値がデイリーボーナス・ゲーム・奪取を左右します。既定値はサイト開始時の数値です。",
+        "dailyXp": "1日のXP",
+        "dailyCoins": "1日のコイン",
+        "streakXpPerDay": "連続日数のXP（1日あたり）",
+        "streakXpCap": "連続XPの上限",
+        "streakCoinsPerDay": "連続日数のコイン（1日あたり）",
+        "streakCoinsCap": "連続コインの上限",
+        "gameWinXp": "勝利ラウンドのXP",
+        "gameLoseXp": "敗北ラウンドのXP",
+        "coinRainCoins": "コインの雨1回あたり",
+        "stealPrice": "既定の奪取価格",
+        "stealMax": "既定の奪取上限",
+        "stealFloodMinutes": "奪取の待ち時間（分）",
+        "stealPerHour": "1時間あたりの奪取回数"
+      },
+      "games": {
+        "title": "ゲーム",
+        "hint": "個別のゲームを停止したり、ベット範囲を変更できます。ハブは停止したゲームを表示せず、エンジンも拒否します。",
+        "master": "ゲームコーナー有効（マスタースイッチ）",
+        "col": {
+          "game": "ゲーム",
+          "enabled": "オン",
+          "min": "最小ベット",
+          "max": "最大ベット"
+        }
+      },
+      "admins": {
+        "title": "管理者とモデレーター",
+        "hint": "Twitch ユーザー名でパネルへのアクセスを付与します。プロフィールが存在するよう、本人が一度ログインしている必要があります。",
+        "owner": "オーナー: {username} — ブートストラップパスコードで設定され、ここからは解除できません。",
+        "username": "Twitch ユーザー名",
+        "role": "ロール",
+        "add": "アクセスを付与",
+        "remove": "解除",
+        "empty": "追加の管理者やモデレーターはまだいません。"
+      }
+    },
+    "stats": {
+      "loading": "統計を読み込み中…",
+      "loadFailed": "統計を読み込めませんでした。",
+      "noData": "訪問データはまだありません。",
+      "kpi": {
+        "online": "現在オンライン",
+        "views24": "今日の閲覧",
+        "views7": "7日間の閲覧",
+        "views30": "30日間の閲覧",
+        "total": "総閲覧数",
+        "unique": "ユニーク訪問者"
+      },
+      "chart": {
+        "title": "直近30日の閲覧と訪問者",
+        "hits": "閲覧",
+        "visitors": "訪問者"
+      },
+      "devices": "デバイス",
+      "browsers": "ブラウザ",
+      "topPaths": "よく見られるページ",
+      "referrers": "参照元",
+      "locales": "言語",
+      "privacy": "平均滞在時間: {avg} 秒。IPアドレス・Cookie・完全な参照元URLなしで計測しています。"
+    },
+    "status": {
+      "loading": "サービスを確認中…",
+      "loadFailed": "サービスの状態を読み込めませんでした。",
+      "title": "サービス",
+      "probing": "確認中…",
+      "reprobe": "再確認",
+      "uptime24": "可用性（24時間）",
+      "live": "ライブ確認",
+      "checkedAt": "{time} に確認",
+      "col": {
+        "service": "サービス",
+        "last": "最終実行",
+        "status": "状態",
+        "24h": "24時間",
+        "7d": "7日",
+        "30d": "30日",
+        "avg": "平均所要時間"
+      },
+      "empty": "ハートビートはまだ記録されていません。",
+      "messages": "最近のメッセージ",
+      "noMessages": "メッセージはありません — すべてのサービスが正常です。"
+    },
+    "newsletter": {
+      "intro": "お知らせを書き、配信方法を選びます。受信者数は、メールアドレスを持つアカウントとプッシュを購読しているブラウザから数えます。",
+      "audienceEmails": "メール登録アカウント",
+      "audiencePush": "購読ブラウザ",
+      "provider": "メール事業者",
+      "providerResend": "設定済み",
+      "providerNone": "未設定",
+      "noProviderHint": "メール事業者が設定されていないため、実際に配信できるのはプッシュだけです。「メール」に設定した下書きはウェブプッシュとして送信され、結果にもその旨が表示されます — 送っていないメールを送ったとは報告しません。",
+      "delivery": "配信: {channel}、成功 {sent}、失敗 {failed}",
+      "loadFailed": "ニュースレターを読み込めませんでした。",
+      "failed": "操作に失敗しました。",
+      "saved": "下書きを保存しました。",
+      "sent": "送信しました。",
+      "deleted": "下書きを削除しました。",
+      "new": "新しい下書き",
+      "edit": "編集",
+      "save": "保存",
+      "send": "今すぐ送信",
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "confirmSend": "このニュースレターを今すぐ全員に送信しますか？",
+      "confirmDelete": "この下書きを削除しますか？",
+      "sendHint": "下書きは一度しか送信できず、実際に配信されたときだけ送信済みになります。",
+      "empty": "下書きはまだありません。",
+      "col": {
+        "subject": "件名",
+        "channel": "チャネル",
+        "status": "状態",
+        "recipients": "受信者",
+        "date": "日付"
+      },
+      "field": {
+        "subject": "件名",
+        "body": "本文",
+        "channel": "チャネル"
+      }
+    },
+    "ideas": {
+      "intro": "サイトのアイデアボード。集めて、評価して、仕分けします。閲覧は誰でも、書き込みはここからのみです。",
+      "filter": "カテゴリ",
+      "allCategories": "すべてのカテゴリ",
+      "new": "新しいアイデア",
+      "edit": "編集",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "upvote": "賛成",
+      "downvote": "反対",
+      "confirmDelete": "このアイデアを削除しますか？",
+      "loadFailed": "アイデアを読み込めませんでした。",
+      "failed": "操作に失敗しました。",
+      "saved": "アイデアを保存しました。",
+      "deleted": "アイデアを削除しました。",
+      "empty": "アイデアはまだありません。",
+      "field": {
+        "category": "カテゴリ",
+        "status": "状態",
+        "title": "タイトル",
+        "body": "メモ"
+      }
+    },
+    "audit": {
+      "intro": "すべての管理操作を新しい順に表示します。各項目には実行者、対象、該当する場合は関与した値を記録します。",
+      "filterAction": "操作",
+      "allActions": "すべての操作",
+      "filterActor": "実行者",
+      "count": "{count} 件",
+      "loadFailed": "監査ログを読み込めませんでした。",
+      "empty": "まだ記録がありません。",
+      "details": "詳細",
+      "hide": "隠す",
+      "col": {
+        "when": "日時",
+        "actor": "実行者",
+        "action": "操作",
+        "target": "対象"
+      }
+    }
+  },
+  "roles": {
+    "owner": "オーナー",
+    "admin": "管理者",
+    "moderator": "モデレーター",
+    "ownerHint": "このサイトの運営者",
+    "adminHint": "パネルへのフルアクセスを持つ管理者",
+    "moderatorHint": "モデレーター — メンバーとコンテンツを管理できます"
   }
 }

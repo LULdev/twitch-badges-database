@@ -1,0 +1,276 @@
+{
+  "agent": "xp-coin-admin",
+  "scope": "XP and level system, BadgesCoins economy and the admin control panel",
+  "ideas": [
+    {
+      "category": "xp",
+      "title": "Per-Game Mastery Tracks",
+      "body": "Each of the 13 arcade games gets its own mastery level 1-10, advanced by rounds played and won in that specific game, derived from game_rounds and stored as a compact per-game counter. A profile shows a mastery strip beside the global level badge, and mastery 10 in any game unlocks a game-specific flair on that badge. Mastery awards no XP of its own, so it is a parallel visible skill track rather than a second XP bar. Effort: M. Risk if built badly: mastery becomes a pure grind counter players farm with minimum bets, so progress must require rounds above a small bet floor and must not be reachable by losing-only play.",
+      "why": "It turns 13 separate minigames into 13 personal ladders, giving the arcade a progression layer the single global XP bar cannot express."
+    },
+    {
+      "category": "xp",
+      "title": "Level-Race Weeks",
+      "body": "Two members opt into a seven-day head-to-head XP race; the server snapshots both XP totals at accept time and renders a live comparison bar from the delta, read from timestamped activity_events for the two ids. The winner gets a temporary Racer flair and a modest XP bonus, and an inactive or tied week resolves as a draw. Entry is free and one active race per member. Effort: M. Risk if built badly: a player parks earning and dumps it in the final hour, so the race must be scored from timestamped activity deltas and must not create a second board that often sits empty.",
+      "why": "It makes the XP ladder personal and social for the members who will never crack the global top 100."
+    },
+    {
+      "category": "xp",
+      "title": "Branching Level-Up Perks",
+      "body": "On each level-up the member picks one of two timed perks for the next stretch, for example +20 percent game XP for 24 hours versus +5 percentage points of steal success for 24 hours, chosen in the level-up modal and stored on user_progress with an expiry. The perks act through the same server-side award and heist paths that read the economy constants, so they are real effects rather than client-side claims. Effort: M. Risk if built badly: stacking perks across levels compounds into an exploit, so only one may be active at a time and every multiplier must be applied inside the server award.",
+      "why": "It turns a passive level number into a decision the member actually makes, which is what a levels system is for."
+    },
+    {
+      "category": "xp",
+      "title": "Discovery XP for First-Viewed Badges",
+      "body": "Reading a badge detail page the member has never viewed grants a small one-time XP such as +5, recorded per user and badge UUID so it can never pay twice, with a daily ceiling around 50 XP. It reads the existing page views and the badge catalog and gives signed-in readers a reason to explore the 476-badge archive rather than only the drop of the day. Effort: S. Risk if built badly: crawlers and refresh loops farm it, so it must be gated to a signed-in member, permanently deduplicated per badge, and capped per day.",
+      "why": "The catalog is the site's whole asset, and this pays members for actually reading it."
+    },
+    {
+      "category": "xp",
+      "title": "Stake-Weighted Game XP",
+      "body": "Replace the flat +10 win and +2 loss with an XP amount scaled by the stake bracket of the round, for example 5/10/20/40 XP by bet size, still bounded by the existing daily game-XP cap. The value is computed server-side in round resolution from the bet actually placed against that game's minBet and maxBet settings. Effort: S. Risk if built badly: it rewards betting large over playing well and can be gamed with maximum-bet coin flips, so the scaling must stay sub-linear in the stake and the daily cap must hold.",
+      "why": "It links XP to how members actually choose to play instead of treating every round as identical."
+    },
+    {
+      "category": "xp",
+      "title": "Ascension at Level 100",
+      "body": "At level 100 a member may Ascend: the level counter returns to 1, the curve restarts under a small permanent global multiplier capped at a few ascensions, and each ascension adds a permanent star to the level badge. Lifetime XP and a new ascensions counter are kept, so nothing is erased, and it is explicitly not the seasonal game-ladder reset. Effort: M. Risk if built badly: the multiplier compounds across many ascensions into runaway XP, so the bonus must be hard-capped and the curve retuned so ascending is never worse than idling at the cap.",
+      "why": "It gives the level-100 ceiling somewhere to go without taking anything from members who never reach it."
+    },
+    {
+      "category": "xp",
+      "title": "Level-Banded Leagues",
+      "body": "Split the ranked XP board into level bands such as 1-20, 21-40 up to 81-100 so members compete inside their own tier, computed live from user_progress.level and the existing XP totals. Each band shows its own top table and a highest-mover-this-week line built from timestamped XP deltas. It is a partition of the existing board, not a new metric. Effort: S. Risk if built badly: a member who levels out of a band mid-week loses their standing, so the band must be frozen at the week's start.",
+      "why": "It makes the ranked board meaningful for newcomers who would otherwise be permanently buried under veterans."
+    },
+    {
+      "category": "xp",
+      "title": "Next-Level Path Coach",
+      "body": "A dashboard card computes the concrete XP still available today, covering the unclaimed daily bonus, the remaining game-XP cap, the unused wheel spin and unearned discovery XP, and ranks them into a short checklist with the XP each is worth. It reads the live economy settings and the member's user_progress counters, so a member sees exactly what closes the gap to the next level. Effort: S. Risk if built badly: it drifts from real economy values and promises XP the caps will refuse, so every number must come from the live settings rather than hard-coded copy.",
+      "why": "It answers the one question every level bar provokes, what do I do next, with real numbers from this site's economy."
+    },
+    {
+      "category": "xp",
+      "title": "Win-Streak XP Combo",
+      "body": "Consecutive wins within a day build a combo that multiplies game XP, for example a three-win run giving 1.5x, resetting on a loss or at the daily reset and computed server-side from the member's round outcomes. It appears as a small combo meter in the arcade and writes a feed entry when it breaks a personal record, while the daily game-XP cap still bounds the total. Effort: M. Risk if built badly: it amplifies variance and rewards the highest-variance game, so the combo must be capped low and applied only to win XP, never to coins.",
+      "why": "It adds a skill-flavoured reward loop to an arcade that currently pays every win the same."
+    },
+    {
+      "category": "xp",
+      "title": "XP Exchange for Cosmetics",
+      "body": "A member can spend XP, not coins, on a small permanent cosmetic set such as a profile frame, a feed name colour or a level-badge outline, which deducts from lifetime XP and can therefore drop their level. The exchange runs server-side, is written to the changelog, and shows an explicit before-and-after level preview before confirming. Effort: M. Risk if built badly: members destroy their ladder progress by accident, so it needs a typed confirmation, a level-drop warning, and a strictly small catalog of unlocks.",
+      "why": "XP is the site's purest status number, and letting it be spent is what makes it a currency rather than a scoreboard."
+    },
+    {
+      "category": "xp",
+      "title": "Seasonal XP Reward Track",
+      "body": "A free time-limited reward track where members claim cosmetic unlocks at XP thresholds during a season, with season XP counted from activity_events inside the window while the lifetime level stays untouched. Unlocks are claimed manually at each threshold so the track is a visible checklist rather than a silent grant. Effort: L. Risk if built badly: it becomes a grind treadmill that punishes casual members and duplicates the per-level badges, so thresholds must be tuned to ordinary play and its rewards must be visibly distinct from level badges.",
+      "why": "It gives the XP economy a recurring shape, a reason to return this month rather than only today."
+    },
+    {
+      "category": "xp",
+      "title": "Level 100 Hall of Fame",
+      "body": "A public page listing everyone who has reached level 100 in the order they got there, with the date and their level-badge theme, read from user_progress plus the level_up activity_events that already carry a timestamp. It is a static, cacheable list linked from the leaderboard. Effort: S. Risk if built badly: it becomes a vanity wall that leaks member data, so it must show only username, avatar and the date the site recorded, never sign-in or location data.",
+      "why": "Reaching the cap is the site's hardest grind, and a permanent ordered record of who did it honours it."
+    },
+    {
+      "category": "xp",
+      "title": "Anti-Tilt Residual XP",
+      "body": "A member on a losing streak such as five consecutive losses in a day earns a small rising consolation XP on each further loss, so an unlucky session still moves the level bar, resetting on a win or at the daily reset and bounded by the game-XP cap. It is computed server-side from the streak of round outcomes. Effort: S. Risk if built badly: it pays members to lose deliberately, so the consolation must be worth far less than a win and must stop at a small daily ceiling.",
+      "why": "It keeps a bad-luck evening from feeling like the site wasted the member's time."
+    },
+    {
+      "category": "xp",
+      "title": "Earned Level Badge Loadout",
+      "body": "Members own a badge for every level 1-100; this lets them pin any badge they have already earned to their profile instead of always showing the current one, with a hard rule that nothing above the member's true level can be selected. It reads the member's user_progress.level and the existing per-level badge set, and the true level stays rendered as text beside the chosen badge. Effort: S. Risk if built badly: members display a low badge to appear modest and the status signal dissolves, so the numeric level must remain visible next to the cosmetic choice.",
+      "why": "The per-level badges are already the site's most personal reward, and letting members choose which one speaks is free expression over existing art."
+    },
+    {
+      "category": "xp",
+      "title": "Veteran Tenure Bonus",
+      "body": "XP from daily logins and achievements carries a small permanent multiplier that grows with verified account tenure, for example +1 percent per 90 days since the Twitch account was linked, capped around +15 percent and computed from the stored link date. It is quiet recognition of long service rather than a purchasable advantage, shown as a single line on the profile. Effort: S. Risk if built badly: it compounds with every other multiplier into runaway XP for old accounts, so it must be capped and applied before, not after, the caps.",
+      "why": "Long-standing members carry the site's history, and a capped tenure bonus is a cheap way to say so."
+    },
+    {
+      "category": "coin",
+      "title": "Self-Escrow Commitment Contracts",
+      "body": "A member escrows coins against a self-set goal for the day or week, such as winning five arcade rounds or claiming the next global drop, held by the server and released back with a bonus if the goal verifies, or burned if it fails. Verification reads the existing game_rounds and inventory sync data, and escrow is one-way and capped so it cannot be used to shield coins from stealing. Effort: M. Risk if built badly: a goal that cannot be verified honestly becomes a coin-laundering path, so only server-checkable goals may be offered.",
+      "why": "It turns the coin economy into a personal-motivation tool, which is the one thing coins can do that XP cannot."
+    },
+    {
+      "category": "coin",
+      "title": "Badge Yield",
+      "body": "Coins accumulate slowly for the rare badges a member actually displays, with a per-tick yield derived from the TBRI tier of the showcase badges and credited through the normal award path under a daily ceiling. It reads the showcase selection and the existing TBRI values, giving rare-badge ownership a passive economic role. Effort: M. Risk if built badly: it becomes an inflation pump for the handful of legendary holders, so the yield must be small, daily-capped and paid only for badges currently displayed.",
+      "why": "It connects the coin economy to the catalog, so owning a rare badge pays in a way specific to this site."
+    },
+    {
+      "category": "coin",
+      "title": "Savings Vault with Interest",
+      "body": "A member can lock a chosen number of coins for a fixed term such as 7 or 30 days; the deposit earns interest funded from the arcade's house edge and is released at term end, and cannot be withdrawn or stolen while locked. It is the deliberate opposite of the anti-hoard tax, rewarding saving only when coins are genuinely committed. Effort: M. Risk if built badly: it becomes a free inflation machine, so the rate must sit below the house edge and the terms must be long enough that deposits cannot be cycled.",
+      "why": "It gives coin holders a reason to plan instead of gambling everything at once, and gives the economy its first long-term sink."
+    },
+    {
+      "category": "coin",
+      "title": "Bankruptcy Safety Net",
+      "body": "A member who hits near-zero coins receives a small one-time recovery grant, once per cooldown period, so one bad session does not lock them out of the arcade entirely. It is granted server-side and recorded in both the changelog and the economy ledger. Effort: S. Risk if built badly: members deliberately bust to farm the grant, so it needs a cooldown, an amount far below a normal session's win, and a look at recent coin movements.",
+      "why": "A cosmetics-and-games economy should never permanently brick a member's ability to play."
+    },
+    {
+      "category": "coin",
+      "title": "Steal Bounty Board",
+      "body": "After a successful heist the victim can post a public bounty in coins on the thief, and any other member who successfully steals from that thief and claims it splits the bounty. The server verifies the claim from steal_attempts, and the bounty is forfeited if unclaimed within a fixed window. Effort: M. Risk if built badly: coordinated groups use bounties to move coins between themselves, so the payout must require a verified fresh steal and be capped per pair.",
+      "why": "It turns stealing from a one-way drain into a community-enforced game with consequences."
+    },
+    {
+      "category": "coin",
+      "title": "Revenge Counter-Steal Window",
+      "body": "A member robbed within the last hour gets a discounted counter-steal against that specific thief, with reduced price and better odds flagged visibly in the heist UI and derived from the recent steal_attempts row. The window is short and one-shot so it cannot become a farm loop. Effort: S. Risk if built badly: reciprocal robbing inflates both balances, so the odds bonus must be small and the window must not stack with other steal perks.",
+      "why": "It gives a robbed member an immediate, personal answer instead of an anonymous loss."
+    },
+    {
+      "category": "coin",
+      "title": "Parlay Betting Slip",
+      "body": "A member builds a slip of two to five picks across different arcade games and stakes once; every pick must win for a multiplied payout and any loss voids the slip. The server resolves the slip from the same per-game outcomes the individual rounds already produce, so no new randomness is introduced. Effort: M. Risk if built badly: a lucky parlay creates a coin windfall that wrecks the economy, so the multiplier must be capped and the slip stake limited well below the normal maximum bet.",
+      "why": "It adds a genuinely new wagering shape to an arcade whose games are all single-round today."
+    },
+    {
+      "category": "coin",
+      "title": "Mid-Round Cash-Out",
+      "body": "In the games with a running multiplier, such as tower, the coin-flip ladder and higher-or-lower, the player gets a server-enforced settle-now action that banks the current value instead of continuing, recorded with the round outcome in game_rounds. It reads the same server-authoritative round state those games already keep. Effort: M. Risk if built badly: a race between the settle call and the next round step lets a player bank after seeing the next result, so the decision must be resolved inside the single server round transition.",
+      "why": "It turns pure nerve into a real decision in the risk games, which is what makes them replayable."
+    },
+    {
+      "category": "coin",
+      "title": "Daily Coin Emission Budget",
+      "body": "The panel sets a maximum number of coins the site may emit across all sources per day; once the budget is spent, further coin awards are reduced rather than refused, and the remaining budget appears as a meter on the admin statistics tab. It is enforced inside the award path against the settings table. Effort: M. Risk if built badly: a hard cutoff silently punishes members who played legitimately, so the budget must degrade gracefully and must never block XP.",
+      "why": "An economy with no monetary ceiling inflates, and this is the dial that keeps BadgesCoins meaningful."
+    },
+    {
+      "category": "coin",
+      "title": "Community Charity Pool",
+      "body": "Members can donate coins into a shared pool that is dispensed automatically as welcome grants to newly linked members, with a public running total and a per-member donation history. The pool drains only through the server's grant path and never back to its donors. Effort: M. Risk if built badly: the pool is drained by alt accounts, so grants must require a verified Twitch link and be limited to one per account.",
+      "why": "It gives generous members a genuine way to seed the next cohort of collectors."
+    },
+    {
+      "category": "coin",
+      "title": "Feed Megaphone",
+      "body": "A member can pay coins to pin a short moderated announcement into the live activity feed for a fixed window, clearly marked as paid, reusing the feed render pipeline and the existing moderation surface. The price rises with current occupancy so the feed cannot be monopolised by one spender. Effort: S. Risk if built badly: the feed becomes an advertising wall, so the slot must be rate-limited, length-capped and moderated.",
+      "why": "The feed is the site's one social surface, and selling a scarce slot on it is a coin sink that fits the site."
+    },
+    {
+      "category": "coin",
+      "title": "Coins-to-XP Conversion Desk",
+      "body": "A weekly-limited desk lets a member convert coins into XP at a deliberately poor rate, so coins can close a level gap but never compete with normal play for value. The conversion flows through the standard award path with its own changelog row and a visible weekly quota. Effort: S. Risk if built badly: whales buy their way up the ladder, so the weekly cap must be small and the rate bad enough that playing is always better value.",
+      "why": "It links the two currencies the site runs on and gives hoarded coins a legitimate, bounded exit."
+    },
+    {
+      "category": "coin",
+      "title": "Steal Cooldown Shortcut",
+      "body": "A member blocked by the steal flood control can pay coins to clear the cooldown and attempt again immediately, with the price rising per use inside the window. It reads the same per-member flood settings, stealFloodMinutes and stealPerHour, that gate heists today and still respects any global cap. Effort: S. Risk if built badly: paying to bypass the anti-abuse limit hands a rich attacker the very drain the limit exists to stop, so the shortcut must be heavily capped and priced.",
+      "why": "It converts an anti-abuse rule into a bounded, priced choice without removing the rule."
+    },
+    {
+      "category": "coin",
+      "title": "Self-Set Loss Limits",
+      "body": "A member can set a personal coin-loss limit per day or per session; once it is hit the arcade locks their betting until the period resets, with removal possible only after a cooling-off delay rather than a fee. It is opt-in, stored with their other settings, and displayed like a budget. Effort: S. Risk if built badly: it becomes nagware members resent, so it must never be applied silently and must be easy to start, hard to switch off on impulse.",
+      "why": "A real coin economy on a gambling-flavoured arcade owes its players a way to stop."
+    },
+    {
+      "category": "coin",
+      "title": "Session Loss Rebate",
+      "body": "At the end of a losing session, defined as a contiguous run of play, the house returns a small percentage of net losses as a rebate capped at a low daily ceiling, computed from game_rounds and paid through the normal award path. Unlike insurance it is automatic and costs nothing to receive. Effort: S. Risk if built badly: rebates raise the effective return-to-player enough to inflate the economy, so the percentage must be tiny and the daily cap enforced.",
+      "why": "It softens the arcade's worst nights without changing how a normal one feels."
+    },
+    {
+      "category": "admin",
+      "title": "Scheduled Deferred Admin Actions",
+      "body": "An operator can queue a settings or feature change to apply at a future timestamp, such as flipping the arcade off during maintenance, raising the steal price for the weekend or opening a flag for a launch, and the queue shows pending actions with their author. A step in the existing daily cron or the 15-minute GitHub Action applies due entries through the same write path the panel uses. Effort: M. Risk if built badly: a mis-scheduled destructive change fires unattended, so each entry must be cancellable, previewed and written to the audit log with its author.",
+      "why": "The panel can only change things right now, but this site's economy changes are the kind you want to stage overnight."
+    },
+    {
+      "category": "admin",
+      "title": "Settings Rollback from Audit Snapshots",
+      "body": "Every settings write already lands in the audit log, and this adds a one-click revert that restores the previous value of a single settings key from the recorded snapshot with a diff before confirming. It targets the site_settings economy, feature and maintenance documents and reads the audit log rather than a new history table. Effort: S. Risk if built badly: reverting one key silently reverts others or resurrects a value the current schema no longer holds, so the revert must be per-key and re-validated.",
+      "why": "The audit log records what changed but cannot undo it, and on an economy people actually play in, undo is the missing half."
+    },
+    {
+      "category": "admin",
+      "title": "Auto-Trip Feature Kill Switch",
+      "body": "A feature such as a game, the wheel or steals can carry an automatic trip condition, an error rate or economy anomaly above a threshold, that flips it off and writes a notice to the panel with no operator present. It reads the existing heartbeat and game_rounds error signals and uses the same feature-flag write path as the manual switches. Effort: M. Risk if built badly: a transient spike kills a game for everyone mid-event, so tripping must require a sustained breach, show a reason, and be trivially reversible.",
+      "why": "One broken game should not be able to burn the economy all night while the operator sleeps."
+    },
+    {
+      "category": "admin",
+      "title": "Member Support Timeline",
+      "body": "One admin page per member stitches their XP and coin ledger, game rounds, steal attempts, achievement awards, inventory syncs, notifications and audit entries into a single chronological view with filters. All of it is already stored across user_progress, activity_events, game_rounds, steal_attempts, user_achievements and the audit log. Effort: M. Risk if built badly: it becomes a surveillance tool, so access must be restricted to the admin role, the view itself logged, and it must show only data the site already holds.",
+      "why": "Answering why a member lost their coins today means opening five tabs, and support needs one."
+    },
+    {
+      "category": "admin",
+      "title": "Incident Playbooks on Alerts",
+      "body": "Each panel alert, such as a failed sync, a heartbeats-gone-quiet condition or an economy anomaly, can carry a short operator playbook listing the checks to run and the safe action to take, rendered beside the alert and editable in the panel. It reads the alert and status data the Status tab already computes. Effort: S. Risk if built badly: a stale playbook sends an operator down a wrong path, so each playbook needs a last-reviewed date and version history.",
+      "why": "The panel tells an operator something is wrong but never what to do about it, and that difference matters at 03:00."
+    },
+    {
+      "category": "admin",
+      "title": "Dual-Control Approval for Destructive Actions",
+      "body": "Destructive operations such as purge, bulk delete, maintenance on or an economy reset require a second admin to approve within a short window before executing, with both the request and the approval written to the audit log. It complements per-action permissions by making the most dangerous actions two-person rather than one-person. Effort: M. Risk if built badly: a single-admin team is locked out during an emergency, so a documented break-glass path with its own loud audit entry must exist.",
+      "why": "The panel lets one person delete the catalog, and nothing today makes a second person look first."
+    },
+    {
+      "category": "admin",
+      "title": "Soft-Delete Trash and Restore",
+      "body": "Content deleted from the panel goes to a trash view holding the original row and the deleting admin, and can be restored within a retention window before a scheduled purge. It covers blog posts, brainstorm ideas and badge overrides, reading the same tables with a deleted_at marker. Effort: M. Risk if built badly: trashed rows still leak to public queries, so every public read must filter deleted_at and the purge must actually run.",
+      "why": "One mis-click in the Content tab currently means a row is gone, and a trash can is the cheapest safety rail."
+    },
+    {
+      "category": "admin",
+      "title": "Member Data Purge Tool",
+      "body": "An admin can run a scoped audited purge of one member's personal data, covering profile fields, customization, progress, achievements, notifications and analytics rows keyed to their visitor hash, with a preview of what will be removed and a completion receipt. It provides the operator side of the member-facing deletion promise. Effort: M. Risk if built badly: a purge reaches the wrong account or leaves orphaned rows, so it must require the username to be typed, run table by table, and be irreversible.",
+      "why": "A public site with member data needs a real erasure path, and operators need to be able to run it on request."
+    },
+    {
+      "category": "admin",
+      "title": "Bulk Badge Metadata Editor",
+      "body": "A grid over the badge catalog where an admin can edit category, how-to-earn text, tags or status across many selected rows at once, with a preview diff and a single commit. It reads the same badge tables the Badges tab already edits but adds multi-select and batch apply. Effort: M. Risk if built badly: a bulk edit overwrites hand-tuned values with a wrong default, so every batch must show a diff, be reversible from the audit log, and skip custom-protected rows.",
+      "why": "Catalog rows are corrected one at a time today, which does not scale with a growing catalog."
+    },
+    {
+      "category": "admin",
+      "title": "Idea Deduplication Assistant",
+      "body": "When an idea is submitted to the brainstorm board, the panel shows the closest existing ideas by text similarity and category so an operator can merge or reject a duplicate before it lands, the exact costly failure mode this site keeps hitting. It reads the brainstorm ideas table and is purely advisory, never blocking a submission. Effort: M. Risk if built badly: it hides a genuinely new idea behind a false match, so similarity must never become an automatic rejection.",
+      "why": "The idea board's worst outcome is the duplicate nobody noticed, and this catches it at entry."
+    },
+    {
+      "category": "admin",
+      "title": "Cohort Notification Segments",
+      "body": "An admin can send an in-app notification and optionally a push to a filter-selected cohort, such as members at level 1 who never played, members inactive for 30 days, or holders of one achievement, built from user_progress filters and delivered through the existing notification and push paths. It is a broadcast to a saved segment, not a new message system. Effort: M. Risk if built badly: a badly chosen segment spams or singles members out, so segments must preview a live count and be rate-limited per member.",
+      "why": "The site can already push to everyone, and it cannot yet reach the one group a change actually concerns."
+    },
+    {
+      "category": "admin",
+      "title": "Settings Drift Snapshot and Diff",
+      "body": "The panel periodically snapshots the effective site_settings documents and diffs them against the code defaults, flagging keys changed from the constant the code falls back to and any key present in code but missing in the database. It reads the economy and game accessors against the settings table. Effort: S. Risk if built badly: it cries wolf on intentional tuning, so it must separate a deliberate audited change from an unnoticed drift.",
+      "why": "The economy silently depends on settings that fall back to code constants, and drift between the two is invisible until it breaks."
+    },
+    {
+      "category": "admin",
+      "title": "Internal Member Notes and Tags",
+      "body": "Admins can attach short private notes and coloured tags to a member, such as known alt, reported for abuse or contest winner, that appear beside their row in the Users tab and are never shown to the member. They are stored against the profile and written to the audit log on every change. Effort: S. Risk if built badly: notes become an unaccountable record that biases every later decision, so they must be editable, attributable and purged with the member.",
+      "why": "The team has three roles and no memory of past context about a member, which is exactly what a note column fixes."
+    },
+    {
+      "category": "admin",
+      "title": "Step-Up Re-authentication for Sensitive Tabs",
+      "body": "Opening the settings, sync or audit tabs after a period of inactivity demands a fresh Twitch confirmation before the panel will act, refreshing the session rather than adding a second factor. It reads the existing session and role and wraps the sensitive API routes. Effort: S. Risk if built badly: it locks an operator out mid-incident, so the challenge must be short-lived and re-entry quick and auditable.",
+      "why": "An unattended open panel with a service-role client behind it is the site's largest single risk, and this shrinks the window cheaply."
+    },
+    {
+      "category": "admin",
+      "title": "Infrastructure Quota and Cost Monitor",
+      "body": "A panel tab tracks the platform limits this project actually lives inside, covering Vercel Hobby function invocations and cron minutes, Supabase database size and egress, and the 60-second function budget, with a warning line before a limit is hit. It reads provider usage where exposed plus the sync heartbeats' recorded durations. Effort: M. Risk if built badly: provider APIs may change or not be exposed on Hobby, so the tab must degrade to honest in-app counters rather than pretend to know the provider's numbers.",
+      "why": "This site runs on a free tier with hard walls, and hitting one silently takes the whole thing down."
+    }
+  ]
+}

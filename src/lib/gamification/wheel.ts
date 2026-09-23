@@ -17,6 +17,14 @@ export interface WheelSlot {
   turbo?: boolean;
 }
 
+/**
+ * The Turbo slot's win probability. The slot is drawn SEPARATELY from the weighted
+ * pick (see spinWheel) so its `weight` is informational — but it must still be the
+ * real probability, or any consumer deriving odds from WHEEL_SLOTS publishes
+ * 1 : 10,000,000 while the UI says 1 : 100,000,000.
+ */
+const TURBO_PROBABILITY = 0.00000001;
+
 export const WHEEL_SLOTS: WheelSlot[] = [
   { id: "xp25", label: "+25 XP", xp: 25, coins: 10, weight: 4000 },
   { id: "xp50", label: "+50 XP", xp: 50, coins: 20, weight: 2500 },
@@ -25,10 +33,8 @@ export const WHEEL_SLOTS: WheelSlot[] = [
   { id: "xp500", label: "+500 XP", xp: 500, coins: 200, weight: 220 },
   { id: "xp1000", label: "+1,000 XP", xp: 1000, coins: 400, weight: 70 },
   { id: "xp2500", label: "+2,500 XP", xp: 2500, coins: 1000, weight: 10 },
-  { id: "turbo", label: "Twitch Turbo!", xp: 5000, coins: 50000, weight: 0.0000001, turbo: true },
+  { id: "turbo", label: "Twitch Turbo!", xp: 5000, coins: 50000, weight: TURBO_PROBABILITY, turbo: true },
 ];
-
-const TURBO_PROBABILITY = 0.00000001;
 
 export interface SpinResult {
   slot: WheelSlot;
@@ -63,15 +69,33 @@ export async function spinWheel(userId: string): Promise<
     ? WHEEL_SLOTS[WHEEL_SLOTS.length - 1]
     : weightedPick(WHEEL_SLOTS.slice(0, -1));
 
-  await award(userId, {
-    xp: slot.xp,
-    coins: slot.coins,
-    source: "wheel",
-    skipAchievements: false,
-    feedKind: "wheel",
-    feedTitle: `spun the Wheel of Fortune: ${slot.label}`,
-    payload: { slot: slot.id },
-  });
+  try {
+    await award(userId, {
+      xp: slot.xp,
+      coins: slot.coins,
+      source: "wheel",
+      skipAchievements: false,
+      feedKind: "wheel",
+      feedTitle: `spun the Wheel of Fortune: ${slot.label}`,
+      payload: { slot: slot.id },
+    });
+  } catch (error) {
+    // Same reasoning as the daily gate: the gate already advanced `last_wheel_date`
+    // and `wheel_spins`, so a failed award would burn the day's spin with nothing
+    // paid and no way to retry. Release it (date AND the counter, atomically) and
+    // rethrow. Only the award is wrapped — the turbo path below must not re-open the
+    // gate after a paid spin.
+    try {
+      const release = await supabase.rpc("release_wheel_gate", {
+        p_user_id: userId,
+        p_today: today(),
+      });
+      if (release.error) throw release.error;
+    } catch (releaseError) {
+      console.warn("[wheel] could not release the gate after a failed award:", releaseError);
+    }
+    throw error;
+  }
 
   if (turboWon) {
     // The jackpot must be recorded before the UI is told about it: discarding

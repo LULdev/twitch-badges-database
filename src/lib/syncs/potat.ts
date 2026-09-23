@@ -14,6 +14,8 @@ export interface PotatSyncSummary {
   statsInserted: number;
   rarityUpdated: number;
   statusSweeps: number;
+  /** False when the owners feed failed or came back empty and stored counts were kept. */
+  ownersFeedOk: boolean;
 }
 
 const BADGE_UUID = /badges\/v1\/([0-9a-f-]{36})/i;
@@ -79,27 +81,35 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
 
   // Load current badges (full rows — updates are merged and bulk-upserted,
   // because per-id PATCHes would exceed serverless function time limits).
-  const badges = await supabase
-    .from("badges")
-    .select("*")
-    .neq("status", "removed")
-    .then(({ data, error }) => {
-      if (error) throw error;
-      return (data ?? []) as Array<Record<string, unknown> & {
-        id: string;
-        set_id: string;
-        version: string;
-        image_url_1x: string | null;
-        status: string;
-        start_date: string | null;
-        end_date: string | null;
-        first_seen_at: string;
-        owner_count: number | null;
-        active_count: number | null;
-        percentage: number | null;
-        last_polled_at: string | null;
-      }>;
-    });
+  // Paged: a single select silently stops at PostgREST's 1000-row cap, after
+  // which the rows past it never get their owner counts or rarity refreshed.
+  type BadgeRow = Record<string, unknown> & {
+    id: string;
+    set_id: string;
+    version: string;
+    image_url_1x: string | null;
+    status: string;
+    start_date: string | null;
+    end_date: string | null;
+    first_seen_at: string;
+    owner_count: number | null;
+    active_count: number | null;
+    percentage: number | null;
+    last_polled_at: string | null;
+  };
+  const badges: BadgeRow[] = [];
+  for (let offset = 0; ; offset += 1000) {
+    const { data, error } = await supabase
+      .from("badges")
+      .select("*")
+      .neq("status", "removed")
+      .order("id")
+      .range(offset, offset + 999);
+    if (error) throw error;
+    const page = (data ?? []) as BadgeRow[];
+    badges.push(...page);
+    if (page.length < 1000) break;
+  }
 
   const byKey = new Map<string, (typeof badges)[number]>();
   const byUuid = new Map<string, (typeof badges)[number]>();
@@ -110,9 +120,15 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
   }
 
   // 24h active-user growth (rarity momentum input) from the time series.
-  const { data: momentumRows } = await supabase
+  const { data: momentumRows, error: momentumError } = await supabase
     .from("badge_momentum")
     .select("badge_id, growth_24h");
+  // Read errors in this file throw (see the catalog paging read above): a failed
+  // momentum read silently yielded an empty map, every badge got growth24h null,
+  // momentumOf() returned the neutral 0.5, and rarity_score/rarity_tier were
+  // written wrong for the entire catalog while the run still reported ok. The view
+  // ships in migration 0002, so an error here is a real failure.
+  if (momentumError) throw momentumError;
   const growthByBadge = new Map<string, number | null>(
     ((momentumRows ?? []) as Array<{ badge_id: string; growth_24h: number | null }>).map(
       (row) => [row.badge_id, row.growth_24h],
@@ -259,5 +275,10 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
     statsInserted,
     rarityUpdated,
     statusSweeps,
+    // Surfaced on the summary so the cron routes can record a DEGRADED heartbeat
+    // for a run that kept stored owner counts because the feed was unavailable:
+    // this function deliberately resolves normally in that case, so without the
+    // flag the uptime view stayed green through an owners outage.
+    ownersFeedOk: ownersOk,
   };
 }

@@ -1,7 +1,7 @@
 /**
  * Level system: 1–100.
  * XP required to advance from level L to L+1: 100 + (L-1)·50
- * → total XP for level 100: 254 900.
+ * → total XP for level 100: 252 450 (99 advances: 9 900 + 50·4 851).
  */
 
 export interface LevelInfo {

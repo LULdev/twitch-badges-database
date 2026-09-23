@@ -32,7 +32,8 @@
     "faqNav": "FAQ",
     "wheel": "운명의 수레바퀴",
     "mainNav": "주요 메뉴",
-    "mobileNav": "모바일 메뉴"
+    "mobileNav": "모바일 메뉴",
+    "acp": "관리자 패널"
   },
   "common": {
     "search": "배지 검색…",
@@ -82,7 +83,8 @@
     "errorTitle": "문제가 발생했습니다",
     "errorBody": "페이지를 불러올 수 없습니다. 대개 일시적인 문제이니 다시 시도해 주세요.",
     "errorRetry": "다시 시도",
-    "levelAria": "레벨 {level}"
+    "levelAria": "레벨 {level}",
+    "breadcrumb": "이동 경로"
   },
   "home": {
     "heroTitle": "모든 Twitch 배지를 하나의 데이터베이스에서.",
@@ -262,7 +264,14 @@
     "empty": "아직 게시물이 없습니다.",
     "autoTag": "자동 생성",
     "notFound": "이 게시물은 존재하지 않습니다.",
-    "react": "반응"
+    "react": "반응",
+    "reactions": {
+      "like": "좋아요",
+      "love": "하트",
+      "laugh": "웃김",
+      "fire": "불",
+      "wow": "놀람"
+    }
   },
   "changelog": {
     "title": "체인지로그",
@@ -429,7 +438,19 @@
     "sourceSyncEnrichment": "수령 기간 보강",
     "sourceSyncOwners": "보유자 통계",
     "sourceWeb": "웹 요청",
-    "sourceOther": "기타 소스"
+    "sourceOther": "기타 소스",
+    "navVisitors": "방문자",
+    "visitorsTitle": "방문자",
+    "visitorsSubtitle": "익명 페이지 조회로, IP 주소와 쿠키 없이 집계합니다.",
+    "visitorsOnline": "현재 접속 중",
+    "visitorsOnlineHint": "최근 5분간 순 방문자",
+    "visitorsTotal": "총 조회수",
+    "visitorsTotalHint": "집계 시작 이후",
+    "visitors24h": "24시간 조회",
+    "visitors7d": "7일 조회",
+    "visitors30d": "30일 조회",
+    "visitorsUnique": "순 방문자",
+    "visitorsPrivacy": "IP 주소, 쿠키, 전체 참조 URL을 저장하지 않습니다. Do Not Track을 보내는 방문자는 페이지 조회로만 집계됩니다."
   },
   "notifications": {
     "title": "알림",
@@ -518,7 +539,7 @@
     "currentRarity": "현재 희귀도 점수",
     "higher": "높음",
     "lower": "낮음",
-    "hiloHint": "다음 배지의 희귀도 점수가 높을까 낮을까? 맞히면 1.95배 지급.",
+    "hiloHint": "다음 배지의 희귀도 점수가 더 높을까요, 낮을까요? 배당은 확률에 따라 달라집니다 — 유력한 선택은 적게, 이변은 최대 20x. 무승부는 베팅금을 돌려줍니다.",
     "red": "빨강",
     "black": "검정",
     "green": "초록",
@@ -529,8 +550,8 @@
     "stop": "STOP",
     "again": "다시 플레이",
     "newCard": "새 카드",
-    "scratchHint": "9개 칸을 긁으세요 — 같은 심볼 3개면 당첨, 트리플 잭팟은 20배.",
-    "vaultHint": "각 바늘을 초록 구역에 멈추세요: 배율 0/0.5배, 1/1.5배, 2/3배, 3/3배.",
+    "scratchHint": "9칸을 모두 긁으세요 — 같은 심볼 3개면 당첨. 잭팟 3개는 최대 10x 지급.",
+    "vaultHint": "초록 영역에 멈춘 바늘이 많을수록(0/1/2/3) 승률이 올라갑니다. 승리 시 2x 지급.",
     "floor": "층",
     "cashout": "정산",
     "cashoutAt": "정산 지점",
@@ -557,7 +578,7 @@
     "dailyComeBack": "내일 다시 오셔서 다음 보너스를 받으세요.",
     "streak": "연속",
     "rpsTitle": "가위바위보",
-    "rpsDesc": "봇과의 클래식 대결. 매 라운드 배수 또는 전액 잃음.",
+    "rpsDesc": "봇과의 클래식 대결. 승리 시 1.9x 지급, 무승부는 베팅금을 돌려줍니다.",
     "slotsTitle": "Badges of Ra 6 Deluxe",
     "slotsDesc": "5개 릴, 3개 행, 실제 배지 심볼과 스캐터 잭팟.",
     "shootTitle": "Shoot the Badges",
@@ -569,21 +590,25 @@
     "coinflipTitle": "BadgesCoins 사다리",
     "coinflipDesc": "7단계 사다리에서 앞면 또는 뒷면 — 한 단계마다 상금이 두 배.",
     "hiloTitle": "높음 또는 낮음",
-    "hiloDesc": "다음 배지의 희귀도 점수에 베팅하세요 — 맞히면 1.95배.",
+    "hiloDesc": "다음 배지의 희귀도 점수에 베팅하세요. 배당은 선택한 방향의 확률에 따라 달라집니다(최대 20x). 무승부는 베팅금을 돌려줍니다.",
     "rouletteTitle": "배지 룰렛",
     "rouletteDesc": "빨강, 검정 또는 초록 제로는 14배. 37개 칸의 긴장감.",
     "blackjackTitle": "배지 블랙잭",
     "blackjackDesc": "딜러와의 21 — 전략을 고르고 카드를 받으세요.",
     "vaultTitle": "금고 해제",
-    "vaultDesc": "바늘 3개를 초록 구역에 멈추세요. 3번 완벽하면 3배.",
+    "vaultDesc": "바늘 세 개를 초록 영역에 멈추세요 — 바늘이 많을수록 승률이 오르고, 승리 시 2x를 지급합니다.",
     "scratchTitle": "Scratch the Badge",
-    "scratchDesc": "9개 칸을 긁으세요 — 같은 심볼 3개면 최대 20배.",
+    "scratchDesc": "9칸을 긁으세요 — 같은 심볼 3개면 최대 10x.",
     "towerTitle": "배지의 탑",
     "towerDesc": "위험이 커지는 10개 층을 오르세요 — 경비병에게 붙잡히기 전에 정산하세요.",
     "catcherTitle": "배지 캐처",
     "catcherDesc": "떨어지는 배지를 바구니로 받고 폭탄은 피하세요.",
     "notEnoughBadges": "카탈로그에 배지가 아직 충분하지 않아 퀴즈를 만들 수 없습니다.",
-    "streakDay": "{streak}일차"
+    "streakDay": "{streak}일차",
+    "disabled": "게임장이 현재 꺼져 있습니다. 나중에 다시 방문해 주세요.",
+    "scatter": "SCATTER!",
+    "scratchFounder": "파운더",
+    "scratchJackpot": "잭팟"
   },
   "wheel": {
     "title": "운명의 수레바퀴",
@@ -655,7 +680,7 @@
     "freeQ": "이 모든 것이 무료인가요?",
     "gamesA": "운에 따른 결과(슬롯, 룰렛, 수레바퀴, 동전 던지기, 블랙잭, 스크래치, 탑)는 모두 서버에서 생성되어 조작할 수 없습니다. 실력 게임(사격, 기억, 받기)은 서버에서 상한과 함께 점수를 검증합니다.",
     "gamesQ": "게임은 공정한가요?",
-    "levelsA": "레벨 1은 0 XP에서 시작합니다. 각 레벨은 100 + (레벨-1) x 50 XP가 필요하며 레벨 100의 총합은 254,900 XP입니다. 모든 레벨에 반짝이는 애니메이션 배지가 프로필에 표시되며 항상 보이고 숨길 수 없습니다.",
+    "levelsA": "레벨 1은 0 XP에서 시작합니다. 각 레벨은 100 + (레벨-1) x 50 XP가 필요하며 레벨 100의 총합은 252,450 XP입니다. 모든 레벨에 반짝이는 애니메이션 배지가 프로필에 표시되며 항상 보이고 숨길 수 없습니다.",
     "levelsQ": "레벨 1~100은 어떻게 작동하나요?",
     "profileA": "설정 35가지: 일반 20(색상, 글꼴, 배너, 카드 스타일, 프레임, 공개 범위, 소셜 링크)과 창의 15(오라, 입자 배경, 무지개 이름, 3D 기울기, 픽셀 아바타, 업적 티커 등).",
     "profileQ": "프로필은 얼마나 커스터마이즈할 수 있나요?",
@@ -727,6 +752,480 @@
     "stealHint": "비용이 높을수록 가벼운 도둑을 막습니다. 실패 시 비용은 당신에게 지급됩니다.",
     "saving": "저장 중…",
     "saved": "저장됨!",
-    "save": "변경 저장"
+    "save": "변경 저장",
+    "titlePlaceholder": "배지 헌터",
+    "usernamePlaceholder": "사용자 이름",
+    "statusBubblePlaceholder": "SUBtember 사냥 중…",
+    "options": {
+      "font": {
+        "sans": "산세리프",
+        "serif": "세리프",
+        "mono": "고정폭",
+        "rounded": "둥근"
+      },
+      "cardStyle": {
+        "glass": "유리",
+        "solid": "단색",
+        "outline": "윤곽"
+      },
+      "radius": {
+        "sharp": "각진",
+        "soft": "부드러운",
+        "round": "원형"
+      },
+      "avatarFrame": {
+        "none": "없음",
+        "ring": "링",
+        "double": "이중",
+        "glow": "광채",
+        "crown": "왕관"
+      },
+      "showcaseLayout": {
+        "grid": "그리드",
+        "row": "행",
+        "carousel": "캐러셀"
+      },
+      "density": {
+        "cozy": "넉넉함",
+        "compact": "조밀함"
+      },
+      "profileTheme": {
+        "auto": "자동",
+        "violet": "보라",
+        "emerald": "에메랄드",
+        "sapphire": "사파이어",
+        "gold": "골드"
+      },
+      "effectsIntensity": {
+        "off": "끔",
+        "subtle": "은은함",
+        "full": "가득"
+      }
+    }
+  },
+  "admin": {
+    "title": "관리자 패널",
+    "common": {
+      "working": "처리 중…"
+    },
+    "gate": {
+      "title": "관리자 접근",
+      "intro": "아직 소유자가 등록되지 않았습니다. 부트스트랩 암호를 입력하여 설치를 인수하세요.",
+      "passcodeLabel": "암호",
+      "submit": "잠금 해제",
+      "hint": "소유자가 등록되면 이 입구는 영구적으로 닫힙니다.",
+      "invalid": "암호가 올바르지 않습니다.",
+      "throttled": "시도가 너무 많습니다. 몇 분 후 다시 시도하세요.",
+      "closed": "암호 입구가 닫혔습니다 — 소유자가 이미 존재합니다.",
+      "network": "네트워크 오류입니다. 다시 시도하세요."
+    },
+    "setup": {
+      "title": "소유자 등록",
+      "intro": "여기서 지정한 프로필이 소유자가 되어 모든 것을 관리할 수 있습니다.",
+      "usernameLabel": "Twitch 사용자 이름",
+      "twitchIdLabel": "Twitch 사용자 ID (선택)",
+      "twitchIdPlaceholder": "숫자 ID — 권장",
+      "submit": "소유자 등록",
+      "notFound": "해당 이름의 프로필이 없습니다 — Twitch로 한 번 로그인한 후 다시 시도하세요.",
+      "failed": "등록에 실패했습니다.",
+      "doneTitle": "소유자가 등록되었습니다",
+      "doneBody": "부트스트랩 암호가 더 이상 작동하지 않습니다. 새로 고침하여 대시보드를 여세요."
+    },
+    "dashboard": {
+      "title": "관리 제어 센터",
+      "signedInAs": "{role}(으)로 로그인했습니다.",
+      "intro": "모듈이 단계적으로 출시됩니다 — 사용자, 콘텐츠, 동기화, 설정, 통계 등이 다음 단계에서 추가됩니다."
+    },
+    "forbidden": {
+      "title": "사용할 수 없음",
+      "body": "관리자 패널은 소유자와 관리자만 사용할 수 있습니다."
+    },
+    "tabs": {
+      "label": "섹션",
+      "users": "사용자",
+      "content": "콘텐츠",
+      "sync": "동기화",
+      "settings": "설정",
+      "stats": "통계",
+      "status": "상태",
+      "newsletter": "뉴스레터",
+      "brainstorm": "아이디어",
+      "audit": "감사 로그",
+      "soon": "이 섹션은 이후 단계에서 제공됩니다.",
+      "badges": "배지"
+    },
+    "users": {
+      "searchLabel": "검색",
+      "searchPlaceholder": "사용자 이름, 표시 이름 또는 Twitch ID",
+      "bannedOnly": "차단된 사용자만",
+      "count": "회원 {count}명",
+      "loadFailed": "목록을 불러올 수 없습니다.",
+      "loading": "불러오는 중…",
+      "empty": "이 검색과 일치하는 회원이 없습니다.",
+      "actionFailed": "작업에 실패했습니다.",
+      "saved": "프로필을 저장했습니다.",
+      "progressSaved": "진행도를 저장했습니다.",
+      "roleSaved": "역할을 업데이트했습니다.",
+      "close": "닫기",
+      "banned": "차단됨",
+      "active": "활성",
+      "cols": {
+        "user": "회원",
+        "role": "역할",
+        "level": "레벨",
+        "xp": "XP",
+        "coins": "코인",
+        "status": "상태",
+        "joined": "가입"
+      },
+      "profile": {
+        "title": "프로필",
+        "save": "프로필 저장"
+      },
+      "field": {
+        "username": "사용자 이름",
+        "display_name": "표시 이름",
+        "bio": "소개",
+        "color": "색상",
+        "banner_url": "배너 URL",
+        "theme": "테마",
+        "mood": "기분",
+        "steal_price": "훔치기 가격",
+        "steal_max": "훔치기 최대",
+        "inventory_public": "인벤토리 공개",
+        "steal_enabled": "훔치기 활성화"
+      },
+      "progress": {
+        "title": "진행도",
+        "xp": "XP",
+        "coins": "코인",
+        "level": "레벨",
+        "login_streak": "로그인 연속일",
+        "save": "진행도 저장"
+      },
+      "role": {
+        "title": "역할",
+        "apply": "역할 적용"
+      },
+      "ban": {
+        "title": "차단",
+        "reason": "사유",
+        "days": "일수",
+        "apply": "차단",
+        "lift": "차단 해제",
+        "hint": "0일은 영구 차단을 의미합니다.",
+        "active": "차단됨: {reason} — {until}까지",
+        "noReason": "사유 없음",
+        "permanent": "영구",
+        "saved": "차단했습니다.",
+        "removed": "차단을 해제했습니다.",
+        "confirmPermanent": "{username} 님을 영구 차단하시겠습니까? 이 차단은 만료되지 않습니다."
+      },
+      "achievements": {
+        "title": "업적",
+        "grant": "부여",
+        "revoke": "회수",
+        "granted": "업적을 부여했습니다.",
+        "revoked": "업적을 회수했습니다."
+      },
+      "danger": {
+        "title": "위험 구역",
+        "delete": "회원 삭제",
+        "confirm": "{username} 및 모든 데이터를 삭제할까요? 되돌릴 수 없습니다.",
+        "deleted": "회원을 삭제했습니다."
+      }
+    },
+    "content": {
+      "tabs": {
+        "blog": "블로그",
+        "changelog": "변경 내역"
+      },
+      "search": "검색",
+      "new": "새 항목",
+      "edit": "편집",
+      "save": "저장",
+      "cancel": "취소",
+      "delete": "삭제",
+      "confirmDelete": "이 항목을 삭제할까요? 되돌릴 수 없습니다.",
+      "saved": "저장했습니다.",
+      "deleted": "삭제했습니다.",
+      "saveFailed": "저장하지 못했습니다.",
+      "loadFailed": "불러오지 못했습니다.",
+      "loading": "불러오는 중…",
+      "empty": "아직 아무것도 없습니다.",
+      "auto": "자동",
+      "badJson": "페이로드가 올바른 JSON이 아닙니다.",
+      "col": {
+        "title": "제목",
+        "slug": "슬러그",
+        "status": "상태",
+        "date": "날짜"
+      },
+      "field": {
+        "title": "제목",
+        "slug": "슬러그",
+        "slugHint": "비어 있으면 제목에서 생성",
+        "author": "작성자",
+        "locale": "언어",
+        "status": "상태",
+        "cover": "커버 이미지 URL",
+        "tags": "태그",
+        "tagsHint": "쉼표로 구분",
+        "excerpt": "요약",
+        "content": "본문",
+        "contentHint": "Markdown 지원"
+      },
+      "changelog": {
+        "kind": "종류",
+        "body": "설명",
+        "payload": "페이로드 (JSON)"
+      }
+    },
+    "badges": {
+      "search": "검색",
+      "searchPlaceholder": "제목, 세트 ID 또는 슬러그",
+      "customOnly": "사용자 정의만",
+      "new": "새 배지",
+      "hint": "직접 만든 항목은 카탈로그 동기화에서 보호됩니다. 동기화는 이를 덮어쓰거나 삭제하지 않으며, 세트 ID와 버전이 충돌하는 제공자 배지는 대신 건너뜁니다.",
+      "edit": "편집",
+      "save": "저장",
+      "cancel": "취소",
+      "delete": "삭제",
+      "confirmDelete": "이 배지를 삭제할까요? 되돌릴 수 없습니다.",
+      "saved": "배지를 저장했습니다.",
+      "deleted": "배지를 삭제했습니다.",
+      "saveFailed": "배지를 저장하지 못했습니다.",
+      "loadFailed": "배지를 불러오지 못했습니다.",
+      "empty": "배지를 찾을 수 없습니다.",
+      "providerHint": "이 항목은 제공자에서 왔습니다. 제목과 이미지는 동기화할 때마다 갱신되며, 직접 만든 항목만 삭제할 수 있습니다.",
+      "col": {
+        "badge": "배지",
+        "setId": "세트 / 버전",
+        "category": "카테고리",
+        "status": "상태",
+        "source": "출처"
+      },
+      "field": {
+        "setId": "세트 ID",
+        "version": "버전",
+        "title": "제목",
+        "category": "카테고리",
+        "status": "상태",
+        "start": "시작",
+        "end": "종료",
+        "image": "이미지 URL",
+        "clickUrl": "클릭 URL",
+        "description": "설명",
+        "howToEarn": "획득 방법",
+        "paid": "유료 또는 구독 배지"
+      }
+    },
+    "sync": {
+      "intro": "이 버튼은 매일 도는 cron 작업과 동일한 엔진을 즉시 수동으로 실행합니다. 수동 실행은 가동 이력에 별도 행으로 기록되므로, 예정된 실행 누락을 가리지 않습니다.",
+      "run": "지금 실행",
+      "running": "실행 중…",
+      "results": "최근 실행",
+      "ok": "정상",
+      "failed": "동기화를 시작하지 못했습니다.",
+      "global": {
+        "title": "카탈로그 비교",
+        "hint": "Twitch 실시간 카탈로그와 데이터베이스를 비교해 새 배지를 추가하고, 변경된 배지를 갱신하며, 사라진 배지를 제거됨으로 표시합니다."
+      },
+      "badgebase": {
+        "title": "드롭 기간",
+        "hint": "badges.blog의 진행 중 및 예정 목록을 읽어 현재 획득 가능한 배지를 확인하고 시작일과 종료일을 설정합니다."
+      },
+      "potat": {
+        "title": "보유자 통계",
+        "hint": "potat에서 보유자 수, 희귀도 점수, 상태 점검을 갱신합니다."
+      }
+    },
+    "settings": {
+      "loading": "설정 불러오는 중…",
+      "loadFailed": "설정을 불러오지 못했습니다.",
+      "saved": "설정을 저장했습니다.",
+      "saveFailed": "설정을 저장하지 못했습니다.",
+      "save": "저장",
+      "features": {
+        "title": "기능 플래그",
+        "hint": "꺼진 기능은 내비게이션에서 사라지고, 해당 엔드포인트도 그 동작을 거부합니다.",
+        "feed": "실시간 피드",
+        "wheel": "행운의 수레바퀴",
+        "steals": "코인 훔치기",
+        "coinRain": "코인 비",
+        "compare": "배지 비교",
+        "games": "게임장"
+      },
+      "economy": {
+        "title": "경제",
+        "hint": "이 값이 일일 보너스, 게임, 훔치기를 좌우합니다. 기본값은 사이트가 시작할 때의 수치입니다.",
+        "dailyXp": "일일 XP",
+        "dailyCoins": "일일 코인",
+        "streakXpPerDay": "연속 XP(일당)",
+        "streakXpCap": "연속 XP 상한",
+        "streakCoinsPerDay": "연속 코인(일당)",
+        "streakCoinsCap": "연속 코인 상한",
+        "gameWinXp": "승리 라운드 XP",
+        "gameLoseXp": "패배 라운드 XP",
+        "coinRainCoins": "코인 비 1회당 코인",
+        "stealPrice": "기본 훔치기 가격",
+        "stealMax": "기본 훔치기 최대",
+        "stealFloodMinutes": "훔치기 대기(분)",
+        "stealPerHour": "시간당 훔치기 횟수"
+      },
+      "games": {
+        "title": "게임",
+        "hint": "개별 게임을 끄거나 배팅 범위를 옮길 수 있습니다. 허브는 꺼진 게임을 숨기고 엔진도 이를 거부합니다.",
+        "master": "게임장 활성화(마스터 스위치)",
+        "col": {
+          "game": "게임",
+          "enabled": "켜짐",
+          "min": "최소 배팅",
+          "max": "최대 배팅"
+        }
+      },
+      "admins": {
+        "title": "관리자와 모더레이터",
+        "hint": "Twitch 사용자 이름으로 패널 접근 권한을 부여합니다. 프로필이 있으려면 본인이 한 번 로그인해야 합니다.",
+        "owner": "소유자: {username} — 부트스트랩 암호로 설정되며 여기서는 제거할 수 없습니다.",
+        "username": "Twitch 사용자 이름",
+        "role": "역할",
+        "add": "권한 부여",
+        "remove": "제거",
+        "empty": "추가 관리자나 모더레이터가 아직 없습니다."
+      }
+    },
+    "stats": {
+      "loading": "통계 불러오는 중…",
+      "loadFailed": "통계를 불러오지 못했습니다.",
+      "noData": "아직 방문 데이터가 없습니다.",
+      "kpi": {
+        "online": "현재 접속 중",
+        "views24": "오늘 조회",
+        "views7": "7일 조회",
+        "views30": "30일 조회",
+        "total": "총 조회수",
+        "unique": "순 방문자"
+      },
+      "chart": {
+        "title": "최근 30일 조회와 방문자",
+        "hits": "조회",
+        "visitors": "방문자"
+      },
+      "devices": "기기",
+      "browsers": "브라우저",
+      "topPaths": "가장 많이 본 페이지",
+      "referrers": "유입 경로",
+      "locales": "언어",
+      "privacy": "페이지 평균 체류: {avg}초. IP 주소, 쿠키, 전체 참조 URL 없이 집계합니다."
+    },
+    "status": {
+      "loading": "서비스 확인 중…",
+      "loadFailed": "서비스 상태를 불러오지 못했습니다.",
+      "title": "서비스",
+      "probing": "확인 중…",
+      "reprobe": "다시 확인",
+      "uptime24": "가용성, 24시간",
+      "live": "실시간 점검",
+      "checkedAt": "{time}에 확인",
+      "col": {
+        "service": "서비스",
+        "last": "마지막 실행",
+        "status": "상태",
+        "24h": "24시간",
+        "7d": "7일",
+        "30d": "30일",
+        "avg": "평균 소요"
+      },
+      "empty": "아직 하트비트 기록이 없습니다.",
+      "messages": "최근 메시지",
+      "noMessages": "메시지 없음 — 모든 서비스가 정상입니다."
+    },
+    "newsletter": {
+      "intro": "공지를 작성하고 발송 방식을 고릅니다. 수신자 수는 이메일이 있는 계정과 푸시를 구독한 브라우저에서 계산합니다.",
+      "audienceEmails": "이메일 있는 계정",
+      "audiencePush": "구독한 브라우저",
+      "provider": "메일 제공자",
+      "providerResend": "설정됨",
+      "providerNone": "설정 안 됨",
+      "noProviderHint": "메일 제공자가 설정되지 않아 실제로 가능한 발송은 푸시뿐입니다. '이메일'로 설정한 초안은 웹 푸시로 발송되며, 결과에도 그렇게 표시됩니다 — 나가지 않은 메일을 보냈다고 보고하지 않습니다.",
+      "delivery": "발송: {channel}, 성공 {sent}, 실패 {failed}",
+      "loadFailed": "뉴스레터를 불러오지 못했습니다.",
+      "failed": "작업에 실패했습니다.",
+      "saved": "초안을 저장했습니다.",
+      "sent": "발송했습니다.",
+      "deleted": "초안을 삭제했습니다.",
+      "new": "새 초안",
+      "edit": "편집",
+      "save": "저장",
+      "send": "지금 발송",
+      "cancel": "취소",
+      "delete": "삭제",
+      "confirmSend": "이 뉴스레터를 지금 모두에게 발송할까요?",
+      "confirmDelete": "이 초안을 삭제할까요?",
+      "sendHint": "초안은 한 번만 발송할 수 있고, 실제로 전달된 경우에만 발송됨으로 표시됩니다.",
+      "empty": "초안이 없습니다.",
+      "col": {
+        "subject": "제목",
+        "channel": "채널",
+        "status": "상태",
+        "recipients": "수신자",
+        "date": "날짜"
+      },
+      "field": {
+        "subject": "제목",
+        "body": "내용",
+        "channel": "채널"
+      }
+    },
+    "ideas": {
+      "intro": "사이트 아이디어 보드입니다. 모으고, 평가하고, 분류합니다. 읽기는 누구나, 쓰기는 여기서만 가능합니다.",
+      "filter": "카테고리",
+      "allCategories": "모든 카테고리",
+      "new": "새 아이디어",
+      "edit": "편집",
+      "save": "저장",
+      "cancel": "취소",
+      "delete": "삭제",
+      "upvote": "찬성",
+      "downvote": "반대",
+      "confirmDelete": "이 아이디어를 삭제할까요?",
+      "loadFailed": "아이디어를 불러오지 못했습니다.",
+      "failed": "작업에 실패했습니다.",
+      "saved": "아이디어를 저장했습니다.",
+      "deleted": "아이디어를 삭제했습니다.",
+      "empty": "아이디어가 없습니다.",
+      "field": {
+        "category": "카테고리",
+        "status": "상태",
+        "title": "제목",
+        "body": "메모"
+      }
+    },
+    "audit": {
+      "intro": "모든 관리자 작업을 최신순으로 봅니다. 각 항목에는 수행자, 대상, 그리고 해당되는 경우 관련 값이 기록됩니다.",
+      "filterAction": "작업",
+      "allActions": "모든 작업",
+      "filterActor": "수행자",
+      "count": "{count}개 항목",
+      "loadFailed": "감사 로그를 불러오지 못했습니다.",
+      "empty": "아직 기록이 없습니다.",
+      "details": "세부 정보",
+      "hide": "숨기기",
+      "col": {
+        "when": "시각",
+        "actor": "수행자",
+        "action": "작업",
+        "target": "대상"
+      }
+    }
+  },
+  "roles": {
+    "owner": "소유자",
+    "admin": "관리자",
+    "moderator": "모더레이터",
+    "ownerHint": "이 사이트를 운영합니다",
+    "adminHint": "패널 전체 권한을 가진 관리자",
+    "moderatorHint": "모더레이터 — 회원과 콘텐츠를 관리할 수 있습니다"
   }
 }

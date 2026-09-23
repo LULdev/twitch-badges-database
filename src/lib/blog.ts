@@ -77,20 +77,28 @@ export interface FeaturePostInput {
  */
 export async function createFeaturePost(post: FeaturePostInput): Promise<void> {
   const supabase = createAdminClient();
-  const { error } = await supabase.from("blog_posts").upsert(
-    {
-      slug: post.slug,
-      title: post.title,
-      excerpt: post.excerpt,
-      content: post.content,
-      cover_url: post.cover ?? null,
-      status: "published",
-      is_auto: true,
-      tags: ["feature", ...(post.tags ?? [])],
-    },
-    { onConflict: "slug", ignoreDuplicates: true },
-  );
+  // `.select("id")` makes the upsert report whether it inserted: with
+  // `ignoreDuplicates` a re-run writes nothing, but the changelog row below was
+  // written unconditionally, so every call claimed a publication that had not
+  // happened (the live table held 139 of these rows under 24 distinct titles).
+  const { data: inserted, error } = await supabase
+    .from("blog_posts")
+    .upsert(
+      {
+        slug: post.slug,
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        cover_url: post.cover ?? null,
+        status: "published",
+        is_auto: true,
+        tags: ["feature", ...(post.tags ?? [])],
+      },
+      { onConflict: "slug", ignoreDuplicates: true },
+    )
+    .select("id");
   if (error) throw error;
+  if (!inserted || inserted.length === 0) return;
   await supabase.from("changelog").insert({
     kind: "blog",
     title: `Blog post published: ${post.title}`,

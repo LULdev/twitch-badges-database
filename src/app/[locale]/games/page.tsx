@@ -5,6 +5,7 @@ import { authUserId } from "@/lib/gamification/session";
 import { getProgress } from "@/lib/gamification/xp";
 import { levelFromXp } from "@/lib/gamification/levels";
 import { GAMES } from "@/lib/gamification/games";
+import { getFeatures, getGames } from "@/lib/settings";
 import DailyClaim from "@/components/DailyClaim";
 import LevelBadge from "@/components/LevelBadge";
 import Coin from "@/components/Coin";
@@ -50,6 +51,16 @@ export default async function GamesHubPage({
     }
   }
 
+  // BOTH switches gate the hub. The hub used to honour the master switch only, so
+  // a `features.games=false` arcade still listed all thirteen tiles while every
+  // round answered 403. The bet bounds shown on each tile come from the same
+  // settings, so a tile can never advertise a range the engine would refuse.
+  const [settings, features] = await Promise.all([getGames(GAMES), getFeatures()]);
+  const visible =
+    settings.enabled && features.games
+      ? GAMES.filter((game) => settings.games[game.id]?.enabled !== false)
+      : [];
+
   return (
     <div className="space-y-8">
       <header className="card flex flex-col items-center gap-5 p-6 sm:flex-row">
@@ -80,8 +91,13 @@ export default async function GamesHubPage({
         </div>
       </header>
 
+      {visible.length === 0 ? (
+        <div className="card p-8 text-center text-sm text-muted">{t("disabled")}</div>
+      ) : (
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {GAMES.map((game) => (
+        {visible.map((game) => {
+          const range = settings.games[game.id] ?? game;
+          return (
           <Link
             key={game.id}
             href={`/games/${game.id}`}
@@ -97,12 +113,14 @@ export default async function GamesHubPage({
                 {game.type === "luck" ? t("luck") : t("skill")}
               </span>
               <span className="chip pointer-events-none text-[0.5625rem]">
-                {game.minBet}–{game.maxBet} <Coin size={11} />
+                {range.minBet}–{range.maxBet} <Coin size={11} />
               </span>
             </div>
           </Link>
-        ))}
+          );
+        })}
       </div>
+      )}
     </div>
   );
 }

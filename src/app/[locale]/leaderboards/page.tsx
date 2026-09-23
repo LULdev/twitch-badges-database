@@ -15,8 +15,6 @@ import RarityChip from "@/components/badges/RarityChip";
 import { formatCompact } from "@/components/badges/BadgeCard";
 import { localeAlternates } from "@/lib/seo";
 
-export const revalidate = 3600;
-
 export async function generateMetadata({
   params,
 }: {

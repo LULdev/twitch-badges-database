@@ -5,8 +5,6 @@ import BadgeExplorer, {
 } from "@/components/badges/BadgeExplorer";
 import { localeAlternates } from "@/lib/seo";
 
-export const revalidate = 120;
-
 export async function generateMetadata({
   params,
 }: {

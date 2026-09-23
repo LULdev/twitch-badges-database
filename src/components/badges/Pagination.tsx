@@ -12,7 +12,7 @@ export default function Pagination({
 }: {
   page: number;
   pages: number;
-  params: Record<string, string | undefined>;
+  params: Record<string, string | string[] | undefined>;
 }) {
   const t = useTranslations("common");
   if (pages <= 1) return null;
@@ -20,7 +20,11 @@ export default function Pagination({
   const href = (target: number) => {
     const next = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
-      if (value && key !== "page") next.set(key, value);
+      // A repeated key (?q=a&q=b) arrives as an array, and the filter control and
+      // the query both use the FIRST value — `set(key, array)` stringified it to
+      // "a,b", so page 2 filtered on a different term than page 1.
+      const first = Array.isArray(value) ? value[0] : value;
+      if (first && key !== "page") next.set(key, first);
     }
     if (target > 1) next.set("page", String(target));
     const query = next.toString();

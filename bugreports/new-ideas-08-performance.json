@@ -1,0 +1,276 @@
+{
+  "agent": "performance",
+  "scope": "Performance, reliability and scale: caching strategy, query and payload efficiency, rendering strategy, asset delivery, database load, resilience against provider failure, cost control and capacity planning.",
+  "ideas": [
+    {
+      "category": "performance",
+      "title": "Feed the filter bar from the categories view",
+      "body": "getCategories() in src/lib/queries.ts selects the category column of every row in badges and de-duplicates in JS, and BadgeExplorer calls it on every render of /badges, /active, /upcoming and /expired in all 11 locales. The stats_catalog_categories view (migration 0013) already returns one row per category with its count and is read by getSiteStats, so the filter bar should read that view instead, turning a roughly 476-row transfer into a handful of rows. Effort: S. Risk if built badly: the view needs the same anon grant as the other stats_* views, or the filter bar renders empty for logged-out visitors while logged-in staff still see it.",
+      "why": "The catalog filter bar is on every status page in every language, and it currently reads the whole table to show a dropdown of about ten values."
+    },
+    {
+      "category": "performance",
+      "title": "Ship only the columns the grid renders",
+      "body": "listBadges() selects * from badges, so each of up to 96 tiles on /badges carries description, how_to_earn, click_url, removed_at and all three image URLs even though a tile renders only title, one image, rarity tier, status and owner count. Introduce a picked column list for list surfaces (BadgeTileRow) and keep select(*) only on /badges/[slug], the one route that renders the prose. Effort: S. Risk if built badly: a component that quietly expected a column now renders an empty value, so make the narrower row its own type so the omission is a compile error rather than a blank tile.",
+      "why": "The catalog grid is the highest-traffic page on the site and it currently ships every badge's long description text to render a tile."
+    },
+    {
+      "category": "performance",
+      "title": "Cursor pagination for the catalog",
+      "body": "listBadges() uses .range() (an OFFSET) plus count exact, so a page deep into /badges makes PostgREST walk and discard every preceding row and count the whole filtered set on each request. Replace ?page= with a keyset cursor ordered on the sort column with id as the tie-break, return nextCursor, and keep the current ?page= handling as a redirect for old links. Effort: M. Risk if built badly: a keyset cursor over a non-unique sort column (owner_count, end_date) skips or repeats rows at page boundaries, so the id tie-break is mandatory and the stale-page redirect must stay.",
+      "why": "Deep pages and crawler walks of the catalog are exactly where an offset starts to cost, and this site has hundreds of badges in every filter combination."
+    },
+    {
+      "category": "performance",
+      "title": "Estimated counts for text-search pagination",
+      "body": "When ?q= is set, listBadges runs three ilike conditions plus an exact COUNT over badges before returning a single page, so the heaviest query on the site answers only how many pages exist. Request an estimated count from PostgREST when q is present and let Pagination render about N badges instead of an exact total. Effort: S. Risk if built badly: an estimate that disagrees with the pager's arithmetic produces a dead last page, so clamp the requested page to the window that actually returned rows rather than to the estimate.",
+      "why": "Search is the main way people find a specific badge, and its pagination count currently costs more than the search itself."
+    },
+    {
+      "category": "performance",
+      "title": "One read per badge page for metadata",
+      "body": "generateMetadata() and the page body on /badges/[slug] (and /blog/[slug]) each call the same lookup, getBadgeBySlug / getPostBySlug, so every ISR render and every cache miss issues two identical PostgREST round trips for one row. Wrap those lookups in React's cache() so one request issues one read. Effort: S. Risk if built badly: cache() must not memoise a failed lookup, or a transient pooler error becomes a 404 for that whole request; cache the resolved row only.",
+      "why": "Every badge detail page doubles its first database read for no benefit, which is pure cost on the site's second-busiest route."
+    },
+    {
+      "category": "performance",
+      "title": "Downsample the owner-history chart query",
+      "body": "getBadgeStatsHistory() fetches up to 250 badge_stats rows for every badge page and maps each into a chart point, but OwnersChart renders roughly 60 readable positions at its width. Ask for a bucketed series (one average per time bucket) or step the series server-side, keeping raw points for the recent window, so both the read and the RSC payload shrink about four-fold. Effort: S. Risk if built badly: a coarse bucket hides the claim spike the chart exists to show, so keep the last 24 hours at full resolution and bucket only the older range.",
+      "why": "The owner-trend chart is on every badge page, and it currently transfers four times more time-series data than any screen can draw."
+    },
+    {
+      "category": "performance",
+      "title": "A hard timeout on every catalog read",
+      "body": "Every query in src/lib/queries.ts goes out with no abort signal, so one slow Supabase pooler response holds the whole server render until the platform kills it, producing a 504 instead of the empty state the .catch() wrappers were written for. Pass AbortSignal.timeout on the PostgREST reads (about 2500 ms, from a setting) and let the existing fallbacks render the empty state. Effort: S. Risk if built badly: too tight a limit turns a merely busy database into a site that looks empty, so log every abort with its label so the rate is visible before the value is tuned.",
+      "why": "A pooler hiccup should degrade the catalog to an empty state with a logged cause, not hand every visitor a gateway timeout."
+    },
+    {
+      "category": "performance",
+      "title": "Run the functions in the database region",
+      "body": "next.config.ts sets no function region, so deployments default to one Vercel region while the Supabase pooler configured for this project is aws-1-eu-west-1, meaning every PostgREST read may cross an ocean. /api/health already reports dbLatencyMs and VERCEL_REGION, so pin the functions beside the pooler (or move the pooler) and compare both numbers before and after. Effort: S. Risk if built badly: moving functions away from the audience improves database latency and worsens time-to-first-byte for visitors, so measure both and keep the CDN in front of the cached routes.",
+      "why": "One configuration line decides whether every query on this read-heavy site makes a transatlantic round trip."
+    },
+    {
+      "category": "performance",
+      "title": "Cache the settings reads in the layout",
+      "body": "src/app/[locale]/layout.tsx awaits getFeatures() and getMaintenance() on every render of every route in all 11 locales, and each is a site_settings read that changes only when an admin saves the panel. Wrap both in unstable_cache with a tag that the settings PATCH route invalidates, and keep the maintenance decision on the uncached path. Effort: S. Risk if built badly: a cached maintenance flag would leave the site locked after an admin switches it off, so the write must invalidate and the flag should be re-read at the point it is enforced.",
+      "why": "Two database reads are paid by every visitor on every page for values that change a few times a month."
+    },
+    {
+      "category": "performance",
+      "title": "A typeahead instead of every badge key",
+      "body": "/compare calls getCatalogKeys(), which pages through all of badges in 1000-row batches to build a picker that shows a handful of matches, so the compare page transfers the whole catalog before it can render anything. Replace the picker with a debounced ilike prefix query limited to 20 rows (reusing the existing sanitizeQuery escaping) and keep the paged sweep only where a full list is genuinely exported. Effort: M. Risk if built badly: an ilike on user input without the existing wildcard escaping matches everything and turns the typeahead into a full scan, so reuse sanitizeQuery and cap the limit server-side.",
+      "why": "The two-member compare view is a small feature that currently pays the cost of the entire catalog on every visit."
+    },
+    {
+      "category": "performance",
+      "title": "Pre-render the hottest badge pages",
+      "body": "/badges/[slug] declares revalidate=120 but no generateStaticParams, so all roughly 476 badges times 11 locales are built on first hit and the popular ones pay that regeneration repeatedly. Generate the badges with the most owners plus every currently active badge at build time across the locale set, and let the long tail stay on demand. Effort: M. Risk if built badly: pre-rendering thousands of pages at build is what makes next build die with exit code 134 on a small machine, so cap the generated set and keep it out of the growth path.",
+      "why": "A small hot subset of badge pages absorbs most of the traffic and is the cheapest thing on the site to serve from a prebuilt cache."
+    },
+    {
+      "category": "performance",
+      "title": "Stream the badge page slow sections",
+      "body": "/badges/[slug] awaits the badge row, its owner history, the related category list and a third-party live count before the first byte, so a slow provider delays even the title and the how-to-earn text. Put OwnersChart, the related grid and the live count behind Suspense with fixed-height skeletons so the header paints on the badge row alone. Effort: M. Risk if built badly: a skeleton with the wrong height makes the page jump when the chart lands, which is worse than waiting, so reserve the chart's exact box in CSS before streaming behind it.",
+      "why": "The badge detail page is where a countdown matters, and its static text should never wait on a chart or a third-party count."
+    },
+    {
+      "category": "performance",
+      "title": "Take third-party calls out of the render",
+      "body": "/badges/[slug] calls fetchBadgeLiveStats(set_id) against potat during render and /profile/[username] calls fetchUserBadges() when the inventory looks stale, so a third party's latency becomes the page's latency. Both values are already written by the 15-minute potat sync and by the inventory sync, so read the stored columns during render and let the syncs own every outbound call. Effort: M. Risk if built badly: the owner counter becomes only as fresh as the last sync, so keep the as-of timestamp the badge page already has room for, or a stale number reads as live.",
+      "why": "The site already syncs these values on a schedule, so making a visitor's page wait on the upstream provider is cost with no freshness gain."
+    },
+    {
+      "category": "performance",
+      "title": "A shorter provider timeout inside a request",
+      "body": "perfil.ts, potat.ts, badgebase.ts, ivr.ts and helix.ts all share a single 15-second FETCH_TIMEOUT_MS, so a provider call made while a visitor waits can hold that request for fifteen seconds, far past the point where the failure looks like a broken site. Split the constant into a sync budget (15 s) and a request budget (about 1500 ms), and have the request path fall back to the stored value on timeout. Effort: S. Risk if built badly: too short a request budget makes a slow provider look permanently down and the fallback silently serves old data, so log every timeout with the provider name so the fallback rate is visible.",
+      "why": "A one-size timeout means the sync and a visitor share the same patience, and only the sync can afford to wait."
+    },
+    {
+      "category": "performance",
+      "title": "Immutable caching for the static assets",
+      "body": "/flags/*, icon-192.png, icon-512.png and sw.js are served from public/ with no explicit cache policy, and sw.js is re-fetched on every navigation, which is also how a push-subscription update can fail to land. Set a long immutable policy for the genuinely static assets in next.config.ts and give the service worker a version query or a short revalidation so updates reach devices. Effort: S. Risk if built badly: caching sw.js immutably strands devices on an old worker with no way to receive the fix, so the worker's own policy must stay short while the flags and icons go long.",
+      "why": "Every visitor downloads flag SVGs and PWA icons that never change, and the service worker in particular must not be cached like them."
+    },
+    {
+      "category": "performance",
+      "title": "Cache badge art in the service worker",
+      "body": "public/sw.js handles push only, so every repeat visit re-downloads the same badge PNGs from static-cdn.jtvnw.net along with the versioned Next static chunks. Add a fetch handler that serves badge art and /_next/static/ cache-first, which is safe because the badge URL already carries set_id and version. Effort: M. Risk if built badly: a cache-first handler in front of the HTML shell serves a stale page forever, so match only the image hosts and the versioned static path and leave navigations network-first.",
+      "why": "Badge art is immutable per version and is the site's dominant asset volume, so caching it on the device removes most repeat-visit network cost."
+    },
+    {
+      "category": "performance",
+      "title": "Preconnect the badge CDN and hero",
+      "body": "BadgeImage always sets loading=lazy, including the 96 px hero on a badge page, and the document never declares a preconnect to static-cdn.jtvnw.net, so the largest contentful paint pays a fresh DNS and TLS handshake after hydration. Add preconnect and dns-prefetch in the locale layout head, and use fetchpriority=high with eager loading for the badge-detail hero and the first grid row while keeping everything else lazy. Effort: S. Risk if built badly: marking a whole grid eager competes with the CSS for bandwidth and makes the paint worse, so restrict the eager set to the hero and the first row.",
+      "why": "The badge image is the point of a badge page, and today it starts loading late and behind a cold connection."
+    },
+    {
+      "category": "performance",
+      "title": "Mirror the badge art into our storage",
+      "body": "Every badge tile loads its image from a third-party CDN this project does not control, so a rate limit or a removed file there is a hole in the catalog with no fallback. At sync time, copy the 1x, 2x and 4x PNGs whose URLs badges already stores into a Supabase Storage bucket (roughly 1,400 small files) and serve them with a long cache header, keeping the original URL in the row as a fallback. Effort: M. Risk if built badly: a bucket that is not served through the same image path as today is worse than the CDN, so keep the original URL as the fallback until the copy is verified for every row.",
+      "why": "The catalog's whole visual identity depends on another company's CDN staying up and staying unmetered."
+    },
+    {
+      "category": "performance",
+      "title": "Bound the cacheable catalog URLs",
+      "body": "/badges is ISR with revalidate=120 while every filter lives in searchParams, so each combination of q, category, rarity, sort, price and page is its own cache entry, and a crawler or a shared link with arbitrary parameters mints unbounded entries, each one a fresh PostgREST read. Canonicalise the parameter set, redirecting unknown keys away while preserving the ones BadgeExplorer reads, and treat the free-text search variant as a short-cache or no-store route. Effort: M. Risk if built badly: dropping a parameter a user legitimately shares breaks their link, so recognise only the keys the explorer actually reads and redirect the rest rather than rejecting the URL.",
+      "why": "An unbounded cache key space silently turns the CDN from a shield into a fan-out amplifier for the database."
+    },
+    {
+      "category": "performance",
+      "title": "Warm the changed pages after a sync",
+      "body": "After runGlobalSync or runPotatSync commits, the changed slugs are already known (they are what the engines just wrote), yet the first visitor to each freshly invalidated page pays the regeneration, and that visitor arrives at the exact moment a drop is announced. Have the sync issue a small number of internal fetches for the changed badge URLs so the cache is warm before the traffic peak. Effort: M. Risk if built badly: a loop that fetches every changed page from inside the 60-second serverless sync blows the invocation budget, so cap the warm list to new and newly expired badges and run it after the writes commit.",
+      "why": "New badges are the site's traffic spike, and the current cache makes the first wave of visitors do the regeneration work."
+    },
+    {
+      "category": "performance",
+      "title": "One data cache behind eleven locales",
+      "body": "A badge's row, its owner history and its category list are identical in all 11 message locales, yet each locale's route is a separate ISR entry that runs the same queries, so the catalog's database work is paid up to eleven times for one answer. Compute the locale-independent data once (unstable_cache keyed on slug and params only, never on the locale) and let each locale's render translate only the text around it. Effort: M. Risk if built badly: a cache key that includes or omits the locale by accident serves one language's copy of a localized field, so classify which columns are genuinely locale-independent before sharing them.",
+      "why": "Eleven locales are the site's biggest multiplier on catalog cost, and almost none of the data behind them differs by language."
+    },
+    {
+      "category": "performance",
+      "title": "A two-speed potat sync",
+      "body": "The every-15-minutes GitHub Actions job hits /api/cron/potat, which runs the full distribution and owner sweep across the whole catalog, roughly 476 badges, on every tick. Split it: a cheap pass that only asks about badges whose window is open or whose count moved runs on the 15-minute cadence, while the full reconciliation stays in the daily 06:30 cron. Effort: M. Risk if built badly: a changed-only pass that trusts its own last state drifts from reality after any provider gap, so keep the daily full sweep authoritative and make the frequent pass strictly additive.",
+      "why": "Ninety-six full-catalog sweeps a day is the site's largest recurring external cost, and most of those runs find nothing new."
+    },
+    {
+      "category": "performance",
+      "title": "Write a stats row only when it moves",
+      "body": "runPotatSync inserts into badge_stats for every badge on every run, so the 15-minute cadence writes roughly 45,000 rows a day that mostly repeat the previous value, and the owner-trend chart has to filter flat lines. Gate the insert on an actual change in owner_count or active_count so the series records events, and keep one slow heartbeat row per badge per day so a flat badge is still visibly alive. Effort: S. Risk if built badly: a chart that only plots changes makes a paused poll look like a missing series, so keep the daily heartbeat point and let the chart interpolate between it and the last change.",
+      "why": "The time series is the site's fastest-growing table, and most of what it stores is the absence of news."
+    },
+    {
+      "category": "performance",
+      "title": "A resume cursor for a killed sync",
+      "body": "The syncs write in 200-row chunks and can be cut off by the 60-second serverless limit mid-run, leaving a half-applied diff that the next tick recomputes from scratch, meaning two sets of provider calls for one outcome. Record a sync_runs row holding the phase and the chunk reached, and have the next run resume from it. Effort: M. Risk if built badly: resuming onto a stale plan applies yesterday's diff to today's catalog, so the cursor must be invalidated when the provider snapshot it was planned from has changed.",
+      "why": "A timed-out sync currently pays full price twice, and the per-badge sweep is the workload most likely to hit the wall."
+    },
+    {
+      "category": "performance",
+      "title": "Retention windows for the append-only tables",
+      "body": "analytics_events (a row per beacon), activity_events (a row per XP event), profile_visits and blog_views grow forever, while /stats and /feed only ever read recent windows. Add a retention step to the existing 06:00 cron that folds the older range into the daily stats_* views and then deletes it, with the window kept in site_settings. Effort: M. Risk if built badly: deleting rows that the achievement checks still page through changes members' unlocked achievements, so confirm nothing reads the range being pruned and roll up before the delete in the same run.",
+      "why": "Four free tables grow at traffic speed while every feature that touches them only looks at the last few weeks."
+    },
+    {
+      "category": "performance",
+      "title": "Month-partition the event tables",
+      "body": "analytics_events and activity_events are the tables that will decide this database's size, and every read of them is a recent-window read while the retention delete has to scan the whole table. Give them native monthly partitions, or at minimum a BRIN index on ts and created_at, so the feed, the stats views and the prune stay cheap as they pass millions of rows. Effort: L. Risk if built badly: partitioning a live table requires rewriting the data and re-creating every policy and grant, so rehearse it against the local seed database and keep the unpartitioned table recoverable until the swap is verified.",
+      "why": "Partitioning is the one database change that gets harder every day this catalog is live, and the event tables are where it will be needed."
+    },
+    {
+      "category": "performance",
+      "title": "Memoise the achievement stat bundle",
+      "body": "evaluateAchievements calls buildStats, which issues roughly fifteen PostgREST reads (user_inventory, game_rounds, activity_events, profile_visits through pageAll, blog_reactions and three global counts) on every /achievements, /inventory and post-game evaluation. Compute the bundle once per member and reuse it while user_progress.updated_at has not moved, and replace the unbounded activity_events kind select and the pageAll visit sweep with the counts the checks actually need. Effort: M. Risk if built badly: a reused bundle after a game result silently stops unlocking achievements, so key the cache on the progress row's timestamp and drop it on every XP write.",
+      "why": "The 125 self-evaluating achievements are the site's most interesting system and its heaviest read path, paid repeatedly for the same member."
+    },
+    {
+      "category": "performance",
+      "title": "Server-Timing headers on the catalog routes",
+      "body": "Nothing on a rendered page says how long its database work took, so the claim that a badge page is slow cannot be attributed without reproducing it locally. Emit a Server-Timing header from the query helper (one db;dur= per read plus a total) on /badges, /badges/[slug], /stats and /leaderboards so the browser's network panel answers the question directly. Effort: S. Risk if built badly: a timing header on a publicly cached response can leak internal table names or query shape, so emit whole-millisecond durations with a generic label and never a table or bind value.",
+      "why": "Performance work on this site needs a measurement that reaches a real visitor's browser, not a local build."
+    },
+    {
+      "category": "performance",
+      "title": "Log the slow reads and show them",
+      "body": "The failures are logged and the heartbeats carry per-run totals, but a read that takes 900 ms and succeeds is invisible, and that is the class that turns into a slow site without ever erroring. Have the query helper record label, duration and row count for reads over a threshold into a small table or the next heartbeat payload, and list the slowest of the last hour on the admin status tab. Effort: M. Risk if built badly: a per-read write doubles the database traffic exactly when it is already slow, so sample rather than log every read and apply the same retention rule to the table.",
+      "why": "The expensive-but-successful read is invisible today, and it is the one that degrades the site without a single alert."
+    },
+    {
+      "category": "performance",
+      "title": "A per-route query-count budget in CI",
+      "body": "Nothing notices when a page quietly gains a round trip, which is how /badges grew its extra reads in the first place. Add a script that renders a fixed list of routes against the seeded local Supabase, counts the PostgREST calls per route, and fails when a route exceeds its recorded budget (/badges at most 3, badge detail at most 5, /stats at most 6). Effort: M. Risk if built badly: a hard-coded budget becomes a number nobody wants to raise and blocks a legitimate new section, so store the budget per route with its reason and require the raise to come with an explanation.",
+      "why": "Round-trip count is the cheapest metric that predicts this site's response time, and it is the only one that can be asserted in a build."
+    },
+    {
+      "category": "performance",
+      "title": "Record real-user page timings",
+      "body": "The site already has an anonymous beacon (AnalyticsBeacon to /api/track) and a charted /stats page, but no timing signal, so the site feels slow is not measurable per route or per locale. Extend the beacon payload with LCP, INP and CLS from small passive PerformanceObservers, store them alongside the existing analytics_events fields and chart the p75 next to the sync metrics. Effort: M. Risk if built badly: an observer running on every paint adds main-thread work to the pages it is measuring, so use passive observers, sample the collection and stop once the page is hidden.",
+      "why": "The site has traffic analytics and uptime already; field performance is the missing half of the same picture."
+    },
+    {
+      "category": "performance",
+      "title": "A capacity board on the status tab",
+      "body": "The Hobby plan's function invocations, fast data transfer and image optimizations, and Supabase's database size, are the limits that would stop the site without any code change, and nothing currently watches them. Derive what can be derived from system_heartbeats and analytics_events, read the database size from a small view, and show each as a percentage of its allowance together with the per-table insert rate projected to the date it crosses a threshold. Effort: M. Risk if built badly: a projection computed from one atypical week reads as a hard deadline, so label it a projection, show the sample window it came from and never alert on it.",
+      "why": "The site runs on free tiers, so the plan limits are the most likely cause of a sudden outage and the least observed."
+    },
+    {
+      "category": "performance",
+      "title": "Batch the fan-out push send",
+      "body": "runGlobalSync calls sendPushToAll after a new drop, and that loop over push_subscriptions runs inside the sync's 60-second serverless budget and grows with the member count. Send in chunks with bounded concurrency, let one bad endpoint not abort the run, or move the whole fan-out to a separate invocation the sync triggers. Effort: M. Risk if built badly: a batched send that duplicates a notification or drops an endpoint is worse than a slow send, so keep the send idempotent per subscription and badge and prune endpoints the push service rejects.",
+      "why": "The new-drop notification is the site's best retention feature and it currently shares a budget with the catalog write."
+    },
+    {
+      "category": "performance",
+      "title": "Parallelise the potat page fetches",
+      "body": "fetchAllDistribution and fetchAllOwners walk their cursors one page at a time, so the sync's wall clock is the sum of every page's latency and sits close to the serverless limit for no reason other than sequencing. Fetch with a small bounded window (three or four in flight) while still honouring the Retry-After: 60 the provider returns. Effort: S. Risk if built badly: parallel pages against a provider that rate-limits by request count turn one sync into a 429 storm, so keep the pool small, back the whole pool off on the first Retry-After and expose the window as a setting.",
+      "why": "The owner sweep is the sync most likely to time out, and its time is currently the sum of hundreds of sequential round trips."
+    },
+    {
+      "category": "performance",
+      "title": "ETag the changelog RSS feed",
+      "body": "/api/changelog/rss is force-dynamic and rebuilds the feed from the changelog table on every subscriber poll, and RSS readers poll on a schedule whether or not anything happened. Add a revalidate window plus ETag and Last-Modified derived from the newest changelog.created_at so an unchanged feed answers 304 with no database read. Effort: S. Risk if built badly: a stale validator keeps readers on an old feed after a new entry lands, so derive it from the newest row id or timestamp and never from a build time.",
+      "why": "The changelog feed is polled by machines that mostly find nothing, and the automatic changelog is one of the site's calling cards."
+    },
+    {
+      "category": "performance",
+      "title": "Poll the feed with the cursor it returns",
+      "body": "FeedList fetches /api/feed?limit=30 every five seconds and re-sends the same thirty events, de-duplicating by id on the client, even though the endpoint already returns nextCursor and accepts a cursor parameter. Send the newest id the client holds and prepend only what came back, so a quiet period transfers an empty array instead of thirty activity rows. Effort: S. Risk if built badly: a cursor that is dropped after a hidden tab or a long sleep shows a gap the reader cannot detect, so fall back to a full fetch when the tab was hidden and keep the existing id de-duplication.",
+      "why": "The live feed is on every page's attention path and currently transfers its whole result set every five seconds forever."
+    },
+    {
+      "category": "performance",
+      "title": "One analytics beacon per page view",
+      "body": "AnalyticsBeacon posts to /api/track once on mount (the view) and again on pagehide (the duration), so analytics_events receives two rows per view and every /stats aggregate has to filter them apart. Emit a single row on visibilitychange or pagehide carrying the duration, with a short timer as a fallback for a visit that never fires an unload event. Effort: S. Risk if built badly: a pagehide-only beacon loses the visit entirely when the browser kills a tab, undercounting exactly the bounces the dashboard is watching, so keep the timer fallback and compare daily view counts before and after.",
+      "why": "Halving the largest write volume on the site costs one client change and makes the traffic numbers simpler, not weaker."
+    },
+    {
+      "category": "performance",
+      "title": "Sample the beacon under spike load",
+      "body": "When a new global badge drops, every visitor writes to analytics_events and posts twice, so the table and the /stats aggregates absorb their heaviest load at the exact moment they matter most. Put a sample rate in site_settings that the beacon reads, send one view in N with the row carrying its weight, and multiply the weight back in the aggregates. Effort: M. Risk if built badly: a weight applied to some rows and not others makes the dashboard quietly wrong, so apply the weight at write time and keep the raw-count chart visibly separate from the sampled one.",
+      "why": "A drop is both the site's busiest hour and its most-watched dashboard, which is the worst possible time for the analytics write path to be the bottleneck."
+    },
+    {
+      "category": "performance",
+      "title": "Batch the sync per-badge side effects",
+      "body": "runGlobalSync writes badge_events one row at a time and, for every new badge, creates a blog post, a set of notifications and a push inside the same loop, so a large drop becomes a serial chain of round trips inside a 60-second invocation. Collect the events into one insert, publish a single digest post for a multi-badge drop instead of one per badge, and fan the notifications out in one pass. Effort: M. Risk if built badly: replacing a post per badge with a digest changes what the blog feed and the push history show, so keep the per-badge badge_events rows intact so each badge's own provenance page is unaffected.",
+      "why": "A new drop is the one sync run that also writes content, pushes and notifications, and it is the run most likely to be cut off."
+    },
+    {
+      "category": "performance",
+      "title": "Share third-party rankings across instances",
+      "body": "fetchBadgesBlogRanking holds a module-level Map with a six-hour TTL that dies with each serverless instance, so a cold instance re-fetches badges.blog/api/ranking during a /leaderboards render, and each of the 11 locales can pay it again. Persist the ranking in a small table or an unstable_cache keyed without the locale, written by the sync, so one copy serves every instance and language. Effort: M. Risk if built badly: a ranking frozen in the database keeps showing last week's leaders after the provider updates, so refresh it with the daily sync and show its timestamp on the page.",
+      "why": "The leaderboards page depends on an external ranking service, and right now every cold server instance reintroduces that dependency for a visitor."
+    },
+    {
+      "category": "performance",
+      "title": "A seq-scan advisor over catalog queries",
+      "body": "The indexes in 0001_init and 0009 were chosen by reading the code and nothing shows when the planner stops using one, so a query can regress to a sequential scan and stay there unnoticed. Add a script that runs EXPLAIN (ANALYZE, BUFFERS) for the top catalog queries (the /badges filter and sort combinations, the badge_stats history read, the feed, the leaderboards and the momentum view) against the seeded local database and prints every sequential scan with its row estimate and the index it should have used. Effort: M. Risk if built badly: an advisor that indexes whatever it sees recommends duplicate indexes on tiny tables and slows every write, so require a minimum estimated row count and make the tool report, never create.",
+      "why": "A read-heavy catalog on free infrastructure lives or dies by whether its hot queries use an index, and today nobody can tell."
+    },
+    {
+      "category": "performance",
+      "title": "Split the sitemap into a chunked index",
+      "body": "src/app/sitemap.ts returns one document containing every badge times 11 locales plus every post, game and static page, roughly six thousand entries rebuilt from a paged scan of badges on each revalidation. Move to Next's generateSitemaps so /sitemap.xml becomes an index of per-locale or per-chunk children, which also lets each child carry a real per-badge lastModified. Effort: M. Risk if built badly: a sitemap index whose children 404 makes crawlers drop the entire set, so assert every child URL resolves in the post-deploy smoke check and keep each child well inside the entry limit.",
+      "why": "The sitemap is how a catalog of hundreds of badge pages gets discovered, and one six-thousand-entry response is a fragile way to publish it."
+    },
+    {
+      "category": "performance",
+      "title": "Ship the non-Latin OG font subsets",
+      "body": "/api/og/profile loads a Google Fonts subset per request for any non-Latin display name, so sharing a CJK or Arabic profile makes a cold instance call a third party before it can draw the card. Pre-subset the families it uses at build time, or fetch each full family into the bundle once, as static assets under public/, keeping the per-instance cache as a second layer. Effort: M. Risk if built badly: a bundled subset that misses a glyph a name actually uses renders boxes for exactly the users the runtime fetch was added for, so keep that fetch as the fallback when the bundled subset does not cover the text.",
+      "why": "Profile cards are the site's share surface, and today an Arabic or Japanese collector's card depends on an external font fetch succeeding during a crawler request."
+    },
+    {
+      "category": "performance",
+      "title": "Stop the health probe counting the catalog",
+      "body": "/api/health runs an exact count over badges on every call before deciding the site is up, which makes the uptime probe itself one of the heavier reads on the site and couples its latency to the table's size. Read the total from the same aggregate the catalog views maintain, or from a value the sync refreshes, and keep one cheap bounded read as the reachability signal. Effort: S. Risk if built badly: a total that stops updating makes the probe report a healthy catalog that has not synced in days, so keep the last_seen_at read live, since staleness is the thing the probe exists to catch.",
+      "why": "The one endpoint that must answer fast and cheaply is also, today, one of the few that counts the whole catalog."
+    },
+    {
+      "category": "performance",
+      "title": "Load only the message namespaces a route needs",
+      "body": "next-intl resolves messages/<locale>.json per request, so every page in every locale parses the whole catalogue of namespaces to render a handful of strings, and the file also carries 227 keys nothing references. Split the messages per namespace and request only the ones a route declares, or at least group the largest namespaces so the parse is proportional to the page. Effort: M. Risk if built badly: a namespace a page needs but does not declare throws MISSING_MESSAGE, which builds green and fails silently per locale, so add the namespace check to the release audit before this lands.",
+      "why": "Eleven locales times every route means the i18n bundle is parsed more often than any other module on this site."
+    }
+  ]
+}

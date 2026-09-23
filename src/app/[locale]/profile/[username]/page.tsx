@@ -17,11 +17,14 @@ import RarityChip from "@/components/badges/RarityChip";
 import ShareButtons from "@/components/ShareButtons";
 import TwitchLoginButton from "@/components/TwitchLoginButton";
 import LevelBadge from "@/components/LevelBadge";
+import RoleBadge from "@/components/RoleBadge";
+import { isStaffRole } from "@/lib/roles";
 import AchievementBadge from "@/components/AchievementBadge";
 import CoinRainButton from "@/components/CoinRainButton";
 import Coin from "@/components/Coin";
 import StealPanel from "@/components/StealPanel";
 import { readProgress } from "@/lib/gamification/xp";
+import { getEconomy } from "@/lib/settings";
 import { ProfileAutoRain, ProfileParticles, ProfileTilt } from "@/components/profile/ProfileEffects";
 import { levelFromXp } from "@/lib/gamification/levels";
 import { ACH_BY_ID } from "@/lib/gamification/achievements";
@@ -29,8 +32,6 @@ import { recordProfileVisit } from "@/lib/gamification/visits";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { visitorIpHash } from "@/lib/gamification/session";
 import { localeAlternates } from "@/lib/seo";
-
-export const revalidate = 300;
 
 interface PageProps {
   params: Promise<{ locale: string; username: string }>;
@@ -58,6 +59,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         },
       ],
     },
+    // Same layout contract as the blog page: without an explicit `twitter`
+    // object the card headline is the site title, not the profile.
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 
@@ -66,6 +74,10 @@ export default async function ProfilePage({ params }: PageProps) {
   setRequestLocale(locale);
   const t = await getTranslations("profile");
   const ti = await getTranslations("inventory");
+  // The steal panel advertises the price the server will charge. The fallback for a
+  // victim who never set their own must be the panel's configured economy, not a
+  // hardcoded 100/250 — and with the same clamps `attemptSteal` applies.
+  const economy = await getEconomy();
 
   let profile: ProfileRow | null = null;
   try {
@@ -83,12 +95,23 @@ export default async function ProfilePage({ params }: PageProps) {
   // View counter with 5-minute per-IP reload block + visitor log.
   let latestVisitors: Array<{ username: string | null; avatar_url: string | null }> = [];
   if (profile) {
-    const [ipHash] = await Promise.all([visitorIpHash()]);
+    // The view counter is best-effort. hashIp throws when no salt is configured
+    // (a misconfigured env) and the blog page guards the identical call — a
+    // missing hash must degrade to "not counted", never take down the page.
+    let ipHash = "";
+    try {
+      ipHash = await visitorIpHash();
+    } catch (error) {
+      console.warn("[profile] visitor hash unavailable, not counting view:", error);
+    }
     // Your own view of someone else's profile must not be counted, and the
     // visitor list is only shown to the profile owner: `profile_visits` is
     // owner-only under RLS, and reading it through the admin client for every
     // visitor published who had looked at whom.
-    if (!isOwn) {
+    // `ipHash` is required for the 5-minute dedup: without it every visitor would
+    // share one key and the window would suppress unrelated visits, so an
+    // unavailable hash skips the count rather than recording under a bogus one.
+    if (!isOwn && ipHash) {
       await recordProfileVisit(profile.id, viewer?.id ?? null, ipHash).catch(() => false);
     }
     if (isOwn) {
@@ -400,6 +423,11 @@ export default async function ProfilePage({ params }: PageProps) {
                 >
                   {displayName}
                 </h1>
+                {isStaffRole(profile?.role) ? (
+                  <div className="mt-1.5">
+                    <RoleBadge role={profile.role} />
+                  </div>
+                ) : null}
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <p className="text-sm text-muted">@{handle}</p>
                   {memberTitle && (
@@ -675,8 +703,8 @@ export default async function ProfilePage({ params }: PageProps) {
       {profile && !isOwn && (
         <StealPanel
           victim={profile.username}
-          price={profile.steal_price ?? 100}
-          maxAmount={profile.steal_max ?? 250}
+          price={Math.max(0, profile.steal_price ?? economy.stealPrice)}
+          maxAmount={Math.max(10, profile.steal_max ?? economy.stealMax)}
           enabled={profile.steal_enabled !== false}
         />
       )}

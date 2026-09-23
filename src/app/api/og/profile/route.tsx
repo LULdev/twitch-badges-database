@@ -12,8 +12,11 @@ export const revalidate = 3600;
 // will be drawn, and cached per server instance. When the name is pure Latin
 // (Geist covers it) no extra font is fetched.
 //
-// Order matters: kana is tested before Han, so a name mixing kanji and kana uses
-// the Japanese family rather than Simplified Chinese.
+// Every entry is a Google Fonts family name (the css2 endpoint 400s on an unknown
+// one, which just leaves the name as tofu — the same outcome as no gate, so
+// adding coverage is safe). Order matters: the first match wins, so kana precedes
+// Han and the specific Indic families precede nothing generic. Latin needs no
+// entry (Geist covers it).
 const SCRIPT_FAMILIES: Array<[RegExp, string]> = [
   [/[\p{Script=Hiragana}\p{Script=Katakana}]/u, "Noto+Sans+JP"],
   [/\p{Script=Hangul}/u, "Noto+Sans+KR"],
@@ -22,6 +25,23 @@ const SCRIPT_FAMILIES: Array<[RegExp, string]> = [
   [/\p{Script=Hebrew}/u, "Noto+Sans+Hebrew"],
   [/\p{Script=Thai}/u, "Noto+Sans+Thai"],
   [/\p{Script=Devanagari}/u, "Noto+Sans+Devanagari"],
+  [/\p{Script=Bengali}/u, "Noto+Sans+Bengali"],
+  [/\p{Script=Tamil}/u, "Noto+Sans+Tamil"],
+  [/\p{Script=Telugu}/u, "Noto+Sans+Telugu"],
+  [/\p{Script=Kannada}/u, "Noto+Sans+Kannada"],
+  [/\p{Script=Malayalam}/u, "Noto+Sans+Malayalam"],
+  [/\p{Script=Gujarati}/u, "Noto+Sans+Gujarati"],
+  [/\p{Script=Gurmukhi}/u, "Noto+Sans+Gurmukhi"],
+  [/\p{Script=Oriya}/u, "Noto+Sans+Oriya"],
+  [/\p{Script=Sinhala}/u, "Noto+Sans+Sinhala"],
+  [/\p{Script=Tibetan}/u, "Noto+Sans+Tibetan"],
+  [/\p{Script=Myanmar}/u, "Noto+Sans+Myanmar"],
+  [/\p{Script=Khmer}/u, "Noto+Sans+Khmer"],
+  [/\p{Script=Lao}/u, "Noto+Sans+Lao"],
+  [/\p{Script=Ethiopic}/u, "Noto+Sans+Ethiopic"],
+  [/\p{Script=Georgian}/u, "Noto+Sans+Georgian"],
+  [/\p{Script=Armenian}/u, "Noto+Sans+Armenian"],
+  [/\p{Script=Thaana}/u, "Noto+Sans+Thaana"],
   [/\p{Script=Cyrillic}/u, "Noto+Sans"],
 ];
 

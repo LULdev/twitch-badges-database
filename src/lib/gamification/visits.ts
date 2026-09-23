@@ -27,9 +27,19 @@ export async function recordProfileVisit(
   }
   if ((count ?? 0) > 0) return false;
 
+  // Same-bucket key for the partial unique index: two overlapping requests in the
+  // same five-minute window collide on insert instead of both counting. The read
+  // check above keeps the sliding-window behaviour; this closes the race, and a
+  // 23505 that loses it is absorbed by the `return false` below.
+  const bucket = Math.floor(Date.now() / DEDUP_WINDOW_MS);
   const { error: insertError } = await supabase
     .from("profile_visits")
-    .insert({ profile_id: profileId, visitor_id: visitorId, ip_hash: ipHash });
+    .insert({
+      profile_id: profileId,
+      visitor_id: visitorId,
+      ip_hash: ipHash,
+      dedup_bucket: bucket,
+    });
   if (insertError) return false;
 
   // A successful insert already proves the profile exists (the foreign key
@@ -75,8 +85,11 @@ export async function recordBlogView(
   }
   if ((count ?? 0) > 0) return false;
 
+  // The same fix as a profile visit: a fixed bucket on top of the sliding read
+  // check, so two overlapping views cannot both count.
+  const bucket = Math.floor(Date.now() / DEDUP_WINDOW_MS);
   const { error: insertError } = await supabase
     .from("blog_views")
-    .insert({ post_id: postId, ip_hash: ipHash });
+    .insert({ post_id: postId, ip_hash: ipHash, dedup_bucket: bucket });
   return !insertError;
 }

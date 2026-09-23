@@ -17,7 +17,12 @@ export async function GET() {
 
   const items = entries
     .map((entry) => {
-      const url = `${siteUrl()}/en/changelog`;
+      // Per-item permalink. This was one shared `/en/changelog` for all 100
+      // items, so every "read more" opened the same page and readers collapsed
+      // the feed into a single URL; `<guid>` was already per-item but `<link>` is
+      // the item permalink per RSS 2.0. The changelog page carries a matching
+      // `id="changelog-<id>"` on each row.
+      const url = `${siteUrl()}/en/changelog#changelog-${entry.id}`;
       return `    <item>
       <title>${escapeXml(entry.title)}</title>
       <link>${url}</link>

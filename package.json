@@ -13,7 +13,13 @@
     "sync:badgebase": "tsx scripts/sync-badgebase.ts",
     "sync:potat": "tsx scripts/sync-potat.ts",
     "send:push": "tsx scripts/send-push.ts",
-    "log:change": "tsx scripts/log-change.ts"
+    "log:change": "tsx scripts/log-change.ts",
+    "shots": "tsx scripts/screenshots.ts",
+    "import:ideas": "tsx scripts/import-backlog-ideas.ts --write",
+    "seed:ideas": "tsx scripts/seed-acp-ideas.ts",
+    "ideas:inventory": "tsx scripts/export-idea-inventory.ts",
+    "ideas:verify": "tsx scripts/verify-new-ideas.ts",
+    "ideas:import": "tsx scripts/import-new-ideas.ts --write"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -37,6 +43,7 @@
     "@types/web-push": "^3.6.4",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
+    "playwright": "^1.63.0",
     "postgres": "^3.4.5",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",

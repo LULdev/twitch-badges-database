@@ -1,17 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useGame, BetBar, GameError } from "./useGame";
 
 export default function RouletteGame() {
   const { bet, setBet, busy, error, balance, play, t } = useGame("roulette");
-  const [history, setHistory] = useState<Array<{ number: number; color: string; won: boolean }>>([]);
+  const [history, setHistory] = useState<
+    Array<{ id: number; number: number; color: string; won: boolean }>
+  >([]);
+  // The list PREPENDS, so an array index is not a stable identity: every round
+  // shifted the indices and React reused the wrong node for the wrong spin.
+  const nextId = useRef(0);
 
   async function pick(choice: string) {
     const result = await play({ choice });
     if (!result) return;
     const r = result.result as { number: number; color: string; won: boolean };
-    setHistory((prev) => [{ number: r.number, color: r.color, won: r.won }, ...prev].slice(0, 12));
+    setHistory((prev) =>
+      [
+        { id: nextId.current++, number: r.number, color: r.color, won: r.won },
+        ...prev,
+      ].slice(0, 12),
+    );
   }
 
   return (
@@ -31,9 +41,9 @@ export default function RouletteGame() {
           </button>
         </div>
         <div className="flex flex-wrap justify-center gap-1.5">
-          {history.map((entry, index) => (
+          {history.map((entry) => (
             <span
-              key={index}
+              key={entry.id}
               className={`grid size-9 place-items-center rounded-full border text-xs font-black tabular-nums ${
                 entry.color === "red"
                   ? "border-danger bg-danger/25 text-danger"

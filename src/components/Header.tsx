@@ -6,14 +6,35 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
+import RoleBadge from "./RoleBadge";
 import { createClient } from "@/lib/supabase/browser";
 
 export interface HeaderUser {
   username: string;
   avatarUrl: string | null;
+  /** True for admins and owners — surfaces the ACP entry in the account menu. */
+  isAdmin?: boolean;
+  /** The staff role, for the badge in the account menu. */
+  role?: string | null;
 }
 
-export default function Header({ user }: { user: HeaderUser | null }) {
+/** Feature flags from site_settings; a disabled feature loses its nav entry. */
+export interface HeaderFeatures {
+  feed: boolean;
+  wheel: boolean;
+  steals: boolean;
+  coinRain: boolean;
+  compare: boolean;
+  games: boolean;
+}
+
+export default function Header({
+  user,
+  features,
+}: {
+  user: HeaderUser | null;
+  features?: HeaderFeatures;
+}) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const router = useRouter();
@@ -21,16 +42,20 @@ export default function Header({ user }: { user: HeaderUser | null }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
+  // Undefined features (an un-migrated settings table) means "everything on",
+  // matching the defaults the server uses.
+  const on = (key: keyof HeaderFeatures) => features?.[key] !== false;
+
   const links: Array<{ href: string; label: string }> = [
     { href: "/badges", label: t("badges") },
     { href: "/active", label: t("active") },
     { href: "/upcoming", label: t("upcoming") },
-    { href: "/games", label: t("games") },
-    { href: "/wheel", label: t("wheel") },
+    ...(on("games") ? [{ href: "/games", label: t("games") }] : []),
+    ...(on("wheel") ? [{ href: "/wheel", label: t("wheel") }] : []),
     { href: "/leaderboards", label: t("leaderboards") },
     { href: "/achievements", label: t("achievementsNav") },
-    { href: "/feed", label: t("feedNav") },
-    { href: "/compare", label: t("compare") },
+    ...(on("feed") ? [{ href: "/feed", label: t("feedNav") }] : []),
+    ...(on("compare") ? [{ href: "/compare", label: t("compare") }] : []),
     { href: "/stats", label: t("stats") },
     { href: "/blog", label: t("blog") },
     { href: "/faq", label: t("faqNav") },
@@ -95,6 +120,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
             <Link
               key={link.href}
               href={link.href}
+              aria-current={isActive(link.href) ? "page" : undefined}
               className={`rounded-lg px-2.5 py-1.5 text-[0.8125rem] font-semibold transition-colors ${
                 isActive(link.href)
                   ? "text-foreground"
@@ -166,6 +192,20 @@ export default function Header({ user }: { user: HeaderUser | null }) {
                   >
                     {t("account")}
                   </Link>
+                  {user.role === "owner" || user.role === "admin" || user.role === "moderator" ? (
+                    <div className="px-3 pb-1 pt-1.5">
+                      <RoleBadge role={user.role} size="sm" />
+                    </div>
+                  ) : null}
+                  {user.isAdmin ? (
+                    <Link
+                      href="/admin"
+                      className="block rounded-lg px-3 py-2 text-[0.8125rem] font-semibold text-accent hover:bg-surface-2"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      {t("acp")}
+                    </Link>
+                  ) : null}
                   <button
                     type="button"
                     onClick={logout}
@@ -212,6 +252,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={isActive(link.href) ? "page" : undefined}
                 className="rounded-lg px-3 py-2 text-sm font-semibold text-muted hover:bg-surface-2 hover:text-foreground"
                 onClick={() => setMenuOpen(false)}
               >

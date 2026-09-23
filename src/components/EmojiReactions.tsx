@@ -3,31 +3,39 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-const EMOJI_OPTIONS: Array<{ key: string; glyph: string }> = [
-  { key: "like", glyph: "👍" },
-  { key: "love", glyph: "❤️" },
-  { key: "laugh", glyph: "😂" },
-  { key: "fire", glyph: "🔥" },
-  { key: "wow", glyph: "😮" },
+const EMOJI_OPTIONS: Array<{ key: string; nameKey: string; glyph: string }> = [
+  { key: "like", nameKey: "reactions.like", glyph: "👍" },
+  { key: "love", nameKey: "reactions.love", glyph: "❤️" },
+  { key: "laugh", nameKey: "reactions.laugh", glyph: "😂" },
+  { key: "fire", nameKey: "reactions.fire", glyph: "🔥" },
+  { key: "wow", nameKey: "reactions.wow", glyph: "😮" },
 ];
 
 /** Blog post emoji reactions (toggle per IP) + view counter display. */
 export default function EmojiReactions({
   slug,
   initial,
+  initialActive,
 }: {
   slug: string;
   initial: Record<string, number>;
+  /** The emojis this visitor already reacted with, resolved server-side. */
+  initialActive: string[];
 }) {
   const t = useTranslations("blog");
   const [counts, setCounts] = useState<Record<string, number>>(initial);
-  const [active, setActive] = useState<Set<string>>(new Set());
+  // Seeded from the server. Starting empty made the control lie about a
+  // reaction that already existed: the visitor's first click hit the route's
+  // *delete* branch, the count went down, and the button lit up because it
+  // believed it had just added one.
+  const [active, setActive] = useState<Set<string>>(
+    () => new Set(initialActive),
+  );
   const [busy, setBusy] = useState(false);
 
   async function react(emoji: string) {
     if (busy) return;
     setBusy(true);
-    const wasActive = active.has(emoji);
     try {
       const res = await fetch("/api/blog/react", {
         method: "POST",
@@ -44,9 +52,11 @@ export default function EmojiReactions({
         ...prev,
         [emoji]: Math.max(0, (prev[emoji] ?? 0) + (data.added ? 1 : -1)),
       }));
+      // Follow the server's answer instead of guessing from local state: the
+      // toggle is decided by the stored row, which the client cannot know.
       setActive((prev) => {
         const next = new Set(prev);
-        if (wasActive) next.delete(emoji);
+        if (data.removed) next.delete(emoji);
         else next.add(emoji);
         return next;
       });
@@ -65,7 +75,7 @@ export default function EmojiReactions({
           type="button"
           onClick={() => react(option.key)}
           className={`chip ${active.has(option.key) ? "chip-active" : ""}`}
-          aria-label={`${t("react")}: ${option.key}`}
+          aria-label={`${t("react")}: ${t(option.nameKey)}`}
         >
           <span aria-hidden>{option.glyph}</span>
           <span className="tabular-nums">{counts[option.key] ?? 0}</span>

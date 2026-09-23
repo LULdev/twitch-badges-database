@@ -19,8 +19,6 @@ import LiveRefresher from "@/components/LiveRefresher";
 import { localeAlternates } from "@/lib/seo";
 import { fetchBadgeLiveStats } from "@/lib/twitch/potat";
 
-export const revalidate = 120;
-
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
@@ -44,7 +42,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       canonical: `/${locale}/badges/${badge.slug}`,
       languages: localeAlternates(`/badges/${badge.slug}`),
     },
+    // A page-level `openGraph` REPLACES the layout's rather than merging with it,
+    // so the layout's `type`/`siteName` never reached the head — the live page
+    // emitted only og:title/og:description/og:image, i.e. no og:type (which the
+    // Open Graph protocol requires) and no og:url. `url` is resolved against the
+    // layout's metadataBase. "website" is the correct generic type here: "article"
+    // would declare a news post and imply article:* properties a catalog entry
+    // does not have.
     openGraph: {
+      type: "website",
+      siteName: t("siteTitle"),
+      url: `/${locale}/badges/${badge.slug}`,
       title,
       description,
       images: image ? [{ url: image }] : undefined,
@@ -118,7 +126,7 @@ export default async function BadgeDetailPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
 
-      <nav className="text-xs text-muted" aria-label="Breadcrumb">
+      <nav className="text-xs text-muted" aria-label={tc("breadcrumb")}>
         <Link href="/badges" className="hover:text-foreground">
           {tc("viewAll")}
         </Link>
@@ -176,17 +184,22 @@ export default async function BadgeDetailPage({ params }: PageProps) {
               <span className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
                 {badge.status === "upcoming" && badge.start_date
                   ? tcd("startsIn")
-                  : tcd("expiresIn")}
+                  : badge.end_date
+                    ? tcd("expiresIn")
+                    : tcd("permanent")}
               </span>
-              <Countdown
-                size="lg"
-                target={
-                  badge.status === "upcoming" && badge.start_date
-                    ? badge.start_date
-                    : (badge.end_date ?? badge.start_date!)
-                }
-                mode={badge.status === "upcoming" && badge.start_date ? "starts" : "expires"}
-              />
+              {badge.status === "upcoming" && badge.start_date ? (
+                <Countdown size="lg" target={badge.start_date} mode="starts" />
+              ) : badge.end_date ? (
+                <Countdown size="lg" target={badge.end_date} mode="expires" />
+              ) : (
+                // An ACTIVE badge with a start date and no end date has no window
+                // to count down to. The strip used to render "Expires in" against
+                // `end_date ?? start_date!` — i.e. a countdown to a date in the
+                // PAST, beside the "Live" status chip, and the non-null assertion
+                // hid the missing case from the type checker.
+                <span className="text-xs font-semibold text-success">{tcd("live")}</span>
+              )}
             </div>
           )}
       </section>
@@ -220,22 +233,32 @@ export default async function BadgeDetailPage({ params }: PageProps) {
             {tc("owners")}
           </h2>
           <dl className="space-y-3 text-sm">
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted">{t("ownerCount", { count: badge.owner_count ?? 0 })}</dt>
-              <dd className="font-semibold tabular-nums">
-                {badge.owner_count !== null
-                  ? new Intl.NumberFormat(locale).format(badge.owner_count)
-                  : "—"}
-              </dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted">{t("activeCount", { count: badge.active_count ?? 0 })}</dt>
-              <dd className="font-semibold tabular-nums">
-                {badge.active_count !== null
-                  ? new Intl.NumberFormat(locale).format(badge.active_count)
-                  : "—"}
-              </dd>
-            </div>
+            {/* A row is only rendered when the count is known. `?? 0` existed to
+                satisfy the ICU plural, so a badge nobody has polled rendered the
+                contradiction "0 owners" beside the value "—" (live:
+                /en/badges/bits-v100). The listing card already omits the line
+                entirely when the count is null (BadgeCard.tsx), and a real 0 now
+                reads "0 owners / 0" — label and value always agree. */}
+            {badge.owner_count !== null && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted">
+                  {t("ownerCount", { count: badge.owner_count })}
+                </dt>
+                <dd className="font-semibold tabular-nums">
+                  {new Intl.NumberFormat(locale).format(badge.owner_count)}
+                </dd>
+              </div>
+            )}
+            {badge.active_count !== null && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted">
+                  {t("activeCount", { count: badge.active_count })}
+                </dt>
+                <dd className="font-semibold tabular-nums">
+                  {new Intl.NumberFormat(locale).format(badge.active_count)}
+                </dd>
+              </div>
+            )}
             {live?.userCount !== null && live?.userCount !== undefined && (
               <div className="flex justify-between gap-4">
                 <dt className="text-muted">

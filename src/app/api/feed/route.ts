@@ -1,9 +1,16 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getFeatures } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
 /** Public live feed: latest activities across all users. */
 export async function GET(request: Request) {
+  // The flag removes the feature, not just the nav link: with the feed switched
+  // off the endpoint used to keep serving the full public feed at /api/feed.
+  const features = await getFeatures();
+  if (!features.feed) {
+    return Response.json({ error: "not found" }, { status: 404 });
+  }
   const url = new URL(request.url);
   // `?limit=abc` used to produce NaN and fail the query with a 500; both
   // parameters fall back to their defaults unless they are real numbers.

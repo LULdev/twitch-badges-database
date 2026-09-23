@@ -9,7 +9,15 @@ interface FilterBarProps {
   categories: string[];
   statusLocked?: string;
   showStatus?: boolean;
+  /** The sort the page's query falls back to when no ?sort= is set. */
+  defaultSort?: string;
+  /** The sort the page's query is actually applying (resolveSortKey). */
+  sort?: string;
 }
+
+/** Keys whose "all" value is the clear sentinel (their <option value="all">).
+ *  Free-text keys such as `q` are literal: searching "all" is a search. */
+const ALL_SENTINEL_KEYS = new Set(["status", "price", "category", "rarity"]);
 
 function buildHref(
   pathname: string,
@@ -18,7 +26,11 @@ function buildHref(
 ): string {
   const next = new URLSearchParams(params);
   for (const [key, value] of Object.entries(updates)) {
-    if (value === null || value === "" || value === "all") {
+    const clears =
+      value === null ||
+      value === "" ||
+      (value === "all" && ALL_SENTINEL_KEYS.has(key));
+    if (clears) {
       next.delete(key);
     } else {
       next.set(key, value);
@@ -33,6 +45,8 @@ export default function FilterBar({
   categories,
   statusLocked,
   showStatus = true,
+  defaultSort = "newest",
+  sort,
 }: FilterBarProps) {
   const t = useTranslations("common");
   const tr = useTranslations("rarity");
@@ -40,27 +54,6 @@ export default function FilterBar({
   const pathname = usePathname();
   const params = useSearchParams();
   const [isPending, startTransition] = useTransition();
-
-  const current = {
-    q: params.get("q") ?? "",
-    status: statusLocked ?? params.get("status") ?? "all",
-    price: params.get("price") ?? "all",
-    category: params.get("category") ?? "all",
-    rarity: params.get("rarity") ?? "all",
-    sort: params.get("sort") ?? "newest",
-  };
-
-  function navigate(updates: Record<string, string | null>) {
-    startTransition(() => {
-      router.push(buildHref(pathname, params, updates), { scroll: false });
-    });
-  }
-
-  function onSearch(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const value = new FormData(event.currentTarget).get("q");
-    navigate({ q: String(value ?? "") });
-  }
 
   const priceOptions = [
     { value: "all", label: t("all") },
@@ -73,6 +66,87 @@ export default function FilterBar({
     { value: "upcoming", label: t("upcoming") },
     { value: "expired", label: t("expired") },
   ];
+  const sortOptions = [
+    { value: "newest", label: t("newest") },
+    { value: "oldest", label: t("oldest") },
+    { value: "rarity", label: t("rarest") },
+    { value: "owners", label: t("mostOwned") },
+    { value: "ending", label: t("endingSoon") },
+    { value: "releasing", label: t("releasingSoon") },
+    { value: "name", label: t("name") },
+  ];
+
+  // Every controlled value is validated against the option list it is rendered
+  // from, and defaults to the page's own default.
+  //  * An unknown `?sort=`/`?category=`/`?rarity=` used to be handed straight to
+  //    `value=`, leaving the <select> with no matching <option> — React ends with
+  //    selectedIndex -1 and the control renders blank — while the query silently
+  //    fell back to "newest".
+  //  * The sort control hardcoded "newest" as its fallback even on /active and
+  //    /upcoming, whose queries default to "ending"/"releasing", so it labelled
+  //    the grid with a sort it was not using.
+  // A value that is NOT in the list (a stale ?category=bits, or a category the
+  // catalog no longer has) is rendered as its own option instead of being folded
+  // to "all": the query still filters on it, so showing "All" made the control
+  // contradict the grid while leaving no way to switch away from it.
+  const rawCategory = params.get("category") ?? "";
+  const rawRarity = params.get("rarity") ?? "";
+  const rawStatus = statusLocked ?? params.get("status") ?? "";
+  const foreignCategories =
+    rawCategory && rawCategory !== "all" && !categories.includes(rawCategory)
+      ? [rawCategory]
+      : [];
+  const foreignRarity =
+    rawRarity && !(RARITY_TIERS as readonly string[]).includes(rawRarity) && rawRarity !== "all"
+      ? [rawRarity]
+      : [];
+  const foreignStatus =
+    !statusLocked &&
+    rawStatus &&
+    rawStatus !== "all" &&
+    !statusOptions.some((option) => option.value === rawStatus)
+      ? [rawStatus]
+      : [];
+
+  const current = {
+    q: params.get("q") ?? "",
+    status:
+      statusLocked ??
+      statusOptions.find((option) => option.value === rawStatus)?.value ??
+      // `||`, not `??`: an absent ?status= normalises to "" above, and "" is not
+      // nullish — `?? "all"` would return "", leaving NO chip pressed on the
+      // default view. The category/rarity lines below use the same `||` form.
+      (rawStatus || "all"),
+    price:
+      priceOptions.find((option) => option.value === params.get("price"))
+        ?.value ?? "all",
+    category: categories.includes(rawCategory) ? rawCategory : rawCategory || "all",
+    rarity: (RARITY_TIERS as readonly string[]).includes(rawRarity)
+      ? rawRarity
+      : rawRarity || "all",
+    // `sort` is resolved by the page through the SAME key list the query uses
+    // (resolveSortKey in queries.ts), so the control cannot show a sort the query
+    // is not applying. The local fallbacks only cover a caller that passes none.
+    sort:
+      sortOptions.find((option) => option.value === sort)?.value ??
+      sortOptions.find((option) => option.value === defaultSort)?.value ??
+      "newest",
+  };
+
+  const allCategories = [...categories, ...foreignCategories];
+  const allRarity = [...(RARITY_TIERS as readonly string[]), ...foreignRarity];
+
+  function navigate(updates: Record<string, string | null>) {
+    startTransition(() => {
+      router.push(buildHref(pathname, params, updates), { scroll: false });
+    });
+  }
+
+  function onSearch(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const value = new FormData(event.currentTarget).get("q");
+    navigate({ q: String(value ?? "") });
+  }
 
   return (
     <div className={`card p-4 transition-opacity ${isPending ? "opacity-60" : ""}`}>
@@ -119,6 +193,18 @@ export default function FilterBar({
                 {option.label}
               </button>
             ))}
+            {foreignStatus.map((value) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed
+                className="chip chip-active"
+                onClick={() => navigate({ status: null })}
+                title={t("clear")}
+              >
+                {value}
+              </button>
+            ))}
           </div>
         )}
 
@@ -147,7 +233,7 @@ export default function FilterBar({
           <option value="all">
             {t("category")}: {t("all")}
           </option>
-          {categories.map((category) => (
+          {allCategories.map((category) => (
             <option key={category} value={category}>
               {category}
             </option>
@@ -163,9 +249,9 @@ export default function FilterBar({
           <option value="all">
             {t("rarity")}: {t("all")}
           </option>
-          {RARITY_TIERS.map((tier) => (
+          {allRarity.map((tier) => (
             <option key={tier} value={tier}>
-              {tr(tier)}
+              {(RARITY_TIERS as readonly string[]).includes(tier) ? tr(tier) : tier}
             </option>
           ))}
         </select>
@@ -176,13 +262,11 @@ export default function FilterBar({
           onChange={(e) => navigate({ sort: e.target.value })}
           aria-label={t("sort")}
         >
-          <option value="newest">{t("newest")}</option>
-          <option value="oldest">{t("oldest")}</option>
-          <option value="rarity">{t("rarest")}</option>
-          <option value="owners">{t("mostOwned")}</option>
-          <option value="ending">{t("endingSoon")}</option>
-          <option value="releasing">{t("releasingSoon")}</option>
-          <option value="name">{t("name")}</option>
+          {sortOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
 
         {(current.q || params.get("price") || params.get("category") || params.get("rarity") || (!statusLocked && params.get("status"))) && (

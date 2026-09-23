@@ -136,7 +136,7 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
                 {nowTick !== null ? <span>· {timeAgo(event.created_at, nowTick)}</span> : null}
                 {event.xp_amount ? <span className="font-bold text-accent">+{event.xp_amount} XP</span> : null}
                 {event.coins_amount ? (
-                  <span className={`inline-flex items-center gap-1 font-bold ${event.coins_amount > 0 ? "text-success" : "text-danger"}`}>
+                  <span dir="ltr" className={`inline-flex items-center gap-1 font-bold ${event.coins_amount > 0 ? "text-success" : "text-danger"}`}>
                     {event.coins_amount > 0 ? "+" : ""}{event.coins_amount.toLocaleString(locale)} <Coin size={12} />
                   </span>
                 ) : null}

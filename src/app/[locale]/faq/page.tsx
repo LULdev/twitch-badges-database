@@ -4,8 +4,6 @@ import { localeAlternates } from "@/lib/seo";
 import { jsonLdScript } from "@/lib/jsonld";
 import { ACTIVE_ACHIEVEMENTS } from "@/lib/gamification/achievements";
 
-export const revalidate = 3600;
-
 const FAQ_KEYS = [
   "what",
   "xp",

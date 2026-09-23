@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -11,11 +11,15 @@ import { useTranslations } from "next-intl";
  */
 
 interface Customization {
-  // 20 common
+  // Legacy document fields. The columns of the same name are owned by
+  // AccountSettings and are what the profile renders; `color` doubles as the
+  // profile page's fallback when the column is null. They stay on the type so an
+  // existing document round-trips — this editor no longer writes them.
   displayName: string;
   bio: string;
   bannerUrl: string;
   color: string;
+  // 20 common
   accent2: string;
   font: "sans" | "serif" | "mono" | "rounded";
   cardStyle: "glass" | "solid" | "outline";
@@ -68,34 +72,36 @@ const DEFAULTS: Customization = {
 };
 
 type Field =
-  | { key: keyof Customization; kind: "text"; label: string; placeholder?: string }
+  | { key: keyof Customization; kind: "text"; label: string; placeholder?: string; placeholderKey?: string }
   | { key: keyof Customization; kind: "color"; label: string }
   | { key: keyof Customization; kind: "toggle"; label: string; hint?: string }
   | { key: keyof Customization; kind: "select"; label: string; options: Array<[string, string]> }
   | { key: keyof Customization; kind: "range"; label: string; min: number; max: number };
 
+// This editor owns ONLY the `customization` document, the mood and the steal
+// settings. `displayName` / `bio` / `bannerUrl` / `color` are the *columns* that
+// AccountSettings edits: the account page mounts both forms, and this one used to
+// seed those four from the customization document (empty for a member who never
+// opened it) and ship them on every save — so toggling one effect wiped the
+// member's name, bio and banner and reverted a colour set in the sibling editor.
 const COMMON_FIELDS: Field[] = [
-  { key: "displayName", kind: "text", label: "displayName" },
-  { key: "title", kind: "text", label: "title", placeholder: "Badge Hunter" },
-  { key: "bio", kind: "text", label: "bio" },
-  { key: "bannerUrl", kind: "text", label: "banner" },
-  { key: "color", kind: "color", label: "color" },
+  { key: "title", kind: "text", label: "title", placeholderKey: "titlePlaceholder" },
   { key: "accent2", kind: "color", label: "accent2" },
-  { key: "font", kind: "select", label: "font", options: [["sans", "Sans"], ["serif", "Serif"], ["mono", "Mono"], ["rounded", "Rounded"]] },
-  { key: "cardStyle", kind: "select", label: "cardStyle", options: [["glass", "Glass"], ["solid", "Solid"], ["outline", "Outline"]] },
-  { key: "radius", kind: "select", label: "radius", options: [["sharp", "Sharp"], ["soft", "Soft"], ["round", "Round"]] },
+  { key: "font", kind: "select", label: "font", options: [["sans", "options.font.sans"], ["serif", "options.font.serif"], ["mono", "options.font.mono"], ["rounded", "options.font.rounded"]] },
+  { key: "cardStyle", kind: "select", label: "cardStyle", options: [["glass", "options.cardStyle.glass"], ["solid", "options.cardStyle.solid"], ["outline", "options.cardStyle.outline"]] },
+  { key: "radius", kind: "select", label: "radius", options: [["sharp", "options.radius.sharp"], ["soft", "options.radius.soft"], ["round", "options.radius.round"]] },
   { key: "nameGradient", kind: "text", label: "nameGradient", placeholder: "#a970ff,#60a5fa" },
-  { key: "avatarFrame", kind: "select", label: "avatarFrame", options: [["none", "None"], ["ring", "Ring"], ["double", "Double"], ["glow", "Glow"], ["crown", "Crown"]] },
+  { key: "avatarFrame", kind: "select", label: "avatarFrame", options: [["none", "options.avatarFrame.none"], ["ring", "options.avatarFrame.ring"], ["double", "options.avatarFrame.double"], ["glow", "options.avatarFrame.glow"], ["crown", "options.avatarFrame.crown"]] },
   { key: "bannerOverlay", kind: "range", label: "bannerOverlay", min: 0, max: 90 },
-  { key: "showcaseLayout", kind: "select", label: "showcaseLayout", options: [["grid", "Grid"], ["row", "Row"], ["carousel", "Carousel"]] },
+  { key: "showcaseLayout", kind: "select", label: "showcaseLayout", options: [["grid", "options.showcaseLayout.grid"], ["row", "options.showcaseLayout.row"], ["carousel", "options.showcaseLayout.carousel"]] },
   { key: "showStats", kind: "toggle", label: "showStats" },
   { key: "showInventory", kind: "toggle", label: "showInventory" },
   { key: "showLevel", kind: "toggle", label: "showLevel" },
   { key: "showCoins", kind: "toggle", label: "showCoins" },
   { key: "showVisitors", kind: "toggle", label: "showVisitors" },
-  { key: "socialTwitter", kind: "text", label: "socialTwitter", placeholder: "username" },
-  { key: "socialDiscord", kind: "text", label: "socialDiscord", placeholder: "username" },
-  { key: "density", kind: "select", label: "density", options: [["cozy", "Cozy"], ["compact", "Compact"]] },
+  { key: "socialTwitter", kind: "text", label: "socialTwitter", placeholderKey: "usernamePlaceholder" },
+  { key: "socialDiscord", kind: "text", label: "socialDiscord", placeholderKey: "usernamePlaceholder" },
+  { key: "density", kind: "select", label: "density", options: [["cozy", "options.density.cozy"], ["compact", "options.density.compact"]] },
 ];
 
 const CREATIVE_FIELDS: Field[] = [
@@ -109,9 +115,9 @@ const CREATIVE_FIELDS: Field[] = [
   { key: "greetingBanner", kind: "toggle", label: "greetingBanner" },
   { key: "levelHalo", kind: "color", label: "levelHalo" },
   { key: "cursorBadge", kind: "toggle", label: "cursorBadge" },
-  { key: "statusBubble", kind: "text", label: "statusBubble", placeholder: "hunting SUBtember…" },
-  { key: "profileTheme", kind: "select", label: "profileTheme", options: [["auto", "Auto"], ["violet", "Violet"], ["emerald", "Emerald"], ["sapphire", "Sapphire"], ["gold", "Gold"]] },
-  { key: "effectsIntensity", kind: "select", label: "effectsIntensity", options: [["off", "Off"], ["subtle", "Subtle"], ["full", "Full"]] },
+  { key: "statusBubble", kind: "text", label: "statusBubble", placeholderKey: "statusBubblePlaceholder" },
+  { key: "profileTheme", kind: "select", label: "profileTheme", options: [["auto", "options.profileTheme.auto"], ["violet", "options.profileTheme.violet"], ["emerald", "options.profileTheme.emerald"], ["sapphire", "options.profileTheme.sapphire"], ["gold", "options.profileTheme.gold"]] },
+  { key: "effectsIntensity", kind: "select", label: "effectsIntensity", options: [["off", "options.effectsIntensity.off"], ["subtle", "options.effectsIntensity.subtle"], ["full", "options.effectsIntensity.full"]] },
   { key: "coinRainAuto", kind: "toggle", label: "coinRainAuto" },
   { key: "visitorMarquee", kind: "toggle", label: "visitorMarquee" },
 ];
@@ -126,11 +132,21 @@ export default function ProfileCustomizer({
   steal: { enabled: boolean; price: number; max: number };
 }) {
   const t = useTranslations("customizer");
+  const te = useTranslations("errors");
   const router = useRouter();
   const [values, setValues] = useState<Customization>({ ...DEFAULTS, ...initial });
   const [mood, setMood] = useState(initialMood);
   const [stealSettings, setStealSettings] = useState(steal);
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Cancel the pending state update on unmount: React 18 no longer warns about
+  // setting state on an unmounted component, so nothing surfaced this.
+  useEffect(
+    () => () => {
+      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+    },
+    [],
+  );
 
   function set<K extends keyof Customization>(key: K, value: Customization[K]) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -142,11 +158,12 @@ export default function ProfileCustomizer({
       const res = await fetch("/api/account", {
         method: "POST",
         headers: { "content-type": "application/json" },
+        // Only the fields this editor owns. `displayName` / `bio` / `bannerUrl` /
+        // `color` belong to AccountSettings (the columns): the route writes any
+        // string field it is handed and treats an absent one as "leave it alone",
+        // and this form's copy of those four lives in the customization document,
+        // which is empty for anyone who never opened it.
         body: JSON.stringify({
-          displayName: values.displayName,
-          bio: values.bio,
-          bannerUrl: values.bannerUrl,
-          color: values.color,
           mood,
           customization: values,
           stealEnabled: stealSettings.enabled,
@@ -157,10 +174,12 @@ export default function ProfileCustomizer({
       if (!res.ok) throw new Error(String(res.status));
       setState("saved");
       router.refresh();
-      setTimeout(() => setState("idle"), 3000);
+      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => setState("idle"), 3000);
     } catch {
       setState("error");
-      setTimeout(() => setState("idle"), 3000);
+      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => setState("idle"), 3000);
     }
   }
 
@@ -175,7 +194,7 @@ export default function ProfileCustomizer({
             <input
               className="input"
               value={String(value ?? "")}
-              placeholder={field.placeholder}
+              placeholder={field.placeholderKey ? t(field.placeholderKey) : field.placeholder}
               maxLength={120}
               onChange={(event) => set(field.key, event.target.value as Customization[typeof field.key])}
             />
@@ -222,7 +241,7 @@ export default function ProfileCustomizer({
               onChange={(event) => set(field.key, event.target.value as Customization[typeof field.key])}
             >
               {field.options.map(([optionValue, optionLabel]) => (
-                <option key={optionValue} value={optionValue}>{optionLabel}</option>
+                <option key={optionValue} value={optionValue}>{t(optionLabel)}</option>
               ))}
             </select>
           </label>
@@ -269,6 +288,7 @@ export default function ProfileCustomizer({
           value={mood}
           maxLength={60}
           placeholder={t("statusBubble")}
+          aria-label={t("moodSection")}
           onChange={(event) => setMood(event.target.value)}
         />
       </section>
@@ -293,7 +313,19 @@ export default function ProfileCustomizer({
               min={0}
               max={10000}
               value={stealSettings.price}
-              onChange={(event) => setStealSettings((prev) => ({ ...prev, price: Number(event.target.value) || 0 }))}
+              onChange={(event) => {
+                // Keep the last valid number while the field is empty: `Number("") || 0`
+                // rewrote a cleared field to 0, so retyping concatenated onto a
+                // sentinel instead of the digits actually entered.
+                const parsed = Number(event.target.value);
+                setStealSettings((prev) => ({
+                  ...prev,
+                  price:
+                    event.target.value.trim() !== "" && Number.isFinite(parsed)
+                      ? Math.max(0, Math.min(10000, Math.trunc(parsed)))
+                      : prev.price,
+                }));
+              }}
             />
           </label>
           <label className="block">
@@ -304,7 +336,18 @@ export default function ProfileCustomizer({
               min={10}
               max={10000}
               value={stealSettings.max}
-              onChange={(event) => setStealSettings((prev) => ({ ...prev, max: Number(event.target.value) || 10 }))}
+              onChange={(event) => {
+                // Same rule as steal_price above: an emptied field keeps its last
+                // valid value instead of becoming the `10` sentinel.
+                const parsed = Number(event.target.value);
+                setStealSettings((prev) => ({
+                  ...prev,
+                  max:
+                    event.target.value.trim() !== "" && Number.isFinite(parsed)
+                      ? Math.max(10, Math.min(10000, Math.trunc(parsed)))
+                      : prev.max,
+                }));
+              }}
             />
           </label>
         </div>
@@ -315,8 +358,13 @@ export default function ProfileCustomizer({
         <button type="button" className="btn btn-primary" onClick={save} disabled={state === "saving"}>
           {state === "saving" ? t("saving") : t("save")}
         </button>
-        {state === "saved" && <span className="text-sm font-semibold text-success">{t("saved")}</span>}
-        {state === "error" && <span className="text-sm font-semibold text-danger">✗</span>}
+        {/* One live region for both outcomes: the error used to be a bare "✗"
+            with no accessible name, and neither state was announced — a screen
+            reader learned nothing from pressing Save. Mirrors AccountSettings. */}
+        <span role="status" aria-live="polite" className="text-sm font-semibold">
+          {state === "saved" ? <span className="text-success">{t("saved")}</span> : null}
+          {state === "error" ? <span className="text-danger">{te("generic")}</span> : null}
+        </span>
       </div>
     </div>
   );

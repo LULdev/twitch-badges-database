@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
 type PushState = "unsupported" | "off" | "enabling" | "on" | "denied";
@@ -36,6 +36,15 @@ export default function PushToggle() {
   const t = useTranslations("notifications");
   const [state, setState] = useState<PushState>("off");
   const [testSent, setTestSent] = useState(false);
+  const testTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Cancel the pending state update on unmount: React 18 no longer warns about
+  // setting state on an unmounted component, so nothing surfaced this.
+  useEffect(
+    () => () => {
+      if (testTimer.current !== null) clearTimeout(testTimer.current);
+    },
+    [],
+  );
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -142,7 +151,8 @@ export default function PushToggle() {
         tag: "tbd-test",
       });
       setTestSent(true);
-      setTimeout(() => setTestSent(false), 3000);
+      if (testTimer.current !== null) clearTimeout(testTimer.current);
+      testTimer.current = setTimeout(() => setTestSent(false), 3000);
     } catch (caught) {
       console.warn("[push] test notification failed", caught);
       setError(true);

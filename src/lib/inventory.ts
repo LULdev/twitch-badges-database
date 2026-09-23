@@ -107,12 +107,34 @@ export async function syncUserInventory(
     if (error) throw error;
   }
 
-  // Badge-unlock rewards: 1,000 XP + 500 coins per newly claimed badge,
-  // one public feed entry each (aggregated into a single progress update).
+  // Badge-unlock rewards: 1,000 XP + 500 coins per newly claimed badge, one
+  // public feed entry each (aggregated into a single progress update).
+  //
+  // The payment is recorded BEFORE it happens, in the same table that decides
+  // whether it happens: `badge_unlock_rewards` has (user_id, badge_id) as its key,
+  // so claiming a row is what "this badge has not been paid yet" means. The
+  // previous version paid for whatever was absent from `user_inventory`, which
+  // made the reward a function of table state — and a member could delete those
+  // rows (the grant and policy that allowed it are gone in migration 0033) and be
+  // paid again for every badge they owned, without limit.
   if (toAdd.length > 0) {
     const { award, logActivity } = await import("./gamification/xp");
-    const catalogRows = catalog;
-    const addedBadges = catalogRows.filter((row) => toAdd.includes(row.id));
+
+    // `ignoreDuplicates` plus a select returns only the rows that were actually
+    // inserted, which is exactly the set of badges that had no reward yet.
+    const { data: claimed, error: claimError } = await supabase
+      .from("badge_unlock_rewards")
+      .upsert(
+        toAdd.map((badgeId) => ({ user_id: userId, badge_id: badgeId })),
+        { onConflict: "user_id,badge_id", ignoreDuplicates: true },
+      )
+      .select("badge_id");
+    if (claimError) throw claimError;
+
+    const rewardIds = new Set(
+      (claimed ?? []).map((row) => String((row as { badge_id: string }).badge_id)),
+    );
+    const addedBadges = catalog.filter((row) => rewardIds.has(row.id));
     for (const badge of addedBadges) {
       await logActivity({
         userId,
@@ -124,12 +146,14 @@ export async function syncUserInventory(
         payload: { badge: badge.slug },
       });
     }
-    await award(userId, {
-      xp: addedBadges.length * 1000,
-      coins: addedBadges.length * 500,
-      source: "badge_claims",
-      skipAchievements: false,
-    });
+    if (addedBadges.length > 0) {
+      await award(userId, {
+        xp: addedBadges.length * 1000,
+        coins: addedBadges.length * 500,
+        source: "badge_claims",
+        skipAchievements: false,
+      });
+    }
   }
 
   const now = new Date().toISOString();
@@ -152,12 +176,11 @@ export async function syncUserInventory(
     );
   if (stateError) throw stateError;
 
-  // Keep profile Twitch metadata fresh (avatar / display name / creation).
-  // Only fields the provider actually returned are written: an empty or null
-  // value used to overwrite a good one, so one thin response blanked the
-  // avatar and display name of a user who had both.
+  // Provider-owned identity metadata: avatar, twitch id and account creation are
+  // refreshed on every sync. `display_name` is deliberately NOT in this patch —
+  // it is member-editable (AccountSettings) and is the public profile heading, so
+  // a sync writing it silently reverted a chosen name to the Twitch name.
   const profilePatch: Record<string, unknown> = {};
-  if (perfil.displayName) profilePatch.display_name = perfil.displayName;
   if (perfil.profileImageURL) profilePatch.avatar_url = perfil.profileImageURL;
   if (perfil.id) profilePatch.twitch_id = perfil.id;
   if (perfil.createdAt) profilePatch.twitch_created_at = perfil.createdAt;
@@ -170,6 +193,18 @@ export async function syncUserInventory(
     // failing the whole run over a cosmetic profile field would mark the
     // heartbeat as an error for something that self-heals on the next sync.
     if (profileError) console.warn("[inventory] profile update failed:", profileError.message);
+  }
+
+  // Seed `display_name` from Twitch only while it is still unset, so a first
+  // sync populates it and a member's chosen name is never reverted. Conditional
+  // in SQL (`.is(..., null)`) so it stays correct under concurrency.
+  if (perfil.displayName) {
+    const { error: nameError } = await supabase
+      .from("profiles")
+      .update({ display_name: perfil.displayName })
+      .eq("id", userId)
+      .is("display_name", null);
+    if (nameError) console.warn("[inventory] display name seed failed:", nameError.message);
   }
 
   // Best-effort potat.app enrichment: level, potatoes, first-seen, color and

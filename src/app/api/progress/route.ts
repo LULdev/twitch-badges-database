@@ -1,6 +1,7 @@
 import { authUserId } from "@/lib/gamification/session";
 import { getProgress } from "@/lib/gamification/xp";
 import { levelFromXp } from "@/lib/gamification/levels";
+import { isUserBanned } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,11 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const userId = await authUserId();
   if (!userId) return Response.json({ authenticated: false });
+  // `getProgress` below INSERTS a row on miss, so this is a mutating route: a
+  // banned member is stopped here like every other mutation (see admin.ts).
+  if (await isUserBanned(userId)) {
+    return Response.json({ error: "banned" }, { status: 403 });
+  }
   const progress = await getProgress(userId);
   return Response.json({
     authenticated: true,

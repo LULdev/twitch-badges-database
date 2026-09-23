@@ -6,8 +6,6 @@ import { formatCompact } from "@/components/badges/BadgeCard";
 import LiveRefresher from "@/components/LiveRefresher";
 import TwitchLoginButton from "@/components/TwitchLoginButton";
 
-export const revalidate = 120;
-
 export default async function HomePage({
   params,
 }: {
@@ -21,15 +19,21 @@ export default async function HomePage({
   let data = null;
   try {
     data = await getHomeData();
-  } catch {
+  } catch (error) {
+    // A database failure is NOT an empty catalog. This used to collapse into the
+    // "catalog is empty, run the sync" hint plus four 0 tiles — a false
+    // operational claim on a healthy installation. Mirrors the badges explorer.
     data = null;
+    console.warn("[home] catalog load failed:", error);
   }
 
+  // `null` (not 0) when the load failed, so the tiles read "—" instead of a number
+  // the page does not actually have. formatCompact renders null as "—".
   const stats = [
-    { label: t("statActive"), value: data?.counts.active ?? 0 },
-    { label: t("statUpcoming"), value: data?.counts.upcoming ?? 0 },
-    { label: t("statExpired"), value: data?.counts.expired ?? 0 },
-    { label: t("statTotal"), value: data?.counts.total ?? 0 },
+    { label: t("statActive"), value: data ? data.counts.active : null },
+    { label: t("statUpcoming"), value: data ? data.counts.upcoming : null },
+    { label: t("statExpired"), value: data ? data.counts.expired : null },
+    { label: t("statTotal"), value: data ? data.counts.total : null },
   ];
 
   return (
@@ -128,7 +132,7 @@ export default async function HomePage({
               <div className="section-title">
                 <h2>{t("fromChangelog")}</h2>
                 <Link href="/changelog" className="text-xs font-semibold text-accent hover:underline">
-                  <span className="dir-arrow" aria-hidden>→</span>
+                  {tc("viewAll")} <span className="dir-arrow" aria-hidden>→</span>
                 </Link>
               </div>
               <ul className="space-y-3">
@@ -151,7 +155,7 @@ export default async function HomePage({
               <div className="section-title">
                 <h2>{t("fromBlog")}</h2>
                 <Link href="/blog" className="text-xs font-semibold text-accent hover:underline">
-                  <span className="dir-arrow" aria-hidden>→</span>
+                  {tc("viewAll")} <span className="dir-arrow" aria-hidden>→</span>
                 </Link>
               </div>
               <ul className="space-y-3">
@@ -172,8 +176,9 @@ export default async function HomePage({
       )}
 
       {!data && (
-        <section className="card p-8 text-center">
-          <p className="text-sm text-muted">{tc("setupHint")}</p>
+        <section className="card border-danger/40 bg-danger/10 p-8 text-center">
+          <p className="text-sm font-semibold text-danger">{tc("errorTitle")}</p>
+          <p className="mt-1 text-sm text-muted">{tc("errorBody")}</p>
         </section>
       )}
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -8,11 +8,30 @@ export default function SyncButton() {
   const t = useTranslations("inventory");
   const router = useRouter();
   const [state, setState] = useState<"idle" | "busy" | "done" | "error">("idle");
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Cancel the pending reset on unmount: React 18 no longer warns about setting
+  // state on an unmounted component, so nothing surfaced this.
+  useEffect(
+    () => () => {
+      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+    },
+    [],
+  );
 
   async function sync() {
     setState("busy");
     try {
       const res = await fetch("/api/inventory/sync", { method: "POST" });
+      if (res.status === 429) {
+        // The server's per-user cooldown: the inventory was synced less than a
+        // minute ago, so it IS current — showing the failure state for that would
+        // tell the member something went wrong when nothing did.
+        setState("done");
+        router.refresh();
+        if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+        resetTimer.current = setTimeout(() => setState("idle"), 4000);
+        return;
+      }
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as
           | { error?: string }
@@ -21,11 +40,13 @@ export default function SyncButton() {
       }
       setState("done");
       router.refresh();
-      setTimeout(() => setState("idle"), 4000);
+      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => setState("idle"), 4000);
     } catch (error) {
       console.warn("[inventory] sync failed", error);
       setState("error");
-      setTimeout(() => setState("idle"), 4000);
+      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => setState("idle"), 4000);
     }
   }
 

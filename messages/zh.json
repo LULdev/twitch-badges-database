@@ -32,7 +32,8 @@
     "faqNav": "FAQ",
     "wheel": "命运转盘",
     "mainNav": "主导航",
-    "mobileNav": "移动端导航"
+    "mobileNav": "移动端导航",
+    "acp": "管理面板"
   },
   "common": {
     "search": "搜索徽章…",
@@ -82,7 +83,8 @@
     "errorTitle": "出错了",
     "errorBody": "页面无法加载。通常是暂时性的，请重试。",
     "errorRetry": "重试",
-    "levelAria": "等级 {level}"
+    "levelAria": "等级 {level}",
+    "breadcrumb": "面包屑导航"
   },
   "home": {
     "heroTitle": "所有 Twitch 徽章，尽在一个数据库。",
@@ -262,7 +264,14 @@
     "empty": "暂无文章。",
     "autoTag": "自动生成",
     "notFound": "该文章不存在。",
-    "react": "互动"
+    "react": "互动",
+    "reactions": {
+      "like": "赞",
+      "love": "爱心",
+      "laugh": "大笑",
+      "fire": "火",
+      "wow": "惊讶"
+    }
   },
   "changelog": {
     "title": "更新日志",
@@ -429,7 +438,19 @@
     "sourceSyncEnrichment": "领取窗口补全",
     "sourceSyncOwners": "拥有者统计",
     "sourceWeb": "网页请求",
-    "sourceOther": "其他来源"
+    "sourceOther": "其他来源",
+    "navVisitors": "访客",
+    "visitorsTitle": "访客",
+    "visitorsSubtitle": "匿名页面浏览统计，不使用 IP 地址或 Cookie。",
+    "visitorsOnline": "当前在线",
+    "visitorsOnlineHint": "最近 5 分钟内的独立访客",
+    "visitorsTotal": "总浏览量",
+    "visitorsTotalHint": "自开始统计以来",
+    "visitors24h": "24 小时浏览",
+    "visitors7d": "7 天浏览",
+    "visitors30d": "30 天浏览",
+    "visitorsUnique": "独立访客",
+    "visitorsPrivacy": "不记录 IP 地址、Cookie 或完整来源网址。发送 Do Not Track 的访客只被计为一次浏览，除此之外不记录任何内容。"
   },
   "notifications": {
     "title": "通知",
@@ -518,7 +539,7 @@
     "currentRarity": "当前稀有度评分",
     "higher": "更高",
     "lower": "更低",
-    "hiloHint": "下一枚徽章的稀有度评分会更高还是更低？猜对可得 1.95 倍。",
+    "hiloHint": "下一个徽章的稀有度分数会更高还是更低？赔付随概率变化——押中的概率越高赔付越少，冷门可达 20x。平局退还投注。",
     "red": "红",
     "black": "黑",
     "green": "绿",
@@ -529,8 +550,8 @@
     "stop": "STOP",
     "again": "再玩一次",
     "newCard": "新牌",
-    "scratchHint": "刮开 9 个格子——3 个相同符号即中奖，三连头奖可得 20 倍。",
-    "vaultHint": "让每根指针停在绿色区域：倍率 0/0.5 倍、1/1.5 倍、2/3 倍、3/3 倍。",
+    "scratchHint": "刮开全部 9 个格子——3 个相同符号即中奖。头奖三连最高赔付 10x。",
+    "vaultHint": "绿色区域内的指针越多（0/1/2/3），获胜几率越高。获胜赔付 2x。",
     "floor": "层",
     "cashout": "兑现",
     "cashoutAt": "兑现于",
@@ -557,7 +578,7 @@
     "dailyComeBack": "明天再来领取下一份奖励。",
     "streak": "连击",
     "rpsTitle": "石头剪刀布",
-    "rpsDesc": "与机器人的经典对决。每局翻倍或归零。",
+    "rpsDesc": "与机器人对战。获胜赔付 1.9x；平局退还投注。",
     "slotsTitle": "Badges of Ra 6 Deluxe",
     "slotsDesc": "5 个转轴、3 行，真实的徽章符号与散射头奖。",
     "shootTitle": "Shoot the Badges",
@@ -569,21 +590,25 @@
     "coinflipTitle": "BadgesCoins 阶梯",
     "coinflipDesc": "在 7 级阶梯上猜正反面——每上一级奖金翻倍。",
     "hiloTitle": "更高或更低",
-    "hiloDesc": "押注下一枚徽章的稀有度评分——猜对得 1.95 倍。",
+    "hiloDesc": "对下一个徽章的稀有度分数下注。赔付随你所押方向的概率变化（最高 20x）；平局退还投注。",
     "rouletteTitle": "徽章轮盘",
     "rouletteDesc": "红、黑或绿色零，14 倍赔率。37 个格子，悬念十足。",
     "blackjackTitle": "徽章 21 点",
     "blackjackDesc": "与庄家比 21 点——选择你的策略并发牌。",
     "vaultTitle": "破解保险箱",
-    "vaultDesc": "让三根指针停在绿色区域。三次完美停针 = 3 倍。",
+    "vaultDesc": "让三根指针停在绿色区域内——越多指针意味着越高的获胜几率，获胜赔付 2x。",
     "scratchTitle": "Scratch the Badge",
-    "scratchDesc": "刮开九个格子——三个相同符号最高赢 20 倍。",
+    "scratchDesc": "刮开九个格子——三个相同符号最高中奖 10x。",
     "towerTitle": "徽章之塔",
     "towerDesc": "攀爬十层，风险递增——在被守卫抓住前及时兑现。",
     "catcherTitle": "接徽章",
     "catcherDesc": "用篮子接住下落的徽章，避开炸弹。",
     "notEnoughBadges": "目录中的徽章还不够，暂时无法生成问答。",
-    "streakDay": "第 {streak} 天"
+    "streakDay": "第 {streak} 天",
+    "disabled": "游戏厅目前已关闭，请稍后再来。",
+    "scatter": "SCATTER!",
+    "scratchFounder": "创始人",
+    "scratchJackpot": "头奖"
   },
   "wheel": {
     "title": "命运转盘",
@@ -655,7 +680,7 @@
     "freeQ": "这一切都免费吗？",
     "gamesA": "所有运气类结果（老虎机、轮盘、转盘、抛硬币、21 点、刮刮乐、高塔）均由服务器生成，无法操控。技巧类游戏（射击、记忆、接取）的成绩在服务器端校验并设上限。",
     "gamesQ": "游戏公平吗？",
-    "levelsA": "1 级从 0 XP 开始。每级需要 100 + (等级-1) × 50 XP——100 级共需 254,900 XP。每个等级都有一枚独特的闪烁动画等级徽章，在主页始终可见且无法隐藏。",
+    "levelsA": "1 级从 0 XP 开始。每级需要 100 + (等级-1) × 50 XP——100 级共需 252,450 XP。每个等级都有一枚独特的闪烁动画等级徽章，在主页始终可见且无法隐藏。",
     "levelsQ": "1 到 100 级如何运作？",
     "profileA": "35 项设置：20 项常规（颜色、字体、横幅、卡片样式、相框、隐私开关、社交链接）和 15 项创意扩展（光环、粒子背景、彩虹名字、3D 倾斜、像素头像、成就跑马灯等）。",
     "profileQ": "我的主页可以定制到什么程度？",
@@ -727,6 +752,480 @@
     "stealHint": "价格越高越能吓退顺手牵羊者；失败时价格归你所有。",
     "saving": "保存中…",
     "saved": "已保存！",
-    "save": "保存更改"
+    "save": "保存更改",
+    "titlePlaceholder": "徽章猎人",
+    "usernamePlaceholder": "用户名",
+    "statusBubblePlaceholder": "正在蹲 SUBtember…",
+    "options": {
+      "font": {
+        "sans": "无衬线",
+        "serif": "衬线",
+        "mono": "等宽",
+        "rounded": "圆体"
+      },
+      "cardStyle": {
+        "glass": "玻璃",
+        "solid": "实心",
+        "outline": "描边"
+      },
+      "radius": {
+        "sharp": "直角",
+        "soft": "柔和",
+        "round": "圆角"
+      },
+      "avatarFrame": {
+        "none": "无",
+        "ring": "圆环",
+        "double": "双层",
+        "glow": "辉光",
+        "crown": "皇冠"
+      },
+      "showcaseLayout": {
+        "grid": "网格",
+        "row": "横排",
+        "carousel": "轮播"
+      },
+      "density": {
+        "cozy": "宽松",
+        "compact": "紧凑"
+      },
+      "profileTheme": {
+        "auto": "自动",
+        "violet": "紫色",
+        "emerald": "翠绿",
+        "sapphire": "蓝宝石",
+        "gold": "金色"
+      },
+      "effectsIntensity": {
+        "off": "关闭",
+        "subtle": "轻微",
+        "full": "全开"
+      }
+    }
+  },
+  "admin": {
+    "title": "管理面板",
+    "common": {
+      "working": "处理中…"
+    },
+    "gate": {
+      "title": "管理员访问",
+      "intro": "尚未注册所有者。请输入引导密码以接管此安装。",
+      "passcodeLabel": "密码",
+      "submit": "解锁",
+      "hint": "一旦注册所有者，此入口将永久关闭。",
+      "invalid": "密码不正确。",
+      "throttled": "尝试次数过多，请几分钟后再试。",
+      "closed": "密码入口已关闭——已存在所有者。",
+      "network": "网络错误，请重试。"
+    },
+    "setup": {
+      "title": "注册所有者",
+      "intro": "此处指定的个人主页将成为所有者，可管理一切。",
+      "usernameLabel": "Twitch 用户名",
+      "twitchIdLabel": "Twitch 用户 ID（可选）",
+      "twitchIdPlaceholder": "数字 ID——推荐",
+      "submit": "注册所有者",
+      "notFound": "找不到该名称的个人主页——请先用 Twitch 登录一次，然后重试。",
+      "failed": "注册失败。",
+      "doneTitle": "所有者已注册",
+      "doneBody": "引导密码已失效。重新加载以打开面板。"
+    },
+    "dashboard": {
+      "title": "管理控制中心",
+      "signedInAs": "已以 {role} 身份登录。",
+      "intro": "各模块正在逐步推出——用户、内容、同步、设置、统计等将在后续阶段上线。"
+    },
+    "forbidden": {
+      "title": "不可用",
+      "body": "管理面板仅限所有者和管理员访问。"
+    },
+    "tabs": {
+      "label": "板块",
+      "users": "用户",
+      "content": "内容",
+      "sync": "同步",
+      "settings": "设置",
+      "stats": "统计",
+      "status": "状态",
+      "newsletter": "简报",
+      "brainstorm": "创意",
+      "audit": "审计日志",
+      "soon": "此板块将在后续阶段推出。",
+      "badges": "徽章"
+    },
+    "users": {
+      "searchLabel": "搜索",
+      "searchPlaceholder": "用户名、显示名称或 Twitch ID",
+      "bannedOnly": "仅已封禁",
+      "count": "{count} 位成员",
+      "loadFailed": "无法加载列表。",
+      "loading": "加载中…",
+      "empty": "没有符合此搜索的成员。",
+      "actionFailed": "操作失败。",
+      "saved": "个人主页已保存。",
+      "progressSaved": "进度已保存。",
+      "roleSaved": "角色已更新。",
+      "close": "关闭",
+      "banned": "已封禁",
+      "active": "正常",
+      "cols": {
+        "user": "成员",
+        "role": "角色",
+        "level": "等级",
+        "xp": "XP",
+        "coins": "金币",
+        "status": "状态",
+        "joined": "加入时间"
+      },
+      "profile": {
+        "title": "个人主页",
+        "save": "保存个人主页"
+      },
+      "field": {
+        "username": "用户名",
+        "display_name": "显示名称",
+        "bio": "简介",
+        "color": "颜色",
+        "banner_url": "横幅链接",
+        "theme": "主题",
+        "mood": "心情",
+        "steal_price": "偷取价格",
+        "steal_max": "偷取上限",
+        "inventory_public": "库存公开",
+        "steal_enabled": "启用偷取"
+      },
+      "progress": {
+        "title": "进度",
+        "xp": "XP",
+        "coins": "金币",
+        "level": "等级",
+        "login_streak": "登录连续天数",
+        "save": "保存进度"
+      },
+      "role": {
+        "title": "角色",
+        "apply": "应用角色"
+      },
+      "ban": {
+        "title": "封禁",
+        "reason": "原因",
+        "days": "天数",
+        "apply": "封禁",
+        "lift": "解除封禁",
+        "hint": "零天表示永久封禁。",
+        "active": "已封禁：{reason} — 至 {until}",
+        "noReason": "未填写原因",
+        "permanent": "永久",
+        "saved": "已封禁。",
+        "removed": "已解除封禁。",
+        "confirmPermanent": "永久封禁 {username}？此封禁不会到期。"
+      },
+      "achievements": {
+        "title": "成就",
+        "grant": "授予",
+        "revoke": "撤销",
+        "granted": "已授予成就。",
+        "revoked": "已撤销成就。"
+      },
+      "danger": {
+        "title": "危险区域",
+        "delete": "删除成员",
+        "confirm": "删除 {username} 及其所有数据？此操作无法撤销。",
+        "deleted": "成员已删除。"
+      }
+    },
+    "content": {
+      "tabs": {
+        "blog": "博客",
+        "changelog": "更新日志"
+      },
+      "search": "搜索",
+      "new": "新建条目",
+      "edit": "编辑",
+      "save": "保存",
+      "cancel": "取消",
+      "delete": "删除",
+      "confirmDelete": "删除此条目？此操作无法撤销。",
+      "saved": "已保存。",
+      "deleted": "已删除。",
+      "saveFailed": "无法保存。",
+      "loadFailed": "无法加载。",
+      "loading": "加载中…",
+      "empty": "这里还没有内容。",
+      "auto": "自动",
+      "badJson": "载荷不是有效的 JSON。",
+      "col": {
+        "title": "标题",
+        "slug": "别名",
+        "status": "状态",
+        "date": "日期"
+      },
+      "field": {
+        "title": "标题",
+        "slug": "别名",
+        "slugHint": "留空时由标题生成",
+        "author": "作者",
+        "locale": "语言",
+        "status": "状态",
+        "cover": "封面图片链接",
+        "tags": "标签",
+        "tagsHint": "以逗号分隔",
+        "excerpt": "摘要",
+        "content": "内容",
+        "contentHint": "支持 Markdown"
+      },
+      "changelog": {
+        "kind": "类型",
+        "body": "说明",
+        "payload": "载荷（JSON）"
+      }
+    },
+    "badges": {
+      "search": "搜索",
+      "searchPlaceholder": "标题、套装 ID 或别名",
+      "customOnly": "仅自定义",
+      "new": "新建徽章",
+      "hint": "手动创建的条目受目录同步保护：同步绝不会覆盖或删除它们，若某提供方徽章在套装 ID 和版本上冲突，则会跳过该徽章。",
+      "edit": "编辑",
+      "save": "保存",
+      "cancel": "取消",
+      "delete": "删除",
+      "confirmDelete": "删除此徽章？此操作无法撤销。",
+      "saved": "徽章已保存。",
+      "deleted": "徽章已删除。",
+      "saveFailed": "无法保存徽章。",
+      "loadFailed": "无法加载徽章。",
+      "empty": "未找到徽章。",
+      "providerHint": "此条目来自数据提供方。其标题和图片每次同步都会刷新，只有手动创建的条目才能删除。",
+      "col": {
+        "badge": "徽章",
+        "setId": "套装 / 版本",
+        "category": "类别",
+        "status": "状态",
+        "source": "来源"
+      },
+      "field": {
+        "setId": "套装 ID",
+        "version": "版本",
+        "title": "标题",
+        "category": "类别",
+        "status": "状态",
+        "start": "开始",
+        "end": "结束",
+        "image": "图片链接",
+        "clickUrl": "点击链接",
+        "description": "说明",
+        "howToEarn": "获取方式",
+        "paid": "付费或订阅徽章"
+      }
+    },
+    "sync": {
+      "intro": "这些按钮会立即手动运行与每日定时任务相同的引擎。手动运行会在可用性历史中记录为独立的一行，因此绝不会掩盖遗漏的定时运行。",
+      "run": "立即运行",
+      "running": "运行中…",
+      "results": "最近运行",
+      "ok": "正常",
+      "failed": "无法启动同步。",
+      "global": {
+        "title": "目录比对",
+        "hint": "将 Twitch 实时目录与数据库比对：添加新徽章、刷新变更的徽章，并把消失的标记为已移除。"
+      },
+      "badgebase": {
+        "title": "掉落窗口",
+        "hint": "读取 badges.blog 的进行中和即将开始列表，以确认哪些徽章当前可获得，并设置其开始和结束日期。"
+      },
+      "potat": {
+        "title": "持有者统计",
+        "hint": "从 potat 刷新持有者数量、稀有度评分和状态扫描。"
+      }
+    },
+    "settings": {
+      "loading": "正在加载设置…",
+      "loadFailed": "无法加载设置。",
+      "saved": "设置已保存。",
+      "saveFailed": "无法保存设置。",
+      "save": "保存",
+      "features": {
+        "title": "功能开关",
+        "hint": "关闭的功能会从导航中消失，对应接口也会拒绝该操作。",
+        "feed": "实时动态",
+        "wheel": "幸运转盘",
+        "steals": "金币偷取",
+        "coinRain": "金币雨",
+        "compare": "徽章对比",
+        "games": "游戏厅"
+      },
+      "economy": {
+        "title": "经济",
+        "hint": "这些数值决定每日奖励、游戏和偷取。默认值即网站上线时使用的数值。",
+        "dailyXp": "每日 XP",
+        "dailyCoins": "每日金币",
+        "streakXpPerDay": "每日连续 XP",
+        "streakXpCap": "连续 XP 上限",
+        "streakCoinsPerDay": "每日连续金币",
+        "streakCoinsCap": "连续金币上限",
+        "gameWinXp": "获胜一局 XP",
+        "gameLoseXp": "失败一局 XP",
+        "coinRainCoins": "每次金币雨的金币",
+        "stealPrice": "默认偷取价格",
+        "stealMax": "默认偷取上限",
+        "stealFloodMinutes": "偷取等待（分钟）",
+        "stealPerHour": "每小时偷取次数"
+      },
+      "games": {
+        "title": "游戏",
+        "hint": "可单独关闭游戏或调整其下注范围。游戏厅会隐藏已关闭的游戏，引擎也会拒绝它。",
+        "master": "游戏厅已启用（总开关）",
+        "col": {
+          "game": "游戏",
+          "enabled": "启用",
+          "min": "最小下注",
+          "max": "最大下注"
+        }
+      },
+      "admins": {
+        "title": "管理员与版主",
+        "hint": "通过 Twitch 用户名授予面板访问权限。该成员需要已登录过一次，以便存在个人主页。",
+        "owner": "所有者：{username}——由引导密码设置，此处不可移除。",
+        "username": "Twitch 用户名",
+        "role": "角色",
+        "add": "授予访问权限",
+        "remove": "移除",
+        "empty": "暂无其他管理员或版主。"
+      }
+    },
+    "stats": {
+      "loading": "正在加载统计…",
+      "loadFailed": "无法加载统计。",
+      "noData": "尚无访客数据。",
+      "kpi": {
+        "online": "当前在线",
+        "views24": "今日浏览",
+        "views7": "7 天浏览",
+        "views30": "30 天浏览",
+        "total": "总浏览量",
+        "unique": "独立访客"
+      },
+      "chart": {
+        "title": "最近 30 天的浏览与访客",
+        "hits": "浏览",
+        "visitors": "访客"
+      },
+      "devices": "设备",
+      "browsers": "浏览器",
+      "topPaths": "访问最多的页面",
+      "referrers": "来源",
+      "locales": "语言",
+      "privacy": "页面平均停留：{avg} 秒。统计不使用 IP 地址、Cookie 或完整来源网址。"
+    },
+    "status": {
+      "loading": "正在检查服务…",
+      "loadFailed": "无法加载服务状态。",
+      "title": "服务",
+      "probing": "检查中…",
+      "reprobe": "重新检查",
+      "uptime24": "可用性，24 小时",
+      "live": "实时探测",
+      "checkedAt": "探测时间 {time}",
+      "col": {
+        "service": "服务",
+        "last": "上次运行",
+        "status": "状态",
+        "24h": "24 小时",
+        "7d": "7 天",
+        "30d": "30 天",
+        "avg": "平均耗时"
+      },
+      "empty": "尚无心跳记录。",
+      "messages": "最近消息",
+      "noMessages": "没有消息——所有服务都报告正常。"
+    },
+    "newsletter": {
+      "intro": "撰写公告并选择发送方式。收件人数来自有邮箱的账户和已订阅推送的浏览器。",
+      "audienceEmails": "有邮箱的账户",
+      "audiencePush": "已订阅的浏览器",
+      "provider": "邮件服务商",
+      "providerResend": "已配置",
+      "providerNone": "未配置",
+      "noProviderHint": "未配置邮件服务商，因此推送是唯一真正可行的投递方式。设置为“邮件”的草稿将以网页推送发送，结果也会如实说明——不会谎报从未发出的邮件。",
+      "delivery": "投递：{channel}，成功 {sent}，失败 {failed}",
+      "loadFailed": "无法加载简报。",
+      "failed": "操作失败。",
+      "saved": "草稿已保存。",
+      "sent": "已发送。",
+      "deleted": "草稿已删除。",
+      "new": "新建草稿",
+      "edit": "编辑",
+      "save": "保存",
+      "send": "立即发送",
+      "cancel": "取消",
+      "delete": "删除",
+      "confirmSend": "现在向所有人发送这份简报？",
+      "confirmDelete": "删除这份草稿？",
+      "sendHint": "草稿只能发送一次，且只有在确实完成投递后才会标记为已发送。",
+      "empty": "暂无草稿。",
+      "col": {
+        "subject": "主题",
+        "channel": "渠道",
+        "status": "状态",
+        "recipients": "收件人",
+        "date": "日期"
+      },
+      "field": {
+        "subject": "主题",
+        "body": "内容",
+        "channel": "渠道"
+      }
+    },
+    "ideas": {
+      "intro": "站点的创意看板：收集、排序、分诊。任何人都可以阅读，只有这里能写入。",
+      "filter": "类别",
+      "allCategories": "所有类别",
+      "new": "新创意",
+      "edit": "编辑",
+      "save": "保存",
+      "cancel": "取消",
+      "delete": "删除",
+      "upvote": "赞成",
+      "downvote": "反对",
+      "confirmDelete": "删除这个创意？",
+      "loadFailed": "无法加载创意。",
+      "failed": "操作失败。",
+      "saved": "创意已保存。",
+      "deleted": "创意已删除。",
+      "empty": "暂无创意。",
+      "field": {
+        "category": "类别",
+        "status": "状态",
+        "title": "标题",
+        "body": "备注"
+      }
+    },
+    "audit": {
+      "intro": "每个管理操作，最新的在前。每条记录包含操作者、涉及对象，以及相关时的具体数值。",
+      "filterAction": "操作",
+      "allActions": "所有操作",
+      "filterActor": "操作者",
+      "count": "{count} 条记录",
+      "loadFailed": "无法加载审计日志。",
+      "empty": "尚无记录。",
+      "details": "详情",
+      "hide": "隐藏",
+      "col": {
+        "when": "时间",
+        "actor": "操作者",
+        "action": "操作",
+        "target": "对象"
+      }
+    }
+  },
+  "roles": {
+    "owner": "所有者",
+    "admin": "管理员",
+    "moderator": "版主",
+    "ownerHint": "负责此站点的运行",
+    "adminHint": "拥有完整面板权限的管理员",
+    "moderatorHint": "版主——可管理成员与内容"
   }
 }

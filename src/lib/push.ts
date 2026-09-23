@@ -37,17 +37,29 @@ export async function sendPushToAll(payload: PushPayload): Promise<PushResult> {
   }
 
   const supabase = createAdminClient();
-  const { data: subscriptions, error } = await supabase
-    .from("push_subscriptions")
-    .select("endpoint, p256dh, auth");
-  if (error) throw error;
+  // Paged: PostgREST caps one response at 1000 rows, so a single select would
+  // silently notify an arbitrary 1000 subscribers and only ever see their dead
+  // endpoints.
+  type Subscription = { endpoint: string; p256dh: string; auth: string };
+  const subscriptions: Subscription[] = [];
+  for (let offset = 0; ; offset += 1000) {
+    const { data, error } = await supabase
+      .from("push_subscriptions")
+      .select("endpoint, p256dh, auth")
+      .order("endpoint")
+      .range(offset, offset + 999);
+    if (error) throw error;
+    const page = (data ?? []) as Subscription[];
+    subscriptions.push(...page);
+    if (page.length < 1000) break;
+  }
 
   let sent = 0;
   let failed = 0;
   const deadEndpoints: string[] = [];
 
   await Promise.allSettled(
-    (subscriptions ?? []).map(async (sub) => {
+    subscriptions.map(async (sub) => {
       try {
         await webpush.sendNotification(
           {

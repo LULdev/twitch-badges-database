@@ -7,6 +7,9 @@ export type HeartbeatSource =
   | "cron/global"
   | "cron/potat"
   | "cron/badgebase"
+  | "manual/global"
+  | "manual/badgebase"
+  | "manual/potat"
   | "web";
 
 export type HeartbeatStatus = "ok" | "degraded" | "error";

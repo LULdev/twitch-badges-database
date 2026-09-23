@@ -32,7 +32,8 @@
     "faqNav": "FAQ",
     "wheel": "Roleta da fortuna",
     "mainNav": "Navegação principal",
-    "mobileNav": "Navegação móvel"
+    "mobileNav": "Navegação móvel",
+    "acp": "Painel de admin"
   },
   "common": {
     "search": "Buscar insígnias…",
@@ -82,7 +83,8 @@
     "errorTitle": "Algo deu errado",
     "errorBody": "Não foi possível carregar a página. Normalmente é temporário — tente novamente.",
     "errorRetry": "Tentar novamente",
-    "levelAria": "Nível {level}"
+    "levelAria": "Nível {level}",
+    "breadcrumb": "Trilha de navegação"
   },
   "home": {
     "heroTitle": "Todas as insígnias da Twitch. Um só banco de dados.",
@@ -262,7 +264,14 @@
     "empty": "Ainda não há posts.",
     "autoTag": "Gerado automaticamente",
     "notFound": "Este post não existe.",
-    "react": "Reagir"
+    "react": "Reagir",
+    "reactions": {
+      "like": "Gostei",
+      "love": "Amei",
+      "laugh": "Riso",
+      "fire": "Fogo",
+      "wow": "Uau"
+    }
   },
   "changelog": {
     "title": "Changelog",
@@ -429,7 +438,19 @@
     "sourceSyncEnrichment": "Enriquecimento de janelas",
     "sourceSyncOwners": "Estatísticas de proprietários",
     "sourceWeb": "Requisições web",
-    "sourceOther": "Outra fonte"
+    "sourceOther": "Outra fonte",
+    "navVisitors": "Visitantes",
+    "visitorsTitle": "Visitantes",
+    "visitorsSubtitle": "Visualizações anônimas, contadas sem endereços IP nem cookies.",
+    "visitorsOnline": "Online agora",
+    "visitorsOnlineHint": "Visitantes distintos nos últimos 5 minutos",
+    "visitorsTotal": "Visualizações totais",
+    "visitorsTotalHint": "Desde o início da contagem",
+    "visitors24h": "Views 24 h",
+    "visitors7d": "Views 7 d",
+    "visitors30d": "Views 30 d",
+    "visitorsUnique": "visitantes únicos",
+    "visitorsPrivacy": "Sem endereços IP, sem cookies e sem URLs de referência completas. Quem envia Do Not Track é contado como uma visualização e nada mais."
   },
   "notifications": {
     "title": "Notificações",
@@ -518,7 +539,7 @@
     "currentRarity": "Pontuação de raridade atual",
     "higher": "Maior",
     "lower": "Menor",
-    "hiloHint": "A pontuação de raridade do próximo emblema será maior ou menor? Acertar paga 1,95x.",
+    "hiloHint": "O score de raridade do próximo badge será maior ou menor? O pagamento depende das probabilidades — uma aposta provável paga pouco, uma zebra até 20x. Um empate devolve sua aposta.",
     "red": "Vermelho",
     "black": "Preto",
     "green": "Verde",
@@ -529,8 +550,8 @@
     "stop": "STOP",
     "again": "Jogar novamente",
     "newCard": "Nova carta",
-    "scratchHint": "Raspe os 9 campos — 3 símbolos iguais ganham. O jackpot triplo paga 20x.",
-    "vaultHint": "Pare cada agulha na zona verde: multiplicador 0/0,5x, 1/1,5x, 2/3x, 3/3x.",
+    "scratchHint": "Raspe os 9 campos — 3 símbolos iguais ganham. O triplo jackpot paga até 10x.",
+    "vaultHint": "Mais agulhas na zona verde (0/1/2/3) aumentam a chance de ganhar. Uma vitória paga 2x.",
     "floor": "Andar",
     "cashout": "Sacar",
     "cashoutAt": "Sacar em",
@@ -557,7 +578,7 @@
     "dailyComeBack": "Volte amanhã para o próximo bônus.",
     "streak": "Sequência",
     "rpsTitle": "Pedra, papel e tesoura",
-    "rpsDesc": "O duelo clássico contra o bot. Dobro ou nada em cada rodada.",
+    "rpsDesc": "O duelo clássico contra o bot. Uma vitória paga 1,9x; um empate devolve sua aposta.",
     "slotsTitle": "Badges of Ra 6 Deluxe",
     "slotsDesc": "5 rolos, 3 linhas, símbolos reais de emblemas e um jackpot scatter.",
     "shootTitle": "Shoot the Badges",
@@ -569,21 +590,25 @@
     "coinflipTitle": "Escada de BadgesCoins",
     "coinflipDesc": "Cara ou coroa em uma escada de 7 degraus — cada degrau dobra o prêmio.",
     "hiloTitle": "Maior ou menor",
-    "hiloDesc": "Aposte na pontuação de raridade do próximo emblema — 1,95x por acerto.",
+    "hiloDesc": "Aposte no score de raridade do próximo badge. O pagamento depende das probabilidades da sua aposta (até 20x); um empate devolve sua aposta.",
     "rouletteTitle": "Roleta de emblemas",
     "rouletteDesc": "Vermelho, preto ou o zero verde a 14x. 37 casas, puro suspense.",
     "blackjackTitle": "Blackjack de emblemas",
     "blackjackDesc": "21 contra o crupiê — escolha sua estratégia e distribua.",
     "vaultTitle": "Arrombar o cofre",
-    "vaultDesc": "Pare três agulhas na zona verde. Três paradas perfeitas = 3x.",
+    "vaultDesc": "Pare três agulhas na zona verde — mais agulhas significam mais chance de ganhar, e uma vitória paga 2x.",
     "scratchTitle": "Scratch the Badge",
-    "scratchDesc": "Raspe nove campos — três símbolos iguais ganham até 20x.",
+    "scratchDesc": "Raspe nove campos — três símbolos iguais ganham até 10x.",
     "towerTitle": "Torre de emblemas",
     "towerDesc": "Suba dez andares de risco crescente — saque antes que os guardas peguem você.",
     "catcherTitle": "Pega emblemas",
     "catcherDesc": "Pegue emblemas que caem na sua cesta, evite as bombas.",
     "notEnoughBadges": "Ainda não há selos suficientes no catálogo para criar um quiz.",
-    "streakDay": "Dia {streak}"
+    "streakDay": "Dia {streak}",
+    "disabled": "O fliperama está desativado no momento. Volte mais tarde.",
+    "scatter": "SCATTER!",
+    "scratchFounder": "Fundador",
+    "scratchJackpot": "JACKPOT"
   },
   "wheel": {
     "title": "Roleta da fortuna",
@@ -655,7 +680,7 @@
     "freeQ": "Tudo isso é gratuito?",
     "gamesA": "Todos os resultados de azar (caça-níqueis, roleta, roleta da fortuna, cara ou coroa, blackjack, raspadinha, torre) são gerados no servidor e não podem ser manipulados. Os jogos de habilidade (tiro, memória, cesta) validam a pontuação no servidor com limites.",
     "gamesQ": "Os jogos são justos?",
-    "levelsA": "O nível 1 começa em 0 XP. Cada nível exige 100 + (nível-1) x 50 XP — o nível 100 soma 254.900 XP. Cada nível tem um emblema único com animação de brilho no seu perfil, sempre visível e impossível de ocultar.",
+    "levelsA": "O nível 1 começa em 0 XP. Cada nível exige 100 + (nível-1) x 50 XP — o nível 100 soma 252.450 XP. Cada nível tem um emblema único com animação de brilho no seu perfil, sempre visível e impossível de ocultar.",
     "levelsQ": "Como funcionam os níveis de 1 a 100?",
     "profileA": "35 ajustes: 20 comuns (cores, fontes, banner, estilo de cartão, molduras, controles de privacidade, links sociais) e 15 extras criativos (aura, fundo de partículas, nome arco-íris, inclinação 3D, avatar pixelado, ticker de conquistas e mais).",
     "profileQ": "Quanto posso personalizar meu perfil?",
@@ -727,6 +752,480 @@
     "stealHint": "Preços altos afastam ladrões casuais; tentativas falhas pagam o preço a você.",
     "saving": "Salvando…",
     "saved": "Salvo!",
-    "save": "Salvar alterações"
+    "save": "Salvar alterações",
+    "titlePlaceholder": "Caçador de badges",
+    "usernamePlaceholder": "nome de usuário",
+    "statusBubblePlaceholder": "caçando o SUBtember…",
+    "options": {
+      "font": {
+        "sans": "Sans",
+        "serif": "Serif",
+        "mono": "Mono",
+        "rounded": "Arredondada"
+      },
+      "cardStyle": {
+        "glass": "Vidro",
+        "solid": "Sólido",
+        "outline": "Contorno"
+      },
+      "radius": {
+        "sharp": "Afiado",
+        "soft": "Suave",
+        "round": "Redondo"
+      },
+      "avatarFrame": {
+        "none": "Nenhum",
+        "ring": "Anel",
+        "double": "Duplo",
+        "glow": "Brilho",
+        "crown": "Coroa"
+      },
+      "showcaseLayout": {
+        "grid": "Grade",
+        "row": "Linha",
+        "carousel": "Carrossel"
+      },
+      "density": {
+        "cozy": "Confortável",
+        "compact": "Compacto"
+      },
+      "profileTheme": {
+        "auto": "Automático",
+        "violet": "Violeta",
+        "emerald": "Esmeralda",
+        "sapphire": "Safira",
+        "gold": "Dourado"
+      },
+      "effectsIntensity": {
+        "off": "Desligado",
+        "subtle": "Sutil",
+        "full": "Completo"
+      }
+    }
+  },
+  "admin": {
+    "title": "Painel de admin",
+    "common": {
+      "working": "Processando…"
+    },
+    "gate": {
+      "title": "Acesso de administrador",
+      "intro": "Nenhum proprietário registrado ainda. Insira o código de bootstrap para assumir a instalação.",
+      "passcodeLabel": "Código de acesso",
+      "submit": "Desbloquear",
+      "hint": "Esta porta se fecha permanentemente assim que um proprietário for registrado.",
+      "invalid": "Esse código está incorreto.",
+      "throttled": "Tentativas demais. Tente novamente em alguns minutos.",
+      "closed": "A porta do código está fechada — já existe um proprietário.",
+      "network": "Erro de rede. Tente novamente."
+    },
+    "setup": {
+      "title": "Registrar o proprietário",
+      "intro": "O perfil indicado aqui se torna o proprietário e pode gerenciar tudo.",
+      "usernameLabel": "Nome de usuário da Twitch",
+      "twitchIdLabel": "ID de usuário da Twitch (opcional)",
+      "twitchIdPlaceholder": "ID numérico — recomendado",
+      "submit": "Registrar proprietário",
+      "notFound": "Nenhum perfil com esse nome — faça login com a Twitch uma vez e tente de novo.",
+      "failed": "O registro falhou.",
+      "doneTitle": "Proprietário registrado",
+      "doneBody": "O código de bootstrap não funciona mais. Recarregue para abrir o painel."
+    },
+    "dashboard": {
+      "title": "Centro de controle",
+      "signedInAs": "Conectado como {role}.",
+      "intro": "Os módulos estão sendo lançados — usuários, conteúdo, sincronização, ajustes, estatísticas e mais chegam nas próximas fases."
+    },
+    "forbidden": {
+      "title": "Indisponível",
+      "body": "O painel de admin é restrito ao proprietário e aos administradores."
+    },
+    "tabs": {
+      "label": "Seções",
+      "users": "Usuários",
+      "content": "Conteúdo",
+      "sync": "Sincronização",
+      "settings": "Configurações",
+      "stats": "Estatísticas",
+      "status": "Status",
+      "newsletter": "Boletim",
+      "brainstorm": "Ideias",
+      "audit": "Log de auditoria",
+      "soon": "Esta seção chega em uma fase posterior.",
+      "badges": "Emblemas"
+    },
+    "users": {
+      "searchLabel": "Buscar",
+      "searchPlaceholder": "Nome de usuário, nome de exibição ou ID da Twitch",
+      "bannedOnly": "Apenas banidos",
+      "count": "{count} membros",
+      "loadFailed": "Não foi possível carregar a lista.",
+      "loading": "Carregando…",
+      "empty": "Nenhum membro corresponde a esta busca.",
+      "actionFailed": "A ação falhou.",
+      "saved": "Perfil salvo.",
+      "progressSaved": "Progresso salvo.",
+      "roleSaved": "Função atualizada.",
+      "close": "Fechar",
+      "banned": "Banido",
+      "active": "Ativo",
+      "cols": {
+        "user": "Membro",
+        "role": "Função",
+        "level": "Nível",
+        "xp": "XP",
+        "coins": "Moedas",
+        "status": "Status",
+        "joined": "Entrou"
+      },
+      "profile": {
+        "title": "Perfil",
+        "save": "Salvar perfil"
+      },
+      "field": {
+        "username": "Nome de usuário",
+        "display_name": "Nome de exibição",
+        "bio": "Bio",
+        "color": "Cor",
+        "banner_url": "URL do banner",
+        "theme": "Tema",
+        "mood": "Humor",
+        "steal_price": "Preço do roubo",
+        "steal_max": "Roubo máximo",
+        "inventory_public": "Inventário público",
+        "steal_enabled": "Roubo ativado"
+      },
+      "progress": {
+        "title": "Progresso",
+        "xp": "XP",
+        "coins": "Moedas",
+        "level": "Nível",
+        "login_streak": "Sequência de login",
+        "save": "Salvar progresso"
+      },
+      "role": {
+        "title": "Função",
+        "apply": "Aplicar função"
+      },
+      "ban": {
+        "title": "Banimento",
+        "reason": "Motivo",
+        "days": "Dias",
+        "apply": "Banir",
+        "lift": "Remover banimento",
+        "hint": "Zero dias significa banimento permanente.",
+        "active": "Banido: {reason} — até {until}",
+        "noReason": "sem motivo informado",
+        "permanent": "permanentemente",
+        "saved": "Banimento aplicado.",
+        "removed": "Banimento removido.",
+        "confirmPermanent": "Banir {username} permanentemente? Este banimento não expira."
+      },
+      "achievements": {
+        "title": "Conquistas",
+        "grant": "Conceder",
+        "revoke": "Revogar",
+        "granted": "Conquista concedida.",
+        "revoked": "Conquista revogada."
+      },
+      "danger": {
+        "title": "Zona de perigo",
+        "delete": "Excluir membro",
+        "confirm": "Excluir {username} e todos os seus dados? Não pode ser desfeito.",
+        "deleted": "Membro excluído."
+      }
+    },
+    "content": {
+      "tabs": {
+        "blog": "Blog",
+        "changelog": "Registro de alterações"
+      },
+      "search": "Buscar",
+      "new": "Nova entrada",
+      "edit": "Editar",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "delete": "Excluir",
+      "confirmDelete": "Excluir esta entrada? Não pode ser desfeito.",
+      "saved": "Salvo.",
+      "deleted": "Excluído.",
+      "saveFailed": "Não foi possível salvar.",
+      "loadFailed": "Não foi possível carregar.",
+      "loading": "Carregando…",
+      "empty": "Ainda não há nada aqui.",
+      "auto": "auto",
+      "badJson": "O payload não é JSON válido.",
+      "col": {
+        "title": "Título",
+        "slug": "Slug",
+        "status": "Status",
+        "date": "Data"
+      },
+      "field": {
+        "title": "Título",
+        "slug": "Slug",
+        "slugHint": "Derivado do título quando vazio",
+        "author": "Autor",
+        "locale": "Idioma",
+        "status": "Status",
+        "cover": "URL da imagem de capa",
+        "tags": "Tags",
+        "tagsHint": "Separadas por vírgula",
+        "excerpt": "Resumo",
+        "content": "Conteúdo",
+        "contentHint": "Markdown é suportado"
+      },
+      "changelog": {
+        "kind": "Tipo",
+        "body": "Explicação",
+        "payload": "Payload (JSON)"
+      }
+    },
+    "badges": {
+      "search": "Buscar",
+      "searchPlaceholder": "Título, id do set ou slug",
+      "customOnly": "Apenas personalizados",
+      "new": "Novo emblema",
+      "hint": "Entradas feitas à mão ficam protegidas da sincronização do catálogo: ela nunca as sobrescreve nem as remove, e um emblema do provedor que colidiria em id do set e versão é ignorado.",
+      "edit": "Editar",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "delete": "Excluir",
+      "confirmDelete": "Excluir este emblema? Não pode ser desfeito.",
+      "saved": "Emblema salvo.",
+      "deleted": "Emblema excluído.",
+      "saveFailed": "Não foi possível salvar o emblema.",
+      "loadFailed": "Não foi possível carregar os emblemas.",
+      "empty": "Nenhum emblema encontrado.",
+      "providerHint": "Esta entrada veio do provedor. Seu título e imagem são atualizados a cada sincronização, e apenas entradas feitas à mão podem ser excluídas.",
+      "col": {
+        "badge": "Emblema",
+        "setId": "Set / versão",
+        "category": "Categoria",
+        "status": "Status",
+        "source": "Origem"
+      },
+      "field": {
+        "setId": "Id do set",
+        "version": "Versão",
+        "title": "Título",
+        "category": "Categoria",
+        "status": "Status",
+        "start": "Início",
+        "end": "Fim",
+        "image": "URL da imagem",
+        "clickUrl": "URL de clique",
+        "description": "Descrição",
+        "howToEarn": "Como conseguir",
+        "paid": "Emblema pago ou de assinatura"
+      }
+    },
+    "sync": {
+      "intro": "Estes botões executam à mão, na hora, os mesmos motores das tarefas cron diárias. Uma execução manual é registrada como linha própria no histórico de disponibilidade, então nunca disfarça uma tarefa agendada perdida.",
+      "run": "Executar agora",
+      "running": "Executando…",
+      "results": "Execuções recentes",
+      "ok": "ok",
+      "failed": "Não foi possível iniciar a sincronização.",
+      "global": {
+        "title": "Diferenças do catálogo",
+        "hint": "Compara o catálogo da Twitch ao vivo com o banco: adiciona emblemas novos, atualiza os alterados e marca os desaparecidos como removidos."
+      },
+      "badgebase": {
+        "title": "Janelas de drop",
+        "hint": "Lê as listas ativas e futuras do badges.blog para confirmar quais emblemas estão disponíveis e definir suas datas de início e fim."
+      },
+      "potat": {
+        "title": "Estatísticas de proprietários",
+        "hint": "Atualiza as contagens de proprietários, as pontuações de raridade e as varreduras de status a partir do potat."
+      }
+    },
+    "settings": {
+      "loading": "Carregando configurações…",
+      "loadFailed": "Não foi possível carregar as configurações.",
+      "saved": "Configurações salvas.",
+      "saveFailed": "Não foi possível salvar as configurações.",
+      "save": "Salvar",
+      "features": {
+        "title": "Chaves de recursos",
+        "hint": "Um recurso desligado perde sua entrada de navegação, e o endpoint correspondente recusa a ação.",
+        "feed": "Feed ao vivo",
+        "wheel": "Roda da fortuna",
+        "steals": "Roubo de moedas",
+        "coinRain": "Chuva de moedas",
+        "compare": "Comparação de emblemas",
+        "games": "Fliperama"
+      },
+      "economy": {
+        "title": "Economia",
+        "hint": "Estes valores regem o bônus diário, os jogos e o roubo. Os padrões são os números com que o site foi lançado.",
+        "dailyXp": "XP diário",
+        "dailyCoins": "Moedas diárias",
+        "streakXpPerDay": "XP de sequência por dia",
+        "streakXpCap": "Limite de XP de sequência",
+        "streakCoinsPerDay": "Moedas de sequência por dia",
+        "streakCoinsCap": "Limite de moedas de sequência",
+        "gameWinXp": "XP por rodada ganha",
+        "gameLoseXp": "XP por rodada perdida",
+        "coinRainCoins": "Moedas por chuva",
+        "stealPrice": "Preço de roubo padrão",
+        "stealMax": "Roubo máximo padrão",
+        "stealFloodMinutes": "Espera entre roubos (minutos)",
+        "stealPerHour": "Tentativas de roubo por hora"
+      },
+      "games": {
+        "title": "Jogos",
+        "hint": "Desligue jogos individualmente ou mova a faixa de aposta. O hub esconde um jogo desligado e o motor o recusa.",
+        "master": "Fliperama ativado (interruptor geral)",
+        "col": {
+          "game": "Jogo",
+          "enabled": "Ligado",
+          "min": "Aposta mín.",
+          "max": "Aposta máx."
+        }
+      },
+      "admins": {
+        "title": "Administradores e moderadores",
+        "hint": "Conceda acesso ao painel pelo nome de usuário da Twitch. A pessoa precisa ter feito login uma vez para que o perfil exista.",
+        "owner": "Proprietário: {username} — definido pelo código de bootstrap e não removível aqui.",
+        "username": "Nome de usuário da Twitch",
+        "role": "Função",
+        "add": "Conceder acesso",
+        "remove": "Remover",
+        "empty": "Ainda não há administradores ou moderadores adicionais."
+      }
+    },
+    "stats": {
+      "loading": "Carregando estatísticas…",
+      "loadFailed": "Não foi possível carregar as estatísticas.",
+      "noData": "Ainda não há dados de visitas.",
+      "kpi": {
+        "online": "Online agora",
+        "views24": "Views hoje",
+        "views7": "Views 7 dias",
+        "views30": "Views 30 dias",
+        "total": "Views totais",
+        "unique": "Visitantes únicos"
+      },
+      "chart": {
+        "title": "Views e visitantes, últimos 30 dias",
+        "hits": "Views",
+        "visitors": "Visitantes"
+      },
+      "devices": "Dispositivos",
+      "browsers": "Navegadores",
+      "topPaths": "Páginas mais vistas",
+      "referrers": "Origens",
+      "locales": "Idiomas",
+      "privacy": "Tempo médio na página: {avg} s. Contado sem endereços IP, cookies ou URLs de referência completas."
+    },
+    "status": {
+      "loading": "Verificando serviços…",
+      "loadFailed": "Não foi possível carregar o status dos serviços.",
+      "title": "Serviços",
+      "probing": "Verificando…",
+      "reprobe": "Verificar novamente",
+      "uptime24": "Disponibilidade, 24 h",
+      "live": "Sonda ao vivo",
+      "checkedAt": "Verificado às {time}",
+      "col": {
+        "service": "Serviço",
+        "last": "Última execução",
+        "status": "Status",
+        "24h": "24 h",
+        "7d": "7 dias",
+        "30d": "30 dias",
+        "avg": "Duração média"
+      },
+      "empty": "Nenhum heartbeat registrado ainda.",
+      "messages": "Últimas mensagens",
+      "noMessages": "Sem mensagens — todos os serviços respondem limpos."
+    },
+    "newsletter": {
+      "intro": "Escreva um anúncio e escolha como ele sai. Os destinatários são contados entre as contas com e-mail e os navegadores inscritos no push.",
+      "audienceEmails": "Contas com e-mail",
+      "audiencePush": "Navegadores inscritos",
+      "provider": "Provedor de e-mail",
+      "providerResend": "Configurado",
+      "providerNone": "Não configurado",
+      "noProviderHint": "Nenhum provedor de e-mail está configurado, então o push é a única entrega que pode realmente acontecer. Um rascunho marcado como e-mail será enviado como notificação web, e o resultado dirá isso — não vai informar e-mails que nunca saíram.",
+      "delivery": "Entrega: {channel}, {sent} enviados, {failed} falharam",
+      "loadFailed": "Não foi possível carregar os boletins.",
+      "failed": "A ação falhou.",
+      "saved": "Rascunho salvo.",
+      "sent": "Enviado.",
+      "deleted": "Rascunho excluído.",
+      "new": "Novo rascunho",
+      "edit": "Editar",
+      "save": "Salvar",
+      "send": "Enviar agora",
+      "cancel": "Cancelar",
+      "delete": "Excluir",
+      "confirmSend": "Enviar este boletim para todos agora?",
+      "confirmDelete": "Excluir este rascunho?",
+      "sendHint": "Um rascunho só pode ser enviado uma vez, e só é marcado como enviado quando algo foi realmente entregue.",
+      "empty": "Nenhum rascunho ainda.",
+      "col": {
+        "subject": "Assunto",
+        "channel": "Canal",
+        "status": "Status",
+        "recipients": "Destinatários",
+        "date": "Data"
+      },
+      "field": {
+        "subject": "Assunto",
+        "body": "Mensagem",
+        "channel": "Canal"
+      }
+    },
+    "ideas": {
+      "intro": "O quadro de ideias do site: coletar, avaliar e triar. Qualquer um pode ler; só se escreve daqui.",
+      "filter": "Categoria",
+      "allCategories": "Todas as categorias",
+      "new": "Nova ideia",
+      "edit": "Editar",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "delete": "Excluir",
+      "upvote": "Votar a favor",
+      "downvote": "Votar contra",
+      "confirmDelete": "Excluir esta ideia?",
+      "loadFailed": "Não foi possível carregar as ideias.",
+      "failed": "A ação falhou.",
+      "saved": "Ideia salva.",
+      "deleted": "Ideia excluída.",
+      "empty": "Nenhuma ideia ainda.",
+      "field": {
+        "category": "Categoria",
+        "status": "Status",
+        "title": "Título",
+        "body": "Notas"
+      }
+    },
+    "audit": {
+      "intro": "Cada ação administrativa, mais recente primeiro. Cada entrada registra quem fez, o que foi tocado e, quando relevante, os valores envolvidos.",
+      "filterAction": "Ação",
+      "allActions": "Todas as ações",
+      "filterActor": "Autor",
+      "count": "{count} entradas",
+      "loadFailed": "Não foi possível carregar o log de auditoria.",
+      "empty": "Nada registrado ainda.",
+      "details": "Detalhes",
+      "hide": "Ocultar",
+      "col": {
+        "when": "Quando",
+        "actor": "Autor",
+        "action": "Ação",
+        "target": "Alvo"
+      }
+    }
+  },
+  "roles": {
+    "owner": "Proprietário",
+    "admin": "Admin",
+    "moderator": "Moderador",
+    "ownerHint": "Administra esta instalação",
+    "adminHint": "Administrador com acesso total ao painel",
+    "moderatorHint": "Moderador — pode gerenciar membros e conteúdo"
   }
 }

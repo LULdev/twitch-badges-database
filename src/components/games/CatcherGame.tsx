@@ -112,12 +112,26 @@ export default function CatcherGame() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running, timeLeft]);
 
-  function move(event: React.MouseEvent<HTMLDivElement>) {
+  // Pointer events, not mouse events: `onMouseMove` never fires for touch or pen,
+  // so the basket could not be moved at all on a phone.
+  function move(event: React.PointerEvent<HTMLDivElement>) {
     if (!running) return;
     const rect = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     setBasketX(x);
     stateRef.current.basketX = x;
+  }
+
+  // The basket moves on one axis, so the arrow keys map onto it directly — the
+  // game is fully playable from the keyboard without a second input system.
+  function nudge(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (!running) return;
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const delta = event.key === "ArrowLeft" ? -6 : 6;
+    const next = Math.min(95, Math.max(5, stateRef.current.basketX + delta));
+    setBasketX(next);
+    stateRef.current.basketX = next;
   }
 
   function start() {
@@ -128,6 +142,9 @@ export default function CatcherGame() {
     setItems([]);
     setTimeLeft(30);
     setRunning(true);
+    // Hand the keyboard to the play field, so the arrow keys work immediately
+    // instead of requiring a Tab into it first.
+    areaRef.current?.focus();
   }
 
   return (
@@ -137,8 +154,15 @@ export default function CatcherGame() {
       <RoundOutcome last={last} />
       <div
         ref={areaRef}
-        onMouseMove={move}
-        className="relative h-80 select-none overflow-hidden rounded-[var(--radius-card)] border border-line bg-gradient-to-b from-background to-surface-2"
+        tabIndex={0}
+        // `application` tells assistive technology to pass keystrokes through
+        // instead of interpreting them as navigation — which is what a play field
+        // with its own arrow-key controls needs.
+        role="application"
+        aria-label={t("catcherTitle")}
+        onPointerMove={move}
+        onKeyDown={nudge}
+        className="relative h-80 select-none overflow-hidden rounded-[var(--radius-card)] border border-line bg-gradient-to-b from-background to-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
         {items.map((item) =>
           item.bomb ? (

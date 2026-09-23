@@ -3,14 +3,17 @@
 import { useState } from "react";
 import { useGame, BetBar, GameError } from "./useGame";
 
-const LABELS: Record<string, string> = {
+/**
+ * Twitch brand and event names — deliberately identical (Latin) in every locale,
+ * because that is what players read on Twitch itself. The two common nouns among
+ * the symbols (`founder`, `jackpot`) go through t().
+ */
+const BRANDS: Record<string, string> = {
   premium: "Prime",
   turbo: "Turbo",
   bits: "Bits",
-  founder: "Founder",
   subtember: "SUBtember",
   wsci: "WSCI",
-  jackpot: "★ JACKPOT ★",
 };
 
 export default function ScratchGame() {
@@ -50,7 +53,21 @@ export default function ScratchGame() {
                   : "border-line bg-surface-3 text-muted"
               }`}
             >
-              {revealed[index] && cell ? (LABELS[String(cell)] ?? String(cell)) : "?"}
+              {revealed[index] && cell ? (
+                cell === "jackpot" ? (
+                  <>
+                    <span aria-hidden>★ </span>
+                    {t("scratchJackpot")}
+                    <span aria-hidden> ★</span>
+                  </>
+                ) : cell === "founder" ? (
+                  t("scratchFounder")
+                ) : (
+                  (BRANDS[String(cell)] ?? String(cell))
+                )
+              ) : (
+                "?"
+              )}
             </button>
           ))}
         </div>

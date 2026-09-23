@@ -1,11 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
 export default function ShareButtons({ path, title }: { path: string; title: string }) {
   const t = useTranslations("common");
   const [copied, setCopied] = useState(false);
+  const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Cancel the pending state update on unmount: React 18 no longer warns about
+  // setting state on an unmounted component, so nothing surfaced this.
+  useEffect(
+    () => () => {
+      if (copiedTimer.current !== null) clearTimeout(copiedTimer.current);
+    },
+    [],
+  );
   // Computed after mount: deriving it during render produced "" on the server
   // and the real URL on the client, which is a hydration mismatch on every
   // share link's href.
@@ -34,7 +43,8 @@ export default function ShareButtons({ path, title }: { path: string; title: str
       area.remove();
     }
     setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+    if (copiedTimer.current !== null) clearTimeout(copiedTimer.current);
+    copiedTimer.current = setTimeout(() => setCopied(false), 2500);
   }
 
   return (

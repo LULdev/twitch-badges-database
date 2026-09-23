@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 function pad(value: number): string {
   return String(value).padStart(2, "0");
@@ -30,6 +30,7 @@ export default function Countdown({
   size?: "sm" | "lg";
 }) {
   const t = useTranslations("countdown");
+  const locale = useLocale();
   const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
@@ -66,11 +67,21 @@ export default function Countdown({
     { value: seconds, label: t("seconds") },
   ];
 
+  // The accessible name needs a properly spaced, pluralised day unit: concatenating
+  // `${days}${t("days")}` produced "5days" in en/de/ar and would leave a stray space
+  // in the CJK locales. Intl gives the locale's own form (`5 days`, `5 Tage`,
+  // `٥ أيام`, `5日`).
+  const dayUnit = new Intl.NumberFormat(locale, {
+    style: "unit",
+    unit: "day",
+    unitDisplay: "long",
+  }).format(days);
+
   return (
     <span
       className={`countdown ${size === "lg" ? "gap-2" : ""}`}
       role="timer"
-      aria-label={`${mode === "expires" ? t("expiresIn") : t("startsIn")}: ${days}${t("days")} ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`}
+      aria-label={`${mode === "expires" ? t("expiresIn") : t("startsIn")}: ${dayUnit} ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`}
     >
       {units.map((unit, index) => (
         <span key={unit.label} className="unit">

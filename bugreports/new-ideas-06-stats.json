@@ -1,0 +1,276 @@
+{
+  "agent": "stats",
+  "scope": "statistics, data and insight",
+  "ideas": [
+    {
+      "category": "stats",
+      "title": "Catalog Net-Flow Ledger",
+      "body": "A stacked-area time series of catalog change per ISO week: badges first seen (the first badge_events sighting, falling back to badges.created_at), badges that expired, and a net line for resulting catalog size. Each week shows gross inflow, gross outflow and the net, so the operator sees at a glance whether the catalog is growing, churning or shrinking. Reads badge_events joined to badges. Effort: S. Risk if built badly: a re-sync that re-emits an unchanged badge as a 'new' event would inflate inflow, so first-seen must be deduplicated by badge id.",
+      "why": "Turns the raw event log into the single-line answer to whether the catalog is healthy."
+    },
+    {
+      "category": "stats",
+      "title": "Owner-Acquisition Spike Rank",
+      "body": "For every badge, compute the peak one-hour owner-count delta from badge_stats, the hour it occurred relative to the window open, and the spike-to-final ratio; rank badges by peak velocity. A front-loaded badge takes a large share of owners in hour one, a slow burn trickles for days. Reads badge_stats. Effort: M. Risk if built badly: uneven potat sampling makes some hourly deltas artifacts, so the sampling gap must be shown next to the number.",
+      "why": "Shows collectors which drops are genuinely competitive in the first minutes, not just which end up rare."
+    },
+    {
+      "category": "stats",
+      "title": "Catalog Stagnation Index",
+      "body": "A single percentage per week: the share of catalog badges whose owner count moved by fewer than N in the trailing 30 days and which had no window event in that period, charted as a trend with a per-category breakdown. Reads badge_stats and badge_events. Effort: M. Risk if built badly: a paused or failing sync would read as sudden maturity, so the metric must be gated on heartbeat freshness before it is trusted.",
+      "why": "An early warning that either the data has gone quiet or the catalog has genuinely stopped moving."
+    },
+    {
+      "category": "stats",
+      "title": "Category Vacuum Detector",
+      "body": "Per category, compare badges that expired in the trailing 90 days against badges first seen in the same window, and flag categories that fall below their rolling baseline as depleting with the exact deficit. Rendered as a small signed bar per category. Reads badge_events with badges.category. Effort: S. Risk if built badly: seasonal categories such as convention badges always look depleting mid-year, so a seasonality adjustment is required.",
+      "why": "Tells collectors which categories are drying up so they can finish sets before the opportunity vanishes."
+    },
+    {
+      "category": "stats",
+      "title": "Return-Visit Cadence Histogram",
+      "body": "Using the salted visitor hash in the analytics table, compute the gap in hours between consecutive sessions per hash and histogram the result into 0-1h, 1-24h, 1-7d and 7d+ buckets; the mode indicates whether the site is a daily habit or an occasional lookup. Reads the analytics table only. Effort: M. Risk if built badly: rotating the salt breaks hash continuity and manufactures fake new-visitor spikes, so salt rotation dates must be annotated.",
+      "why": "Quantifies habit formation, the best single predictor of whether collectors keep returning for drops."
+    },
+    {
+      "category": "stats",
+      "title": "Locale Content-Depth Score",
+      "body": "Per locale, compute the mean number of distinct paths a visitor touches in one session and the share of single-path sessions, then rank locales. A high-depth locale is reading the catalog; a high single-path share suggests people land and leave. Reads the analytics table columns locale, path and visitor hash. Effort: S. Risk if built badly: low-traffic locales yield noisy means, so results must be suppressed below a minimum session count.",
+      "why": "Shows which of the eleven translations produce engaged readers instead of translated bounces."
+    },
+    {
+      "category": "stats",
+      "title": "Referrer-to-Catalog Funnel",
+      "body": "For each referrer host, compute the conversion from a landing page view to a badge-detail view within the same session, using the ordered analytics rows per visitor hash. Ranks referral sources by whether they reached the catalog rather than by raw traffic. Reads the analytics table (referrer host, path, timestamp, visitor hash). Effort: M. Risk if built badly: hash collisions between sessions understate conversion, so a floor and per-source sample size must be reported.",
+      "why": "Separates the referrers who bring badge collectors from those who bring idle clicks."
+    },
+    {
+      "category": "stats",
+      "title": "Drop Hype Multiple",
+      "body": "For each new-badge event, compare the traffic on the badge detail path class and the catalog grid in the 24 hours after the event against a trailing-30-day baseline for the same path class; the ratio is the hype multiple. Rank drops and correlate hype against the badge's final owner count. Reads badge_events plus the analytics table. Effort: M. Risk if built badly: concurrent social pushes confound the signal, so it must be labelled correlation rather than attributed traffic.",
+      "why": "Turns every drop into a measurable popularity event the team can learn from over time."
+    },
+    {
+      "category": "stats",
+      "title": "Changelog Release Rhythm",
+      "body": "Treat the changelog table as a time series: entries per week, median gap between entries, and the split by type (feature, bugfix, data_sync), rendered as a cadence chart with the current streak. Reads the changelog table only. Effort: S. Risk if built badly: bulk backfilled entries create false bursts, so the view must segment by whether a row was written live or imported.",
+      "why": "Makes engineering cadence visible and directly enriches the public changelog the site already ships."
+    },
+    {
+      "category": "stats",
+      "title": "Bugfix-to-Feature Ratio by Area",
+      "body": "Parse changelog type and payload tags to compute the monthly ratio of bugfix entries to feature entries, grouped by the area tag in the payload, to rank which subsystems generate the most rework. Rendered as a stacked bar per month plus an area table. Reads the changelog table. Effort: S. Risk if built badly: inconsistent free-text tagging makes areas meaningless, so the tag field must be constrained to a fixed enum first.",
+      "why": "Points the operator at the parts of the site that keep breaking, using data they already record."
+    },
+    {
+      "category": "stats",
+      "title": "Duplicate-Artwork Detector",
+      "body": "Cluster catalog rows by a perceptual hash of the badge PNG plus a normalized set-and-name key, and surface probable duplicates or re-releases with a similarity score and side-by-side thumbnails in an admin queue. Reads the badges table (set_id, version, image_url). Effort: L. Risk if built badly: legitimate variant badges across versions share artwork, so clusters must require admin confirmation and never auto-merge.",
+      "why": "Keeps the catalog trustworthy, which is the entire product for a badge database."
+    },
+    {
+      "category": "stats",
+      "title": "Metadata Completeness Heatmap",
+      "body": "For each catalog row, score the fraction of required fields populated (image, end_date, category, region, how-to-earn), aggregate by provider and by release month, and render a heatmap that exposes whether newer or provider-specific badges are under-documented. Reads the badges table and its source columns. Effort: M. Risk if built badly: counting optional fields as required would make every badge look broken, so required fields must be declared per category.",
+      "why": "Shows where the catalog is thin so data-quality work can be targeted instead of guessed."
+    },
+    {
+      "category": "stats",
+      "title": "Provider Field Disagreement Report",
+      "body": "For badges covered by more than one source (badgebase, potat, helix), compare category, window open and close, and image per badge, and track a per-field disagreement rate over time; badge pages can then show that two sources disagree on the end date. Reads the per-source fields on the catalog row. Effort: M. Risk if built badly: incorrect date or string normalization produces thousands of false conflicts, so the comparison rules must be pinned and versioned.",
+      "why": "Cross-source disagreement is the earliest possible warning that a badge's data is wrong."
+    },
+    {
+      "category": "stats",
+      "title": "TBRI Driver Decomposition",
+      "body": "For every badge, split its TBRI into the contribution of each input signal (scarcity, window brevity, age, free versus paid, wear, category) and render a stacked contribution bar labelled with the dominant driver, so a badge page can say it is driven mainly by window brevity. Reads the rarity.ts inputs and badge rows. Effort: M. Risk if built badly: if TBRI combines multiplicatively, a naive additive split misleads, so the decomposition must be done in log space with the residuals shown.",
+      "why": "Explains the site's headline rarity number instead of presenting it as an opaque score."
+    },
+    {
+      "category": "stats",
+      "title": "Rarity Tier Dwell Time",
+      "body": "From each badge's tier history in badge_stats, measure how many weeks the median badge stays in each rarity tier before crossing to another, and publish a per-tier dwell distribution with percentiles. Answers how long a Legendary badge is stable. Reads badge_stats tier history. Effort: M. Risk if built badly: badges still sitting in a tier are censored rather than finished, so naive averages overstate short dwell and must be replaced with censored estimates.",
+      "why": "Tells collectors how much a tier badge is worth holding onto versus chasing the next drop."
+    },
+    {
+      "category": "stats",
+      "title": "Owner-Accrual Seasonality Profile",
+      "body": "Aggregate global new-owner counts per day from badge_stats and decompose them into day-of-week and month effects (mean and median lift per weekday, per month) with a confidence band, producing a weekday bar and a peak-accrual-window note. Reads badge_stats. Effort: M. Risk if built badly: a single large drop skews the mean, so medians must be used and outlier events excluded or flagged.",
+      "why": "Reveals when the catalog actually moves, so drops can be timed for maximum participation."
+    },
+    {
+      "category": "stats",
+      "title": "Category Momentum Ranking",
+      "body": "For each category, compute owner-count growth over the trailing seven days versus the prior seven, normalized by category size, and rank categories by momentum with a sparkline each. Reads badge_stats joined to badges.category. Effort: S. Risk if built badly: small categories swing wildly, so the absolute delta must be shown next to the normalized ratio.",
+      "why": "Gives a live read on which categories are hot instead of hand-waving at the catalog."
+    },
+    {
+      "category": "stats",
+      "title": "Rarity Ripple Correlation",
+      "body": "Compute cross-correlation between the daily owner-count delta series of badge pairs over a 90-day window and surface pairs that move together, rendered as a small network or a list of badges that rise together. Reveals drops that are co-claimed from the same event or region. Reads badge_stats. Effort: L. Risk if built badly: the O(n squared) pair space is expensive and full of spurious matches, so pairs must be prefiltered by shared category or set and hard-capped.",
+      "why": "Uncovers hidden relationships between badges that pure ownership overlap cannot see."
+    },
+    {
+      "category": "stats",
+      "title": "Badge Re-issue Tracker",
+      "body": "Detect badges whose set_id or artwork returns after a previous expiry, tag them as re-issued, and compare the second-life owner curve against the original to see whether it spiked the same way or plateaued lower. A small table of recycled drops. Reads badge_events plus badge_stats. Effort: M. Risk if built badly: a new version of a set can look like a re-issue, so matching must key on set_id plus artwork hash rather than name.",
+      "why": "Answers the recurring collector question of whether a badge came back and was rarer the first time."
+    },
+    {
+      "category": "stats",
+      "title": "Source Corroboration Coverage",
+      "body": "For each catalog row, record which independent sources have confirmed it and render a coverage breakdown plus a single-source-risk count, flagging badges that rest on one provider alone. Reads the per-source confirmation columns and events on badge rows. Effort: S. Risk if built badly: a provider that simply does not cover a badge type would raise false alarms, so 'not covered' must be distinguished from 'missing'.",
+      "why": "Puts a number on data trust by showing how much of the catalog is independently corroborated."
+    },
+    {
+      "category": "stats",
+      "title": "Coin Inflation Rate",
+      "body": "Track the daily net change in total BadgesCoins in circulation as a percentage, decomposed by faucet (daily login, wheel, games, coin rain) and sink (stakes, burns, heists), so one line answers whether the economy is inflating and from where. Reads balances in user_progress plus activity_events. Effort: M. Risk if built badly: any un-tracked sink makes the balance sheet fail to reconcile, so the computed total must be checked against a stored supply figure.",
+      "why": "A live currency needs a live inflation gauge, or payouts and prices drift blind."
+    },
+    {
+      "category": "stats",
+      "title": "Game Skill-versus-Luck Dispersion",
+      "body": "Per game, compute the entropy or Gini of outcomes across players (win rate and payout distribution) to score how luck-dominated each of the thirteen games is, and rank them on a skill-luck axis. Reads the game rounds table. Effort: M. Risk if built badly: games with small samples look skillless, so a minimum round count is required before a game is plotted.",
+      "why": "Tells the operator which games reward skill and which are pure chance, guiding balancing."
+    },
+    {
+      "category": "stats",
+      "title": "Steal Network Topology",
+      "body": "Build a directed graph of steal_attempts from attacker to victim and compute reciprocity, target concentration (Gini of victims) and predator/prey roles, surfacing repeat rivals as a small network or ranked table. Reads the steal_attempts table. Effort: M. Risk if built badly: naming victims is a harassment vector, so any display must aggregate or pseudonymize before it is shown.",
+      "why": "Shows whether the steal mechanic builds rivalries or merely a few victims, which decides its health."
+    },
+    {
+      "category": "stats",
+      "title": "Activity Mix Drift",
+      "body": "Render the composition of activity_events by kind per week (login, unlock, wheel, game, heist, coin rain) as a 100 percent stacked area, with a drift alert when a kind's share moves beyond a band. Shows whether engagement is broadening or narrowing across features. Reads activity_events. Effort: S. Risk if built badly: a renamed event kind reads as the old one vanishing, so kinds must be canonicalized before charting.",
+      "why": "One chart that shows whether the site's engagement is diversifying or collapsing into one feature."
+    },
+    {
+      "category": "stats",
+      "title": "Achievement Adoption Funnel",
+      "body": "For each of the 125 achievements, compute the share of eligible members who earned it and the median time from eligibility to earning, then rank by adoption and flag near-zero-adoption dead achievements and near-100 trivial ones. Reads achievement rows plus user_progress. Effort: M. Risk if built badly: eligibility definitions drift from the engine, so eligibility must be derived from the same self-evaluating predicate the achievements already use.",
+      "why": "Large achievement sets usually carry dead weight, and this finds which half is inert."
+    },
+    {
+      "category": "stats",
+      "title": "Observed-versus-Published EV Audit",
+      "body": "Compare the theoretical expected value of each wheel slot and game payout against the observed EV from actual outcomes over a rolling 90 days, with a tolerance band and a drift flag, producing a public audit table. Reads game rounds and wheel outcomes plus the odds constants. Effort: M. Risk if built badly: p-hacking small samples manufactures fake drift, so windows must be fixed in advance and confidence intervals always shown.",
+      "why": "An economy with published odds needs published evidence that reality actually matches them."
+    },
+    {
+      "category": "stats",
+      "title": "Progression Velocity Cohorts",
+      "body": "Group members by the week they joined and plot median XP earned per active day against cohort age, a retention-style curve for gamification that shows whether newer cohorts progress faster or stall early. Reads user_progress and activity_events. Effort: M. Risk if built badly: changing XP payouts across cohorts confounds cohort effect with rules effect, so payout changes must be annotated on the timeline.",
+      "why": "Measures whether the gamification loop is actually pulling new collectors forward or just rewarding veterans."
+    },
+    {
+      "category": "stats",
+      "title": "Rarity Breadth Oscillator",
+      "body": "A single line tracking the percentage of catalog badges setting a new 30-day owner-count high (getting more common) minus the percentage setting a new low, each week; positive means the catalog is broadly getting easier, negative means rarer. Reads badge_stats. Effort: M. Risk if built badly: a change in catalog size shifts the base, so the series must be normalized per active badge rather than per total row count.",
+      "why": "A market-breadth indicator that says whether rarity is rising everywhere or only in a few famous spikes."
+    },
+    {
+      "category": "stats",
+      "title": "Catalog Supply-Demand Ratio",
+      "body": "Per category per month, compute badges released versus net new owners gained, producing a supply-per-demand ratio, and plot categories on a quadrant where high supply with low owner gain is oversupplied. Reads badge_events plus badge_stats. Effort: M. Risk if built badly: owner gains are attributed to a category rather than to individual badges, so the attribution assumption must be stated plainly on the chart.",
+      "why": "Tells the operator where new drops add real value and where they merely add catalog noise."
+    },
+    {
+      "category": "stats",
+      "title": "Benford Conformity Test",
+      "body": "Apply Benford's law to the leading digits of badge owner counts and coin balances and report the chi-square deviation per data source, where a strong deviation flags fabricated, truncated or mis-parsed numbers. Reads owner counts from badges or badge_stats. Effort: S. Risk if built badly: narrow numeric ranges violate the premise of Benford's law, so the test must restrict to spans of at least three orders of magnitude.",
+      "why": "A cheap, rigorous check that the site's core number has not been silently corrupted by a parsing bug."
+    },
+    {
+      "category": "stats",
+      "title": "Owner-Count Jump Anomaly Detector",
+      "body": "Per badge, flag owner-count changes beyond k standard deviations of that badge's own recent delta distribution, labelling each as a likely data error or a possible viral moment based on whether other badges spiked at the same time, as a review queue. Reads badge_stats and sync heartbeats. Effort: M. Risk if built badly: a large event can legitimately spike many badges at once, so corroboration with the drop feed is required before flagging.",
+      "why": "Catches the data errors that would otherwise surface as unexplained rarity shifts on badge pages."
+    },
+    {
+      "category": "stats",
+      "title": "Window Timezone Fairness Score",
+      "body": "For each claim window, compute the share of the globe for whom the window fell in local waking hours (07:00 to 24:00), aggregate per month and category into a fairness score, and highlight windows that were unfair to a majority of timezones. Reads badge window start and end plus timezone offsets. Effort: M. Risk if built badly: waking hours is an assumption, so the model must be stated and the band left adjustable by the reader.",
+      "why": "Puts a number on an inequality collectors feel viscerally: drops scheduled for one hemisphere."
+    },
+    {
+      "category": "stats",
+      "title": "Catalog Freshness Decay Curve",
+      "body": "Per field (owner count, drop window, category, image), plot the distribution of time since that field last changed across the whole catalog, yielding a decay curve and a median field age, and flag fields aging faster than their sync cadence. Reads sync heartbeats plus badge rows. Effort: M. Risk if built badly: fields that legitimately never change look stale, so stable must be separated from stale using churn history.",
+      "why": "Tells the operator which data is aging and whether the sync cadence actually keeps up field by field."
+    },
+    {
+      "category": "stats",
+      "title": "Owner Concentration Gini",
+      "body": "Compute the Gini coefficient of the catalog owner-count distribution, globally and per category, as one tracked number each week, where a rising Gini means ownership is concentrating into a smaller set of popular badges. Reads badge owner counts and badge_stats. Effort: S. Risk if built badly: catalog additions shift Gini structurally, so releases must be annotated and a fixed badge set used for comparable weeks.",
+      "why": "One number that captures whether the catalog is becoming a winner-take-all ownership market."
+    },
+    {
+      "category": "stats",
+      "title": "Tier Population Balance Index",
+      "body": "Compare the actual badge count in each TBRI tier against a target pyramid and compute a single imbalance index plus a per-tier deviation bar, flagging when the catalog drifts toward too many Legendary or too few Rare badges. Reads the current tier assignment of every badge. Effort: S. Risk if built badly: the target pyramid is a value judgement, so it must be configurable and the choice shown alongside the index.",
+      "why": "Keeps the rarity ladder meaningful instead of quietly collapsing into a top-heavy or flat spread."
+    },
+    {
+      "category": "stats",
+      "title": "Wishlist Demand versus Supply",
+      "body": "Rank badges by wishlist or watch count and overlay their current availability (claimable now, live window, expired) to expose demand with no supply, producing a most-wanted-but-unobtainable board. Reads the wishlist table plus badge status. Effort: S. Risk if built badly: displaying individual watchers leaks private interest, so only aggregate counts may ever be shown.",
+      "why": "Shows the site's most sought-after badges and whether the catalog can still satisfy that demand."
+    },
+    {
+      "category": "stats",
+      "title": "Blog Engagement Efficiency",
+      "body": "Per blog post, compute reactions and views relative to the median of its post type (badge-of-the-day, monthly digest, obituary), producing an engagement index that surfaces post types which consistently over- or under-perform. Reads blog posts and their reaction storage. Effort: S. Risk if built badly: view counts include crawlers, so views must be filtered by the analytics client class before indexing.",
+      "why": "Shows which automated content formats actually land with collectors and which are ignored."
+    },
+    {
+      "category": "stats",
+      "title": "Peak Concurrent Visitors Estimate",
+      "body": "From the analytics table, estimate concurrency by counting visitors whose timestamp plus duration intervals overlap, and chart the daily peak, relating peaks to drop events for context. Reads the analytics table (timestamp, duration, visitor hash). Effort: M. Risk if built badly: duration is client-reported and often missing, so a fixed assumed session must be used as fallback and the result clearly labelled an estimate.",
+      "why": "Gives the operator a real people-here-at-once number useful for both capacity and community sense."
+    },
+    {
+      "category": "stats",
+      "title": "Dwell versus Depth Correlation",
+      "body": "Across path classes (catalog grid, badge detail, stats, blog), correlate median session dwell with paths-per-session to find which page types hold attention and which are quick exits, rendered as a scatter with one point per path class. Reads the analytics table (duration, path, visitor hash). Effort: M. Risk if built badly: idle-tab duration outliers distort the mean, so the top percentile must be trimmed and medians used throughout.",
+      "why": "Turns raw dwell and depth numbers into an actionable read on which page types actually work."
+    },
+    {
+      "category": "stats",
+      "title": "Release-to-Rarity Yield",
+      "body": "For each release month, compute the median TBRI of badges released that month alongside the number released, highlighting months where a few badges carry the whole rarity load. A scatter of monthly volume against median rarity, with the yield curve drawn. Reads badges (release date and tier). Effort: S. Risk if built badly: recent months have not finished accruing owners, inflating their rarity, so a maturation window must exclude or mark immature months.",
+      "why": "Shows whether the catalog's rare badges come from busy release months or from quiet ones."
+    },
+    {
+      "category": "stats",
+      "title": "New versus Returning Visitor Ratio",
+      "body": "From the salted visitor hash, classify each day's visitors as new (first day ever seen) or returning (seen on an earlier day) and chart the new-visitor share over time, where a rising share means growth and a falling one means retention. Reads the analytics table. Effort: S. Risk if built badly: a salt reset recasts every visitor as new, so reset dates must be annotated and the transition marked on the chart.",
+      "why": "The simplest growth-versus-retention signal for a site whose entire thesis is that collectors return."
+    },
+    {
+      "category": "stats",
+      "title": "Dormant-Collector Rate",
+      "body": "Using the analytics visitor hash joined to known members, compute the share of once-active members with no session in the trailing 30 days, broken out by signup cohort, as a churn-style curve for collectors. Reads the analytics table plus profiles. Effort: M. Risk if built badly: hash-to-member joins are approximate and privacy-sensitive, so the output must stay aggregate-only and never expose a per-member dormancy flag.",
+      "why": "Quantifies whether collectors stay, the metric that ultimately decides the site's future."
+    },
+    {
+      "category": "stats",
+      "title": "Heartbeat Cadence Regularity Score",
+      "body": "From system_heartbeats, measure each source's inter-beat interval against its expected cadence and compute a regularity score (jitter and missed schedule slots), flagging sources that drift even when they never fully stop. Reads system_heartbeats. Effort: M. Risk if built badly: normal retry jitter looks like irregularity, so a per-source tolerance band is needed and the raw intervals must remain visible.",
+      "why": "Catches degrading sync schedules before they become outright outages that freshness monitoring only notices late."
+    },
+    {
+      "category": "stats",
+      "title": "View versus Rarity Divergence",
+      "body": "For each badge, compare its page-view rank from the analytics paths against its rarity rank from TBRI and surface the largest divergences: rare-but-unseen and common-but-popular, plotted on a two-axis scatter with the diagonal marked. Reads the analytics table plus rarity. Effort: M. Risk if built badly: low-traffic badges have noisy view ranks, so a minimum view count is required before a badge is plotted.",
+      "why": "Reveals the gap between what the catalog calls valuable and what collectors actually look at."
+    },
+    {
+      "category": "stats",
+      "title": "Editorial Coverage Gaps",
+      "body": "Join badges to their blog and how-to content and rank the uncovered ones by rarity and page views, producing a prioritized write-about-this queue where rare and sought-after badges with no playbook rise to the top. Reads badges, blog posts and view counts. Effort: S. Risk if built badly: detecting coverage by title string match is fuzzy, so posts must reference badges through an explicit payload field rather than free text.",
+      "why": "Points content effort at the rare, sought-after badges that currently have no explanation anywhere."
+    }
+  ]
+}

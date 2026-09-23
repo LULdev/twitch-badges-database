@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Coin from "@/components/Coin";
 
@@ -22,6 +22,10 @@ export function useGame(gameId: string) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [last, setLast] = useState<PlayResponse | null>(null);
+  // A ref, not the `busy` state: a state transition can fire play() again in the
+  // same commit, before `busy` has re-rendered (Vault's "again" did exactly this),
+  // so the guard has to be synchronous.
+  const inFlight = useRef(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -40,6 +44,10 @@ export function useGame(gameId: string) {
 
   const play = useCallback(
     async (input: Record<string, unknown> = {}): Promise<PlayResponse | null> => {
+      // One round at a time: a second call while a round is open would charge a
+      // second bet and race two responses into `last`/`balance`.
+      if (inFlight.current) return null;
+      inFlight.current = true;
       setBusy(true);
       setError(null);
       try {
@@ -60,6 +68,7 @@ export function useGame(gameId: string) {
         setError("Network error");
         return null;
       } finally {
+        inFlight.current = false;
         setBusy(false);
       }
     },
@@ -86,6 +95,20 @@ export function BetBar({
 }) {
   const locale = useLocale();
   const t = useTranslations("games");
+  // A string draft while the field is being typed. Clamping on every keystroke made
+  // an arbitrary bet impossible to enter: the first digit was pulled up to `min`
+  // (or down to `max`) before the rest arrived, so "1000" settled on 10.
+  const [draft, setDraft] = useState<string | null>(null);
+
+  function commitDraft() {
+    if (draft === null) return;
+    const parsed = Number(draft);
+    if (draft.trim() !== "" && Number.isFinite(parsed)) {
+      setBet(Math.max(min, Math.min(max, parsed)));
+    }
+    setDraft(null);
+  }
+
   return (
     <div className="card flex flex-wrap items-center gap-3 p-4">
       <span className="text-xs font-semibold text-muted">{t("bet")}</span>
@@ -105,12 +128,15 @@ export function BetBar({
       <input
         type="number"
         className="input w-28 py-2 text-sm"
-        value={bet}
+        value={draft ?? String(bet)}
         min={min}
         max={max}
-        onChange={(event) =>
-          setBet(Math.max(min, Math.min(max, Number(event.target.value) || min)))
-        }
+        onFocus={() => setDraft(String(bet))}
+        onChange={(event) => setDraft(event.target.value)}
+        onBlur={commitDraft}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") event.currentTarget.blur();
+        }}
         aria-label={t("bet")}
       />
       {balance !== null && (

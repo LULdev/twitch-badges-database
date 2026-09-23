@@ -29,6 +29,7 @@ type ExistingBadge = Record<string, unknown> & {
   slug: string;
   title: string;
   status: string;
+  source: string;
   start_date: string | null;
   end_date: string | null;
   removed_at: string | null;
@@ -67,10 +68,39 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     if (!data || data.length < 1000) break;
   }
 
+  // Badges created by hand in the admin panel (source 'custom') are owned by
+  // the dashboard, not by Twitch. They are removed from the provider's reach
+  // for the whole run:
+  //   - the sweep below would otherwise mark every one of them 'removed', since
+  //     a custom set_id never appears in the live catalog;
+  //   - the upsert loop would overwrite admin-authored titles and artwork if a
+  //     real Twitch badge ever reused the same (set_id, version) pair, which
+  //     would also fail the unique constraint because the row is already there.
+  // The custom keys are taken out of `incoming`, and their rows are skipped by
+  // the removal sweep.
+  const customKeys = new Set(
+    [...existing.entries()]
+      .filter(([, row]) => row.source === "custom")
+      .map(([key]) => key),
+  );
+  if (customKeys.size > 0) {
+    const skipped = incoming.filter((v) =>
+      customKeys.has(`${v.setId}:${v.version}`),
+    ).length;
+    if (skipped > 0) {
+      console.warn(
+        `[global-sync] ${skipped} provider badge(s) skipped: the (set_id, version) belongs to a custom catalog entry`,
+      );
+    }
+  }
+  const incomingLive = incoming.filter(
+    (v) => !customKeys.has(`${v.setId}:${v.version}`),
+  );
+
   const now = new Date();
-  const incomingKeys = new Set(incoming.map((v) => `${v.setId}:${v.version}`));
+  const incomingKeys = new Set(incomingLive.map((v) => `${v.setId}:${v.version}`));
   const incomingUuids = new Set<string>();
-  for (const v of incoming) {
+  for (const v of incomingLive) {
     const uuid = extractBadgeUuid(v.imageUrl1x) ?? extractBadgeUuid(v.imageUrl2x);
     if (uuid) incomingUuids.add(uuid);
   }
@@ -81,13 +111,19 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
   // wipe the whole catalog while the heartbeat still reported ok.
   //
   // This runs before EVERY write in this function, including the status-badge
-  // cleanup that used to sit above it. The ratio counts only rows the sweep can
-  // actually act on: `existing` also holds already-removed rows, which are never
-  // deleted, so comparing against its raw size tightened the threshold a little
-  // more on every run until a legitimate sync could be blocked forever.
+  // cleanup that used to sit above it. The ratio is like-for-like: the numerator
+  // is Twitch feed keys, so the denominator may only count rows a healthy feed
+  // would key. `custom` rows (skipped by the sweep at :269) and badgebase-created
+  // rows (source 'badgebase', whose set_id is a badgebase slug and which survive
+  // on the UUID fallback) never appear in `incomingKeys` — counting them degraded
+  // the ratio until it tripped, and this guard throws before every write, so a
+  // tripped run could never clear what tripped it.
   const MIN_INCOMING = 50;
   const liveExisting = [...existing.values()].filter(
-    (row) => row.status !== "removed",
+    (row) =>
+      row.status !== "removed" &&
+      row.source !== "custom" &&
+      row.source !== "badgebase",
   ).length;
   const suspicious =
     incomingKeys.size < MIN_INCOMING ||
@@ -157,7 +193,7 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
   const upsertsNew: UpsertRow[] = [];
   const upsertsExisting: UpsertRow[] = [];
 
-  for (const v of incoming) {
+  for (const v of incomingLive) {
     const key = `${v.setId}:${v.version}`;
     const ex = existing.get(key);
 
@@ -235,6 +271,8 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
   const removed: Array<{ id: string; title: string }> = [];
   for (const [key, ex] of existing) {
     if (incomingKeys.has(key) || ex.status === "removed") continue;
+    // Admin-authored entries are never swept (see customKeys above).
+    if (ex.source === "custom") continue;
     // A badgebase-inserted row carries a badgebase slug as its set_id, so its
     // key never appears in incomingKeys. Twitch still publishes the same
     // artwork — match on the image UUID (the cross-source identity) before
@@ -284,12 +322,16 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     // (badgeSlug(setId, version)) — the same value written into the row above.
     const freshBatches: Array<Record<string, unknown>> = [];
     for (const batch of chunk(newSlugs, 200)) {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("badges")
         .select(
           "id,slug,title,set_id,image_url_2x,category,is_paid,how_to_earn,start_date,end_date,rarity_tier,rarity_score",
         )
         .in("slug", batch);
+      // A dropped lookup error used to leave `freshRows` empty: the durable
+      // badge_events history and every drop post were skipped silently while the
+      // changelog, notification and push still went out with a dead link.
+      if (error) throw error;
       freshBatches.push(...((data ?? []) as Array<Record<string, unknown>>));
     }
     const fresh = freshBatches;
@@ -310,13 +352,14 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     }>;
 
     if (freshRows.length > 0) {
-      await supabase.from("badge_events").insert(
+      const { error: eventsError } = await supabase.from("badge_events").insert(
         freshRows.map((row) => ({
           badge_id: row.id,
           kind: "added" as const,
           detail: { source, set_id: row.set_id },
         })),
       );
+      if (eventsError) throw eventsError;
       if (!isInitialSeed) {
         for (const row of freshRows) {
           await createDropPost(
@@ -358,7 +401,14 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     // Desktop notification: "new badge is live" — skipped on initial seed.
     if (!isInitialSeed) {
       const first = freshRows[0];
-      const url = `/en/badges/${first?.slug ?? ""}`;
+      // Locale-less on purpose. Two different consumers read this one string: the
+      // /notifications page renders it through next-intl's `Link`, which prepends
+      // the ACTIVE locale — so a stored `/en/…` came out as `/en/en/…` and every
+      // notification link 404'd — while the service worker navigates to it
+      // root-relative, where the i18n middleware picks the visitor's own locale.
+      // `/badges` is also the fallback when the lookup returned no row, because
+      // `/en/badges/` (empty slug) was itself a 404.
+      const url = first ? `/badges/${first.slug}` : "/badges";
       await recordNotification({
         kind: "badge_added",
         title:
@@ -393,13 +443,14 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     );
   }
   if (removed.length > 0) {
-    await supabase.from("badge_events").insert(
+    const { error: removedEventsError } = await supabase.from("badge_events").insert(
       removed.map((r) => ({
         badge_id: r.id,
         kind: "removed" as const,
         detail: null,
       })),
     );
+    if (removedEventsError) throw removedEventsError;
     await logChange(
       {
         kind: "badge_removed",

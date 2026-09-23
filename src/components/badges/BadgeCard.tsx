@@ -52,6 +52,7 @@ export default async function BadgeCard({
   showCountdown?: boolean;
 }) {
   const t = await getTranslations("badges");
+  const tc = await getTranslations("common");
   const locale = await getLocale();
   // "NEW" marker is computed against request time; catalog pages revalidate
   // on a short ISR window so this stays acceptably fresh.
@@ -71,7 +72,7 @@ export default async function BadgeCard({
           new Date(badge.first_seen_at).getTime() <= now &&
           now - new Date(badge.first_seen_at).getTime() < 14 * 86_400_000 && (
             <span className="absolute -end-1 -top-1 rounded-full bg-accent px-1.5 py-px text-[0.5625rem] font-bold uppercase tracking-wider text-accent-ink">
-              NEW
+              {tc("new")}
             </span>
           )}
       </div>

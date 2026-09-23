@@ -1,0 +1,276 @@
+{
+  "agent": "content",
+  "scope": "Content and editorial: written and generated content, editorial workflows, SEO and discovery of that content, documentation, community knowledge, newsletters and digests.",
+  "ideas": [
+    {
+      "category": "content",
+      "title": "Badge glossary of Twitch terminology",
+      "body": "A /glossary page defining the vocabulary the catalog silently assumes: Prime Gaming, Turbo, Hype Train, sub, bit and cheer badges, affiliate versus partner, TwitchCon drops, charity badges, OG sub, plus the site's own terms (TBRI, claim window, drop, set_id, version). Each entry is a two-part definition (one line plus a longer explanation) with a link into the matching catalog filter or the badge that exemplifies the term, so a definition doubles as a discovery path. Entries are stored rows (term, slug, short, long, related badge IDs) rather than a hardcoded list, so each gets a stable anchor and DefinedTerm structured data. Data: hand-authored rows plus catalog rows for the example badges. Effort: M. Risk if built badly: entries drift from the catalog as categories are renamed and example badges expire, and a DefinedTerm block pointing at a deleted badge is worse than no markup; keep the example references validated against the catalog on render.",
+      "why": "Every visitor who does not know what a Hype Train badge is bounces, and a glossary is the cheapest way to turn that confusion into an internal link."
+    },
+    {
+      "category": "content",
+      "title": "Catalog Eras editorial hubs",
+      "body": "Named historical periods of badge releases — the closed-beta years, the Prime Gaming era, the Hype Train era, the affiliate-era explosion — each with an editorial page explaining what changed about how badges were earned and a grid of the badges released inside it. Eras are explicit date ranges in a small table (name, slug, start, end, intro copy) and the grid is an ordinary catalog query filtered to that range, so the page stays correct as new badges arrive. Each era links to its predecessor and successor to form a readable history. Data: first-sighting and release dates from badge_events and the catalog, plus authored copy. Effort: M. Risk if built badly: the era boundaries are arguable and a wrong one becomes a factual claim the site publishes with authority; keep the ranges in data with a note explaining how they were chosen.",
+      "why": "It turns a flat catalog of 476 items into a story a newcomer can read in order, which is exactly the narrative the badge world has never had written down."
+    },
+    {
+      "category": "content",
+      "title": "Learn hub for claiming basics",
+      "body": "A /learn section of long-form tutorials answering what a new viewer actually types: what a global badge is, how to claim a Prime badge, why a badge does not appear in the picker, how channel sub badges differ from global ones, and how to check which global badges an account owns. Each tutorial is a real article with numbered steps, catalog examples and HowTo structured data where the steps are procedural, ending by pointing at the catalog surface that performs the action. Articles are content rows with locale, so they translate like the rest of the site. Data: authored copy plus cited catalog rows and badge images. Effort: M. Risk if built badly: the tutorials duplicate the per-badge how-to text and rot whenever Twitch changes its UI; keep platform mechanics in one place, date-stamp every article, and link rather than restate.",
+      "why": "It captures the highest-volume search intent in this niche and converts it into a visit to the claimable view instead of a bounce."
+    },
+    {
+      "category": "content",
+      "title": "TBRI methodology and caveats page",
+      "body": "A public explanation of how the rarity index and its tiers are computed: the six signals, their weights, the tier cut-offs, what is genuinely unknowable (third-party owner estimates), and one fully worked example badge showing every intermediate number. It imports the same constants module the rarity code uses and computes the worked example live from a real badge row, so the published formula cannot silently diverge from the engine. It also states the refresh cadence and the known edge cases (badges with no owner data, paid versus free windows). Data: the rarity constants, one live badge row, that badge's badge_stats series. Effort: S. Risk if built badly: the page describes an older formula after a scoring change and the site's own transparency artifact becomes misinformation; derive displayed numbers from the live function instead of restating them.",
+      "why": "The rarity index is the site's core claim to authority, and a methodology page is what separates a computed number from a made-up one."
+    },
+    {
+      "category": "content",
+      "title": "Data sources and credits page",
+      "body": "A /sources page naming every external provider the catalog depends on — the official Twitch Helix catalog, badgebase drop windows, potat owner counts, badges.blog per-user ownership, IVR where used — with what each contributes, its refresh cadence, its known limits and a link to its own documentation. It also carries an explicit reuse statement for the site's images and aggregates (what may be quoted, what may not be bulk-copied), making it the canonical page to point a requester at. Data: the provider list from the sync engines plus each engine's last-write timestamp for a live refreshed-at column. Effort: S. Risk if built badly: the cadence column is typed by hand, goes stale, and the page claims freshness it does not have; pull the timestamps from the heartbeat rows instead.",
+      "why": "A database built on other people's feeds owes its visitors an honest account of where the numbers come from and how fresh they are."
+    },
+    {
+      "category": "content",
+      "title": "Press and media kit page",
+      "body": "A /press page for journalists and fansite editors: an approved one-paragraph description of the site, a fact sheet (catalog size, tracked badges, locales, data sources), downloadable logo assets, a live snapshot of a few headline numbers read from the stats views, and a contact route for quotes or data requests. It pairs with the existing Open Graph route so a story can illustrate itself, and every number carries its own as-of timestamp. Data: stats views for headline numbers, static assets for the logo pack, authored boilerplate. Effort: S. Risk if built badly: a reporter copies a number that was accurate a month ago or a designer reuses a retired logo; keep numbers live and version asset filenames with the date.",
+      "why": "Badge coverage in a fan blog or gaming outlet is free distribution, and giving writers a ready kit is how that coverage happens accurately."
+    },
+    {
+      "category": "content",
+      "title": "Per-badge flavor blurbs",
+      "body": "Every badge gets a short human-written line — one or two sentences of context or character, deliberately separate from the dry how-to-earn instructions — rendered on the tile tooltip, the detail page and the OG card. Blurbs are a column on the badge row authored in the content tab, and any badge without one falls back to a generated line assembled from its category, tier and release year so coverage is never zero. Collectors can rate a blurb's accuracy with a single tap, feeding a queue for admins to revise the weakest ones. Data: authored text plus catalog fields for the fallback. Effort: M. Risk if built badly: 476 hand-written lines become a maintenance debt and a wrong blurb about how a badge was earned reads as authoritative; keep blurb and how-to-earn strictly separate and label generated fallbacks as generated.",
+      "why": "Unique prose on every badge page is both the difference between an index and a guide, and the only original text search engines can rank."
+    },
+    {
+      "category": "content",
+      "title": "Per-badge generated FAQ",
+      "body": "Each badge detail page gains a small FAQ block built from its own row: when the claim window closes, whether it is still obtainable, how many owners it has, which category it belongs to, and whether it is free or paid — each answer short and linking to the tool that owns the fact. It renders as FAQPage structured data so search engines can lift exact answers, and it is generated at render time from live columns rather than stored prose, so answers expire with the data. Data: badge row (window, category, paid flag), latest owner count, TBRI tier. Effort: S. Risk if built badly: a generated answer restates a null or stale column and produces confidently wrong schema; suppress any question whose underlying field is missing instead of writing a hedge.",
+      "why": "It makes each of the 476 badge pages answer the exact long-tail question a searcher typed, with no editorial effort per badge."
+    },
+    {
+      "category": "content",
+      "title": "Structured-data coverage audit",
+      "body": "A report that walks every indexable route type and records which structured-data blocks it emits — HowTo on badge pages, FAQPage on the generated FAQs, Article on posts, DefinedTerm on glossary entries, BreadcrumbList, ItemList on landing pages — and which are missing or invalid for that route type, with counts and the specific rows failing. It validates a sample, so a regression in the render path is visible before search results degrade. Data: a route-type registry in code plus the catalog and content rows it enumerates. Effort: M. Risk if built badly: it becomes a red dashboard nobody reads and its expectation table falls behind the pages; keep the expectation list next to the components that emit the markup.",
+      "why": "Rich results are how a badge page wins a search click over the wiki, and they break silently the moment a component changes."
+    },
+    {
+      "category": "content",
+      "title": "Hreflang and canonical audit",
+      "body": "A check over the eleven locale trees verifying that each page canonicalises to itself, emits hreflang alternates for all locales plus x-default, never points two locales at one canonical, and never lets the locale prefix drop out of a canonical or a link. A scheduled walk over a fixed list of route templates reads each rendered head and reports missing, duplicated or self-conflicting tags, and flags any page whose translated copy is byte-identical to English (an untranslated page that probably should not be indexed yet). Data: rendered heads from the running site plus the message catalogs to detect identical copy. Effort: M. Risk if built badly: a canonical mistake de-indexes eleven locales at once, so run the audit read-only first and treat any canonical change as a reviewed edit rather than an automated fix.",
+      "why": "Eleven locales multiply the content surface elevenfold and also multiply the ways a single wrong canonical can erase it."
+    },
+    {
+      "category": "content",
+      "title": "IndexNow ping on publish",
+      "body": "When a post, glossary entry, tutorial or refreshed badge page is published, the publish path submits the affected URLs to IndexNow and warms those routes' cache, so new content is discovered in hours instead of at the next sitemap crawl. The publish action already knows the exact slugs it touched, so this is one outbound request from the existing route handler, deduplicated by URL and capped per run, with failures logged as a heartbeat rather than blocking the publish. Data: the slugs written by the publish action plus the canonical host. Effort: S. Risk if built badly: a loop or a bulk sync submits thousands of URLs and the endpoint throttles the host; cap per-run submissions and never ping from a catalog sync, only from an editorial write.",
+      "why": "Editorial content is only worth writing if it is indexed while the drop it describes is still live."
+    },
+    {
+      "category": "content",
+      "title": "Live data widgets inside prose",
+      "body": "Editorial markdown gains two shortcodes — one for a badge reference and one for a bare owner-count — that render a compact live card inside the article: badge art, current tier chip, owner count and a countdown when the window is open, all resolved at render time and linking to the detail page. A sentence claiming a badge is still claimable therefore proves itself beside the claim instead of going stale the next day. Data: the referenced badge row, latest owner count, drop window. Effort: S. Risk if built badly: a shared post triggers thousands of per-request catalog reads; batch all referenced IDs into one query per render, cache the widget briefly, and never render a broken box for an unknown slug.",
+      "why": "An article about a live drop should show the drop, not a screenshot of it from the day it was written."
+    },
+    {
+      "category": "content",
+      "title": "Internal-link suggestion engine",
+      "body": "While an editor writes a draft, a side panel scans the body for badge names, set names, categories, tier vocabulary and glossary terms and suggests the internal target for each match — a badge detail page, a filtered catalog view, a glossary anchor — with the anchor text taken from the draft itself. It also flags mentions with no target yet (an un-glossed term, a badge absent from the catalog) as content gaps, and reports the draft's internal link count against its length. Data: a term index built from badge names, set ids, categories, FAQ keys and glossary terms, matched against the draft's plain text. Effort: M. Risk if built badly: it over-links common words and turns prose into a link farm; require a confidence threshold and let the editor accept suggestions individually rather than auto-inserting them.",
+      "why": "Internal links are what let 476 badge pages and a growing blog hold each other up in search, and doing it by hand is what nobody does."
+    },
+    {
+      "category": "content",
+      "title": "Content maintenance queue",
+      "body": "A ranked list of published pages that need attention, scored from two signals the site already owns: the page's traffic decay, from the analytics table's per-path views over recent weeks, and fact drift, where a badge cited by the page has since expired, changed tier or left the catalog. Every row names the page, the reason it surfaced, the specific stale reference, and a one-click path to edit it. It runs after the syncs so the queue always reflects the catalog as it now is, and it excludes pages that legitimately never change. Data: analytics paths and views, badge rows and badge_events, and the references extracted from page bodies. Effort: M. Risk if built badly: it floods editors with hundreds of low-value rows until the queue is ignored; cap it per week and rank by traffic at risk rather than raw staleness count.",
+      "why": "Content rots fastest on a site whose subject changes daily, and a decay queue is the only way an archive stays true."
+    },
+    {
+      "category": "content",
+      "title": "Pre-publish fact-check gate",
+      "body": "Before a post or glossary entry publishes, a check extracts every number and badge reference from the body, compares owner counts, dates and tier claims against the live database, and shows the editor a diff: what the draft claims versus what the catalog says today. The publish button stamps an as-of date by default so a number is never presented as permanently true, and the editor can pin a claim to a snapshot when the intent is deliberately historical. Data: the draft body, the referenced badge rows, and badge_stats for the cited metric. Effort: M. Risk if built badly: the extractor misfires on incidental numbers and trains editors to click through blindly; hard-block only sequential claims such as owner counts and dates, and warn on everything else.",
+      "why": "A badge database publishing a written claim about its own data is the one place a wrong number is unforgivable."
+    },
+    {
+      "category": "content",
+      "title": "Keyword-to-page map",
+      "body": "An internal map assigning each target query cluster to exactly one canonical page — a badge detail page, a category landing page, a tutorial, a glossary term — with its current owner page and a cannibalization flag when two pages compete for the same intent. It is generated by matching queries against page titles, headings and copy already in the repo and shows clusters with no page at all as the editorial backlog. Data: per-route text extracted from the content rows plus, where available, the zero-result search log and referrer hosts. Effort: M. Risk if built badly: it hardens into a stale spreadsheet claiming ownership of pages that were renamed; regenerate it from routable content rather than maintaining it by hand.",
+      "why": "With this much overlapping content, the fastest ranking win is stopping two of the site's own pages from fighting over one query."
+    },
+    {
+      "category": "content",
+      "title": "Zero-result search to gap briefs",
+      "body": "Every catalog search returning nothing is logged with its query, locale and timestamp, and a weekly job clusters the queries into themes (prime gaming, twitchcon, mod badge) and turns each cluster into a short brief: what people searched for, whether a near-match exists in the catalog, and which page should answer it. Themes with no answering page become tutorial or glossary candidates; themes where a badge exists but is unfindable become alias or synonym work on the search index. Data: the logged queries plus the catalog's name, set_id and category fields for near-match detection. Effort: S. Risk if built badly: the log becomes an unmoderated dump of whatever a visitor typed into a box; store a trimmed query string only, and drop anything resembling a name or email address.",
+      "why": "A failed search is the most honest statement of what content the site is missing, and the site already collects it by doing nothing."
+    },
+    {
+      "category": "content",
+      "title": "Content performance attribution",
+      "body": "A report answering which written pages actually bring people into the catalog: aggregate the anonymous path sequences so a visit that passes through a post, tutorial or glossary entry and then reaches a badge detail page or a signup is credited to the entry page. It outputs assisted catalog visits and assisted signups beside raw views, so a lower-traffic article that converts well is visible next to a high-traffic one that does not. Data: the analytics table's path, visitor hash, timestamp and locale, aggregated across visitors only. Effort: M. Risk if built badly: attribution invites joining sequences to identity; keep it strictly aggregate, refuse to output any row below a minimum visitor count, and never expose a per-visitor path.",
+      "why": "Without it the team optimizes for pageviews on a site whose actual goal is people reaching and claiming badges."
+    },
+    {
+      "category": "content",
+      "title": "AI-answer readiness pack",
+      "body": "A machine-readable, human-edited front door for answer engines: an llms.txt-style summary saying what the site is, what it tracks and where the data comes from, plus a small set of concise citable fact pages — catalog size, how rarity is defined, what is dropping this week, the biggest rarity movers — written as short prose with explicit as-of dates and stable anchors. Each fact page is regenerated from live data and carries a suggested citation line. Data: stats views and the current catalog for the numbers, authored prose for the framing. Effort: S. Risk if built badly: the summarized facts go stale and an assistant quotes the site's own outdated page back at users; regenerate numbers on each read and date every block.",
+      "why": "When someone asks an assistant which badges exist, the site either supplies the citable answer or is paraphrased from a worse source."
+    },
+    {
+      "category": "content",
+      "title": "Newsletter archive as web pages",
+      "body": "Every issue the site sends becomes a public indexable page at its own URL with a title, description and Article markup, plus an archive index ordered by date and an RSS feed of issues. Each archive page also links the badges and posts it featured, so old issues keep working as internal-link sources, and the send action writes the archive row from the same payload that went out. Data: the newsletter payloads the admin tab already stores plus the badges and posts they reference. Effort: M. Risk if built badly: an issue containing a personal greeting or a subscriber-only offer publishes verbatim; require an explicit archive step and strip every personalization field before the row is written.",
+      "why": "Newsletters are written once and read once, while an archive page keeps earning search traffic forever."
+    },
+    {
+      "category": "content",
+      "title": "Collection-aware newsletter sections",
+      "body": "The digest is assembled from fixed sections — new drops, your categories, deadline warnings, rarity movers, new writing — and their order is chosen per subscriber from their own synced inventory, so someone who owns only Prime badges reads that section first and a category they own nothing in last. It reuses the existing send path and the inventory the potat sync already stores, computes the order at send time, and falls back to the default order when a subscriber has no synced badges. Data: per-user inventory, catalog category mix, closing drop windows, subscriber record. Effort: M. Risk if built badly: the reordering is so aggressive that a subscriber never sees a new category and stops discovering anything; keep every section present and change only the order.",
+      "why": "The site already knows what each subscriber collects, and a digest that ignores that is a generic mailing list."
+    },
+    {
+      "category": "content",
+      "title": "Editorial brief generator",
+      "body": "An internal tool that turns a one-line topic into a filled brief: target page and search intent, required sections (what it is, how to earn, deadline, rarity context), the live data rows to cite, the internal links to include, the target keyword cluster from the map, and the structured-data block the finished page must carry. Briefs are stored rows with a status, so one can be handed to a guest writer and an editor can see what is outstanding at a glance. Data: badge rows for cited data, the keyword map, the route-type registry for required schema. Effort: S. Risk if built badly: every post comes out structurally identical and reads like a template; treat the section list as a floor the writer may cut, and never auto-fill prose.",
+      "why": "It is the difference between one person holding the whole editorial standard in their head and the standard being reproducible."
+    },
+    {
+      "category": "content",
+      "title": "Event-seeded editorial calendar",
+      "body": "A publishing calendar that pre-creates the year's editorial moments from the catalog's own recurring pattern and the known Twitch calendar: TwitchCon months, Prime Gaming's monthly cadence, anniversaries of landmark drops, and the seasonal spikes the window history shows. Each slot pre-fills a brief and a target date so editors write into a place rather than a blank month, and the seeding reads badge_events history so it reflects when the catalog actually moves rather than when someone remembers. Data: badge_events window history, the brief generator, annual events entered by hand. Effort: M. Risk if built badly: the seed confidently predicts a drop month that never comes and drives wasted writing; label every seeded slot as a hypothesis and never as a scheduled fact.",
+      "why": "Badge traffic is seasonal and event-driven, so a calendar built from the drop history beats one built from memory."
+    },
+    {
+      "category": "content",
+      "title": "Guest contributor program",
+      "body": "Outside writers — collector bloggers, fansite editors, well-known community members — can pitch and publish under the site's editor, each with an author profile page listing their posts, a short bio and a link to their collector profile, plus an author entity in the Article markup. Pitches and drafts move through the content tab with a status per stage, and authorship is a real relation on the post row so a writer's body of work gathers in one place. Data: post rows with an author relation, member profiles for the linked collector identity, editorial status fields. Effort: M. Risk if built badly: it becomes an unvetted link channel writers farm for backlinks; require editor approval, nofollow outbound links, and a visible disclosure on any paid or sponsored contribution.",
+      "why": "Domain expertise about badges lives in the community, and this is how it becomes original on-site content instead of a Reddit thread."
+    },
+    {
+      "category": "content",
+      "title": "Editorial revision history with diffs",
+      "body": "Every revision of a post, glossary entry or tutorial is stored as a versioned row (body, editor, timestamp, note), and each published page gains a quiet last-updated line with a diff view between any two versions. Editors can see who changed a fact and when, and a reader can see that a page citing owner numbers was actually re-checked, which is the difference between a decaying blog and a living reference. Data: content rows, an author relation, and the existing audit log for attribution. Effort: M. Risk if built badly: the diff exposes an unpublished draft or an internal note; scope diffs to published versions only and keep edit notes internal unless explicitly published.",
+      "why": "On a data site, a page with a visible revision history reads as maintained, and a page without one reads as abandoned."
+    },
+    {
+      "category": "content",
+      "title": "Curated themed badge lists",
+      "body": "Hand-curated, editorially framed lists that cut across categories — first badges to chase as a newcomer, badges worth a TwitchCon trip, the finest pixel-art badges in the catalog — stored as an ordered list of badge IDs with a rationale per entry and an intro paragraph. Unlike a generated landing page the value is the selection and the sentence explaining why each badge made it, and each entry links to the badge while showing its live tier and owner count. Lists are versioned so a curator can replace an expired entry with a note. Data: an ordered badge-ID list, the badge rows for live state, authored copy. Effort: S. Risk if built badly: a list goes stale as its badges expire and becomes a page of dead ends; drive a re-check from badge expiry and hide an expired entry rather than leaving it in place.",
+      "why": "Curation is the one thing a database cannot generate, and it is what gives a list page a reason to exist beside the filter UI."
+    },
+    {
+      "category": "content",
+      "title": "Data-story investigations",
+      "body": "Occasional long-form analysis pieces that start from a question the catalog can actually answer and answer it with charts and a stated method: whether claim windows have shortened over the years, which categories have grown rarest, how one badge family's owner counts moved version by version. Each piece publishes its query, its sample size and the date the data was pulled so a reader can check the work, and its charts come from the same stats views the dashboard uses. Data: badge_stats series, badge_events window history, catalog fields. Effort: L. Risk if built badly: the analysis over-reads a third-party owner estimate as ground truth; every piece must state the margin of the underlying data and avoid causal claims about why a window moved.",
+      "why": "Nobody publishes badge data journalism, so the site that holds the time series can own the definitive analysis pieces."
+    },
+    {
+      "category": "content",
+      "title": "Last call deadline column",
+      "body": "A short forward-looking post on a fixed cadence naming the badges whose claim windows close in the next few days, with one line of commentary each and a live countdown beside every entry. It is the inverse of a retrospective digest: it exists to be read in the next 72 hours, so it is dated, cheap to write (a template pulls the closing list and the writer adds a sentence and a priority order), and links straight into the claimable view. Data: windows closing soon, badge rows, owner counts. Effort: S. Risk if built badly: it becomes auto-generated filler that is identical every week; require a human editorial choice of what to lead with and skip weeks when nothing closes.",
+      "why": "It is the one piece of writing that has an immediate reason to be read, and it converts a reader into a claim the same day."
+    },
+    {
+      "category": "content",
+      "title": "Alt text for badge art",
+      "body": "A generated accessible name and alt text for every badge image across the site: the badge's name, its set and category and its rarity tier, assembled from the row instead of left empty or as a filename. Where a badge has a curated flavor blurb, that enriches the description, and the Open Graph route uses the same string in its metadata. Data: badge name, set, category, tier and the optional blurb. Effort: S. Risk if built badly: hundreds of near-identical strings simply restate the visible name and make the screen-reader experience worse; keep only the informative fields, skip the decorative tier chip duplication, and mark purely decorative instances empty.",
+      "why": "Badge art is the entire content of the catalog, so its accessibility is not a nicety but the difference between a usable and an unusable page for a screen-reader visitor."
+    },
+    {
+      "category": "content",
+      "title": "Explain-this-number tooltips",
+      "body": "Wherever the site shows jargon or a computed number — TBRI, tier name, owner count, momentum, half-life, wear share — the label carries a focusable tooltip with a one-sentence plain-language definition and a link to the full methodology page. Definitions come from one shared registry keyed by term so the same word means the same thing on a badge tile, a leaderboard and a chart legend, and keyboard focus opens it without a mouse. Data: a definitions map in code, linked to the glossary and methodology content. Effort: S. Risk if built badly: tooltips multiply until every label has a popover and reading the page becomes an exercise in hovering; restrict it to the defined vocabulary list and never wrap ordinary words.",
+      "why": "The site's best features are its numbers, and every undefined number is a reader leaving to look up what TBRI means."
+    },
+    {
+      "category": "content",
+      "title": "Audio editions and podcast feed",
+      "body": "Each substantial post and data story gets a generated audio edition from a fixed, credited voice, served from the same page with a player and a download link, plus a podcast RSS feed carrying the audio as episodes so collectors can subscribe where they already listen. The feed reuses the blog's publish path and its locale field, so an audio edition appears when its source post publishes. Data: post body text, publish metadata, brand cover art. Effort: M. Risk if built badly: a robotic voice reading code, tables and badge UUIDs makes the site sound sloppy; strip markup, spell out abbreviations and skip any post whose body is mostly tabular data.",
+      "why": "It is the same writing reaching a second audience at almost no marginal editorial cost, and a podcast feed is a subscription the site does not currently have."
+    },
+    {
+      "category": "content",
+      "title": "Printable collection checklists",
+      "body": "Generated print-friendly PDFs: choose a category, a set or one of the curated lists and get a one-page sheet of badge thumbnails with name, tier and a checkbox, laid out for A4 and Letter with no site chrome. It doubles as a convention handout and as the download at the end of a tutorial, and it renders from the same catalog query the page uses so the sheet matches the catalog on the day it was generated. Data: catalog rows for the selected slice, badge images and tier chips. Effort: M. Risk if built badly: a cached PDF circulates for months showing badges that since expired; stamp every sheet with a generation date and a short URL that regenerates it fresh.",
+      "why": "Collectors already keep spreadsheets of what they own, and a printable sheet is the site's catalog in the form they actually use."
+    },
+    {
+      "category": "content",
+      "title": "Five-email collector course",
+      "body": "A short automated email course over a week that takes a curious visitor from what a global badge is to claiming their first: message one explains the catalog, two walks through claiming, three explains rarity and why some badges are hard, four introduces the games and XP, five invites them to link Twitch and see their own inventory. Each message carries one live catalog example resolved at send time and exactly one call to action, and replies route into the mailbag column. Data: subscriber record and step progress, one example badge per message chosen by tier, the existing send path. Effort: M. Risk if built badly: it becomes a nagging sequence that burns the list; cap it at five messages, stop the sequence on engagement, and keep the send path unsubscribe-compliant.",
+      "why": "It converts a visitor who read one tutorial into a member with a synced inventory, using the same writing the learn hub already produces."
+    },
+    {
+      "category": "content",
+      "title": "Translation coverage dashboard",
+      "body": "A per-locale view of editorial coverage rather than key coverage: which posts, glossary entries, tutorials and FAQs exist in each of the eleven languages, how long each gap has been open, and which language has the oldest untranslated page that still attracts traffic. Gaps can be queued for a machine-translation draft that lands as an unpublished locale row for a human to review, and the dashboard shows the review backlog per locale. Data: content rows with their locale column, the analytics table for per-locale demand, machine-draft status. Effort: M. Risk if built badly: unreviewed machine output ships as a translated page and damages trust in that locale; block publishing until a human marks it reviewed and label every machine-assisted page in the editor.",
+      "why": "The site ships eleven locales but almost certainly one locale's worth of writing, and nobody can fix a gap they cannot see."
+    },
+    {
+      "category": "content",
+      "title": "Translator termbase",
+      "body": "A shared termbase for the eleven locales holding the tokens that must never be translated (Prime Gaming, TwitchCon, Hype Train, Turbo, badge set names, tier names) with their approved form per locale, plus the approved translation of recurring UI vocabulary so claimable is the same word in every file. A check runs over a draft or a message file and flags a term used outside its approved form or a do-not-translate token that was mutated. Data: a termbase table keyed by term and locale, message catalogs and editorial drafts to check. Effort: S. Risk if built badly: a do-not-translate rule blocks a legitimate local phrase and translators learn to ignore the whole check; keep the list short and reviewed, and warn rather than hard-fail except on brand names.",
+      "why": "With eleven locales, one translator mistranslating Turbo or a tier name introduces the error into every locale at once."
+    },
+    {
+      "category": "content",
+      "title": "Style guide with string linter",
+      "body": "A published editorial style guide — tone, sentence case, no emoji, how to write dates and numbers, when to say Twitch rather than a generic possessive, how to refer to badge sets — plus a linter enforcing the mechanical half over every messages file and draft: emoji and control characters, placeholder-set parity across locales, a string-length budget per key so an Arabic or Japanese label cannot overflow its control, and doubled or trailing whitespace. The guide is the human reference and the linter is the gate, both keyed off one shared rule list so they cannot drift apart. Data: message catalogs and draft bodies. Effort: S. Risk if built badly: the linter hard-fails on a legitimate string and gets disabled wholesale; run it as a report first and promote only the checks with no false positives to a build failure.",
+      "why": "The site's written surface is 11 message files plus every article, and a written standard is the only thing that keeps them sounding like one publication."
+    },
+    {
+      "category": "content",
+      "title": "Changelog to product blog bridge",
+      "body": "A reader-facing layer over the technical changelog: for each product change worth explaining, readers get a short post saying what changed, why, and what it means for their collection, written by an editor with the changelog row as its mandatory source link. A draft opens automatically from high-impact changelog categories (new feature, economy change, data-sync fix) so nothing significant goes unexplained, but a human writes it and discarding is one click. Data: the changelog rows, their category, and their JSON payload for the specifics. Effort: M. Risk if built badly: every internal refactor becomes a breathless blog post and the blog loses all credibility; only categories that change what a member sees should open a draft, discarding should be the default for everything else.",
+      "why": "The site already records every change it makes, and readers currently have no way to learn about any of them without reading the technical feed."
+    },
+    {
+      "category": "content",
+      "title": "Reader mailbag column",
+      "body": "A recurring column answering questions real readers ask, sourced from newsletter replies, unanswered FAQ submissions and community channels, each answered properly and linked to the catalog surface or tutorial that resolves it. Questions that recur graduate into a glossary entry or a tutorial, so the mailbag doubles as the content-discovery loop, and each instalment credits the asker by first name only. Data: submitted questions, the catalog and FAQ for answers, the glossary and tutorials as graduation targets. Effort: S. Risk if built badly: it publishes an asker's identifying details or an unverified guess as fact; anonymize by default and label anything the team could not verify as an open question rather than a settled answer.",
+      "why": "Reader questions are free keyword research with intent attached, and answering them in public is content nobody else has."
+    },
+    {
+      "category": "content",
+      "title": "Human content index page",
+      "body": "An HTML index listing every piece of writing the site has — posts grouped by month, tutorials, glossary terms, methodology and sources pages, curated lists — as a browsable, crawlable directory, deliberately separate from the XML sitemap's machine purpose. It gives a reader the whole archive at a glance, gives crawlers and internal-link auditing a single hub, and can show each content type's coverage count so a gap is visible. Data: content rows grouped by type and date plus the route list. Effort: S. Risk if built badly: it grows into a thousand-link page that is useless as navigation and slow to render; paginate by type and keep it a hub rather than a dump.",
+      "why": "An archive nobody can browse is an archive nobody links to, and internal links are what carry the site's ranking between its own pages."
+    },
+    {
+      "category": "content",
+      "title": "Mentioned-in backlinks block",
+      "body": "Badge and category pages gain a small block listing the writing that discusses them — mentioned in: the claim window analysis, the glossary entry on Prime Gaming — derived from an index of badge references extracted from published content. It closes the loop between editorial and catalog so a reader who arrives at a badge from search discovers the article about it, and it makes the internal-link graph auditable from either direction. Data: a references index built by scanning published bodies for badge slugs, UUIDs and set names, plus post metadata. Effort: M. Risk if built badly: the extractor matches a badge name inside an unrelated word and the block shows nonsense; store reference tokens at author time via the badge shortcode instead of guessing from prose.",
+      "why": "It makes every article about a badge a permanent inbound link to that badge page, at no editorial cost after it is written."
+    },
+    {
+      "category": "content",
+      "title": "Inline editorial review threads",
+      "body": "Drafts in the content tab support inline anchored comments: an editor selects a sentence and leaves a note, the author replies in the same thread, and the thread must be resolved before the publish button unlocks. It replaces out-of-band review and keeps the discussion attached to the exact text it concerns, with each thread typed as fact, structure, SEO or legal so a writer knows what kind of change is being asked for. Data: comment rows anchored to a character range of a content revision, plus the existing content status fields. Effort: M. Risk if built badly: it becomes a second chat and the publish gate is resented; keep threads short-lived, auto-resolve them on publish, and never block a typo fix on an open structural thread.",
+      "why": "Editorial quality on a site written by more than one person depends on review happening in the document rather than in a chat window."
+    },
+    {
+      "category": "content",
+      "title": "Event landing pages",
+      "body": "A curated landing page per recurring real-world moment — each TwitchCon, each anniversary of a landmark drop, an opening hype period — gathering the badges associated with it, the writing done around it and a live view of what is claimable during it. Unlike a generated landing page each one is introduced by an editor with a note on what to watch this year, and each is stamped with its own dates so an old event's page reads as archival rather than current. Data: badges tied to the event by date range and category, related posts, live drop windows. Effort: M. Risk if built badly: last year's page keeps ranking and presents expired windows as current; render an explicit archived state after the event and keep the live block out of the archived version.",
+      "why": "TwitchCon and anniversary moments are when badge interest spikes, and a page that exists only for that week can rank for the year."
+    },
+    {
+      "category": "content",
+      "title": "Cross-post syndication",
+      "body": "Selected posts are syndicated to platforms where the collector audience already reads — a Medium or DEV publication, a subreddit, a LinkedIn article — with the canonical URL pointing back to the site and a short originally-published line, so the site keeps the search credit while the writing reaches a wider audience. Each cross-post is recorded against the post row with its destination and date, and the body is transformed minimally (front-matter stripped, relative links made absolute). Data: post body and slug for the canonical URL, a per-platform destination config, publish metadata. Effort: M. Risk if built badly: near-identical posts appear across platforms with a wrong canonical and compete with the original; verify the canonical resolves before sending and never syndicate a post before it is first indexed.",
+      "why": "Badge writing has a natural audience outside this domain, and canonical-tagged syndication is how the site gets that reach without splitting its ranking."
+    },
+    {
+      "category": "content",
+      "title": "Public roadmap page",
+      "body": "A public roadmap page rendered from the site's own ideas board: each item with its title, a short gist, its status (planned, in progress, shipped, declined) and a vote count members can raise once per item. Items that ship link to the changelog entry that shipped them, closing the loop between the promise and the release note, and the page gives the community a reason to return and gives their suggestions somewhere to land. Data: the ideas rows and statuses, the changelog for shipped links, per-member votes. Effort: M. Risk if built badly: it exposes internal items never meant to be public or reads as a commitment the team cannot keep; default every idea to private, require an explicit publish flag, and word the statuses as intent rather than promise.",
+      "why": "The site has 229 researched ideas nobody outside the team can see, and publishing them converts an internal backlog into community trust."
+    },
+    {
+      "category": "content",
+      "title": "Collector spotlight interviews",
+      "body": "A recurring interview with a notable collector, driven by their own data: the writer pulls the subject's headline numbers (rarest badge, completion percentage, longest-held badge) and builds the question set around them, then publishes the piece with an author byline, the subject's public profile link and their showcase badges rendered live. Subjects are recruited from the leaderboards and from members who opt in to being approached, and every badge mentioned links to its page. Data: the member's public profile, inventory aggregates, leaderboard position, an explicit opt-in flag. Effort: M. Risk if built badly: it interviews people who never consented or publishes numbers they consider private; require opt-in, let the subject review before publishing, and treat a private inventory as a decline.",
+      "why": "Collectors are the audience and the subject matter, and a profile written from real collection data is content no directory can generate."
+    }
+  ]
+}

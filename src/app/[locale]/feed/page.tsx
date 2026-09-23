@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getFeatures } from "@/lib/settings";
 import FeedList, { type FeedEvent } from "@/components/FeedList";
 import LiveRefresher from "@/components/LiveRefresher";
 import { localeAlternates } from "@/lib/seo";
@@ -32,6 +34,10 @@ export default async function FeedPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("feed");
+
+  // The endpoint 404s on the same switch, so the page and the API agree.
+  const features = await getFeatures();
+  if (!features.feed) notFound();
 
   let initialEvents: FeedEvent[] = [];
   try {

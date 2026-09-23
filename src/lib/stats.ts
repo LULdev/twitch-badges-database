@@ -238,14 +238,22 @@ export function availability(ok: number, total: number): number | null {
 }
 
 function serviceStatus(sources: UptimeSource[]): ServiceStatus {
-  if (sources.length === 0) return "degraded";
-  const latest = sources
+  // Operator-initiated one-offs (`manual/*`) are written only when someone
+  // presses "sync now" in the dashboard, and no recurring job ever supersedes
+  // their row — so a single failed manual run would pin the public gauge at
+  // "degraded" forever. The gauge describes the *scheduled* pipeline: `sync/*`
+  // and `cron/*` (plus `web`).
+  const recurring = sources.filter(
+    (source) => !source.source.startsWith("manual/"),
+  );
+  if (recurring.length === 0) return "degraded";
+  const latest = recurring
     .map((source) => source.last_at ?? "")
     .sort()
     .at(-1);
   if (!latest) return "degraded";
   const ageMinutes = (Date.now() - new Date(latest).getTime()) / 60_000;
-  const errored = sources.filter((source) => source.last_status === "error");
+  const errored = recurring.filter((source) => source.last_status === "error");
   // No heartbeat in 36h means the pipeline is not running at all.
   if (ageMinutes > 60 * 36) return "down";
   if (errored.length > 0 || ageMinutes > 120) return "degraded";
@@ -336,29 +344,36 @@ export async function getPlatformStats(): Promise<PlatformStats> {
       .sort()
       .at(-1) ?? null;
 
-  const rawGamification = gamification as GamificationStats | null;
+  // The view returns snake_case columns (`total_xp`, `avg_level`, …) while the
+  // exported shape is camelCase. Reading `rawGamification.totalXp` off the row was
+  // always `undefined`, and num(undefined) is 0 — so every gamification KPI on
+  // /stats rendered as 0 while the view held real values (live: total_xp 3610,
+  // avg_level 11.00). `players` was the only key that happened to match. Read the
+  // real column names and map them onto the shape the consumers use.
+  const raw = (gamification ?? null) as Record<string, unknown> | null;
+  const g = (key: string) => num(raw?.[key]);
 
   return {
-    gamification: rawGamification
+    gamification: raw
       ? {
-          ...rawGamification,
-          players: num(rawGamification.players),
-          totalXp: num(rawGamification.totalXp),
-          totalCoins: num(rawGamification.totalCoins),
-          coinsWon: num(rawGamification.coinsWon),
-          coinsLost: num(rawGamification.coinsLost),
-          gamesPlayed: num(rawGamification.gamesPlayed),
-          gamesWon: num(rawGamification.gamesWon),
-          wheelSpins: num(rawGamification.wheelSpins),
-          stealsSuccessful: num(rawGamification.stealsSuccessful),
-          stealsFailed: num(rawGamification.stealsFailed),
-          timesRobbed: num(rawGamification.timesRobbed),
-          achievementPoints: num(rawGamification.achievementPoints),
-          avgLevel: num(rawGamification.avgLevel),
-          maxLevel: num(rawGamification.maxLevel),
-          active1d: num(rawGamification.active1d),
-          active7d: num(rawGamification.active7d),
-          active30d: num(rawGamification.active30d),
+          players: g("players"),
+          totalXp: g("total_xp"),
+          totalCoins: g("total_coins"),
+          coinsWon: g("coins_won"),
+          coinsLost: g("coins_lost"),
+          gamesPlayed: g("games_played"),
+          gamesWon: g("games_won"),
+          wheelSpins: g("wheel_spins"),
+          stealsSuccessful: g("steals_successful"),
+          stealsFailed: g("steals_failed"),
+          timesRobbed: g("times_robbed"),
+          achievementPoints: g("achievement_points"),
+          avgLevel: g("avg_level"),
+          maxLevel: g("max_level"),
+          active1d: g("active_1d"),
+          active7d: g("active_7d"),
+          active30d: g("active_30d"),
+          lastActivity: (raw.last_activity as string | null) ?? null,
         }
       : null,
     levels: (levels as LevelRow[]).map((row) => ({

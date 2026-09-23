@@ -6,11 +6,28 @@ config({ path: ".env.local" });
  * Functional verification of the atomic economy fixes (B5/B6/B10).
  *
  * Isolates the arithmetic with `skipAchievements` (an award normally cascades
- * into achievement XP, which would mask the deltas) and leaves no trace: the
- * full progress row is snapshotted and restored, and every row the test
- * created is deleted again.
+ * into achievement XP, which would mask the deltas) and restores the progress row
+ * afterwards.
+ *
+ * REQUIRES AN EXPLICIT TARGET. It used to take `profiles…limit(1)` and rewrite
+ * whichever member happened to be first — a live award plus deletions of their
+ * activity_events and user_achievements rows, restored on a best-effort basis and
+ * NOT transactionally, so a crash in between left a real member altered. Pass the
+ * profile to use (a throwaway account), or set ECONOMY_TEST_PROFILE_ID:
+ *
+ *   npx tsx scripts/verify-atomic-economy.ts <username|profile-id>
  */
 async function main() {
+  const target = (process.argv[2] ?? process.env.ECONOMY_TEST_PROFILE_ID ?? "").trim();
+  if (!target) {
+    console.error(
+      "Refusing to run: this script mutates a member's economy row.\n" +
+        "Pass a throwaway profile:  npx tsx scripts/verify-atomic-economy.ts <username|uuid>\n" +
+        "or set ECONOMY_TEST_PROFILE_ID.",
+    );
+    process.exit(1);
+  }
+
   const { createAdminClient } = await import("@/lib/supabase/admin");
   const { award, adjustCoins, getProgress } = await import("@/lib/gamification/xp");
   const { evaluateAchievements, ACTIVE_ACHIEVEMENTS, ACH_BY_ID } = await import(
@@ -19,10 +36,18 @@ async function main() {
 
   const supabase = createAdminClient();
 
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    target,
+  );
   const { data: profiles } = await supabase
     .from("profiles")
     .select("id, username")
+    .eq(isUuid ? "id" : "username", target)
     .limit(1);
+  if (!profiles?.length) {
+    console.error(`No profile matches "${target}" — nothing was touched.`);
+    process.exit(1);
+  }
   if (!profiles?.length) {
     console.log("no profile in the database — skipping live award test");
     return;

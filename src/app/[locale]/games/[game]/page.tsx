@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { GAMES } from "@/lib/gamification/games";
 import { createClient } from "@/lib/supabase/server";
 import { authUserId } from "@/lib/gamification/session";
+import { getFeatures, getGames } from "@/lib/settings";
 import TwitchLoginButton from "@/components/TwitchLoginButton";
 import RpsGame from "@/components/games/RpsGame";
 import CoinflipGame from "@/components/games/CoinflipGame";
@@ -34,7 +35,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: localeAlternates(`/games/${game}`),
     },};
   const t = await getTranslations({ locale, namespace: "games" });
-  return { title: t(`${game}Title`), description: t(`${game}Desc`) };
+  // The valid-game branch returned no `alternates`, so these 143 pages (one per
+  // locale per game) canonicalised to the locale home page — contradicting the
+  // sitemap, which lists them with hreflang. The invalid-game branch above always
+  // had them; this brings the branch that actually renders into line.
+  return {
+    title: t(`${game}Title`),
+    description: t(`${game}Desc`),
+    alternates: {
+      canonical: `/${locale}/games/${game}`,
+      languages: localeAlternates(`/games/${game}`),
+    },
+  };
 }
 
 export default async function GamePage({ params }: PageProps) {
@@ -43,6 +55,23 @@ export default async function GamePage({ params }: PageProps) {
   const t = await getTranslations("games");
   const meta = GAMES.find((g) => g.id === game);
   if (!meta) notFound();
+
+  // The playable board is gated by all three arcade switches, not only the hub's
+  // tile list. With the master off or `features.games` disabled the page used to
+  // render a full board whose every round the engine refuses; a single game
+  // switched off in the panel rendered the board and then showed a raw English
+  // error per round. Master / feature off shows the arcade-off copy; a single
+  // disabled game 404s, matching the hub hiding its tile.
+  const [settings, features] = await Promise.all([getGames(GAMES), getFeatures()]);
+  if (!settings.enabled || !features.games) {
+    return (
+      <div className="mx-auto max-w-lg py-16 text-center">
+        <h1 className="text-2xl font-extrabold tracking-tight">{t(`${game}Title`)}</h1>
+        <p className="mx-auto mt-3 max-w-md text-sm text-muted">{t("disabled")}</p>
+      </div>
+    );
+  }
+  if (settings.games[game]?.enabled === false) notFound();
 
   const userId = await authUserId();
   if (!userId) {

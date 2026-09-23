@@ -32,7 +32,8 @@
     "faqNav": "FAQ",
     "wheel": "Ruota della fortuna",
     "mainNav": "Navigazione principale",
-    "mobileNav": "Navigazione mobile"
+    "mobileNav": "Navigazione mobile",
+    "acp": "Pannello admin"
   },
   "common": {
     "search": "Cerca badge…",
@@ -82,7 +83,8 @@
     "errorTitle": "Qualcosa è andato storto",
     "errorBody": "Non è stato possibile caricare la pagina. Di solito è temporaneo: riprova.",
     "errorRetry": "Riprova",
-    "levelAria": "Livello {level}"
+    "levelAria": "Livello {level}",
+    "breadcrumb": "Percorso di navigazione"
   },
   "home": {
     "heroTitle": "Tutti i badge Twitch. Un solo database.",
@@ -262,7 +264,14 @@
     "empty": "Ancora nessun articolo.",
     "autoTag": "Generato automaticamente",
     "notFound": "Questo articolo non esiste.",
-    "react": "Reagisci"
+    "react": "Reagisci",
+    "reactions": {
+      "like": "Mi piace",
+      "love": "Amore",
+      "laugh": "Risata",
+      "fire": "Fuoco",
+      "wow": "Wow"
+    }
   },
   "changelog": {
     "title": "Changelog",
@@ -429,7 +438,19 @@
     "sourceSyncEnrichment": "Arricchimento finestre",
     "sourceSyncOwners": "Statistiche proprietari",
     "sourceWeb": "Richieste web",
-    "sourceOther": "Altra fonte"
+    "sourceOther": "Altra fonte",
+    "navVisitors": "Visitatori",
+    "visitorsTitle": "Visitatori",
+    "visitorsSubtitle": "Visualizzazioni anonime, contate senza indirizzi IP né cookie.",
+    "visitorsOnline": "Online ora",
+    "visitorsOnlineHint": "Visitatori distinti negli ultimi 5 minuti",
+    "visitorsTotal": "Visualizzazioni totali",
+    "visitorsTotalHint": "Dall'inizio del conteggio",
+    "visitors24h": "Visite 24 h",
+    "visitors7d": "Visite 7 g",
+    "visitors30d": "Visite 30 g",
+    "visitorsUnique": "visitatori unici",
+    "visitorsPrivacy": "Nessun indirizzo IP, nessun cookie, nessun URL di provenienza completo. Chi invia Do Not Track viene contato come visualizzazione e nient'altro."
   },
   "notifications": {
     "title": "Notifiche",
@@ -518,7 +539,7 @@
     "currentRarity": "Punteggio di rarità attuale",
     "higher": "Più alto",
     "lower": "Più basso",
-    "hiloHint": "Il punteggio di rarità del prossimo badge sarà più alto o più basso? Indovinare paga 1,95x.",
+    "hiloHint": "Il punteggio di rarità del prossimo badge sarà più alto o più basso? La vincita dipende dalle probabilità: una giocata probabile paga poco, un colpo a sorpresa fino a 20x. Un pareggio rimborsa la puntata.",
     "red": "Rosso",
     "black": "Nero",
     "green": "Verde",
@@ -529,8 +550,8 @@
     "stop": "STOP",
     "again": "Gioca ancora",
     "newCard": "Nuova carta",
-    "scratchHint": "Gratta i 9 campi — 3 simboli uguali vincono. Il jackpot triplo paga 20x.",
-    "vaultHint": "Ferma ogni ago nella zona verde: moltiplicatore 0/0,5x, 1/1,5x, 2/3x, 3/3x.",
+    "scratchHint": "Gratta i 9 campi — 3 simboli uguali vincono. Il triplo jackpot paga fino a 10x.",
+    "vaultHint": "Più aghi nella zona verde (0/1/2/3) aumentano la probabilità di vincere. Una vincita paga 2x.",
     "floor": "Piano",
     "cashout": "Incassa",
     "cashoutAt": "Incassa a",
@@ -557,7 +578,7 @@
     "dailyComeBack": "Torna domani per il prossimo bonus.",
     "streak": "Serie",
     "rpsTitle": "Sasso, carta, forbice",
-    "rpsDesc": "Il duello classico contro il bot. Doppio o niente a ogni round.",
+    "rpsDesc": "Il duello classico contro il bot. Una vittoria paga 1,9x; un pareggio rimborsa la puntata.",
     "slotsTitle": "Badges of Ra 6 Deluxe",
     "slotsDesc": "5 rulli, 3 righe, veri simboli badge e un jackpot scatter.",
     "shootTitle": "Shoot the Badges",
@@ -569,21 +590,25 @@
     "coinflipTitle": "Scala di BadgesCoins",
     "coinflipDesc": "Testa o croce su una scala di 7 gradini — ogni gradino raddoppia la vincita.",
     "hiloTitle": "Più alto o più basso",
-    "hiloDesc": "Punta sul punteggio di rarità del prossimo badge — 1,95x per risposta corretta.",
+    "hiloDesc": "Scommetti sul punteggio di rarità del prossimo badge. La vincita dipende dalle probabilità della tua giocata (fino a 20x); un pareggio rimborsa la puntata.",
     "rouletteTitle": "Roulette dei badge",
     "rouletteDesc": "Rosso, nero o lo zero verde a 14x. 37 caselle, pura suspense.",
     "blackjackTitle": "Blackjack dei badge",
     "blackjackDesc": "21 contro il banco — scegli la strategia e distribuisci.",
     "vaultTitle": "Forzare la cassaforte",
-    "vaultDesc": "Ferma tre aghi nella zona verde. Tre stop perfetti = 3x.",
+    "vaultDesc": "Ferma tre aghi nella zona verde — più aghi significano più probabilità di vincere, e una vincita paga 2x.",
     "scratchTitle": "Scratch the Badge",
-    "scratchDesc": "Gratta nove campi — tre simboli uguali vincono fino a 20x.",
+    "scratchDesc": "Gratta nove campi — tre simboli uguali vincono fino a 10x.",
     "towerTitle": "Torre dei badge",
     "towerDesc": "Sali dieci piani di rischio crescente — incassa prima che le guardie ti prendano.",
     "catcherTitle": "Cattura badge",
     "catcherDesc": "Cattura i badge che cadono nel cesto, evita le bombe.",
     "notEnoughBadges": "Non ci sono ancora abbastanza badge nel catalogo per creare un quiz.",
-    "streakDay": "Giorno {streak}"
+    "streakDay": "Giorno {streak}",
+    "disabled": "La sala giochi è al momento disattivata. Torna più tardi.",
+    "scatter": "SCATTER!",
+    "scratchFounder": "Fondatore",
+    "scratchJackpot": "JACKPOT"
   },
   "wheel": {
     "title": "Ruota della fortuna",
@@ -655,7 +680,7 @@
     "freeQ": "Tutto questo è gratuito?",
     "gamesA": "Tutti gli esiti casuali (slot, roulette, ruota, testa o croce, blackjack, gratta, torre) sono generati sul server e non possono essere manipolati. I giochi di abilità (tiro, memoria, cesto) verificano il punteggio lato server con dei limiti.",
     "gamesQ": "I giochi sono equi?",
-    "levelsA": "Il livello 1 parte da 0 XP. Ogni livello richiede 100 + (livello-1) x 50 XP — il livello 100 totalizza 254.900 XP. Ogni livello ha un badge unico con animazione scintillante nel profilo, sempre visibile e impossibile da nascondere.",
+    "levelsA": "Il livello 1 parte da 0 XP. Ogni livello richiede 100 + (livello-1) x 50 XP — il livello 100 totalizza 252.450 XP. Ogni livello ha un badge unico con animazione scintillante nel profilo, sempre visibile e impossibile da nascondere.",
     "levelsQ": "Come funzionano i livelli da 1 a 100?",
     "profileA": "35 impostazioni: 20 comuni (colori, font, banner, stile scheda, cornici, opzioni privacy, link sociali) e 15 extra creativi (aura, sfondo di particelle, nome arcobaleno, inclinazione 3D, avatar pixelato, ticker obiettivi e altro).",
     "profileQ": "Quanto posso personalizzare il profilo?",
@@ -727,6 +752,480 @@
     "stealHint": "Prezzi alti scoraggiano i ladri occasionali; i tentativi falliti ti pagano il prezzo.",
     "saving": "Salvataggio…",
     "saved": "Salvato!",
-    "save": "Salva modifiche"
+    "save": "Salva modifiche",
+    "titlePlaceholder": "Cacciatore di badge",
+    "usernamePlaceholder": "nome utente",
+    "statusBubblePlaceholder": "a caccia di SUBtember…",
+    "options": {
+      "font": {
+        "sans": "Sans",
+        "serif": "Serif",
+        "mono": "Mono",
+        "rounded": "Arrotondato"
+      },
+      "cardStyle": {
+        "glass": "Vetro",
+        "solid": "Pieno",
+        "outline": "Contorno"
+      },
+      "radius": {
+        "sharp": "Spigoloso",
+        "soft": "Morbido",
+        "round": "Tondo"
+      },
+      "avatarFrame": {
+        "none": "Nessuno",
+        "ring": "Anello",
+        "double": "Doppio",
+        "glow": "Bagliore",
+        "crown": "Corona"
+      },
+      "showcaseLayout": {
+        "grid": "Griglia",
+        "row": "Riga",
+        "carousel": "Carosello"
+      },
+      "density": {
+        "cozy": "Ampia",
+        "compact": "Compatta"
+      },
+      "profileTheme": {
+        "auto": "Auto",
+        "violet": "Viola",
+        "emerald": "Smeraldo",
+        "sapphire": "Zaffiro",
+        "gold": "Oro"
+      },
+      "effectsIntensity": {
+        "off": "Disattivato",
+        "subtle": "Sottile",
+        "full": "Completo"
+      }
+    }
+  },
+  "admin": {
+    "title": "Pannello admin",
+    "common": {
+      "working": "In corso…"
+    },
+    "gate": {
+      "title": "Accesso amministratore",
+      "intro": "Nessun proprietario ancora registrato. Inserisci il codice di bootstrap per assumere l'installazione.",
+      "passcodeLabel": "Codice di accesso",
+      "submit": "Sblocca",
+      "hint": "Questa porta si chiude definitivamente appena viene registrato un proprietario.",
+      "invalid": "Il codice non è corretto.",
+      "throttled": "Troppi tentativi. Riprova tra qualche minuto.",
+      "closed": "La porta del codice è chiusa — esiste già un proprietario.",
+      "network": "Errore di rete. Riprova."
+    },
+    "setup": {
+      "title": "Registra il proprietario",
+      "intro": "Il profilo indicato qui diventa il proprietario e può gestire tutto.",
+      "usernameLabel": "Nome utente Twitch",
+      "twitchIdLabel": "ID utente Twitch (facoltativo)",
+      "twitchIdPlaceholder": "ID numerico — consigliato",
+      "submit": "Registra proprietario",
+      "notFound": "Nessun profilo con quel nome — accedi una volta con Twitch e riprova.",
+      "failed": "Registrazione non riuscita.",
+      "doneTitle": "Proprietario registrato",
+      "doneBody": "Il codice di bootstrap non funziona più. Ricarica per aprire la dashboard."
+    },
+    "dashboard": {
+      "title": "Centro di controllo",
+      "signedInAs": "Accesso come {role}.",
+      "intro": "I moduli vengono distribuiti a fasi — utenti, contenuti, sincronizzazione, impostazioni, statistiche e altro arrivano nelle prossime fasi."
+    },
+    "forbidden": {
+      "title": "Non disponibile",
+      "body": "Il pannello admin è riservato al proprietario e agli amministratori."
+    },
+    "tabs": {
+      "label": "Sezioni",
+      "users": "Utenti",
+      "content": "Contenuti",
+      "sync": "Sincronizzazione",
+      "settings": "Impostazioni",
+      "stats": "Statistiche",
+      "status": "Stato",
+      "newsletter": "Newsletter",
+      "brainstorm": "Idee",
+      "audit": "Registro di audit",
+      "soon": "Questa sezione arriva in una fase successiva.",
+      "badges": "Badge"
+    },
+    "users": {
+      "searchLabel": "Cerca",
+      "searchPlaceholder": "Nome utente, nome visualizzato o ID Twitch",
+      "bannedOnly": "Solo bannati",
+      "count": "{count} membri",
+      "loadFailed": "Impossibile caricare l'elenco.",
+      "loading": "Caricamento…",
+      "empty": "Nessun membro corrisponde a questa ricerca.",
+      "actionFailed": "L'azione non è riuscita.",
+      "saved": "Profilo salvato.",
+      "progressSaved": "Progressi salvati.",
+      "roleSaved": "Ruolo aggiornato.",
+      "close": "Chiudi",
+      "banned": "Bannato",
+      "active": "Attivo",
+      "cols": {
+        "user": "Membro",
+        "role": "Ruolo",
+        "level": "Livello",
+        "xp": "XP",
+        "coins": "Monete",
+        "status": "Stato",
+        "joined": "Iscritto"
+      },
+      "profile": {
+        "title": "Profilo",
+        "save": "Salva profilo"
+      },
+      "field": {
+        "username": "Nome utente",
+        "display_name": "Nome visualizzato",
+        "bio": "Bio",
+        "color": "Colore",
+        "banner_url": "URL del banner",
+        "theme": "Tema",
+        "mood": "Umore",
+        "steal_price": "Prezzo del furto",
+        "steal_max": "Furto massimo",
+        "inventory_public": "Inventario pubblico",
+        "steal_enabled": "Furto attivo"
+      },
+      "progress": {
+        "title": "Progressi",
+        "xp": "XP",
+        "coins": "Monete",
+        "level": "Livello",
+        "login_streak": "Serie di accessi",
+        "save": "Salva progressi"
+      },
+      "role": {
+        "title": "Ruolo",
+        "apply": "Applica ruolo"
+      },
+      "ban": {
+        "title": "Ban",
+        "reason": "Motivo",
+        "days": "Giorni",
+        "apply": "Banna",
+        "lift": "Revoca il ban",
+        "hint": "Zero giorni significa ban permanente.",
+        "active": "Bannato: {reason} — fino al {until}",
+        "noReason": "nessun motivo indicato",
+        "permanent": "permanentemente",
+        "saved": "Ban applicato.",
+        "removed": "Ban revocato.",
+        "confirmPermanent": "Bandire {username} permanentemente? Questo ban non scade."
+      },
+      "achievements": {
+        "title": "Obiettivi",
+        "grant": "Assegna",
+        "revoke": "Rimuovi",
+        "granted": "Obiettivo assegnato.",
+        "revoked": "Obiettivo rimosso."
+      },
+      "danger": {
+        "title": "Zona pericolosa",
+        "delete": "Elimina membro",
+        "confirm": "Eliminare {username} e tutti i suoi dati? Irreversibile.",
+        "deleted": "Membro eliminato."
+      }
+    },
+    "content": {
+      "tabs": {
+        "blog": "Blog",
+        "changelog": "Registro modifiche"
+      },
+      "search": "Cerca",
+      "new": "Nuova voce",
+      "edit": "Modifica",
+      "save": "Salva",
+      "cancel": "Annulla",
+      "delete": "Elimina",
+      "confirmDelete": "Eliminare questa voce? Irreversibile.",
+      "saved": "Salvato.",
+      "deleted": "Eliminato.",
+      "saveFailed": "Impossibile salvare.",
+      "loadFailed": "Impossibile caricare.",
+      "loading": "Caricamento…",
+      "empty": "Ancora nulla qui.",
+      "auto": "auto",
+      "badJson": "Il payload non è JSON valido.",
+      "col": {
+        "title": "Titolo",
+        "slug": "Slug",
+        "status": "Stato",
+        "date": "Data"
+      },
+      "field": {
+        "title": "Titolo",
+        "slug": "Slug",
+        "slugHint": "Derivato dal titolo se vuoto",
+        "author": "Autore",
+        "locale": "Lingua",
+        "status": "Stato",
+        "cover": "URL immagine di copertina",
+        "tags": "Tag",
+        "tagsHint": "Separati da virgole",
+        "excerpt": "Estratto",
+        "content": "Contenuto",
+        "contentHint": "Markdown supportato"
+      },
+      "changelog": {
+        "kind": "Tipo",
+        "body": "Spiegazione",
+        "payload": "Payload (JSON)"
+      }
+    },
+    "badges": {
+      "search": "Cerca",
+      "searchPlaceholder": "Titolo, id del set o slug",
+      "customOnly": "Solo personalizzati",
+      "new": "Nuovo badge",
+      "hint": "Le voci create a mano sono protette dalla sincronizzazione del catalogo: non le sovrascrive né le elimina mai, e un badge del fornitore che entrerebbe in conflitto su id del set e versione viene saltato.",
+      "edit": "Modifica",
+      "save": "Salva",
+      "cancel": "Annulla",
+      "delete": "Elimina",
+      "confirmDelete": "Eliminare questo badge? Irreversibile.",
+      "saved": "Badge salvato.",
+      "deleted": "Badge eliminato.",
+      "saveFailed": "Impossibile salvare il badge.",
+      "loadFailed": "Impossibile caricare i badge.",
+      "empty": "Nessun badge trovato.",
+      "providerHint": "Questa voce proviene dal fornitore. Titolo e immagine vengono aggiornati a ogni sincronizzazione, e solo le voci create a mano si possono eliminare.",
+      "col": {
+        "badge": "Badge",
+        "setId": "Set / versione",
+        "category": "Categoria",
+        "status": "Stato",
+        "source": "Fonte"
+      },
+      "field": {
+        "setId": "Id del set",
+        "version": "Versione",
+        "title": "Titolo",
+        "category": "Categoria",
+        "status": "Stato",
+        "start": "Inizio",
+        "end": "Fine",
+        "image": "URL immagine",
+        "clickUrl": "URL di clic",
+        "description": "Descrizione",
+        "howToEarn": "Come ottenerlo",
+        "paid": "Badge a pagamento o abbonamento"
+      }
+    },
+    "sync": {
+      "intro": "Questi pulsanti eseguono a mano, subito, gli stessi motori dei cron job giornalieri. Un'esecuzione manuale viene registrata come riga a sé nello storico di disponibilità, quindi non maschera mai un'esecuzione pianificata mancata.",
+      "run": "Esegui ora",
+      "running": "In esecuzione…",
+      "results": "Esecuzioni recenti",
+      "ok": "ok",
+      "failed": "Impossibile avviare la sincronizzazione.",
+      "global": {
+        "title": "Differenze catalogo",
+        "hint": "Confronta il catalogo Twitch dal vivo con il database: aggiunge i badge nuovi, aggiorna quelli cambiati e segna come rimossi quelli spariti."
+      },
+      "badgebase": {
+        "title": "Finestre di drop",
+        "hint": "Legge gli elenchi attivi e futuri di badges.blog per confermare quali badge sono ottenibili e fissarne le date di inizio e fine."
+      },
+      "potat": {
+        "title": "Statistiche dei possessori",
+        "hint": "Aggiorna i conteggi dei possessori, i punteggi di rarità e le scansioni di stato da potat."
+      }
+    },
+    "settings": {
+      "loading": "Caricamento impostazioni…",
+      "loadFailed": "Impossibile caricare le impostazioni.",
+      "saved": "Impostazioni salvate.",
+      "saveFailed": "Impossibile salvare le impostazioni.",
+      "save": "Salva",
+      "features": {
+        "title": "Interruttori funzionalità",
+        "hint": "Una funzionalità disattivata perde la voce di navigazione, e l'endpoint corrispondente rifiuta l'azione.",
+        "feed": "Feed dal vivo",
+        "wheel": "Ruota della fortuna",
+        "steals": "Furto di monete",
+        "coinRain": "Pioggia di monete",
+        "compare": "Confronto badge",
+        "games": "Sala giochi"
+      },
+      "economy": {
+        "title": "Economia",
+        "hint": "Questi valori governano il bonus giornaliero, i giochi e il furto. I valori predefiniti sono quelli con cui il sito è partito.",
+        "dailyXp": "XP giornalieri",
+        "dailyCoins": "Monete giornaliere",
+        "streakXpPerDay": "XP serie al giorno",
+        "streakXpCap": "Tetto XP serie",
+        "streakCoinsPerDay": "Monete serie al giorno",
+        "streakCoinsCap": "Tetto monete serie",
+        "gameWinXp": "XP per una partita vinta",
+        "gameLoseXp": "XP per una partita persa",
+        "coinRainCoins": "Monete per pioggia",
+        "stealPrice": "Prezzo furto predefinito",
+        "stealMax": "Furto massimo predefinito",
+        "stealFloodMinutes": "Attesa tra furti (minuti)",
+        "stealPerHour": "Tentativi di furto all'ora"
+      },
+      "games": {
+        "title": "Giochi",
+        "hint": "Disattiva singoli giochi o sposta la fascia di puntata. L'hub nasconde un gioco disattivato e il motore lo rifiuta.",
+        "master": "Sala giochi attiva (interruttore generale)",
+        "col": {
+          "game": "Gioco",
+          "enabled": "Attivo",
+          "min": "Puntata min.",
+          "max": "Puntata max."
+        }
+      },
+      "admins": {
+        "title": "Amministratori e moderatori",
+        "hint": "Concedi l'accesso al pannello tramite nome utente Twitch. La persona deve aver effettuato l'accesso almeno una volta perché il profilo esista.",
+        "owner": "Proprietario: {username} — impostato dal codice di bootstrap e non rimovibile qui.",
+        "username": "Nome utente Twitch",
+        "role": "Ruolo",
+        "add": "Concedi accesso",
+        "remove": "Rimuovi",
+        "empty": "Nessun amministratore o moderatore aggiuntivo."
+      }
+    },
+    "stats": {
+      "loading": "Caricamento statistiche…",
+      "loadFailed": "Impossibile caricare le statistiche.",
+      "noData": "Ancora nessun dato sulle visite.",
+      "kpi": {
+        "online": "Online ora",
+        "views24": "Visite oggi",
+        "views7": "Visite 7 giorni",
+        "views30": "Visite 30 giorni",
+        "total": "Visite totali",
+        "unique": "Visitatori unici"
+      },
+      "chart": {
+        "title": "Visite e visitatori, ultimi 30 giorni",
+        "hits": "Visite",
+        "visitors": "Visitatori"
+      },
+      "devices": "Dispositivi",
+      "browsers": "Browser",
+      "topPaths": "Pagine più viste",
+      "referrers": "Provenienze",
+      "locales": "Lingue",
+      "privacy": "Tempo medio sulla pagina: {avg} s. Contato senza indirizzi IP, cookie o URL di provenienza completi."
+    },
+    "status": {
+      "loading": "Verifica dei servizi…",
+      "loadFailed": "Impossibile caricare lo stato dei servizi.",
+      "title": "Servizi",
+      "probing": "Verifica…",
+      "reprobe": "Verifica di nuovo",
+      "uptime24": "Disponibilità, 24 h",
+      "live": "Sonda dal vivo",
+      "checkedAt": "Verificato alle {time}",
+      "col": {
+        "service": "Servizio",
+        "last": "Ultima esecuzione",
+        "status": "Stato",
+        "24h": "24 h",
+        "7d": "7 giorni",
+        "30d": "30 giorni",
+        "avg": "Durata media"
+      },
+      "empty": "Nessun heartbeat registrato.",
+      "messages": "Ultimi messaggi",
+      "noMessages": "Nessun messaggio — tutti i servizi rispondono puliti."
+    },
+    "newsletter": {
+      "intro": "Scrivi un annuncio e scegli come inviarlo. I destinatari sono contati tra gli account con un indirizzo e-mail e i browser iscritti alle notifiche.",
+      "audienceEmails": "Account con e-mail",
+      "audiencePush": "Browser iscritti",
+      "provider": "Provider e-mail",
+      "providerResend": "Configurato",
+      "providerNone": "Non configurato",
+      "noProviderHint": "Nessun provider e-mail è configurato, quindi il push è l'unica consegna realmente possibile. Una bozza impostata su «email» verrà inviata come notifica web, e il risultato lo dirà — non dichiarerà e-mail che non sono mai partite.",
+      "delivery": "Consegna: {channel}, {sent} inviati, {failed} non riusciti",
+      "loadFailed": "Impossibile caricare le newsletter.",
+      "failed": "L'azione non è riuscita.",
+      "saved": "Bozza salvata.",
+      "sent": "Inviata.",
+      "deleted": "Bozza eliminata.",
+      "new": "Nuova bozza",
+      "edit": "Modifica",
+      "save": "Salva",
+      "send": "Invia ora",
+      "cancel": "Annulla",
+      "delete": "Elimina",
+      "confirmSend": "Inviare questa newsletter a tutti adesso?",
+      "confirmDelete": "Eliminare questa bozza?",
+      "sendHint": "Una bozza si invia una sola volta, e viene segnata come inviata solo se qualcosa è stato davvero consegnato.",
+      "empty": "Nessuna bozza.",
+      "col": {
+        "subject": "Oggetto",
+        "channel": "Canale",
+        "status": "Stato",
+        "recipients": "Destinatari",
+        "date": "Data"
+      },
+      "field": {
+        "subject": "Oggetto",
+        "body": "Messaggio",
+        "channel": "Canale"
+      }
+    },
+    "ideas": {
+      "intro": "La bacheca delle idee del sito: raccogliere, valutare, smistare. Chiunque può leggerla, si scrive solo da qui.",
+      "filter": "Categoria",
+      "allCategories": "Tutte le categorie",
+      "new": "Nuova idea",
+      "edit": "Modifica",
+      "save": "Salva",
+      "cancel": "Annulla",
+      "delete": "Elimina",
+      "upvote": "Vota a favore",
+      "downvote": "Vota contro",
+      "confirmDelete": "Eliminare questa idea?",
+      "loadFailed": "Impossibile caricare le idee.",
+      "failed": "L'azione non è riuscita.",
+      "saved": "Idea salvata.",
+      "deleted": "Idea eliminata.",
+      "empty": "Ancora nessuna idea.",
+      "field": {
+        "category": "Categoria",
+        "status": "Stato",
+        "title": "Titolo",
+        "body": "Note"
+      }
+    },
+    "audit": {
+      "intro": "Ogni azione amministrativa, dalla più recente. Ogni voce registra chi l'ha fatta, cosa ha toccato e, dove rilevante, i valori coinvolti.",
+      "filterAction": "Azione",
+      "allActions": "Tutte le azioni",
+      "filterActor": "Autore",
+      "count": "{count} voci",
+      "loadFailed": "Impossibile caricare il registro di audit.",
+      "empty": "Niente registrato.",
+      "details": "Dettagli",
+      "hide": "Nascondi",
+      "col": {
+        "when": "Quando",
+        "actor": "Autore",
+        "action": "Azione",
+        "target": "Destinazione"
+      }
+    }
+  },
+  "roles": {
+    "owner": "Proprietario",
+    "admin": "Admin",
+    "moderator": "Moderatore",
+    "ownerHint": "Gestisce questa installazione",
+    "adminHint": "Amministratore con accesso completo al pannello",
+    "moderatorHint": "Moderatore — può gestire membri e contenuti"
   }
 }

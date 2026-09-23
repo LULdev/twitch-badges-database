@@ -1,0 +1,276 @@
+{
+  "agent": "usability",
+  "scope": "Usability and accessibility: information architecture and navigation, first-visit onboarding, search and filter behaviour, forms and error handling, mobile and touch ergonomics, assistive-technology support, internationalisation and RTL behaviour, and the small frictions that make people leave.",
+  "ideas": [
+    {
+      "category": "usability",
+      "title": "Data-driven nav priority per viewport",
+      "body": "The header renders all thirteen destinations only at the xl breakpoint; on a 1024 px laptop nine of them disappear behind a hamburger, and nobody chose which nine. Rank the links by real traffic using the anonymous analytics table, which already stores path, client class and screen width, then take the top six as a primary nav and put the rest in a labelled More menu, recomputing the ranking from a monthly query rather than by hand. Keep the hand-written order in site settings as an override so an admin can pin a link the data would demote. Effort: M. Risk if built badly: the nav reshuffles between visits and a noisy month hides a destination the team considers core.",
+      "why": "It removes real navigation friction on the screen size most visitors use, using traffic data the site already collects instead of a guess."
+    },
+    {
+      "category": "usability",
+      "title": "Structured breadcrumbs on every nested route",
+      "body": "Only /badges/[slug] renders a breadcrumb, and it is hand-written inside the page. Add one shared Breadcrumbs component fed by a small route-to-parent manifest, render it on every nested page (blog post, profile, game, compare, admin tab) and emit the matching BreadcrumbList JSON-LD from that same manifest, so the visible trail and the structured data cannot disagree. The final crumb is the current page, is not a link, and the component takes the locale-aware Link. Effort: S. Risk if built badly: a manifest that drifts from the real routes produces broken parent links, which is worse than having no breadcrumb.",
+      "why": "A site with four parallel catalog sections and a dozen sibling pages needs a visible position indicator, and one manifest keeps it honest."
+    },
+    {
+      "category": "usability",
+      "title": "Contextual empty states with recovery actions",
+      "body": "Every empty state today is one muted sentence such as empty, no stats or the shared setup hint, so a visitor who lands on one has nowhere to go. Give each the actual next step: a zero-result catalog query shows the three nearest badge titles by a cheap similarity match plus one-click links that drop just the rarity filter or just the category filter, built from the current query string; an empty inventory puts the sync button inside the card; an empty leaderboard links to the catalog. Keep the raw setup hint only for the genuinely un-migrated database case. Effort: M. Risk if built badly: fuzzy suggestions on a nonsense query present irrelevant badges as if they matched, so they must be labelled as suggestions and capped at three.",
+      "why": "The moment a search returns nothing is the moment a first-time visitor leaves, and a recovery action is the cheapest way to keep them."
+    },
+    {
+      "category": "usability",
+      "title": "Catalog-only mode for non-gamers",
+      "body": "Someone who came to look up a badge meets XP, coins, a wheel, heists and thirteen games in the same header and home page. Add a catalog-only preference (a cookie plus an optional profile field) that hides the games, wheel, feed, steal and compare entries and the level and coin HUD, leaving the catalog, blog, changelog, FAQ and stats, with a one-click switch back in the account menu. Reuse the existing feature flags from site settings so the same switches that disable a feature server-side shape the reduced nav. Effort: M. Risk if built badly: two header variants to test forever, and a member who turns it on cannot find the switch back and concludes the games were removed.",
+      "why": "A large share of badge-site traffic wants a reference table, not an economy, and hiding the economy makes the reference table legible."
+    },
+    {
+      "category": "usability",
+      "title": "Faceted counts on every filter option",
+      "body": "The category and rarity controls show options with no indication of how many badges each returns, so people pick a facet, get eight results and give up. Compute one grouped count per facet (category, rarity, price, status) over the same predicate the list query uses, render the counts in the option labels, and grey out and disable options that would return zero under the current query. Fetch the counts in the same round trip as the list so the options cannot advertise a count the grid does not have. Effort: M. Risk if built badly: a count query per keystroke turns search into a request storm, so counts must come from one cached aggregate and be suppressed while a search term is being typed.",
+      "why": "Telling someone which filters are worth clicking is the difference between browsing a 476-badge catalog and bouncing off it."
+    },
+    {
+      "category": "usability",
+      "title": "Multi-select category and rarity filters",
+      "body": "Category and rarity are single select elements, so show me Sub and Prime badges is impossible without two passes. Turn both into multi-select chip facets with OR semantics inside a facet and AND across facets, serialised as repeated query parameters (category=sub&category=prime) so a filtered view stays shareable and the back button works. The result count, pagination and every link builder read the same parameter shape. Effort: M. Risk if built badly: repeated parameters need explicit handling in queries.ts and in every link builder or a filter silently vanishes on page two, and OR across two facets can return a set so large the page is pointless.",
+      "why": "Real collecting questions span categories, and forcing one facet value per query makes the catalog answer the wrong question."
+    },
+    {
+      "category": "usability",
+      "title": "Owner-count and TBRI range filter",
+      "body": "There is no way to ask the catalog a numeric question, so badges with between 500 and 5,000 owners means paging and reading. Add a dual-thumb range slider with two numeric inputs for owner count, and a second pair for rarity score, applied as owner_min, owner_max, tbri_min and tbri_max parameters against the badge_stats join the rarity query already reads. Commit the query on pointer release and on input blur rather than on every pixel, and show the active range as a removable chip. Effort: M. Risk if built badly: an unbounded range scan on a growing table is slow, and a slider that re-queries live floods PostgREST and makes the grid feel broken.",
+      "why": "Scarcity is the site's whole subject, and a numeric range is the natural way to hunt it."
+    },
+    {
+      "category": "usability",
+      "title": "Locale-aware collation for name sorting",
+      "body": "The name sort and the category list come from Postgres under the database default collation, so accented and non-Latin categories such as Animaux or Anderungen and the CJK category names order by code point instead of by the reader's alphabet. Sort the category list with an Intl.Collator built from the request locale (the list is small and cacheable), and for the name sort either add a collation to the ORDER BY or sort the loaded page with the same collator while labelling it as page-local. Effort: S. Risk if built badly: a locale collation on the sort column can be far slower than the b-tree, and page-local sorting makes page two disagree with page one, so the label must be honest.",
+      "why": "An alphabetical index that is not alphabetical in the reader's language is a small daily irritation in ten of eleven locales."
+    },
+    {
+      "category": "usability",
+      "title": "Highlight and explain search matches",
+      "body": "The catalog predicate matches a query against the badge title, the set id and the category, but a result row renders only the title, so a badge returned for a category or set-id match looks like a wrong result. Return the matched field and the matched substring from the list query, emphasise the substring inside the title with a marked-up span, and when the match was not the title render a small line naming where it matched (category Sub, set id 1234). Submit the query with the same accent styling and keep the highlight markup out of the accessible name so screen readers hear the plain title. Effort: M. Risk if built badly: echoing back unescaped user input into the DOM is an injection point, and a highlight computed with a different case-folding rule than the database's ilike marks the wrong characters.",
+      "why": "A search result that cannot explain why it is there reads as a broken search, which is how people stop trusting the catalog."
+    },
+    {
+      "category": "usability",
+      "title": "Route-change focus and page announcement",
+      "body": "Client-side navigation in the App Router swaps the tree without moving focus or announcing anything, so a screen-reader user stays anchored in the old header and the new page heading is never read. Add one small client component keyed on the pathname that moves focus to the main heading, sets the document title early and announces the new page once, while ignoring router.refresh so the live refresher does not steal focus every minute. Guard it so it fires only on a real path change. Effort: S. Risk if built badly: if a background refresh is misclassified as navigation it will yank focus out of a form the user is typing in.",
+      "why": "Every soft navigation on the site is currently invisible to assistive technology, which makes the whole catalogue feel frozen."
+    },
+    {
+      "category": "usability",
+      "title": "Streaming badge detail with bounded provider waits",
+      "body": "A badge page awaits potat and badgebase alongside the catalog rows, so a slow third party delays the entire page even though its data is secondary. Render the header, facts, how-to-earn, chart and related badges from Postgres immediately, and stream the live owner count and drop-window detail inside Suspense with their own short timeout, falling back to a last-synced label rather than blocking. Keep the fallback copy identical to the no-data copy so the page does not visibly change shape between loads. Effort: M. Risk if built badly: a live count that hydrates late causes layout shift, and a generous timeout still holds the shell open on mobile.",
+      "why": "The catalog rows are local and fast; letting one third-party call set the page's perceived speed is a self-inflicted friction."
+    },
+    {
+      "category": "usability",
+      "title": "You-own-this marker on catalog surfaces",
+      "body": "A signed-in collector browsing the catalog cannot tell what they already have without opening each badge or leaving for the inventory page. Fetch the member's owned badge id set once per request on the catalog, active, upcoming and home sections and in the badge detail header, then render a small owned marker with a text label rather than colour alone on each tile plus an inline in-your-inventory line on the detail page. It is only ever the viewer's own set, never a lookup of someone else's. Effort: M. Risk if built badly: an extra inventory read on the busiest routes hurts the catalog, and an unsynced inventory makes every badge look unowned, so the marker must be suppressed until a first sync exists.",
+      "why": "Knowing at a glance what you still need turns the catalog from a reference into a to-do list."
+    },
+    {
+      "category": "usability",
+      "title": "Hide badges I own catalog toggle",
+      "body": "Once a collector owns a few hundred badges the catalog is mostly noise. Add a hide-what-I-own toggle on the catalog, active and upcoming pages that subtracts the viewer's inventory id set from the query server-side, with the count line reading N shown of M, hiding your 412. When no sync has ever run, show the toggle disabled with a sync prompt instead of an empty grid. Effort: M. Risk if built badly: applying the exclusion without saying so makes the catalog look broken, and a large exclusion list must be passed as a set rather than a giant NOT IN string.",
+      "why": "For a returning collector, filtering out the known is the single biggest reduction in catalog friction."
+    },
+    {
+      "category": "usability",
+      "title": "ARIA combobox search with suggestions",
+      "body": "Catalog search is a plain GET form with no suggestions. Upgrade the input to the combobox pattern with role set, an expanded state and an active-descendant over an options list of the top six matches, each with its image, title and status chip, while keeping the surrounding form a real GET so search still works with JavaScript disabled. Reuse the existing listBadges predicate with a debounce and a stale-response guard. Effort: M. Risk if built badly: this pattern is easy to get wrong (the language switcher already had to move the active descendant onto the listbox owner) and a laggy suggestion query makes typing feel broken.",
+      "why": "Typing three letters and seeing the badge you meant is the fastest path into a 476-row catalog."
+    },
+    {
+      "category": "usability",
+      "title": "Validation summary with field links",
+      "body": "The account settings render a bare cross on a failed save and nothing else, and the profile editor has no per-field validation at all. Validate on blur and on submit, set the invalid and described-by attributes with per-field messages, and put a summary at the top of the form whose items are anchor links that focus the offending input, with every entered value preserved. Keep the rules in one module shared by the client and the account API handler so the two cannot disagree. Effort: M. Risk if built badly: an on-blur validator that scolds before the user has finished typing, and a client rule set that drifts from the server's and lets an invalid document through.",
+      "why": "A save that fails with a symbol and no explanation is the most common reason a member abandons a profile edit."
+    },
+    {
+      "category": "usability",
+      "title": "Unsaved-changes guard on the editors",
+      "body": "The profile customizer carries thirty-five settings and the admin settings panel more, and both save only on an explicit button, so a stray back gesture or tab click silently discards everything. Track dirty state, show an unsaved chip beside the save button, intercept in-app link navigation and the unload event with a confirm, and pair it with a per-group reset. Effort: S. Risk if built badly: a guard that fires on a no-op such as opening the colour picker and closing it trains people to dismiss it, and a guard on the admin panel can block an urgent change.",
+      "why": "Losing a carefully built profile theme to a mis-tapped back button is a permanent reason not to bother customising again."
+    },
+    {
+      "category": "usability",
+      "title": "Inline autosave with a visible undo",
+      "body": "Turn save-on-submit into debounced autosave for the customization document: write 800 ms after the last change, show a saved-at timestamp in place of the button state, and offer a ten-second undo that restores the previously stored document, while keeping the explicit save button for people who prefer it. Keep exactly one previous document per save so undo is a single well-defined restore. Effort: M. Risk if built badly: autosaving a half-typed banner URL or a partially typed hex colour writes junk that renders as a broken profile, and an undo landing after a later edit restores the wrong document.",
+      "why": "Autosave removes the fear that closes the customizer, as long as the undo makes the change feel reversible."
+    },
+    {
+      "category": "usability",
+      "title": "Confirmation and undo for high-stakes actions",
+      "body": "Heists, large wheel spins, showcase removal and reset-to-default all fire on one click with no statement of the stake. Add a confirmation that names the exact consequence and amount, such as the maximum steal from this member and the fact that a failed attempt is spent, and where the action is genuinely reversible offer a short undo window. Read the amounts from the same settings the engine uses so the dialog cannot promise a limit the server would refuse. Effort: M. Risk if built badly: confirmations on every small action become noise, so they need a threshold, and an undo for a coin action reopens the double-spend hole the atomic counters closed.",
+      "why": "Provable fairness is the site's promise for its games, and a dialog that states the exact stake is part of keeping it."
+    },
+    {
+      "category": "usability",
+      "title": "Localised error taxonomy with a cooldown timer",
+      "body": "Game and economy failures render whatever string arrives in the error field, so a member sees Round failed or Network error in English inside an otherwise translated page. Map the known server codes (rate limited, insufficient coins, feature disabled, maintenance, session expired) to localised messages with a try-again-in countdown for the one-per-second limit and a concrete action link for each, announced politely. Keep an unmapped-code fallback that shows a generic message plus a reference instead of the raw string. Effort: S. Risk if built badly: an unmapped code leaks a server internal, and a cooldown that counts down while the server still rejects teaches people to distrust it.",
+      "why": "A rate limit is a normal part of playing thirteen games, and today it is explained in the wrong language and with no remedy."
+    },
+    {
+      "category": "usability",
+      "title": "Session-expiry recovery that preserves the page",
+      "body": "When the Supabase refresh token has been rotated away the client loses writes silently and the member only notices when a save fails. Detect the failed refresh, show a non-blocking banner offering to sign in again with a next parameter back to the current path, and keep in-progress form input in session storage so a re-login restores it, clearing that storage as soon as the save succeeds. Effort: M. Risk if built badly: a next parameter that is not validated against the site origin is an open redirect, and cached form input is a small privacy surface on a shared machine.",
+      "why": "Silent lost writes look like the site being broken, and the fix is a banner rather than a re-typed bio."
+    },
+    {
+      "category": "usability",
+      "title": "Route progress indicator",
+      "body": "Clicking a nav link or a filter chip gives no feedback until Next finishes streaming, so a slow navigation feels like an ignored click. Add a slim indeterminate progress bar driven by the pending transition the filter bar already computes and by the router's link status, with a delay threshold so cached navigations never flash it, positioned under the sticky header so it reads as chrome rather than content. Effort: S. Risk if built badly: a bar that appears and vanishes in thirty milliseconds is visual noise, and one that never completes on a streamed page reads as a stuck site.",
+      "why": "Perceived responsiveness on a catalog that re-queries on every filter click is worth a few lines of client code."
+    },
+    {
+      "category": "usability",
+      "title": "Back-to-results scroll and focus restoration",
+      "body": "Browsing a filtered grid into a badge and pressing back returns to the top of a fresh page with the tile you clicked out of view, which makes comparing several badges painful. Push the current scroll offset and the focused tile id into history state before navigating to a detail page, then restore both on popstate and briefly outline the tile you came from, falling back to the browser default when there is no stored state. Effort: M. Risk if built badly: fighting the framework's own scroll restoration produces a visible jump, and a stale offset on a changed result set lands the user in the middle of nowhere.",
+      "why": "Collectors open several badges in a row, and losing the grid position each time is a friction paid on every comparison."
+    },
+    {
+      "category": "usability",
+      "title": "Print and reading view",
+      "body": "Someone who wants a badge's window, how-to-earn and source on paper currently prints the whole site chrome, and the countdowns print as dashes because they are client timers. Add a print stylesheet and a reading-mode variant that strip navigation and interactive widgets, expand collapsed FAQ answers, swap relative timers for absolute instants, and add a footer with the data source and the generation timestamp. Effort: S. Risk if built badly: a print stylesheet that drifts from the DOM prints empty cards, and printing a live timer is worse than useless, so timers must be replaced rather than left running.",
+      "why": "A badge deadline is exactly the kind of fact people want to keep, and the site currently offers no way to take it away."
+    },
+    {
+      "category": "usability",
+      "title": "Touch target and hit-slop minimums",
+      "body": "The filter chips, the badge-tile secondary controls, the countdown units and several icon-only buttons render well under the recommended minimum touch size on a phone. Introduce a shared tap-minimum token applied through a pseudo-element hit slop on interactive chips and icon buttons so the visual size stays but the target grows, and require an accessible name on any icon-only control in review. Audit the header, filter bar, pagination and the games' bet controls against it. Effort: S. Risk if built badly: larger invisible targets overlap and steal each other's taps on a six-column grid, which is worse than a small target.",
+      "why": "Most badge lookups happen on a phone, where a 24 px chip is a coin toss between two filters."
+    },
+    {
+      "category": "usability",
+      "title": "Mobile input zoom and keyboard hints",
+      "body": "Because the type scale runs small, iOS Safari zooms the viewport whenever the search box, the bet input or the bio textarea is focused, and every field gets the same text keyboard. Set a sixteen-pixel minimum font on form controls and give each field the right input mode, enter-key hint, autocomplete and capitalisation behaviour, numeric for the bet and search for the search box. Effort: S. Risk if built badly: raising control text to sixteen pixels makes the compact filters look inconsistent, and a numeric input mode can block pasting a formatted number.",
+      "why": "The zoom-on-focus jump is the single most visible mobile defect on a site whose primary control is a small search box."
+    },
+    {
+      "category": "usability",
+      "title": "Full-screen swipeable badge viewer",
+      "body": "Badge art is fourteen to twenty-eight pixels in the grid and there is no way to inspect it, even though 2x and 4x assets are already stored. Tapping the image on a tile or detail page opens a full-screen viewer with pinch-zoom, the title, status, rarity and owner count, and horizontal swipe to the previous or next badge in the same result set, with a visible close button plus Escape and swipe-down to dismiss. Use the 4x asset and state the displayed size so nobody mistakes an upscaled sprite for detail. Effort: M. Risk if built badly: horizontal swipe fights the browser's back gesture at the screen edge, and a viewer that pages only through the loaded page of results feels broken at the boundary.",
+      "why": "The badge artwork is the product, and on mobile it is currently the least visible thing on the page."
+    },
+    {
+      "category": "usability",
+      "title": "Long-press tile shortcut menu",
+      "body": "Right-clicking or long-pressing a badge tile does nothing. Add one shortcut menu on the tile, shared by pointer right-click and touch long-press, offering the navigational actions that otherwise need a round trip: open the detail page, add to the compare selection, filter the grid to this badge's category, and show the rest of this badge's set. Make the same menu reachable from a visible overflow button so keyboard users get it too. Effort: M. Risk if built badly: a custom context menu breaks text selection and the browser menu people expect, and a long-press that fires during a scroll opens the menu on every flick.",
+      "why": "The catalog is 476 tiles deep and the fast paths between them should not require a full page load."
+    },
+    {
+      "category": "usability",
+      "title": "Per-section failure isolation with retry",
+      "body": "The home page asks for six things and on any error renders one setup hint for the lot, and a section that throws blanks its whole column. Wrap each section in its own error boundary so a failing query shows a small could-not-load card with a retry that re-runs only that boundary, and the page degrades instead of emptying. Keep one quiet summary line so the page does not become a wall of error cards. Effort: M. Risk if built badly: six error cards read as a broken site, and a retry that re-throws immediately without changing its message teaches people it does nothing.",
+      "why": "One slow provider currently erases the whole landing page, which is the worst possible first impression."
+    },
+    {
+      "category": "usability",
+      "title": "Catalog-searching 404 page",
+      "body": "The not-found page is sixteen lines of text, and a mistyped badge slug is the most likely 404 on the site. Turn it into a recovery page: take the last path segment, run one cheap similarity query against badge slugs and titles plus blog slugs, and offer the five closest badges, a prefilled search box and the three most likely destinations, keeping the query bounded and the page cacheable. Effort: M. Risk if built badly: a similarity query on every bot 404 is free database load for crawlers, and a recovery page that looks like a search result can be mistaken for the real page.",
+      "why": "Most 404s on a slug-driven catalog are one typo away from a real page, and today the site offers no way to find it."
+    },
+    {
+      "category": "usability",
+      "title": "Offline last-known-good catalog",
+      "body": "There is a service worker for push but no offline behaviour, so a dropped connection gives a browser error page. Cache the last successfully viewed catalog page, badge detail and FAQ entry, detect offline from the connection state and a failed fetch, and render the cached content behind a dated bar that says which moment it came from. Suppress countdowns and any claimable-now state while offline, because a stale deadline is worse than an absent one. Effort: L. Risk if built badly: a cached claim window presented as live misleads someone out of a badge, and a cache that outlives a deploy can serve a broken old bundle, so it must be version keyed.",
+      "why": "Twitch badge windows are claimed on phones in poor signal, exactly where a cached catalog beats an error page."
+    },
+    {
+      "category": "usability",
+      "title": "Reduced-transparency and low-end device mode",
+      "body": "The sticky header uses a large backdrop blur and every card is translucent, which is expensive on low-end phones and hard to read for people who find transparency distracting. Honour the reduced-transparency preference and offer a solid-surfaces toggle by swapping the translucent tokens for opaque ones, and skip the blur when the device reports few cores or very little memory, all from one token switch covering the header, cards, chips and game overlays. Effort: S. Risk if built badly: a switch that covers only the header looks broken rather than deliberate, and device-capability sniffing is unreliable enough that it must only ever degrade.",
+      "why": "The blurred sticky header is on screen for every visit and is the most expensive decorative effect the site ships."
+    },
+    {
+      "category": "usability",
+      "title": "Forced-colors and High Contrast support",
+      "body": "Forced-colors mode strips background colours, and the tier chips, live dots, rarity bars and the wheel indicate state with background colour alone, so they collapse to unreadable blocks in Windows High Contrast. Add forced-colors rules that restore visible borders through the system colour keywords, and make sure every state also carries a text or border signal rather than colour alone. Test in a real forced-colors environment rather than a CSS toggle. Effort: M. Risk if built badly: forced-colors rules that fight the theme tokens produce double borders in normal mode, and a drawn wheel needs its own non-colour fallback rather than a stylesheet rule.",
+      "why": "High Contrast mode is a common accessibility setting for low-vision users, and rarity is the site's central encoded fact."
+    },
+    {
+      "category": "usability",
+      "title": "Chart text alternatives and keyboard tooltips",
+      "body": "The owner-trend chart and the stats dashboard's trend, donut and histogram are visuals whose data is reachable only by hovering. Give each chart a described-by sentence generated from the series, plus a visually hidden data table of a sampled series, and make the tooltip reachable with arrow keys so a keyboard user reads the same points. Sample the series for long ranges so the hidden table stays small. Effort: M. Risk if built badly: hidden tables on a thousand-point dashboard bloat the DOM, and a generated sentence that misstates the direction of a noisy series is a wrong fact stated confidently.",
+      "why": "The owner curve is the evidence behind every rarity claim, and right now it exists only as pixels."
+    },
+    {
+      "category": "usability",
+      "title": "Sortable tables with aria-sort",
+      "body": "The data tables on the leaderboards, the compare view and the admin panels are static text. Make the header cells sortable with a real button inside each sortable header cell, set the sort attribute on the active column, announce the change politely, and put the sort key and direction in the URL so a sorted view is shareable and survives a reload. Effort: M. Risk if built badly: client sorting reorders only the rows that were fetched and silently lies about the ranking, so either sort server-side or label it as sorting the current page.",
+      "why": "A leaderboard you cannot reorder makes the visitor do the sorting in their head."
+    },
+    {
+      "category": "usability",
+      "title": "Pinned your-row on the leaderboards",
+      "body": "A member outside the top twenty-five sees no trace of themselves on any board. Fetch their rank, score and the gap to the next place with one query per board and pin that row above the table, labelled as your position, linking to the page of results it falls on. Compute it only for the signed-in member's own account, never as a lookup of another member. Effort: M. Risk if built badly: a rank query per board per render adds load to a cached page, and a pinned row showing a rank from before the last sync misleads the member about their standing.",
+      "why": "A ladder you cannot find yourself on is a spectator feature, and the site already stores the rank to fix that."
+    },
+    {
+      "category": "usability",
+      "title": "Keyboard-accessible showcase reordering",
+      "body": "The six showcase slots have an order but only a mouse can change it today, by removing and re-adding. Add explicit move-earlier and move-later buttons on each slot using logical direction so they mirror automatically under RTL, plus arrow-key reordering with a live announcement of the new position, committing the new order on the next save rather than on every keypress. Effort: S. Risk if built badly: two reorder affordances to keep in sync, and a reorder that posts on every arrow press floods the account endpoint and can half-apply an order.",
+      "why": "The showcase is the profile's only authored artefact, and a mouse-only editor excludes keyboard and switch users."
+    },
+    {
+      "category": "usability",
+      "title": "Grouped, searchable settings panel",
+      "body": "The customizer is one long column of thirty-five fields across common, creative, steal and mood settings with no grouping. Group it into identity, appearance, visibility, effects and socials, add a filter box that matches field labels and hints so a term like halo finds the level halo colour, deep-link each group so a support answer can point at one, and add a per-group reset to defaults. Leave the underlying customization document shape unchanged. Effort: M. Risk if built badly: hiding a setting inside a collapsed group makes it undiscoverable, and a group reset that wipes a hand-picked colour or a banner needs a confirmation.",
+      "why": "Thirty-five ungrouped settings is why members never find the ones they would actually like."
+    },
+    {
+      "category": "usability",
+      "title": "Localised digits inside countdowns",
+      "body": "The countdown builds its digits with a pad helper and raw numbers, so in Arabic and other locales that use their own numerals the timer shows Latin digits next to localised unit labels. Route every digit through the locale number formatter with a minimum integer digit count, and apply the same formatter to the compact owner counts, percentages and dates so one page never mixes numeral systems. Memoise the formatter per locale and recompute the digits only when they change. Effort: S. Risk if built badly: running a full locale format on every tick for every countdown on a grid of hundreds is measurable main-thread work.",
+      "why": "A countdown is the most time-critical thing on the page, and reading it should not require translating numerals."
+    },
+    {
+      "category": "usability",
+      "title": "One formatter module with a lint rule",
+      "body": "Audits keep finding fixed-decimal calls, argument-less locale string calls that format in the server's time zone, and hand-built number strings across the pages. Centralise number, compact, percent, date and duration formatting in one module that always takes a locale and an explicit time zone, and add a lint rule that fails on the banned call shapes outside that module, then migrate the call sites and delete the duplicates (the compact formatter currently lives inside a component). Effort: M. Risk if built badly: a mechanical sweep changes rendered strings and can break anything asserting on text, and a lint rule that fires on legitimate non-display uses gets disabled wholesale.",
+      "why": "Eleven locales and a shared number formatter is the cheapest structural fix for a whole class of presentation bugs."
+    },
+    {
+      "category": "usability",
+      "title": "Time-display preference with a zone label",
+      "body": "Deadlines are formatted on the server with the locale but no time zone, so a visitor in Seoul reads the server's clock as if it were their own. Format dates on the client, or pass the request offset, with a three-way preference of relative, local absolute and UTC; show a small UTC offset label beside every deadline, and put the exact instant in the element's title. Store the preference alongside the locale cookie. Effort: M. Risk if built badly: client-only formatting mismatches the server HTML and flickers on hydration, and a zone label derived from a guess is worse than none, so it must come from the offset actually used.",
+      "why": "A deadline that is silently in another time zone is the most expensive kind of usability bug on a drop-tracking site."
+    },
+    {
+      "category": "usability",
+      "title": "Language attributes on catalog strings",
+      "body": "Badge titles, descriptions, categories and how-to-earn text come from Twitch in English, but a Japanese or Arabic page renders them with no language signal, so a screen reader reads English words with the wrong voice. Mark catalog-sourced text with the source language attribute and leave member-entered text such as display names, bios and status lines on their own locale, driven by a flag on the row rather than a blanket attribute. Add a short note in the language switcher explaining that catalog content is English. Effort: S. Risk if built badly: marking a localised or loanword name as English makes pronunciation worse, and a blanket attribute on all text is actively harmful.",
+      "why": "Ten of eleven locales display English catalog text, and a mixed-language page is exactly where assistive technology gets it wrong."
+    },
+    {
+      "category": "usability",
+      "title": "Per-script font stacks with metric overrides",
+      "body": "One Latin-tuned font stack serves all eleven locales, so Arabic and CJK headings fall back to whatever the operating system picks, with different metrics that clip ascenders and shift line breaks. Define a per-script stack in the theme, selected by the document language, and pair each fallback with a metric-adjusted face definition so a fallback does not jump the layout when the real font loads. Keep the subsets small. Effort: M. Risk if built badly: more font requests slow first paint, and a metric override tuned for one script makes another script's headings collide.",
+      "why": "Text rendering quality is the whole interface for a site whose every locale reads differently."
+    },
+    {
+      "category": "usability",
+      "title": "Untranslated-content fallback notice",
+      "body": "The posts table carries a locale column and some posts exist only in English, so a French reader simply does not see them. Serve the English post in its place with an explicit only-available-in-English label, links to the languages it does exist in and a translation handoff, and set the language attribute on the untranslated body so assistive technology switches voice. Prefer a translated post whenever one exists. Effort: S. Risk if built badly: showing English as though it were the page's language misleads a reader who does not speak it, and an unlabelled machine translation presents its errors as the site's own words.",
+      "why": "Hiding content from non-English readers is a worse outcome than showing it labelled."
+    },
+    {
+      "category": "usability",
+      "title": "RTL-correct charts, gauges and the wheel",
+      "body": "Logical properties fix the layout, but the owner-trend time axis, the XP progress fill, the donut and histogram legends and the wheel still run left to right under Arabic, so a rising trend reads backwards. Mirror the time axis, set the progress fill's transform origin to the inline start, reverse legend order where it encodes reading order, and set the direction on chart containers so text anchors correctly, making a deliberate per-chart decision rather than a blanket flip. State the axis direction in the axis label. Effort: M. Risk if built badly: a blanket flip reverses a legend that should not be reversed, and mirroring a time series without saying so misleads people about the trend.",
+      "why": "The interface mirrors under Arabic but the data inside it does not, which makes the numbers quietly wrong to read."
+    },
+    {
+      "category": "usability",
+      "title": "Public accessibility conformance page",
+      "body": "There is no public statement of what the site supports. Add an accessibility route in all eleven locales stating the target level, which surfaces were tested and when, the known exceptions with a reason and a target date (the canvas games and the admin panel are the likely ones), how to report a barrier, and the last audit date. Generate it partly from a checked-in audit list so the page cannot claim more than was actually tested. Effort: S. Risk if built badly: a conformance page that goes stale over-claims and is worse than none, so it must carry a date and a checked source rather than a hand-typed promise.",
+      "why": "A public commitment with named exceptions is what turns an accessibility effort into something users can hold the site to."
+    }
+  ]
+}

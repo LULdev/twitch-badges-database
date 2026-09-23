@@ -4,8 +4,6 @@ import { Link } from "@/i18n/navigation";
 import { listPosts } from "@/lib/queries";
 import { localeAlternates } from "@/lib/seo";
 
-export const revalidate = 300;
-
 export async function generateMetadata({
   params,
 }: {

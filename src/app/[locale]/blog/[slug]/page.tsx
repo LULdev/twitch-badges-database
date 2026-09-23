@@ -8,11 +8,10 @@ import { jsonLdScript } from "@/lib/jsonld";
 import ShareButtons from "@/components/ShareButtons";
 import { localeAlternates } from "@/lib/seo";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { recordBlogView } from "@/lib/gamification/visits";
 import { visitorIpHash } from "@/lib/gamification/session";
 import EmojiReactions from "@/components/EmojiReactions";
-
-export const revalidate = 300;
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -38,6 +37,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       publishedTime: post.published_at,
       images: post.cover_url ? [{ url: post.cover_url }] : undefined,
     },
+    // Not optional: the layout's `twitter` block survives when a page omits it,
+    // and X prefers twitter:title over og:title — every blog card showed the site
+    // name while og:title was the post title. twitter:image still auto-fills from
+    // openGraph.images.
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: post.excerpt ?? post.title,
+    },
   };
 }
 
@@ -45,6 +53,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("blog");
+  const tc = await getTranslations("common");
 
   const post = await getPostBySlug(slug).catch(() => null);
   if (!post || post.status !== "published") notFound();
@@ -54,6 +63,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   // View counter (5-minute per-IP dedup) + emoji reactions.
   let viewCount = 0;
   const reactions: Record<string, number> = {};
+  let myReactions: string[] = [];
   try {
     const ipHash = await visitorIpHash();
     await recordBlogView(post.id, ipHash);
@@ -72,6 +82,19 @@ export default async function BlogPostPage({ params }: PageProps) {
     for (const row of (reactionsRes.data ?? []) as Array<{ emoji: string }>) {
       reactions[row.emoji] = (reactions[row.emoji] ?? 0) + 1;
     }
+    // Which of these reactions are the visitor's own. `ip_hash` is deliberately
+    // not readable with the anon key (migration 0011 grants only post_id, emoji,
+    // created_at), so this one lookup uses the service-role client — server
+    // component, emoji keys only, never a hash. The page is dynamic regardless:
+    // visitorIpHash() above reads request headers.
+    const { data: mine } = await createAdminClient()
+      .from("blog_reactions")
+      .select("emoji")
+      .eq("post_id", post.id)
+      .eq("ip_hash", ipHash);
+    myReactions = [
+      ...new Set((mine ?? []).map((row) => (row as { emoji: string }).emoji)),
+    ];
   } catch {
     // counters are best-effort
   }
@@ -94,7 +117,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
 
-      <nav className="text-xs text-muted" aria-label="Breadcrumb">
+      <nav className="text-xs text-muted" aria-label={tc("breadcrumb")}>
         <Link href="/blog" className="hover:text-foreground">
           {t("back")}
         </Link>
@@ -148,7 +171,11 @@ export default async function BlogPostPage({ params }: PageProps) {
       />
 
       <div className="border-t border-line pt-4">
-        <EmojiReactions slug={post.slug} initial={reactions} />
+        <EmojiReactions
+          slug={post.slug}
+          initial={reactions}
+          initialActive={myReactions}
+        />
       </div>
       <div className="border-t border-line pt-4">
         <ShareButtons

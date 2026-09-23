@@ -136,6 +136,7 @@ export default function LanguageSwitcher() {
 
   /** On the trigger: opening is all that is needed — focus then moves in. */
   function onKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
+    if (isPending) return;
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       setOpen(true);
@@ -170,13 +171,16 @@ export default function LanguageSwitcher() {
         ref={triggerRef}
         type="button"
         className={`lang-trigger ${isPending ? "is-pending" : ""} ${open ? "is-open" : ""}`}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => { if (!isPending) setOpen((value) => !value); }}
         onKeyDown={onKeyDown}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls="lang-listbox"
         aria-label={`${t("language")}: ${localeNames[locale as Locale] ?? locale}`}
-        disabled={isPending}
+        // NOT `disabled`: a focused element that becomes disabled is blurred to
+        // <body>, which undid the focus() this trigger had just been given. The
+        // pending look is driven by the `.is-pending` class, so nothing is lost.
+        aria-disabled={isPending}
       >
         <FlagIcon locale={locale as Locale} size={22} />
         <span className="lang-spinner" aria-hidden />

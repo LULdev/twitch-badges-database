@@ -34,17 +34,23 @@ interface RawPerfilUser {
   badges?: RawPerfilBadge[];
 }
 
-function normalize(raw: RawPerfilUser): PerfilUser {
+function normalize(raw: RawPerfilUser | null | undefined): PerfilUser {
+  // Both upstream bodies are cast, not validated: a response of {"badges": {}}
+  // (or a literal null) made `.map` a TypeError. Degrade to "no badges" instead —
+  // the profile page turns an escaping throw into a 404.
+  const user: RawPerfilUser =
+    raw && typeof raw === "object" ? raw : {};
+  const list = Array.isArray(user.badges) ? user.badges : [];
   return {
-    id: String(raw.id ?? ""),
-    login: String(raw.login ?? ""),
-    displayName: String(raw.displayName ?? raw.display_name ?? raw.login ?? ""),
+    id: String(user.id ?? ""),
+    login: String(user.login ?? ""),
+    displayName: String(user.displayName ?? user.display_name ?? user.login ?? ""),
     profileImageURL: String(
-      raw.profileImageURL ?? raw.profile_image_url ?? "",
+      user.profileImageURL ?? user.profile_image_url ?? "",
     ),
-    createdAt: raw.createdAt ?? raw.created_at ?? null,
-    isAffiliate: raw.isAffiliate,
-    badges: (raw.badges ?? []).map((b) => ({
+    createdAt: user.createdAt ?? user.created_at ?? null,
+    isAffiliate: user.isAffiliate,
+    badges: list.map((b) => ({
       setID: String(b.setID ?? ""),
       version: String(b.version ?? "1"),
       title: b.title ?? null,
@@ -79,7 +85,7 @@ async function fetchFromBadgesBlog(
  * Fallback: query Twitch's GQL user-badges directly (the same upstream that
  * badges.blog proxies). Used automatically when badges.blog is unreachable.
  */
-async function fetchFromGql(login: string): Promise<PerfilUser> {
+async function fetchFromGql(login: string, revalidate: number): Promise<PerfilUser> {
   const query = `query($login: String!) { user(login: $login) { id login displayName profileImageURL createdAt badges { setID version title description image1x image2x image4x clickAction clickURL } } }`;
   const res = await fetch(envOrNull("TWITCH_GQL_URL") ?? GQL_URL, {
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
@@ -89,15 +95,18 @@ async function fetchFromGql(login: string): Promise<PerfilUser> {
       "content-type": "application/json",
     },
     body: JSON.stringify([{ query, variables: { login } }]),
-    next: { revalidate: 0 },
+    // Honour the caller's window: with `revalidate: 0` an upstream badges.blog
+    // outage — the exact condition this fallback exists for — turned every view
+    // of every non-member profile into an uncached call to gql.twitch.tv.
+    next: { revalidate },
   });
   if (!res.ok) {
     throw new Error(`Twitch GQL failed: ${res.status}`);
   }
-  const payload = (await res.json()) as Array<{
-    data?: { user?: RawPerfilUser | null };
-  }>;
-  const user = payload[0]?.data?.user;
+  const payload = (await res.json()) as
+    | Array<{ data?: { user?: RawPerfilUser | null } }>
+    | null;
+  const user = Array.isArray(payload) ? payload[0]?.data?.user : undefined;
   if (!user) {
     throw new Error(`Twitch GQL: user "${login}" not found`);
   }
@@ -124,6 +133,6 @@ export async function fetchUserBadges(
       `[perfil] badges.blog failed for ${clean}, trying Twitch GQL:`,
       error instanceof Error ? error.message : error,
     );
-    return fetchFromGql(clean);
+    return fetchFromGql(clean, revalidate);
   }
 }

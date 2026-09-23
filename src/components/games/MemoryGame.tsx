@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGame, BetBar, GameError, RoundOutcome } from "./useGame";
 
 interface Card {
@@ -20,6 +20,15 @@ export default function MemoryGame() {
   const [started, setStarted] = useState(false);
   const startTime = useRef(0);
   const firstPick = useRef<number | null>(null);
+  const flipTimer = useRef<number | null>(null);
+  // Cancel the pending state update on unmount: React 18 no longer warns about
+  // setting state on an unmounted component, so nothing surfaced this.
+  useEffect(
+    () => () => {
+      if (flipTimer.current !== null) window.clearTimeout(flipTimer.current);
+    },
+    [],
+  );
 
   async function start() {
     const data = await fetch("/api/games/symbols").then((res) => res.json()).catch(() => null);
@@ -64,7 +73,7 @@ export default function MemoryGame() {
     } else {
       setBusyCards(true);
       setMisses((prev) => prev + 1);
-      window.setTimeout(() => {
+      flipTimer.current = window.setTimeout(() => {
         setCards((prev) =>
           prev.map((card, i) =>
             i === first || i === index ? { ...card, flipped: false } : card,

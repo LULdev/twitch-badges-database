@@ -1,0 +1,36 @@
+name: Drop-window sync (badgebase)
+
+# An independent second trigger for the authoritative drop-status sync. The
+# Vercel Hobby plan allows only 2 daily cron jobs and both are taken, and
+# /api/cron/global runs this engine alongside the catalog diff under one 60 s
+# serverless ceiling — so the badgebase half runs again here, on its own, with
+# the whole budget to itself. The engine is idempotent (keyed upserts, and the
+# activity guard skips rather than sweeping on a truncated listing), so the
+# redundancy is safe.
+on:
+  schedule:
+    - cron: "5 6 * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: badgebase-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Trigger badgebase drop-window sync
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          status="$(curl -s -o response.json -w "%{http_code}" \
+            --max-time 240 \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            "https://twitch-badges-database.vercel.app/api/cron/badgebase")"
+          echo "HTTP ${status}"
+          cat response.json
+          echo
+          test "$status" = "200"

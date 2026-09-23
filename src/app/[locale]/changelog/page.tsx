@@ -4,8 +4,6 @@ import { Link } from "@/i18n/navigation";
 import { listChangelog, type ChangelogRow } from "@/lib/queries";
 import { localeAlternates } from "@/lib/seo";
 
-export const revalidate = 60;
-
 export async function generateMetadata({
   params,
 }: {
@@ -94,7 +92,7 @@ export default async function ChangelogPage({
             <path d="M4 4a16 16 0 0 1 16 16h-3A13 13 0 0 0 4 7z" />
             <path d="M4 10a10 10 0 0 1 10 10h-3a7 7 0 0 0-7-7z" />
           </svg>
-          RSS
+          {t("rss")}
         </a>
       </header>
 
@@ -123,7 +121,11 @@ export default async function ChangelogPage({
               </h2>
               <ol className="space-y-2">
                 {dayEntries.map((entry) => (
-                  <li key={entry.id} className="card flex gap-3 p-4">
+                  <li
+                    key={entry.id}
+                    id={`changelog-${entry.id}`}
+                    className="card flex gap-3 p-4 scroll-mt-24"
+                  >
                     <span
                       aria-hidden
                       className="mt-1.5 size-2 shrink-0 rounded-full"

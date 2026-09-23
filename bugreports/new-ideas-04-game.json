@@ -1,0 +1,276 @@
+{
+  "agent": "game",
+  "scope": "Brand-new playable games and new core mechanics inside the arcade, each server-authoritative and driven by badge-catalog data or existing site systems.",
+  "ideas": [
+    {
+      "category": "game",
+      "title": "Badge Hand Poker",
+      "body": "A round deals five cards from a 52-card deck where each card maps deterministically to a catalog badge, with suit taken from category and rank from TBRI tier plus release year. The player may discard and redraw once, then the server evaluates the hand against a fixed paytable and pays by stake. The mapping lives server-side and a fresh deck is shuffled per round from a stored seed. Effort: M. Risk if built badly: if the mapping is client-visible a player can pre-compute which hand is a royal flush and only play those rounds, so the deck, mapping and shuffle must all be server-owned.",
+      "why": "It makes the catalog itself the deck, so a poker game here can never be badges pasted onto a generic table."
+    },
+    {
+      "category": "game",
+      "title": "Odd One Out",
+      "body": "A timer starts and four badge tiles appear: three drawn from one set_id or category and one intruder pulled from a different set chosen so its artwork is deliberately similar. The player taps the intruder, and the server selects the trio and the intruder from the catalog, withholds the answer and scores only taps that arrive before the server-issued deadline, paying by remaining milliseconds. Effort: S. Risk if built badly: weak intruder selection turns every round into a coin flip, so similarity must be computed from image hashes or shared set attributes rather than random picks.",
+      "why": "It is a fast, endlessly replayable use of badge artwork the site already stores, requiring no trivia lookup."
+    },
+    {
+      "category": "game",
+      "title": "Mosaic Reveal Nonogram",
+      "body": "Each day the server picks one catalog badge and rasterises its PNG into a black-and-white pixel matrix, then derives a nonogram from that matrix; the player fills cells and the server validates the finished grid against the stored clue set before paying. Difficulty scales with grid size, and a correct solve reveals the badge art at full resolution for a small bonus. Effort: M. Risk if built badly: image processing on the request path is slow and repeatable, so the matrix and clues must be generated once by a nightly job and stored, never per visitor.",
+      "why": "It turns real badge artwork into a real logic puzzle whose solution is the badge itself."
+    },
+    {
+      "category": "game",
+      "title": "Claim Window Minesweeper",
+      "body": "A server-generated board hides claim windows as mines, and the digit hints count how many adjacent windows opened in the same month, so the numbers are genuine catalog facts rather than arbitrary. Clearing a board pays scaled by server-measured elapsed time and mine density, and the board seed is stored so a result can be re-derived. Effort: M. Risk if built badly: payouts that scale only with board size can be ground out by a script that knows the optimal sweep, so pay by elapsed time and cap the number of paid boards per day.",
+      "why": "Its clues encode the drop calendar, which makes knowing the catalog genuinely useful rather than decorative."
+    },
+    {
+      "category": "game",
+      "title": "Catalog Match Three",
+      "body": "Badge tiles fall in a six-column grid and a swap is legal only when both tiles share a category, so every move is a small act of catalog sorting. Clears score by the tier of the matched badges, and the server replays the submitted move log against the round seed to recompute the score before paying. Effort: L. Risk if built badly: score is the most forgeable number on the site, so the move log must be the only thing trusted and any client-displayed score must be clearly advisory.",
+      "why": "A match-three loop and the badge catalog reinforce each other instead of one being a skin over the other."
+    },
+    {
+      "category": "game",
+      "title": "Badge Brick Breaker",
+      "body": "A paddle bounces a ball into rows of badge bricks; bricks from the same set sit adjacent, and clearing a full set row drops a power-up named after that set's category. Server physics runs from the stored seed plus the submitted input timeline at a fixed timestep, and the payout is a function of bricks cleared and server-measured session length. Effort: L. Risk if built badly: verifying a long input timeline is expensive and pad-prone, so cap the payable session at sixty seconds and pay only for cleared bricks within it.",
+      "why": "It uses set_id grouping as level design, which a generic breakout clone cannot replicate."
+    },
+    {
+      "category": "game",
+      "title": "Badge Snake Run",
+      "body": "The snake may only eat badges whose claim window is currently open, so its growth is governed by the live claimable set the catalog already computes, and it starves if the set is empty. Walls and obstacles are laid out from the set's category layout, and a round ends after a fixed number of server ticks so scores are comparable. Effort: M. Risk if built badly: a client-side loop is trivially slowed by throttling frames, so the server must own the tick count and accept only an input sequence.",
+      "why": "It is the simplest arcade loop there is, wired to a feed that changes every day."
+    },
+    {
+      "category": "game",
+      "title": "Drop Window Rhythm",
+      "body": "Each round renders a track built from real badgebase start and end dates, and the player taps as a moving marker crosses each window's open and close edges. Accuracy is scored in server-measured milliseconds from the round timestamp rather than the tap's claimed time, with a perfect-chain multiplier that resets on an early or late hit. Effort: S. Risk if built badly: network latency decides perfect taps for distant players, so score against a server-issued clock offset and allow a fair tolerance band.",
+      "why": "It makes the catalog's actual countdown data the rhythm track of a game."
+    },
+    {
+      "category": "game",
+      "title": "Rarity Plinko Drop",
+      "body": "A ball drops through a peg pyramid whose bin payouts mirror the six rarity tiers, and the server precomputes reachable paths from a per-round seed so the distribution can be published and independently checked. The player chooses the bin width and risk band before the drop, and settlement uses the seeded path with the seed stored for later re-derivation. Effort: M. Risk if built badly: a physics implementation the server does not own lets a client pick its own landing bin, so the drop must be a seeded lookup rather than a client simulation.",
+      "why": "It is a household-name arcade game whose payout bins are the site's own rarity ladder."
+    },
+    {
+      "category": "game",
+      "title": "Keno Catalog Draw",
+      "body": "The board is thirty catalog badges, the player marks four to ten of them, and the server draws fifteen from a seeded draw. Payouts follow a published paytable keyed on how many marks were hit, and every draw stores its seed so a member can re-derive it. Effort: M. Risk if built badly: pick counts and paytables tuned by feel produce a return over 100 percent, so the paytable must be computed from exact hypergeometric odds at build time.",
+      "why": "It is a draw game whose tokens are badges a member can recognise and already chases."
+    },
+    {
+      "category": "game",
+      "title": "Badge Derby Betting",
+      "body": "Eight catalog badges enter a simulated race whose lane speeds are drawn from the round seed but weighted by each badge's current TBRI, so rare badges start as favourites and the odds are printed before betting closes. Stakes go into a pari-mutuel pool, winners divide it after a published house cut, and the field, seed and pool are all stored for audit. Effort: M. Risk if built badly: one large late bet can drain a pool, so a last-thirty-second wager cap is needed, and a race whose result is not seeded is unverifiable.",
+      "why": "It is a betting game whose form guide is the rarity index the site already publishes."
+    },
+    {
+      "category": "game",
+      "title": "Fleet of Sets",
+      "body": "A grid hides fleets built from set_ids, so a three-cell ship is a set with three badges, and the AI hunts the player's fleet with a probability map over remaining catalog rows. A hit reveals the badge that occupied the cell, giving the hunt a light memory flavour, and all board state and AI moves live on the server. Effort: M. Risk if built badly: a hunt whose AI runs client-side can be read and countered, so the opponent and the board must never be separated across the network.",
+      "why": "It converts set structure into a spatial hunt with real catalog rows as the payload."
+    },
+    {
+      "category": "game",
+      "title": "Badge Signal Recall",
+      "body": "A sequence of badges flashes one at a time with tier colour and owner-count bar, and the player must repeat it; each correct round appends one more badge and shortens the display window. The server issues each sequence from a round seed and checks the submitted reply, paying by the length reached. Effort: S. Risk if built badly: a fixed reward per step turns it into a grind, so payouts must grow superlinearly and only a small number of attempts per day should pay at all.",
+      "why": "It is a pure recall loop that quietly teaches the catalog's tier colours along the way."
+    },
+    {
+      "category": "game",
+      "title": "Claim Deck Roguelike",
+      "body": "A run starts with a small starter deck of common badges, and each card carries an ability derived from its category, so a Sub card blocks and a TwitchCon card draws two. A run is a chain of drop-event encounters, and between fights the player adds one of three offered catalog cards, with a run seed stored so the same offerings can be replayed and verified. Effort: L. Risk if built badly: deck power quickly outpaces encounter difficulty and every run converges on the same three cards, so encounters and card rarity must be authored together rather than tuned live.",
+      "why": "It is the deepest game on the board, and every card is a real badge with a real category."
+    },
+    {
+      "category": "game",
+      "title": "Overnight Exhibit Shift",
+      "body": "While a member is logged out their showcase accrues visitors computed from the displayed badges' rarities, using the site's own page-view analytics as a baseline, capped to an eight-hour window. Returning shows a shift report: visitors gained, the badge that drew most, and an XP dividend that cannot be converted to coins. Effort: L. Risk if built badly: any offline accrual that converts to currency is an exploit vector, so the reward must be XP and cosmetics only with a hard cap.",
+      "why": "It gives the showcase a reason to exist beyond decoration and rewards returning without paying for absence in coins."
+    },
+    {
+      "category": "game",
+      "title": "Encircle Territory Duel",
+      "body": "On a nine-by-nine board, players place stones and capture territory, and the stones are badge tiles from the player's own inventory, so a rare badge is a cosmetic flex rather than a stat. The opponent is a server-side AI with three difficulty levels, and the final score is computed server-side from the terminal board. Effort: L. Risk if built badly: a weak AI makes the mode trivial and a strong one makes it hopeless, so difficulty must be a search-depth dial and the result should be a rating change rather than coins.",
+      "why": "It is an abstract strategy game whose board is a member's actual collection."
+    },
+    {
+      "category": "game",
+      "title": "Daily Catalog Solitaire",
+      "body": "One deal is generated per day from a published, committed seed, so every member plays the identical Klondike layout, with cards grouped into suits by category. Wins are recorded against the day's deal from a server-checked move log, and a daily ladder ranks members by fewest moves rather than by speed. Effort: M. Risk if built badly: solitaire is patience, so paying per win invites automation; pay only the first win per day and rank by moves, not time.",
+      "why": "One shared daily deal turns a solitary card game into a shared daily ritual."
+    },
+    {
+      "category": "game",
+      "title": "Badge Mahjong Exhibit",
+      "body": "Badge tiles are stacked in layers and a tile is playable only when both long edges are free, which makes the puzzle about uncovering artwork rather than memory. Matching pairs are same-set badges, and each pair both matched and revealed shows a one-line catalog fact. Boards are seeded per day and the server validates the submitted removal order before paying. Effort: M. Risk if built badly: a generated layout can be unsolvable, so boards must be produced by reverse-dealing from a finished state and tested before they are published.",
+      "why": "It is a familiar, calm tile game that pays out in catalog knowledge as well as coins."
+    },
+    {
+      "category": "game",
+      "title": "Badge Crate Pusher",
+      "body": "A small warehouse puzzle asks the player to push badge crates onto drop-window markers, with walls laid out so each level has exactly one solvable route. One level is published per day, generated server-side and reverse-verified from its stored solution, with a strict undo limit. Effort: M. Risk if built badly: a generator that emits unsolvable or trivial boards, so every level must be solved in reverse by the generator and rejected when the solution is shorter than a floor.",
+      "why": "It is a pure logic puzzle anchored to the site's own claim-window geometry."
+    },
+    {
+      "category": "game",
+      "title": "Badge Circuit Routing",
+      "body": "The player routes a signal from a provider port to a collector port by rotating pipe tiles, and the pipe layout represents the badge's path from catalog sighting to claimed inventory, with tile count scaling to set size. Boards are server-generated with a guaranteed solution and validated by replaying the submitted rotation log. Effort: M. Risk if built badly: rotation logs are easy to brute-force for a payout, so the reward must be a one-per-board XP grant rather than a per-attempt payout.",
+      "why": "It tells the story of how a badge actually reaches a member, as a puzzle."
+    },
+    {
+      "category": "game",
+      "title": "Badge Jigsaw Puzzle",
+      "body": "One badge image per puzzle is cut into a server-generated set of pieces, and the cut record lets the server verify the final arrangement before paying. Pieces are dragged into place, the timer runs server-side, and the finished art is shown at full resolution as the reward. Effort: M. Risk if built badly: shipping the catalog CDN image directly makes the puzzle solvable by opening the source in a second tab, so a server-resized, re-encoded crop must be served instead.",
+      "why": "It makes the site's strongest asset, the badge artwork, the object of the game."
+    },
+    {
+      "category": "game",
+      "title": "Daily Badge Crossword",
+      "body": "A daily grid is built from catalog terms: answers are set names, category names and the release years of notable badges, with clues generated from catalog fields and curated templates. The server owns the grid and the clue set, scores the submission, and publishes the solution the next day. Effort: M. Risk if built badly: generated clues that are ambiguous or duplicated, so the generator must reject grids with repeated answers and the clue pool must be curated.",
+      "why": "It is a crossword that only works because the site has a catalog to write clues from."
+    },
+    {
+      "category": "game",
+      "title": "Badge Yahtzee Dice",
+      "body": "Five dice are rolled up to three times per turn and the resulting pips select badges from a board, so a full house is a set of prints and a straight is a run of versions. Thirteen scoring categories are filled over a fixed number of turns, and the final score is recomputed server-side from the roll seed before any payout. Effort: M. Risk if built badly: any mismatch between the client's optimistic scoring and the server recomputation reads as a bug, so the server result must be the only one ever displayed.",
+      "why": "It is a classic dice game whose badge-mapping rule keeps the catalog visible throughout every turn."
+    },
+    {
+      "category": "game",
+      "title": "Badge Dominoes Chain",
+      "body": "Badges are dominoes whose two ends are category and tier, and a move must match one end to the open end of the chain, so the chain records a plausible collector's shelf. The player faces a server AI holding a hidden hand drawn from the round seed, with all moves validated server-side. Effort: M. Risk if built badly: a hidden opponent hand that reaches the client is a trivial cheat, so the hand must never cross the network.",
+      "why": "It is a classic chain-building game whose tiles teach category and tier relationships."
+    },
+    {
+      "category": "game",
+      "title": "Rarity Flip Board",
+      "body": "A Reversi board where the two colours are free and paid badges, and a legal move must outflank a run of the opponent's colour to flip it. Each cell carries the badge it represents, so the board is a small catalog map, and three named opponents expose three AI search depths. Effort: M. Risk if built badly: a strong AI turns a casual mode into a wall, so the easiest opponent must be deliberately shallow and rewards should scale with the named opponent beaten.",
+      "why": "It is a short, deep strategy game that uses free versus paid drops as its two sides."
+    },
+    {
+      "category": "game",
+      "title": "Badge Merge Ladder",
+      "body": "Tiles of the six rarity tiers slide on a four-by-four grid and two equal tiers merge into the next, with reaching Legendary as the win condition. Every tile carries a real badge of that tier, so the final Legendary tile is a specific badge, and the server stores the move log and rebuilds the board before paying. Effort: M. Risk if built badly: a client-side undo makes the top tier cheap, so undo must be a paid, server-counted action or absent entirely.",
+      "why": "The rarity ladder the site computes becomes the merge chain itself."
+    },
+    {
+      "category": "game",
+      "title": "Catalog Category Sudoku",
+      "body": "Nine cell glyphs are badge icons drawn from a single category, and the board is a daily server-generated sudoku whose uniqueness is verified at generation time. Completion is checked server-side against the stored solution, with the solve time as a second, separate reward axis. Effort: M. Risk if built badly: publishing the solution alongside the board leaks the answer, so it must live only server-side and be published after the day ends.",
+      "why": "It is a standard logic puzzle that gives each catalog category its own puzzle face."
+    },
+    {
+      "category": "game",
+      "title": "Badge Fishing Cast",
+      "body": "A cast is a power bar, a wait and a strike timing check, all resolved from a server seed, and what bites is drawn from a table weighted by TBRI so the rarest badges are the rarest catches. The day's creel is a small set of badge cards, one of which can be kept as a cosmetic sticker on the profile. Effort: M. Risk if built badly: a catch table that is not published reads as rigged, so the table and the seed both need to be inspectable.",
+      "why": "It turns chasing a rare badge into a session of waiting and timing rather than a spreadsheet."
+    },
+    {
+      "category": "game",
+      "title": "Rarity Darts Timing",
+      "body": "A throw is a two-stop timing bar: the first stop sets the horizontal and the second the vertical of a dartboard whose rings are rarity tiers, with a small server-applied wobble derived from the round seed. Three darts per visit, scored server-side from the submitted stop times. Effort: S. Risk if built badly: without the server wobble a player learns exact stop positions, so the wobble must be seeded per throw and never fixed.",
+      "why": "Precision timing is a genre the arcade lacks, and the dartboard doubles as the rarity tier chart."
+    },
+    {
+      "category": "game",
+      "title": "Catalog Set Stacker",
+      "body": "Falling tetromino groups are made of badges from one set, and clearing a line clears that set row and briefly shows the set's name. Rotation, drops and line clears are replayed from the submitted input timeline against the round seed, while level speed rises on a server-controlled clock. Effort: L. Risk if built badly: the input timeline is a large, paddable payload, so cap the payable piece count and verify only the first stretch of the run.",
+      "why": "A stacking arcade game whose pieces are literally sets waiting to be completed."
+    },
+    {
+      "category": "game",
+      "title": "Drop Delivery Maze",
+      "body": "A maze is generated server-side from the round seed with the drop at the centre and the player's inventory at the edge, and walls open only when the player collects keys that are claimable badges of that maze's category. The server validates the path from the movement log and pays by steps and time, and a fresh maze is published each day. Effort: M. Risk if built badly: a maze derived from a seed the client receives can be solved by a pathfinder script, so rewards must be capped and the map revealed only tile by tile.",
+      "why": "It turns the journey from a drop announcement to a claim into a small spatial puzzle."
+    },
+    {
+      "category": "game",
+      "title": "Badge Recipe Rush",
+      "body": "Orders appear as required combinations of categories and tiers, such as two Sub badges and one Legendary, and the player assembles them from an owned-badge pantry against a per-order timer. Correct orders are validated server-side against the actual inventory set, so the pantry is real and each recipe is a real constraint on what that member owns. Effort: M. Risk if built badly: a pantry built only from real inventory leaves brand-new members unable to play, so a starter loaner pantry must exist.",
+      "why": "It is a fast sorting game whose ingredients are a member's verified badges."
+    },
+    {
+      "category": "game",
+      "title": "Badge Auto-Chess Battler",
+      "body": "Before a round the player drafts four badge units from a small shop, each unit's ability coming from its category and its power from its tier, and battles then resolve automatically and server-side against seven opponent comps drawn from other members' saved boards. Because opponents are saved boards rather than live players, the whole mode is asynchronous and fits a serverless deploy. Effort: L. Risk if built badly: unit power tied purely to tier makes the shop a straight rarity check, so abilities must outweigh tier and the shop curve must be tuned.",
+      "why": "It is a popular genre the arcade lacks, and its units are the badges themselves."
+    },
+    {
+      "category": "game",
+      "title": "Correspondence Clash Ladder",
+      "body": "A turn-based board match, Reversi on a nine-by-nine, where a player challenges another member and each turn arrives as a notification, so a match lasts days without either side being online together. Boards, turns and clocks live server-side, with a per-move clock and an automatic forfeit for abandoned games. Effort: L. Risk if built badly: notification spam and abandoned matches, so a member may hold at most three open matches and idle ones forfeit silently.",
+      "why": "It gives members a slow, low-pressure competition that suits a site people visit in short bursts."
+    },
+    {
+      "category": "game",
+      "title": "Tier Boss Gauntlet",
+      "body": "A ladder of six named opponents, one per TBRI tier, each using a different existing arcade game with a published difficulty modifier, such as a Legendary boss playing roulette with fewer pockets. Beating a boss unlocks the next and pays a share of an escalating entrance fee, and the roster and modifiers are server config rather than client rules. Effort: M. Risk if built badly: a ladder that is just the same games with worse odds is dull and feels rigged, so each boss needs a distinct twist and a published modifier.",
+      "why": "It sequences the existing thirteen games into a progression with a visible summit."
+    },
+    {
+      "category": "game",
+      "title": "Catalog Raid Weekend",
+      "body": "A community boss with a large server-tracked HP pool appears for a weekend, and every qualifying round a member plays chips a damage roll derived from that round's own result, so normal play doubles as participation. When the pool empties, contributors split a loot table of coins and a cosmetic banner, weighted by participation rather than volume. Effort: L. Risk if built badly: damage proportional to wagered coins makes it a whale leaderboard, so per-member hourly caps and participation weighting are required.",
+      "why": "It turns the arcade into a shared weekend event with a real finish line instead of a solo grind."
+    },
+    {
+      "category": "game",
+      "title": "Tier Wars Campaign",
+      "body": "Members pledge to one of the six rarity tiers for a season, every round they play contributes points to that tier's campaign bar, and the tier with the most points at season end grants its members a temporary banner and a cosmetic frame. The pledge is one-way per season and the points formula is published, so a member can see exactly what their play is worth. Effort: L. Risk if built badly: the most populous tier wins by default, so points must be per-capita within a tier and a rank floor must separate casual from heavy players.",
+      "why": "It gives the rarity tiers a social meaning beyond colour and makes every ordinary round count toward something."
+    },
+    {
+      "category": "game",
+      "title": "Daily Catalog Conditions",
+      "body": "One catalog-derived condition applies to the whole arcade each day and is displayed in the header, such as a closing Legendary window that doubles game XP but halves max bets, or a quiet drop week that adds a floor to the tower. Conditions are computed nightly from the drop calendar and rarity movement and stored as a dated row, so the rule is identical for every member and every client. Effort: M. Risk if built badly: a condition that doubles payouts can stack with an event bonus into a windfall, so conditions must modulate XP and limits and never coin payout multipliers.",
+      "why": "It makes the catalog's daily state change how the arcade feels without a single new game being written."
+    },
+    {
+      "category": "game",
+      "title": "Per-Game Mastery Unlocks",
+      "body": "Every game gets its own mastery track scored only from that game's rounds, with unlocks at fixed thresholds that are gameplay modifiers rather than currency, such as an extra redraw in the poker game or a slower first lane in the derby. Mastery progress and unlocks are stored per member per game and shown on that game's own header. Effort: M. Risk if built badly: unlocks that make a game easier for free become pure power creep, so each unlock must be paired with a raised minimum bet or a reduced payout rate.",
+      "why": "It gives the arcade thirteen separate reasons to return instead of one shared XP number."
+    },
+    {
+      "category": "game",
+      "title": "Cross-Game Variety Streak",
+      "body": "A streak that counts only a win in a game the player has not won in their last five rounds, multiplying XP up to a low ceiling and breaking on any loss. The server records the last five game ids per member, so the rotation is enforced rather than promised, and the streak is displayed beside the existing streak calendar as a separate metric. Effort: S. Risk if built badly: it becomes a chore that punishes a favourite game, so the ceiling must stay low and losing must break the streak without any further penalty.",
+      "why": "It nudges members across all thirteen games and pays them for variety instead of grinding one machine."
+    },
+    {
+      "category": "game",
+      "title": "Daily Shared Seed Ladder",
+      "body": "Every day each game gets one committed seed, and any round played under that seed is grouped into a daily ladder for that game, so members compare runs on an identical sequence rather than on luck. The ladder is a view over game_rounds filtered by the day's seed, and the seed is revealed with a hash at 00:00 UTC so the sequence could not have been chosen after seeing the plays. Effort: M. Risk if built badly: a published seed lets a script pre-solve the sequence, so ladder rounds must be capped per member and the seed must be committed before it becomes usable.",
+      "why": "It creates a fair daily competition where luck cannot explain away the winner."
+    },
+    {
+      "category": "game",
+      "title": "Daily Percentile Payout",
+      "body": "Instead of a fixed paytable, a round's payout scale is set by how its result ranks against every other qualifying round of the same game that day, so a top-decile result pays more than one that merely beat the house. The server computes the daily distribution from game_rounds and settles at the end of the UTC day, showing a live percentile band during play. Effort: M. Risk if built badly: peers can coordinate tiny qualifying stakes to inflate the pool, so qualifying rounds need a minimum stake and the pool must be house-funded rather than player-funded.",
+      "why": "It makes a member's competition the other members rather than the machine, which is what a collector community wants."
+    },
+    {
+      "category": "game",
+      "title": "Arcade Parlay Builder",
+      "body": "A player selects two to four outcomes across different games, such as a correct cover in the drops catcher, a win at blackjack and a tier reached in the merge, and stakes one amount against the product of the individual odds. Every leg is settled from its own stored round result, the parlay pays only when every leg wins, and the combined odds are printed before the stake is taken. Effort: M. Risk if built badly: correlated legs on the same round can be combined to manufacture value, so legs must be restricted to different games and different rounds.",
+      "why": "It turns the arcade's thirteen separate games into one connected betting product."
+    },
+    {
+      "category": "game",
+      "title": "Elo Skill Rating",
+      "body": "Each game carries its own skill rating, and every rated round updates it with a standard Elo step against a comparable-stake opponent or a house difficulty tier, displayed as a per-game rank and a best-of board. Ratings are computed on the server from stored round results, so no client can post one. Effort: M. Risk if built badly: ratings that reward volume over skill, so the step size must shrink as games played rises and rated rounds need a minimum stake.",
+      "why": "It gives a genuinely skilled member something to be ranked on that coins cannot buy."
+    },
+    {
+      "category": "game",
+      "title": "Double or Nothing Chain",
+      "body": "After any settled winning round the player may bank the result or roll the entire payout into the next round with the payout doubled if it also wins, up to three continuations, with the chain ending on any loss. The continuation is recorded as part of the same server-side round chain, so the doubling can never be applied retroactively, and the chain's maximum payout is capped. Effort: S. Risk if built badly: it is a loss-chasing accelerator, so continuations must expire at the end of a session and be unavailable once winnings pass a ceiling.",
+      "why": "It is the smallest possible addition to the arcade that turns every win into a decision."
+    }
+  ]
+}

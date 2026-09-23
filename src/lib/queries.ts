@@ -51,6 +51,8 @@ export interface ProfileRow {
   showcase_slots: string[];
   inventory_public: boolean;
   is_admin: boolean;
+  /** Staff level: 'user' | 'moderator' | 'admin' | 'owner'. */
+  role: string;
   twitch_created_at: string | null;
   potat_level: number | null;
   potatoes: number | null;
@@ -121,6 +123,34 @@ export type SortKey =
   | "releasing"
   | "name";
 
+export const SORT_KEYS = [
+  "newest",
+  "oldest",
+  "rarity",
+  "owners",
+  "ending",
+  "releasing",
+  "name",
+] as const satisfies readonly SortKey[];
+
+/**
+ * The single place a `?sort=` is resolved to an applied key. `listBadges` and the
+ * FilterBar control both come through here, so an unknown or empty `?sort=` can no
+ * longer make the displayed sort and the applied sort disagree — the control used
+ * to fall back to the page's own default (e.g. "ending" on /active) while the
+ * query fell back to "newest".
+ */
+export function resolveSortKey(value: unknown, fallback?: string): SortKey {
+  const single = Array.isArray(value) ? value[0] : value;
+  if (typeof single === "string" && (SORT_KEYS as readonly string[]).includes(single)) {
+    return single as SortKey;
+  }
+  if (typeof fallback === "string" && (SORT_KEYS as readonly string[]).includes(fallback)) {
+    return fallback as SortKey;
+  }
+  return "newest";
+}
+
 export interface ListFilters {
   q?: string;
   status?: string;
@@ -141,8 +171,9 @@ export interface ListResult<T> {
 }
 
 function sanitizeQuery(q: string): string {
-  // Strip characters that break PostgREST's .or(...) syntax.
-  return q.replace(/[,()%]/g, " ").trim();
+  // Strip characters that break PostgREST's .or(...) syntax. `*` is included
+  // because PostgREST aliases it to `%` in ilike.
+  return q.replace(/[,()%*]/g, " ").trim();
 }
 
 export async function listBadges(
@@ -150,59 +181,91 @@ export async function listBadges(
 ): Promise<ListResult<BadgeRow>> {
   const supabase = await createClient();
   const perPage = Math.min(Math.max(filters.perPage ?? 48, 12), 96);
-  const page = Math.max(filters.page ?? 1, 1);
+  // Floored at the entry: a fractional ?page= (2.3) reached range() as a
+  // non-integer offset — a 400, or a silently shifted window for 2.5.
+  const page = Math.max(Math.floor(Number(filters.page ?? 1) || 1), 1);
+
+  // A repeated query parameter (?q=a&q=b) arrives as an array. The first value
+  // is what the filter control displays, so it is the one applied here — an
+  // array handed to sanitizeQuery() used to throw a TypeError into the
+  // load-error card, and comparing price/status/category/rarity against an
+  // array silently matched nothing.
+  const one = (value: unknown): string | undefined =>
+    Array.isArray(value)
+      ? (value[0] as string | undefined)
+      : (value as string | undefined);
 
   let query = supabase
     .from("badges")
     .select("*", { count: "exact", head: false });
 
-  const q = filters.q ? sanitizeQuery(filters.q) : "";
+  const requestedQ = one(filters.q);
+  const q = requestedQ ? sanitizeQuery(requestedQ) : "";
   if (q) {
     query = query.or(
       `title.ilike.%${q}%,set_id.ilike.%${q}%,slug.ilike.%${q}%`,
     );
+  } else if (requestedQ) {
+    // The term survived as input but sanitized to nothing (only PostgREST
+    // delimiters: "%", ",", "(", ")"). The control still displays it, so the grid
+    // must not silently fall back to the whole catalog. `id is null` is a valid
+    // filter that matches no row (id is a NOT NULL primary key) — an honest "no
+    // results for this term".
+    query = query.is("id", null);
   }
-  if (filters.status && filters.status !== "all") {
-    query = query.eq("status", filters.status);
+  const statusFilter = one(filters.status);
+  if (statusFilter && statusFilter !== "all") {
+    query = query.eq("status", statusFilter);
   }
-  if (filters.price === "free") query = query.eq("is_paid", false);
-  if (filters.price === "paid") query = query.eq("is_paid", true);
-  if (filters.category && filters.category !== "all") {
-    query = query.eq("category", filters.category);
+  const priceFilter = one(filters.price);
+  if (priceFilter === "free") query = query.eq("is_paid", false);
+  if (priceFilter === "paid") query = query.eq("is_paid", true);
+  const categoryFilter = one(filters.category);
+  if (categoryFilter && categoryFilter !== "all") {
+    query = query.eq("category", categoryFilter);
   }
-  if (filters.rarity && filters.rarity !== "all") {
-    query = query.eq("rarity_tier", filters.rarity);
+  const rarityFilter = one(filters.rarity);
+  if (rarityFilter && rarityFilter !== "all") {
+    query = query.eq("rarity_tier", rarityFilter);
   }
 
-  const sort: SortKey = (filters.sort as SortKey) ?? "newest";
+  const sort: SortKey = resolveSortKey(filters.sort);
+  // No sort key here is unique — 471 of 476 rows share one `first_seen_at`,
+  // 437 share one `end_date`, 163 share one `rarity_score` — so Postgres is
+  // free to order equal keys differently between two requests, and an offset
+  // window then repeats rows already served and drops others. Every sort gets
+  // an `id` tiebreak, the same guard `getCatalogKeys` already carries.
   switch (sort) {
     case "oldest":
-      query = query.order("first_seen_at", { ascending: true });
+      query = query.order("first_seen_at", { ascending: true }).order("id");
       break;
     case "rarity":
-      query = query.order("rarity_score", { ascending: false });
+      query = query.order("rarity_score", { ascending: false }).order("id");
       break;
     case "owners":
-      query = query.order("owner_count", {
-        ascending: false,
-        nullsFirst: false,
-      });
+      query = query
+        .order("owner_count", { ascending: false, nullsFirst: false })
+        .order("id");
       break;
     case "ending":
       // A sort must never decide WHICH rows appear. The previous
       // `.not("end_date", "is", null)` silently dropped every badge without an
       // end date — on /active, whose default sort is "ending", that hid live
       // badges from the page entirely. Rows without a date now simply sort last.
-      query = query.order("end_date", { ascending: true, nullsFirst: false });
+      query = query
+        .order("end_date", { ascending: true, nullsFirst: false })
+        .order("id");
       break;
     case "releasing":
-      query = query.order("start_date", { ascending: true, nullsFirst: false });
+      query = query
+        .order("start_date", { ascending: true, nullsFirst: false })
+        .order("id");
       break;
     case "name":
-      query = query.order("title", { ascending: true });
+      query = query.order("title", { ascending: true }).order("id");
       break;
     default:
-      query = query.order("first_seen_at", { ascending: false });
+      query = query.order("first_seen_at", { ascending: false }).order("id");
   }
 
   query = query.range((page - 1) * perPage, page * perPage - 1);
@@ -211,13 +274,23 @@ export async function listBadges(
 
   if (error) {
     // PostgREST rejects a window that starts past the end of the result set
-    // (416 / PGRST103) rather than returning an empty page. That is what made a
-    // stale `?page=` a hard failure — previously swallowed into the "catalog is
-    // empty" hint. Treat it as "past the end" and serve the last real page.
+    // (416 / PGRST103) rather than returning an empty page. Decide from the
+    // real total instead of assuming every error is that one:
+    //   * a filtered set with no rows at all is an empty page, not a failure —
+    //     it used to re-throw, so `/badges?q=zzzzzznope&page=2` rendered the
+    //     load-error card for a URL that was merely empty;
+    //   * a stale `?page=` is served the last real page instead of a dead end;
+    //   * anything else (a pooler hiccup, a statement timeout at that offset)
+    //     is re-thrown as-is, because the old `Math.min(page, first.pages)`
+    //     re-issued the *identical* failing request whenever `page` was already
+    //     in range — an unbounded loop, not a retry.
     if (page > 1) {
       const first = await listBadges({ ...filters, page: 1 });
-      if (first.total > 0) {
-        return listBadges({ ...filters, page: Math.min(page, first.pages) });
+      if (first.total === 0) {
+        return { items: [], total: 0, page: 1, perPage, pages: 1 };
+      }
+      if (page > first.pages) {
+        return listBadges({ ...filters, page: first.pages });
       }
     }
     throw error;
@@ -237,9 +310,12 @@ export async function listBadges(
   if (page > 1 && (data ?? []).length === 0) {
     // PostgREST can report a zero count for a window beyond the data, so an
     // empty page needs one cheap first-page query to tell "past the end" from
-    // "these filters match nothing".
+    // "these filters match nothing". `first.pages !== page` keeps that retry
+    // from re-issuing the identical request when the window really is empty.
     const first = await listBadges({ ...filters, page: 1 });
-    if (first.total > 0) return listBadges({ ...filters, page: first.pages });
+    if (first.total > 0 && first.pages !== page) {
+      return listBadges({ ...filters, page: first.pages });
+    }
   }
 
   return {
@@ -380,11 +456,26 @@ export async function getHomeData(): Promise<HomeData> {
 
 export async function getCategories(): Promise<string[]> {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("badges")
-    .select("category")
-    .order("category");
-  const set = new Set((data ?? []).map((row) => row.category as string));
+  // PostgREST caps a single response at 1000 rows and the old select had no
+  // range, so this returned the categories of only the first 1000 badges in
+  // `category` order — once the catalog passed 1000 rows, every
+  // alphabetically-late category silently disappeared from the dropdown, with
+  // no error anywhere. Page with `.range()` and an `id` tiebreak. A query
+  // failure is thrown, not swallowed: the caller treats the category list as
+  // decoration and renders the grid regardless.
+  const pageSize = 1000;
+  const set = new Set<string>();
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await supabase
+      .from("badges")
+      .select("category")
+      .order("id")
+      .range(from, from + pageSize - 1);
+    if (error) throw error;
+    const batch = (data ?? []) as Array<{ category: string }>;
+    for (const row of batch) if (row.category) set.add(row.category);
+    if (batch.length < pageSize) break;
+  }
   return [...set].sort();
 }
 
@@ -398,7 +489,9 @@ export async function getProfileByUsername(
     .trim()
     .replace(/\\/g, "\\\\")
     .replace(/%/g, "\\%")
-    .replace(/_/g, "\\_");
+    .replace(/_/g, "\\_")
+    // PostgREST aliases `*` to `%` in ilike.
+    .replace(/\*/g, "\\*");
   const supabase = await createClient();
   // Explicit column list: the public role is granted SELECT per column, and
   // `twitch_id` is deliberately not among them. `select("*")` would be refused.
@@ -418,7 +511,7 @@ export const PROFILE_PUBLIC_COLUMNS =
   "id, username, display_name, avatar_url, bio, color, banner_url, theme, " +
   "showcase_slots, inventory_public, created_at, updated_at, customization, " +
   "view_count, steal_enabled, steal_price, steal_max, mood, potat_level, " +
-  "potatoes, potat_first_seen, potat_connections, twitch_created_at";
+  "potatoes, potat_first_seen, potat_connections, twitch_created_at, role";
 
 export interface InventoryItem {
   acquired_at: string;

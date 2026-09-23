@@ -1,0 +1,276 @@
+{
+  "agent": "design",
+  "scope": "visual design and interface craft: layout and information hierarchy, motion and transitions, theming and tokens, component design, data-visualisation design, responsive behaviour, iconography, imagery, empty states, and the feel of using the site",
+  "ideas": [
+    {
+      "category": "design",
+      "title": "Lifecycle-adaptive badge detail header",
+      "body": "The badge detail page renders one header composition (image, name, rarity chip, status pill) whatever the badge's stage, so an upcoming badge, an open one and an extinct one all lead with the same weight. Define four header compositions selected server-side from the existing status/is_confirmed_active fields and end_date: upcoming leads with the countdown and a remind action, claimable-now leads with the claim link and time remaining, closed leads with final owner count and tier, extinct leads with the archive framing and its provenance context. No client state, just a prop choosing the composition. Effort: M. Risk if built badly: four near-identical headers that differ only in colour, which is worse than one, or a header that keeps claiming 'open' after the sweep has moved on.",
+      "why": "It makes the page answer the visitor's real question, can I still get this, in the first screen instead of the fifth."
+    },
+    {
+      "category": "design",
+      "title": "Quick-look split pane on wide screens",
+      "body": "On viewports wide enough for two columns the catalog becomes master-detail: the BadgeGrid on one side and a pane on the other showing the focused badge's art at 4x, its rarity, owner count, window and a link to the full page, filled as focus or hover moves through the grid without any navigation. The pane reads the same BadgeRow the tile already has, so it costs no extra query, and below the breakpoint the layout falls back to the current single column. It composes with the roving-tabindex grid work already on the board rather than replacing it. Effort: M. Risk if built badly: hover-driven preview on touch devices where there is no hover, or a pane that swallows the click and makes opening a badge ambiguous.",
+      "why": "Browsing 476 badges is a scanning task, and inspecting without losing your place in the list is the whole game of a catalog."
+    },
+    {
+      "category": "design",
+      "title": "Scroll-spy category header in the grid",
+      "body": "When the catalog is sorted or grouped by category, insert a sticky sub-header per group that pins under the site header while its group is in view, carrying the category name, its count and a jump list of the other groups. The header is derived from the ordered rows the grid already receives (no new query), the pin uses position: sticky with the header height as its top offset, and the active group is resolved by one IntersectionObserver over the group headings. Effort: M. Risk if built badly: a sticky bar stacking under the sticky site header and eating a third of a phone screen, or jump counts that lie while the sync changes group sizes.",
+      "why": "A long catalog needs an index that travels with you, and category is the axis collectors actually scan by."
+    },
+    {
+      "category": "design",
+      "title": "Disclosure accordion for badge detail on phones",
+      "body": "Badge detail stacks six to eight sections in one narrow column, so on a phone the drop window, rarity breakdown, owner trend and ownership sit below the fold in an undifferentiated wall. Below the tablet breakpoint render the sections as a disclosure accordion with the answer-critical section (window and claimability) open and the rest collapsed behind a one-line summary each, keeping the URL hash contract so a shared anchor still lands open. Wider viewports render the same markup expanded, so there is one section list and two presentations. Effort: M. Risk if built badly: hiding the very data the visitor came for behind a tap, or collapsed summaries that drift out of date with the section they summarise.",
+      "why": "Badge pages are dense by nature, and a phone visitor should reach the answer before the bibliography."
+    },
+    {
+      "category": "design",
+      "title": "Home page answer zones",
+      "body": "The home page currently presents the same catalog grid /badges does. Restructure it into three stacked answer zones with fixed vertical budgets: claimable now with the live count and the two soonest-closing badges, just added from the newest badge_events rows, and rarest movers from the momentum view, each zone one row tall with a link into the full surface. Every zone is server-rendered from queries that already exist, and each has a defined quiet-day state rather than collapsing. Effort: M. Risk if built badly: a home page that duplicates /badges with extra chrome, or zones that are empty and unexplained on a day when nothing dropped.",
+      "why": "A live catalog's front door should answer what is happening right now before it shows a wall of tiles."
+    },
+    {
+      "category": "design",
+      "title": "Return-position contract for the catalog",
+      "body": "Leaving the catalog for a badge and coming back loses the visitor's place: the grid re-renders from the top and the tile they opened is unmarked. Define a return-position contract that persists the scroll offset and the focused tile id per route in sessionStorage, restores them on back navigation, and paints a brief you-were-here ring on the tile that was opened, cleared on the next interaction. The state is client-only and survives the App Router remount. Effort: S. Risk if built badly: restoring a stale offset after the grid contents changed, dropping the visitor into the middle of a different list or onto a tile that no longer exists.",
+      "why": "Catalog browsing is inherently exploratory, and punishing every dive into a badge with a lost position is a tax on the main activity."
+    },
+    {
+      "category": "design",
+      "title": "Per-breakpoint information budget on badge tiles",
+      "body": "A badge tile carries name, set, owner count, tier chip and countdown, and at two columns the text wraps to four lines while at six it truncates to nothing useful. Define an explicit budget per breakpoint, two facts at 2 columns (name and tier), three at 4, five at 6, using named slots inside .badge-tile so a tile never renders a field its width cannot hold and the omitted fields are absent from the DOM rather than clipped by overflow. The rule lives once in the tile component, not per page. Effort: S. Risk if built badly: tiles that clip mid-word, or a mobile tile that hides the only fact that matters, whether the badge is still claimable.",
+      "why": "The grid is the site's primary surface and it should read cleanly at every width instead of degrading into truncation."
+    },
+    {
+      "category": "design",
+      "title": "Scroll-adaptive compact header",
+      "body": "The header is a fixed-height sticky bar carrying brand, nav, locale switcher, theme toggle and the personal HUD, and on a phone that vertical cost is paid on every screenful. Give it two defined states: expanded at scroll top, compact after the first screen where it keeps the brand, the coin and level HUD and the account control and folds the nav into the existing sheet, transitioning over a token duration rather than a bounce. The switch is driven by scroll position with a hysteresis threshold so it cannot flicker at the boundary, and the desktop nav is exempt. Effort: S. Risk if built badly: a header that jitters across the threshold, or one that hides navigation on a desktop where it should stay put.",
+      "why": "Persistent chrome should cost the reader less the deeper they read, not the same amount on every screen."
+    },
+    {
+      "category": "design",
+      "title": "One snap rail primitive for horizontal strips",
+      "body": "Several surfaces scroll sideways with ad-hoc markup, the showcase carousel, rarity leaders and the trending strips, and each handles edge fade, snapping and keyboard differently. Define one rail primitive: scroll-snap on the track, an edge-fade mask reflecting scroll position, arrows that appear only when the track actually overflows, and arrow-key movement that scrolls by one card and moves focus into it. The same primitive then serves the mobile table fallback so a narrow screen scrolls cards consistently everywhere. Effort: M. Risk if built badly: arrows shown on a desktop strip where the three cards already fit, or snap fighting a trackpad's free scrolling until the strip feels sticky and broken.",
+      "why": "The site is full of horizontal strips of badges, and consistency there is most of what makes a catalog feel finished."
+    },
+    {
+      "category": "design",
+      "title": "Shared-element transition from tile to detail",
+      "body": "Clicking a tile hard-cuts to the detail page even though the same image is at both ends. Use the View Transitions API, which the Next 16 App Router supports, to give the badge image a view-transition-name keyed to the badge id so it morphs from the 28 px tile into the detail hero while the rest of the page cross-fades, falling back to the current navigation where the API is absent and to a plain cut under the motion preference. Only the image and the title carry names, so the transition count stays small. Effort: M. Risk if built badly: duplicate view-transition-name warnings across a long list, a morph that runs on a reduced-motion device, or a transition that delays first paint of the destination on a slow phone.",
+      "why": "The badge art is the site's one uninterrupted visual thread, and continuing it across the navigation makes the catalog feel like one object instead of pages."
+    },
+    {
+      "category": "design",
+      "title": "FLIP choreography for badges that arrive live",
+      "body": "The catalog re-renders when the sync adds badges, but new tiles appear by reflowing the grid and yanking whatever the visitor is reading. Give the grid a defined insert behaviour: new tiles animate in on entry while existing tiles FLIP to their new positions, and a compact N new badges pill appears above the grid instead of auto-scrolling, so the visitor chooses when to jump. Positions come from getBoundingClientRect before and after the render, gated behind the motion preference and capped so a bulk sync does not animate a hundred tiles. Effort: M. Risk if built badly: an animation on every revalidation that makes a stable grid feel unstable, or measurement work that forces a layout thrash on a large page.",
+      "why": "This is a real-time database, so the grid changes under people's hands and that should feel like an update rather than a glitch."
+    },
+    {
+      "category": "design",
+      "title": "Motion token scale with a motion-level setting",
+      "body": "Each animation picks its own duration and easing, and the only control over motion is the prefers-reduced-motion media query. Define a motion token scale (--dur-1/2/3, --ease-standard/enter/exit) consumed by the component classes, plus an explicit level in the interface, full, subtle or off, persisted like the theme and mapped to a data-motion attribute on the html element. This is a different axis from the reduced-motion idea already on the board, which honours the OS query: this gives a visitor who wants calm but not zero motion a middle setting, and makes the decorative set (sparkles, coin rain, particles) droppable while keeping transitions that carry meaning. Effort: M. Risk if built badly: tokens every component ignores in favour of hardcoded numbers, or an off level that also kills the transition that communicates a state change.",
+      "why": "Motion is part of this site's identity, all sparkles and flying coins, so it deserves the same token discipline as colour and radius."
+    },
+    {
+      "category": "design",
+      "title": "Coin-flight arcs from payout to HUD",
+      "body": "When a game, the wheel or the daily login pays out, the HUD balance simply changes with no link between cause and effect. Choreograph the payment instead: the result panel emits a short arc of coin glyphs that fly from the payout element to the HUD coin counter, which ticks up as they land, with the path computed from the two elements' bounding boxes and the glyph count capped so a jackpot does not spawn hundreds of elements. The motion preference and the motion-level setting skip the flight and update the number directly. Effort: S. Risk if built badly: dozens of animated nodes on a big win, an arc that keeps running after the visitor navigates away, or a displayed balance that drifts from the server value it animates toward.",
+      "why": "The economy is the part of the site people interact with most, and the payout is the moment worth animating."
+    },
+    {
+      "category": "design",
+      "title": "Server-honest suspense reveal for game rounds",
+      "body": "The 13 games and the wheel are server-authoritative, so the client does not know the outcome until the response lands and any spin or flip is theatre of unknown length. Design the reveal to be honest about that: the wheel's easing is computed to land on the server's slot within the time the request actually takes, with a minimum spin so a fast response still reads as deliberate, and the games use a fixed-length reveal that continues while the response is in flight and resolves when it arrives, never announcing a result the client invented. The pending phase is designed suspense, not a spinner covering the board. Effort: M. Risk if built badly: an animation that resolves client-side and then contradicts the server payload, or a reveal that overruns on a slow response and looks frozen exactly when the player is most invested.",
+      "why": "For games whose whole promise is server-decided fairness, the reveal should look like it is waiting for the truth rather than inventing it."
+    },
+    {
+      "category": "design",
+      "title": "Interaction-state tokens and a state matrix",
+      "body": "Hover, active, focus-visible, disabled, loading and selected are hand-tuned per component today, so .btn, .chip and .card-interactive each invent their own mix and a chip and a button feel subtly different in the same state. Introduce one token per role (--state-hover-bg, --state-active-scale, --state-focus-ring, --state-disabled-opacity, --state-selected-bg) and one focus-visible rule drawing a 2 px accent ring with an offset that reads on both the page background and inside a card, then document the matrix in the styleguide. This is a different axis from the elevation and radius token idea already on the board, which scales shadows and corners, not states. Effort: S. Risk if built badly: a focus ring invisible against the accent-filled primary button, or a hover token leaking onto display-only chips until they look clickable.",
+      "why": "A visitor touches these states hundreds of times a session, and inconsistency between a chip and a button is the difference between a system and a pile of parts."
+    },
+    {
+      "category": "design",
+      "title": "High-contrast variant driven by prefers-contrast",
+      "body": "The site ships dark and light and is fixing light hairlines, but nothing responds to a visitor who has asked the operating system for more contrast. Add a third token block, selected by prefers-contrast: more and also offered as an explicit theme option, that lifts body copy to an AAA ratio, promotes --line to a solid colour-mixed hairline, and removes the translucent surfaces and backdrop blurs that reduce legibility over the ambient gradient. It is a token override on the html element, so no component changes and useChartTheme inherits it. Effort: S. Risk if built badly: a variant tested only on the catalog that breaks the charts, whose palette is read from the same tokens, or a variant so flat it stops being recognisably this site.",
+      "why": "Contrast is a preference people state to their OS, and a site this visually busy owes them a version that respects it."
+    },
+    {
+      "category": "design",
+      "title": "Data-semantic palette separate from rarity",
+      "body": "The six rarity tiers have ramps, but ordinary status, upcoming, open, closed, expired, stale and degraded, borrows the generic success/warning/danger tokens, so an expired badge reads as a failure in red and a stale catalog reads like an outage. Define a separate data-semantic palette for lifecycle and health that never uses the rarity hues and never uses danger red for a badge that simply ended: upcoming a neutral outline, open the accent, closed a muted fill, expired a desaturated neutral, and stale and degraded a warning tone of their own. Apply it to status pills, table rows, chart bands and the lifecycle glyphs together. Effort: M. Risk if built badly: collapsed semantics where open and the accent become indistinguishable, or red reserved so tightly that a genuine data failure stops standing out.",
+      "why": "Rarity and lifecycle are two different stories told in colour on the same page, and today they share one alphabet."
+    },
+    {
+      "category": "design",
+      "title": "Ambient theme bound to a live event window",
+      "body": "The catalog knows when a global event is live, a badge set with a shared short window, a TwitchCon drop, a Prime batch, from badge_events and the set metadata. For the duration of such a window, switch the site's ambient accent and --ambient wash to a palette derived from the dominant colours of that event's badge art, time-boxed to the window and reverting automatically, with a small live marker explaining why the site changed. It is a token override scoped to the html element while the window is open, not a saved preference like the existing profile palettes. Effort: M. Risk if built badly: event art yielding an unreadable accent, a theme that sticks after the window closes because the sweep is stale, or contrast regressions in charts that read the accent token.",
+      "why": "The site's whole subject is timed drops, so letting the interface change during one is the design equivalent of live coverage."
+    },
+    {
+      "category": "design",
+      "title": "Native control and OS chrome theming pass",
+      "body": "Native widgets ignore the design system: form controls can render in the OS light style inside a dark page, and while the scrollbar is themed, colour-scheme is never declared so ::selection, the caret, the placeholder, autofill, the date picker and the file button are all left to the browser. One pass declares color-scheme per theme, themes ::selection, ::placeholder and caret-color, styles the checkbox, radio and range tokens, and gives autofill a background that does not flash yellow over the dark surface. Scoped entirely to globals.css. Effort: S. Risk if built badly: a control that looks correct in dark and unreadable in light, or an autofill override that removes an affordance the browser uses for security.",
+      "why": "The seams where a design system meets the browser are exactly where a polished site starts to look assembled rather than designed."
+    },
+    {
+      "category": "design",
+      "title": "Print stylesheet for badges and sets",
+      "body": "A collector wants a badge on paper: a club handout, a classroom sheet, a wall of the set they are chasing. Add a print stylesheet for badge detail and for a filtered catalog list where the ambient gradient and all shadows drop, the layout becomes a single column at a printable measure, each badge prints with its name, set, window dates and a QR to the canonical URL reusing the existing URL shapes, page breaks land between badges, and art is kept with print-color-adjust where the browser allows. It is a media print block over the same markup, so nothing is duplicated. Effort: S. Risk if built badly: a print view that carries the sticky header and nav onto every page, or art that prints as an empty box because it is a CSS background.",
+      "why": "The catalog is reference material, and reference material that cannot be printed is only half a reference."
+    },
+    {
+      "category": "design",
+      "title": "One overlay primitive for dialogs and sheets",
+      "body": "Dialogs, game result panels, the language panel, the mobile nav sheet and the account menu are separate implementations with different scrims, sizes and dismissal rules. Define one overlay primitive with three presentations chosen by viewport and content size, anchored popover, centred dialog and bottom sheet on phones, sharing a scrim token, scroll lock, escape and outside-click dismissal, a title-and-close header pattern and safe-area insets for the sheet. This is the layout and behaviour contract; the focus-trap work already on the board slots into it instead of being rebuilt per surface. Effort: L. Risk if built badly: a sheet that traps page scroll on iOS, an overlay rendered inside a stacking context under a card, or a half-finished migration leaving two scrim colours on the same page.",
+      "why": "Overlays are where the games, the account and the language all live, and five different scrims is five different products."
+    },
+    {
+      "category": "design",
+      "title": "Async action state machine for buttons",
+      "body": "Buttons that trigger server work, sync inventory, claim the daily bonus, copy the badge embed, submit a report, sometimes show a spinner and sometimes show nothing, and a failed action often only reaches the console. Standardise the client lifecycle as one hook plus one button presentation: idle, pending with an inline progress that replaces the label without changing the button width, success with a brief tick then back, and error where the label becomes the retry and the reason goes to a title and a toast. Preserving width through the state change is the point. Effort: S. Risk if built badly: a success tick that fires before the server confirms, or a disabled button that never re-enables after a thrown error.",
+      "why": "Nearly every meaningful action here is a network round trip, and the interface should say so in one consistent voice."
+    },
+    {
+      "category": "design",
+      "title": "Queued toast layer for action feedback",
+      "body": "Transient confirmations, copied, claimed, synced, wishlisted, settings saved, insufficient coins, currently land wherever the component happens to put them and some land nowhere. Add a toast layer with a small queue: single-line, bottom-anchored on desktop and above the mobile action bar on phones, a variant per semantic (neutral, success, warning, danger), at most three stacked with older ones retiring, a dismissal after a token duration plus a manual close, and instant appearance under reduced motion. It reads no data, it is purely the presentation of outcomes. Effort: M. Risk if built badly: toasts stacking over the game board and covering the controls, a queue that buries an error behind three copied messages, or a toast announced twice by a screen reader alongside the live region.",
+      "why": "The site is dense with small actions, and consistent acknowledgement is what makes them feel like they landed."
+    },
+    {
+      "category": "design",
+      "title": "Design family for empty and zero states",
+      "body": "The app renders empty states rather than crashing, but they are ad hoc strings: an empty inventory, a showcase with nothing in it, a wishlist, a category with no badges, a leaderboard in a quiet period, a search with no matches. Define one state family with a shared composition, a small inline SVG in the badge language, one sentence saying what this place is, and exactly one primary action (sync your badges, browse the catalog, add a badge), plus a secondary why-is-this-empty line that distinguishes empty-because-of-you from empty-because-of-the-schedule. Every empty state is one of the defined variants and the variant is checked in review. Effort: M. Risk if built badly: a charming empty state that masks a genuine failure, so an empty inventory caused by a provider error reads identically to an inventory that is truly empty.",
+      "why": "A database site is empty for a dozen different reasons and the visitor deserves to know which one they are looking at."
+    },
+    {
+      "category": "design",
+      "title": "Designed system pages as one family",
+      "body": "404, 500, offline and maintenance are currently whatever Next renders plus the feature-flag gate. Design them as one family sharing a centred measure and a badge-flavoured conceit, a placeholder tile carrying the site's own mark reading this badge is not in the catalog, with the locale-aware message, a primary way back, a secondary retry, and a maintenance variant that shows the last sync heartbeat time so the page admits it is temporary and states how current the data is. The offline variant is served by the existing service worker for cached routes with a clear showing-what-we-have framing. Effort: M. Risk if built badly: an error page that leaks a stack trace or a table name, or an offline page that presents cached catalog data as current.",
+      "why": "The pages a visitor sees when something is wrong are the ones they remember, and right now they are unbranded."
+    },
+    {
+      "category": "design",
+      "title": "Living styleguide route for the design system",
+      "body": "globals.css carries hundreds of component classes and tokens whose only documentation is the CSS itself. Add an internal styleguide route that renders every component class in every state (default, hover, focus-visible, disabled, selected, error, empty, loading), in both themes, at a wide and a narrow viewport and in both directions, each block labelled with its class name and the tokens it consumes, generated from a manifest that is checked against the stylesheet so a class with no entry fails. It becomes the review surface for the rest of these design ideas and the source for visual snapshots. Effort: M. Risk if built badly: a styleguide that re-implements components instead of rendering the real classes and therefore drifts, or one shipped publicly and indexed without a noindex.",
+      "why": "A design system with no place to look at itself is a set of files nobody trusts, and this site's CSS is already past that size."
+    },
+    {
+      "category": "design",
+      "title": "Numeric and date presentation layer",
+      "body": "Numbers are formatted ad hoc across the site: owner counts, TBRI scores, coin balances, XP, percentages, dates and durations each have their own rounding and their alignment differs between a table, a tile and a chart label. Define one presentation layer with tabular figures wherever a number can change or align, locale-correct grouping and compact notation like 1.2M with the exact value in a title, a decimal policy per metric, right-alignment for measures inside .data-table, a consistent delta treatment with a direction glyph so meaning survives colour blindness, and dates in the visitor's locale with an explicit timezone label. Effort: M. Risk if built badly: compact notation collapsing two different values to the same 1.2M in a comparison, or locale formatting that breaks the truncation a tile layout depends on.",
+      "why": "This is a database site, so numbers and dates are the product, and it currently speaks them in a dozen dialects."
+    },
+    {
+      "category": "design",
+      "title": "Wrapping, hyphenation and measure policy",
+      "body": "Headings break mid-phrase, a long badge name orphans one word onto a third line, and prose runs the full width of a wide card. Add a typographic policy: text-wrap balance on headings and section titles, text-wrap pretty with widow control on lead paragraphs, hyphens auto with the correct lang per locale so long German and Russian badge names break sensibly, and a per-locale measure ceiling applied to .prose-content and the FAQ rather than inherited from the container width. This is about wrapping and measure specifically, not the type-scale and logical-inset work already on the board. Effort: S. Risk if built badly: hyphenation that splits a badge name into an unrecognisable fragment, or balanced headings that wrap into a taller and emptier block than the ragged one they replaced.",
+      "why": "This site is mostly text about small images, and clean wrapping is most of what separates a reference page from a wall."
+    },
+    {
+      "category": "design",
+      "title": "Deterministic placeholder for missing badge art",
+      "body": "When a badge image 404s because a provider URL moved or an asset was never mirrored, the grid shows a broken-image icon and the OG render throws. Render a deterministic placeholder instead: a two-tone tile in the badge's tier colour carrying the set initial, hashed from the badge id alone so the same badge always yields the same glyph, sized to the same box so the grid does not shift, labelled art unavailable for assistive tech, with a discreet report link, and used by both the grid and the OG route so a share stays legible. Effort: S. Risk if built badly: a placeholder that looks close enough to real art to hide a broken provider for weeks, or a glyph with enough contrast to be mistaken for a badge in a screenshot.",
+      "why": "Missing art is a certainty in a catalog built from third-party feeds, and the broken-image icon is the one image this site never designed."
+    },
+    {
+      "category": "design",
+      "title": "Optical normalization of badge art",
+      "body": "Badge PNGs have wildly different internal padding and content bounds, a Bits badge fills its canvas while a Partner badge floats in it, so a grid of uniformly sized images still reads as a grid of differently sized badges. Add a sync-time measurement of each image's content bounding box, store the inset alongside the badge row, and render tiles scaling the art so the content occupies a consistent optical box rather than the file filling a fixed one. The source art is untouched and the measurement is one pass per image at sync. Effort: M. Risk if built badly: art upscaled past its native resolution until it blurs, or a trim that clips a glow or shadow that is genuinely part of the badge.",
+      "why": "The whole page is a wall of one object, so the eye reads any size inconsistency as sloppiness before it reads anything else."
+    },
+    {
+      "category": "design",
+      "title": "Light-theme contrast plate for badge art",
+      "body": "Many badge assets are drawn with white or very light strokes on transparency, which reads beautifully on the dark surface and nearly vanishes on the light one. Store a cheap per-image luminance-and-extent measure at sync, and in the light theme render a subtle plate, a surface-2 fill or a low-opacity hairline outline, behind only the art that needs it, so light-stroke badges stay legible while everything else keeps its current unplated look. The decision is per image, not per theme. Effort: M. Risk if built badly: a plate on art that did not need one reading as a rendering bug, or a plate strong enough that the light theme becomes a grid of grey squares.",
+      "why": "Half the catalog is light-on-transparent and the light theme currently loses exactly that half of the wall."
+    },
+    {
+      "category": "design",
+      "title": "Drop-window annotation bands on the owner chart",
+      "body": "The owner-trend chart on a badge page plots a bare line, but the events that explain it, the window opening, a mid-window re-drop, the closing date, are not on it. Read the badge_events rows and the start and end dates and render them as annotated bands and markers on the existing OwnersChart: a shaded band across the open window, a vertical rule at close with a dated label, and a legend line instead of the bands on narrow widths. It reuses the chart's own domain computation, so no new data source and no new query. Effort: M. Risk if built badly: a band covering the curve it is meant to explain, or annotations implying a precision the recorded event timestamps do not have.",
+      "why": "An owner curve without its drop window is a shape with no story, and the events are already sitting in the database."
+    },
+    {
+      "category": "design",
+      "title": "Linked crosshair across the stats dashboard",
+      "body": "The /stats page stacks a dozen independent charts, so reading what happened the week of the 14th means hovering the same date twelve times and holding twelve numbers in your head. Add a linked crosshair: hovering or focusing any chart publishes the resolved bucket, day or week, to a shared context, every other chart draws a thin rule at that bucket and shows its value in the chart head, and moving to another chart moves the whole column. The bucket is the shared key, so it works across different series with no new queries. Effort: L. Risk if built badly: a handler publishing on every pixel of movement and re-rendering twelve charts per frame, or a linked rule landing on a bucket another chart does not have and silently reading nothing.",
+      "why": "The dashboard is a set of series over one time axis, and the only question worth asking of it is what several did at the same moment."
+    },
+    {
+      "category": "design",
+      "title": "Drag-to-measure on the owner curve",
+      "body": "Reading a gain from the owner chart today means eyeballing two gridlines and subtracting. Add a measurement interaction: drag on the chart to place two handles and the chart head reports each handle's value, the delta between them, its direction and the elapsed duration, snapping to real data points, with a click clearing it and arrow keys moving the handles for keyboard users with the same readout. It reads only the series already loaded. Effort: M. Risk if built badly: a drag gesture that fights page scrolling on touch, or a delta drawn straight across a gap in the series as if the line were continuous.",
+      "why": "Owner growth is this site's core measurement, and comparing two dates should be an instrument rather than an estimate."
+    },
+    {
+      "category": "design",
+      "title": "Rarity tier thresholds as chart reference rules",
+      "body": "TBRI tiers derive from owner count and window characteristics, so each tier implies an approximate owner threshold for a given badge profile, and the chart never shows where those boundaries sit. Add optional horizontal reference rules to the owner chart, one per tier boundary for the badge's own window profile, drawn in the tier token colour with a label and toggled from the chart head, so a visitor can see how close a badge is to the legendary line and whether the forecast crosses it. Derived from the same rarity inputs the badge page already loads. Effort: M. Risk if built badly: threshold lines implying a hard boundary where the score is continuous, or a chart so full of rules that the trend they annotate disappears.",
+      "why": "The tiers are the site's central abstraction and the chart that drives them should show where they actually fall."
+    },
+    {
+      "category": "design",
+      "title": "Inline micro-visualisation contract for data tables",
+      "body": "The leaderboards, the category tables and the compare view are numbers in cells, with the shape behind each number invisible. Define one inline micro-viz column contract for .data-table: a 60 by 16 sparkline of the row's own history, a tick marking the column median, and a small delta chip for the period change, all inline SVG drawn from the row's data with no interaction of their own, degrading to the plain number below the tablet breakpoint, and applied only where a series actually exists (owner trends, XP over time, momentum) rather than as decoration on a single value. Effort: M. Risk if built badly: a sparkline on every row turning the table into visual noise, or a median tick computed over the visible page rather than the population.",
+      "why": "Tables are where this site keeps its facts, and a fact with its shape beside it is read in a fraction of the time."
+    },
+    {
+      "category": "design",
+      "title": "Explicit data-sufficiency states for charts",
+      "body": "Charts render the same way with one point, four points or a year of history, and a gap in the sync cadence draws a straight line through it as if nothing were missing. Define the sufficiency states explicitly: one point shows a large value with no-history-yet rather than a flat line, fewer than a week of points shows dots with no trend line and no momentum claim, a gap longer than the sync cadence renders as a dashed segment with a no-data marker, and an empty series shows a designed placeholder instead of bare axes. Thresholds live with the chart contract, distinct from page-level empty states because this is the chart telling the truth about its own inputs. Effort: M. Risk if built badly: hiding a real trend behind a conservative threshold, or a dashed gap overstating how much is missing when it was one skipped heartbeat.",
+      "why": "Every one of these charts is built from a polling sync, and pretending such a series is complete is the easiest way to mislead a collector."
+    },
+    {
+      "category": "design",
+      "title": "Compare view as a three-lane diff",
+      "body": "The two-member compare view puts two inventories side by side, which turns the actual question, what do we share and what do I have that you do not, into a manual scan of two columns. Restructure it as a diff: a shared lane in the middle for badges both own, a lane left for only-A and a lane right for only-B, each badge a tile with its tier, all three lanes aligned by set so related badges line up, with a count per lane and a plain-text export of the delta. It reads the two inventories the compare view already resolves. Effort: M. Risk if built badly: a three-column tile layout unusable below the tablet breakpoint, or alignment by set scattering the lanes because most badges have no set.",
+      "why": "The compare view exists to answer a question about difference, and the current layout makes the visitor do the diffing by eye."
+    },
+    {
+      "category": "design",
+      "title": "Bottom action bar on badge pages for phones",
+      "body": "On a phone a badge page's primary action, the claim link, or the wishlist toggle for an upcoming badge, scrolls away immediately and the visitor has to hunt back up. Add a bottom action bar that appears once the in-flow action leaves the viewport, carrying the primary action plus one context action, wishlist or share, respecting the bottom safe-area inset and sitting above the toast layer, with the in-flow control remaining the source in the accessibility tree and the bar a shortcut to it. Effort: S. Risk if built badly: two competing primary buttons on screen at once, a bar covering the last row of content, or a bar lingering on a finished badge whose only action is gone.",
+      "why": "During a live drop the visitor is holding a phone in one hand, and the one thing they came to tap should never be behind a scroll."
+    },
+    {
+      "category": "design",
+      "title": "Touch target and hit-area policy",
+      "body": "The small controls here, the tier chip, a table row action, rail arrows, the countdown copy affordance, are visually 20 to 28 px, below a comfortable thumb target, so touches land on the row instead of the control. Define a hit-area policy: every interactive control guarantees a 44 px minimum target through an invisible padding or pseudo-element that does not change its visual size, controls in a tight row keep an 8 px minimum gutter so their expanded areas cannot overlap, and the policy is expressed once in the component classes. Effort: S. Risk if built badly: expanded areas overlapping until the neighbour is untappable, or a padding trick that breaks the alignment of a tight chip row.",
+      "why": "The smallest controls on the site are also the most-used ones on the device where they are hardest to hit."
+    },
+    {
+      "category": "design",
+      "title": "Data-saver mode for slow and metered connections",
+      "body": "A visitor on a metered connection gets the full experience and pays for it: decorative motion, particle effects, the chart bundle and 4x art. Add a designed data-saver mode, auto-enabled from the Save-Data header and the connection effective type and overridable in settings, that drops decorative motion and ambient effects to the subtle level, requests 1x art, defers the stats bundle until a chart approaches the viewport, and replaces coin-rain style effects with static equivalents, surfaced as a small chip so the visitor understands why the site looks different rather than assuming it is broken. Effort: M. Risk if built badly: the mode stripping something functional along with the decoration, or auto-detection misreading a connection and making the site feel diminished for everyone.",
+      "why": "This is a data-heavy catalog visited daily by people on phones, and a way to pay less for it is a feature rather than a degradation."
+    },
+    {
+      "category": "design",
+      "title": "Category pictogram set",
+      "body": "Categories, subscription tiers, Bits, Prime, follower milestones, event drops, game-specific sets, are labelled with text-only chips. Draw a small consistent pictogram per top-level category, one grid size and one stroke weight following the icon contract, and place it in the filter chips, the category table rows, a corner mark on the tile and the RSS and OG output, so a category is recognisable before its label is read. The set is deliberately small and closed, and a new category without a pictogram fails the review check rather than shipping a generic dot. Effort: M. Risk if built badly: pictograms literal enough to read as emoji, or a set that keeps growing with mixed metaphors until it signifies nothing.",
+      "why": "Category is one of this catalog's two axes and the one that currently has no visual language at all."
+    },
+    {
+      "category": "design",
+      "title": "Lifecycle glyph set",
+      "body": "Upcoming, open, closing-soon, closed, expired and extinct are each a text pill, so scanning a table means reading every row. Design a small closed set of lifecycle glyphs on the shared icon grid, a clock for upcoming, an open bracket for live, a notched bracket for closing soon, a closed bracket for ended and a struck mark for extinct, each paired with its label and its data-semantic colour and used in the status pill, the table, the tile corner and the deadline calendar. Glyph always travels with its label wherever a screen reader reads it. Effort: M. Risk if built badly: glyphs differing only in a detail that vanishes at 14 px, or an extinct glyph that reads as an error state rather than a neutral archive.",
+      "why": "Whether a badge can still be claimed is the first question on every screen here, and it should be answerable by shape."
+    },
+    {
+      "category": "design",
+      "title": "Icon grid and stroke contract",
+      "body": "Icons are inline SVG written per component, so the same concept is drawn at three sizes with different stroke weights and optical alignment, and nav glyphs sit on different baselines. Establish one icon contract: a 24-unit grid with a defined live area, three sizes (16, 20, 24) scaled from a single drawing, a stroke token using currentColor with one weight per size, rounded caps, and an alignment rule so glyphs in a row share a baseline, then audit the existing set into it and add a check that a new icon matches the contract. No icon font and no change of technique required. Effort: M. Risk if built badly: redrawing everything for uniformity and losing the specific glyphs that worked, or a 16 px variant that turns a detailed icon into a smudge.",
+      "why": "Icons are the only ornament a dark data-dense UI can afford, and three weights of the same symbol is three visual languages."
+    },
+    {
+      "category": "design",
+      "title": "Haptic vocabulary for game and wheel outcomes",
+      "body": "On phones the games and the wheel give no tactile confirmation, so a loss and a win land identically. Define a small haptic vocabulary using the Vibration API: a short tap for a bet placed or a selection, a double tap for a win, a single longer pulse for a bust or loss, and a distinct pattern for a jackpot-scale outcome, fired only where the API exists, behind an explicit preference that defaults off, and never for passive events such as a feed item arriving. It mirrors the visual outcome vocabulary rather than inventing a second meaning. Effort: S. Risk if built badly: buzzing on every interaction until it becomes noise, vibration during passive browsing, or haptics firing for an outcome the server has not confirmed yet.",
+      "why": "The games are the most tactile part of the site and the one place where the phone's own feedback channel is currently silent."
+    }
+  ]
+}

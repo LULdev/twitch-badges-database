@@ -104,13 +104,13 @@ export default function VaultGame() {
           ))}
         </div>
         {phase === "idle" && (
-          <button type="button" onClick={start} className="btn btn-primary w-full">{t("start")}</button>
+          <button type="button" onClick={start} disabled={busy} className="btn btn-primary w-full">{t("start")}</button>
         )}
         {dialIndex >= 0 && phase !== "done" && (
           <button type="button" onClick={stop} className="btn btn-primary w-full">{t("stop")}</button>
         )}
         {phase === "done" && (
-          <button type="button" onClick={start} className="btn btn-secondary w-full">{t("again")}</button>
+          <button type="button" onClick={start} disabled={busy} className="btn btn-secondary w-full">{t("again")}</button>
         )}
         <p className="text-center text-xs text-muted">{t("vaultHint")}</p>
       </div>

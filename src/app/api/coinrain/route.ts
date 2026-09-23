@@ -1,5 +1,7 @@
 import { authUserId, ipHashFromRequest } from "@/lib/gamification/session";
 import { coinRain } from "@/lib/gamification/daily";
+import { isUserBanned } from "@/lib/admin";
+import { getFeatures } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
@@ -7,6 +9,14 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as { profileId?: string } | null;
   if (!body?.profileId) return Response.json({ error: "profileId required" }, { status: 400 });
   const giverId = await authUserId();
+  // Logged-out visitors may still rain coins; a signed-in banned member may
+  // not — otherwise the ban would only hide the account, not stop the abuse.
+  if (giverId && (await isUserBanned(giverId))) {
+    return Response.json({ error: "banned" }, { status: 403 });
+  }
+  if (!(await getFeatures()).coinRain) {
+    return Response.json({ error: "feature disabled" }, { status: 403 });
+  }
   // Logged-out visitors get one rain per profile per day, keyed by their
   // salted IP hash instead of a single shared "anonymous" slot.
   const result = await coinRain(giverId, body.profileId, ipHashFromRequest(request));

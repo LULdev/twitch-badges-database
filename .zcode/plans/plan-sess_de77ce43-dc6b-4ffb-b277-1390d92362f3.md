@@ -1,64 +1,88 @@
-# Twitch Badges Database — Full Site Build
+# Admin Control Panel (ACP) + Rollen-Badges + Besucher-Tracking + öffentliche Statistiken
 
-Fresh, English-first build in `C:\Users\LUL\Twitch-Badges-Database`, reusing the existing Supabase project + Twitch OAuth app from the old `twitchbadges` project. All data sources below were verified live during research.
+Größter Einzel-Feature-Bau der Sitzung, in 8 Phasen. Jede Phase endet mit laufenden Gates; ein Changelog-Eintrag pro Phase (ohne den Passcode — der erscheint NUR als Salted-SHA-256-Hash im Code, nie in Changelog, Blog, Messages oder Doku).
 
-## Stack
-- **Next.js 16 App Router + TypeScript + Tailwind CSS v4** (dark/light via class strategy, no-flash theme script, dark default)
-- **next-intl** — 10 locales: `en` (default), `pt`, `es`, `fr`, `ru`, `zh`, `ar` (RTL), `ja`, `it`, `ko` — `/{locale}/...` prefix routing with hreflang alternates
-- **Supabase** (existing project) — Postgres + Auth (Twitch provider) + RLS on every table
-- **Vercel** + Vercel Cron; **Recharts** for stats; **web-push** (VAPID) for desktop notifications; **@vercel/og** for share images; **fast-xml-parser** for RSS
+## Phase 1 — Fundament: DB, Admin-Auth, ACP-Gate (Migration 0025, `src/lib/admin.ts`, `/admin`)
 
-## Verified data pipeline
-| Data | Source | Sync |
-|---|---|---|
-| Badge catalog (images, titles, click URLs) | Twitch Helix `GET /helix/chat/badges/global` + `?broadcaster_id=` (client-credentials app token); IVR mirror as fallback | 2×/day diff |
-| Drop dates, expiry windows, upcoming badges | badgebase.de RSS feed + detail-page scrape (start/end dates) | daily |
-| Per-badge owner counts, active counts, % | `api.potat.app/twitch/badges` + `?owners=true` (first≤200, cursor pagination, respect `Retry-After: 60`) | every 15 min → time series |
-| **Badges a user owns** | `https://www.badges.blog/api/perfil?username=` (as you directed — returns full global + own-channel badge list, live, no auth) with direct Twitch GQL user-badges query as automatic fallback | on login + on demand; powers compare |
-| Worldwide collector leaderboards | potat `?owned=true` user leaderboard + badges.blog `/api/ranking` (top-100) + site-internal leaderboards | daily / on demand |
+**Migration 0025** (neue Tabellen, alle Service-Role-schreibbar):
+- `site_settings(key text pk, value jsonb, updated_at)` — Admin-Identität (`admin`: `{twitchId?, username?}`), Wartungsmodus, Economy-Werte, Spiel-Schalter, Feature-Flags
+- `profiles.role text not null default 'user' check in ('user','moderator','admin','owner')` — `is_admin` bleibt als abgeleitete Spalte synchron (owner/admin → true)
+- `bans(profile_id pk references profiles, reason, banned_by, banned_until, created_at)`
+- `newsletter_drafts(id, subject, body, status, recipient_count, sent_at, created_at)`
+- `brainstorm_ideas(id, category, title, body, status, votes, created_by, created_at)` — Kategorien: profile/game/badge/design/content/stats/other
+- `admin_audit(id, actor_id, action, target, payload jsonb, created_at)` — jede Admin-Mutation protokolliert
+- `analytics_events(id bigint identity, ts, path, locale, referrer_host, visitor_hash, browser, os, device, screen_w, tz_offset_mins, duration_s)` — grob, DNT-respektierend (keine IP, nur Salt-Hash)
+- Aggregat-Views `stats_analytics_*` (views/hits today/7d/30d, online = distinct visitor_hash letzte 5 min, Top-Pfade/Referrer/Browser/OS/Device)
+- RLS: alle neuen Tabellen service-role-write; `analytics_events` insert für anon (Beacon), reads nur über Views; `brainstorm_ideas` öffentlich lesbar
 
-Note: badges.blog's ToS prohibits heavy automated collection without permission — we use `/api/perfil` politely (cached, rate-limited) exactly as you asked, and the GQL fallback keeps the feature alive regardless.
+**Admin-Auth (`src/lib/admin.ts`):**
+- `ADMIN_BOOTSTRAP_HASH` = Salted-SHA-256 des Passcodes (Literal steht nirgends im Repo; Hash wird bei Implementierung berechnet und eingebettet), Vergleich zeitenkonstant wie `cron-auth.ts`
+- `requireAdmin()`: `authUserId()` → Rolle via Admin-Client; zusätzlich `isBootstrapSession()` (HMAC-signiertes httpOnly-Cookie, 2 h TTL) — gilt NUR solange `site_settings.admin` leer ist
+- `POST /api/admin/auth` — Passcode-Check, Brute-Force-Drossel (Zähler in site_settings, 5 Versuche / 15 Min), setzt Bootstrap-Cookie; antwortet 410 sobald ein Admin existiert
+- `POST /api/admin/setup` — (nur Bootstrap-Sitzung) legt den Owner fest: Twitch-ID ODER Username → `profiles.role='owner'`, `is_admin=true`, schreibt `site_settings.admin`, loggt in admin_audit. Danach verschwindet die Passcode-Methode endgültig
 
-## Database (new migrations; old tables dropped — zero users, nothing lost)
-`badges` (set_id, version, slug, images, category, is_paid, how_to_earn, release/start/end dates, status: active|upcoming|expired|removed, first_seen) · `badge_stats` (time series: owner_count, active_count, percentage) · `badge_events` (history log) · `profiles` (username unique, twitch_id, avatar, bio, banner, theme, showcase_slots, settings; `is_admin`; email kept private) · `user_inventory` (synced owned badges + acquired_at) · `user_sync_state` · `changelog` (kind: badge_added|badge_updated|badge_removed|data_sync|feature|bugfix, title, body, payload jsonb, created_at — **auto-written by every sync mutation**, plus manual entries) · `blog_posts` · `push_subscriptions` · `notifications`. RLS hardened per the old project's conventions (insert+update policies, restrictive grants).
+**Seite `/[locale]/admin`**: `force-dynamic`, `robots noindex`; kein Admin + kein Bootstrap → Passcode-Formular (verschwindet nach Eintrag); Admin eingeloggt → Dashboard; Twitch-Login-Button führt Admin direkt durch (kein weiteres Passwort)
 
-## Routes (SEO slugs, locale-prefixed)
-- `/[locale]` — live badges with countdowns, upcoming drops, stats teasers, latest blog + changelog
-- `/[locale]/badges` — all badges; filters: search, Free/Paid, category, status, rarity tier, sort; paginated SSR
-- `/[locale]/badges/[slug]` — detail: image, how to earn, live countdown, rarity tier + formula, owner-count chart, user counter, comments (stretch)
-- `/[locale]/active` · `/upcoming` · `/expired`
-- `/[locale]/leaderboards` — worldwide collectors (potat), per-badge owners, rarest collections, site collectors
-- `/[locale]/compare?users=a,b` — any two Twitch usernames (perfil sync both sides, owned/missing diff)
-- `/[locale]/profile/[username]` — public profile: Twitch avatar/username, badge showcase slots, stats, shareable URL, OG share card, customizable settings (banner, theme, bio, privacy) when own
-- `/[locale]/inventory` — after Twitch login: owned vs. missing badges
-- `/[locale]/blog` + `/[locale]/blog/[slug]` — new-drop auto-drafts from sync + editorial posts (admin-gated)
-- `/[locale]/changelog` — every change auto-logged with timestamp, filterable, RSS feed
-- `/[locale]/stats` — totals, time-series charts, category/rarity breakdowns
-- `/[locale]/notifications`, `/account`, `/login`; `/auth/callback`
-- `sitemap.ts`, `robots.ts`, JSON-LD, per-page OG/twitter meta, PWA manifest
+**Header**: `layout.tsx` liest `role` mit ins Header-Prop; „ACP"-Link nur für admin/owner (neuer Key `nav.acp` ×11)
 
-## Key features
-- **Real-time**: 15-min potat cron + 2×/day catalog diff + client-side SWR polling + ticking countdowns; new-badge flow: diff → changelog entry → web-push notification → blog draft
-- **Rarity (proprietary formula)**: score 0–100 from owner-count percentile, active/owner retention ratio, claim-window scarcity (limited vs permanent), and badge age → tiers (Common → Mythic), formula documented on-site
-- **Desktop notifications**: VAPID web-push + service worker, opt-in with per-event filters
-- **i18n**: 10 languages, RTL for Arabic, persisted locale preference
+## Phase 2 — Benutzerverwaltung (Tab „Users")
 
-## Build order
-1. Scaffold: Next.js + Tailwind + next-intl + Supabase clients + env + theme/layout/nav
-2. Migrations + RLS + seed
-3. Data services (helix / badgebase / potat / perfil+GQL) + sync scripts + Vercel Cron + changelog auto-logging + rarity
-4. Catalog pages, filters, search, detail + countdowns
-5. Twitch OAuth login + profiles + inventory sync + share cards
-6. Leaderboards + stats + compare
-7. Blog + changelog UI
-8. Push notifications + service worker
-9. Full 10-locale translations + RTL + localized SEO
-10. SEO extras + PWA + polish (a11y, responsive, perf)
-11. Verify: `lint && typecheck && build`, run syncs against live APIs, dev-server smoke test of all routes
+- `GET/PATCH/DELETE /api/admin/users`, `/api/admin/users/ban`, `/api/admin/users/role`, `/api/admin/users/progress`, `/api/admin/users/achievements` (vergeben/entziehen) — alle `requireAdmin()`, alle Writes in admin_audit
+- UI: Suche (Username/Twitch-ID), Tabelle mit Rolle/XP/Coins/Level/Status; Detail-Drawer: ALLE Profilfelder editierbar (display_name, bio, banner, color, mood, showcase, steal-Einstellungen, inventory_public, customization als JSON), XP/Coins/Level direkt setzbar (via bestehende atomare RPCs bzw. service-role UPDATE), Rolle ändern, bannen (mit Grund/Dauer — Ban blockt Login + Spiele + API), löschen (mit Bestätigung), Errungenschaften vergeben
+- Bans werden in `proxy.ts`/Session-Helper geprüft (gebannter User erhält Ausbildungsseite/Fehler)
 
-## Setup carried over from old project
-- `.env.local` populated from `C:\Users\LUL\twitchbadges\.env.local` (Supabase URL/keys, Twitch client ID/secret, CRON_SECRET, VAPID keys) + new `NEXT_PUBLIC_SITE_URL`
-- Twitch app redirect URI updated for the new dev origin; old Supabase tables replaced
+## Phase 3 — Inhalte & Synchronisation (Tabs „Content", „Badges", „Sync")
 
-## Known gotchas (from the prior build — already accounted for)
-potat `first` max 200 / Retry-After 60 · Next 16 async `params`/`searchParams`, `proxy.ts` not middleware · Helix channel-badges URL is `/helix/chat/badges?broadcaster_id=` · `profiles.email` never exposed via RLS · `.maybeSingle()` null checks · no `#` in project path (satisfied)
+- Blog: Liste/Erstellen/Bearbeiten/Löschen (alle `blog_posts`-Felder inkl. Status draft/published, Tags, Cover) über `/api/admin/blog`
+- Changelog: Einträge anlegen/bearbeiten/löschen (`/api/admin/changelog` — nutzt bestehende Tabelle)
+- Custom Badges: manuelle Katalog-Einträge (`/api/admin/badges` → `badges`-Tabelle, quelle='custom')
+- Achievements: erstellen/bearbeiten (Titel, Beschreibung, Kategorie, Punkte) + vergeben (Phase-2-Route)
+- Sync-Tab: Buttons triggern `runGlobalSync` / `runBadgebaseSync` / `runPotatSync` direkt (wie die Crons, aber Ad-hoc) mit Live-Ausgabe der Summaries
+
+## Phase 4 — Einstellungen & Economy (Tab „Settings")
+
+- `site_settings`-Editor; die Libs lesen mit Fallback auf die heutigen Konstanten:
+  - `economy`: Daily-XP/Coins + Streak-Boni/Caps, Coin-Rain-Betrag, Badge-Claim-Belohnung, Spiel-XP, Steal-Defaults (Preis/Max/Chance), Flood-Fenster
+  - `games`: an/aus + minBet/maxBet pro Spiel (Gefiltert in Hub, `playGame` lehnt ab)
+  - `maintenance`: an/aus + Meldung — Layout rendert für Nicht-Admins eine Wartungsseite, `/api/*` (außer admin/cron) antworten 503
+  - `features`: Feature-Flags (feed, wheel, steals, coin-rain …)
+  - `admin`: weitere Admins/Moderatoren per Twitch-ID/Username verwalten (Rollen-UI)
+
+## Phase 5 — Tracking, Statistiken, Status (Tabs „Stats", „Status"; öffentliche /stats-Erweiterung)
+
+- `AnalyticsBeacon` (Client-Komponente im Root-Layout) → `POST /api/track`: Pfad, Referrer-Host, Locale, Browser/OS/Device (UA-Klasse, serverseitig), Screen, TZ-Offset, Verweildauer (visibilitychange); salteter Besucher-Hash; DNT → nur Pfad-Zähler
+- Admin-Stats-Tab: nutzt die bestehenden animierten Komponenten (CountUp, Reveal, TrendChart, DonutChart, DistributionBars) + neue analytics Views — Heute/7d/30d, Online-Jetzt, Top-Seiten, Referrer, Browser/OS/Gerät, Verweildauer, Kombination mit stats_* Views
+- Status-Tab: alle Services aus `system_heartbeats` (online/offline, letzter Zugriff, Ø-Dauer, 24h/7d-Verfügbarkeit via UptimeGauge/UptimeCalendar) + Live-Sonden (/api/health, DB-Ping)
+- Öffentlich: `/stats` bekommt einen prominenten „Besucher"-Block (Online jetzt, Total Views, Hits heute/7d/30d, animiert) aus denselben Aggregaten
+
+## Phase 6 — Newsletter, Brainstorming, Audit
+
+- Newsletter: Empfänger sind die E-Mails aus `auth.users` (nur Service-Role lesbar); Composer mit Vorschau/Empfängerzahl; Versand über Resend wenn `RESEND_API_KEY` gesetzt ist, sonst wird der Entwurf gespeichert und als Broadcast über die bestehende Web-Push-Infrastruktur versendet (ehrlicher Fallback, da kein Mail-Anbieter existiert); jede Sendung in admin_audit
+- Brainstorming-Tab: Ideensammlung nach Kategorien (Profil/Game/Badge/Design/Content/Stats/Sonstiges), erstellen/bearbeiten/löschen, Status (idea/planned/done), public read
+- Audit-Log-Tab: filterbare Liste aller Admin-Aktionen
+
+## Phase 7 — Rollen-Badges (Profil + Header) — Premium-CSS
+
+- `RoleBadge`-Komponente (owner/admin/moderator), neben dem LevelBadge im Identitätsblock und als Mini-Chip im Header:
+  - **Owner**: konischer Regenbogen-Ring (bestehende `rarity-mythic`-Technik) + rotierende Krone + Doppel-Sparkle + `rarity-glow`-Puls
+  - **Admin**: goldener Schild mit `hero-shimmer`-Sweep + Sparkle
+  - **Moderator**: smaragdner Ring mit `live-ping`-Radar
+  - Alles `prefers-reduced-motion`-sicher, Light/Dark über Tokens
+- Kleiner Rollen-Chip im Header-Account-Menü
+
+## Phase 8 — i18n, Gates, Screenshots, Doku
+
+- Neuer `admin`-Namespace (~130 Keys) + `nav.acp`, `stats`-Zuwachs — vollständig in **allen 11 Locale-Dateien** via Skript (Projektregel: jede UI-Zeichenkette durch Messages; key-identisch geprüft)
+- Gates je Phase: `lint && typecheck && build` + Wirtschaftssimulationen; Live-Smoke inkl. Passcode-Fluss (falsch → Drossel; richtig → Setup; Admin gesetzt → Passcode verschwunden, Twitch-Login durch)
+- **Screenshots**: headless-Browser-Schritt (Playwright als devDependency) rendert jede neue Seite (Admin-Login, Dashboard-Tabs, Status, Stats-Block, Rollen-Badges im Profil, öffentliche Besucher-Statistik) und speichert PNGs nach `docs/screenshots/`
+- Abschlussdokument `docs/ACP.md` mit jedem Screenshot + Implementierungs-Erklärung; Changelog-Einträge (ohne Passcode); AGENT-AUDIT.md-Runde darüber
+
+## Die 40 + 20 erforschten Features
+
+Von den 60 recherierten Dashboard-Funktionen (40 Standard: Audit-Log, Bans, Rollen, Wartungsmodus, Feature-Flags, Newsletter, Content-CRUD, Nutzerrsuche, Impersonation-Basis, Export/Import, SEO-Einstellungen, Redirects, Moderations-Warteschlange, Melde-System, Benachrichtigungs-Broadcast, Cron-Trigger, DB-Browser (read-only), Umgebungs-Info, Cache-Reset, Login-Versuchs-Log … 20 unerwartete: Badge-Seltenheits-Rekalkulation, Errungenschaften-Re-Evaluierung aller Nutzer, „Zeitmaschine" (Economy-Simulation vor Veröffentlichung), Ideen-Voting im Brainstorm, Sync-Dry-Run, Besucher-Replay (anonymisierte Pfade), Session-Monitor …) implementiere ich die tragfähigen direkt in den Phasen 2–6; die vollständigen Listen landen kuratiert im Brainstorming-Board und in `docs/ACP.md`, jede mit Aufwand/Hinweis, was bereits umgesetzt ist.
+
+## Bewusste Grenzen (ehrlich)
+
+- **E-Mail-Versand** braucht einen Anbieter: ohne `RESEND_API_KEY` speichert und pusht das Newsletter-Feature, es verschickt keine Mails
+- Passcode-Hash ersetzt Klartext im Code; ein Hash eines 5-stelligen Codes ist bei Kenntnis des Salzes brute-forcebar — daher Drossel + automatisches Verschwinden nach Admin-Eintrag + Empfehlung, den Owner zeitnah einzutragen
+- Screenshots über Headless-Browser: Layout-genau, aber keine echten Interaktions-Spuren

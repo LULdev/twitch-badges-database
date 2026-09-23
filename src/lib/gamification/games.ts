@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { award, bumpCoins, getProgress } from "./xp";
 import { evaluateAchievements } from "./achievements";
+import { getEconomy, getFeatures, getGames } from "@/lib/settings";
 
 /**
  * The arcade: 13 badge-themed games, all server-authoritative.
@@ -79,9 +80,22 @@ export async function playGame(
 ): Promise<PlayResult> {
   const meta = GAMES.find((g) => g.id === gameId);
   if (!meta) return fail("Unknown game.");
+  // All three arcade switches are enforced HERE, not only in the pages. The master
+  // switch and the `features.games` flag were honoured by the hub and the API route
+  // while this engine settled rounds regardless, so an arcade "switched off" stayed
+  // fully playable from the game URL. The panel can also switch a single game off or
+  // move its bet bounds; the catalog metadata is only the fallback, so a settings
+  // document written before a game existed can never make that game unplayable.
+  const [settings, features] = await Promise.all([getGames(GAMES), getFeatures()]);
+  if (!settings.enabled || !features.games) {
+    return fail("The arcade is currently switched off.");
+  }
+  const rules =
+    settings.games[meta.id] ?? { enabled: true, minBet: meta.minBet, maxBet: meta.maxBet };
+  if (!rules.enabled) return fail("This game is currently switched off.");
   bet = Math.floor(bet);
-  if (!Number.isFinite(bet) || bet < meta.minBet || bet > meta.maxBet) {
-    return fail(`Bet must be between ${meta.minBet} and ${meta.maxBet} coins.`);
+  if (!Number.isFinite(bet) || bet < rules.minBet || bet > rules.maxBet) {
+    return fail(`Bet must be between ${rules.minBet} and ${rules.maxBet} coins.`);
   }
 
   const supabase = createAdminClient();
@@ -107,12 +121,14 @@ export async function playGame(
   const outcome = await resolveGame(userId, gameId, bet, input, supabase);
 
   const net = outcome.payout - bet;
-  const streakFlags = await currentStreakFlags(
-    supabase,
-    userId,
-    gameId,
-    outcome.payout > bet,
-  );
+  // ONE grading decision, used everywhere below. A resolver that reports its own
+  // `won` knows better than the payout does: hilo pays by the odds, so a correct
+  // call at the edges returns slightly less than the stake (0.99x) while still
+  // being a win. Previously only the streak flag honoured that — the persisted
+  // row, the `games_won` counter, the win XP, the feed line and the response all
+  // graded on `payout > bet`, so such a round was still recorded as a loss.
+  const won = typeof outcome.result.won === "boolean" ? outcome.result.won : outcome.payout > bet;
+  const streakFlags = await currentStreakFlags(supabase, userId, gameId, won);
 
   const result = { ...outcome.result, ...streakFlags };
 
@@ -123,7 +139,7 @@ export async function playGame(
       game: gameId,
       bet,
       payout: outcome.payout,
-      won: outcome.payout > bet,
+      won,
       result,
     })
     .select("id")
@@ -173,7 +189,7 @@ export async function playGame(
     p_user_id: userId,
     p_deltas: {
       games_played: 1,
-      games_won: outcome.payout > bet ? 1 : 0,
+      games_won: won ? 1 : 0,
       coins_won: Math.max(0, net),
       coins_lost: Math.max(0, -net),
     },
@@ -183,14 +199,20 @@ export async function playGame(
     await bumpCoins(userId, net);
   }
 
+  const economy = await getEconomy();
   const awardResult = await award(userId, {
-    xp: outcome.payout > bet ? 10 : 2,
+    xp: won ? economy.gameWinXp : economy.gameLoseXp,
     source: `game:${gameId}`,
     countsAsGameXp: true,
     skipAchievements: true,
     feedKind: "game",
-    feedTitle: outcome.payout > bet
-      ? `won ${net.toLocaleString("en")} coins in ${meta.title ?? gameId}`
+    // `won` now comes from the resolver, and hilo's odds-priced edges pay slightly
+    // LESS than the stake on a correct call — so "won N coins" must not print a
+    // negative N. A correct call that nets nothing reads as the call it was.
+    feedTitle: won
+      ? net > 0
+        ? `won ${net.toLocaleString("en")} coins in ${meta.title ?? gameId}`
+        : `called it right in ${meta.title ?? gameId} (${net.toLocaleString("en")} coins)`
       : `played ${gameId} (${net >= 0 ? "+" : ""}${net.toLocaleString("en")} coins)`,
     payload: { game: gameId, bet, payout: outcome.payout },
   });
@@ -201,7 +223,7 @@ export async function playGame(
     ok: true,
     bet,
     payout: outcome.payout,
-    won: outcome.payout > bet,
+    won,
     balance: awardResult.coins,
     result,
   };
@@ -318,7 +340,7 @@ export async function resolveGame(
           accuracy: Number(accuracy.toFixed(3)),
           chance: Number(outcome.chance.toFixed(3)),
           won: outcome.won,
-          sharp: accuracy >= 0.9,
+          sharp: outcome.won && accuracy >= 0.9,
         },
       };
     }
@@ -335,8 +357,8 @@ export async function resolveGame(
           timeMs, misses,
           chance: Number(outcome.chance.toFixed(3)),
           won: outcome.won,
-          perfect: misses === 0,
-          fast: timeMs <= 30000,
+          perfect: outcome.won && misses === 0,
+          fast: outcome.won && timeMs <= 30000,
         },
       };
     }
@@ -354,7 +376,7 @@ export async function resolveGame(
           won: outcome.won,
           // "10 correct answers in a row" is a single perfect long round here,
           // which is what the achievement description means.
-          streak10: correct === total && total >= 10,
+          streak10: outcome.won && correct === total && total >= 10,
         },
       };
     }
@@ -385,19 +407,67 @@ export async function resolveGame(
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
-      const currentScore = Number(
-        ((last?.result as Record<string, unknown> | null)?.nextScore as number | undefined) ??
-          30 + Math.floor(Math.random() * 40),
+      const currentScore = Math.min(
+        94,
+        Math.max(
+          6,
+          Number(
+            ((last?.result as Record<string, unknown> | null)?.nextScore as number | undefined) ??
+              30 + Math.floor(Math.random() * 40),
+          ),
+        ),
       );
-      const nextScore = 5 + Math.floor(Math.random() * 91);
+      // Drawn 6..94 so BOTH sides always have at least one winning value: the
+      // value the player is shown is then exactly the value the next round is
+      // judged against, and the impossible-side refund below is unreachable
+      // rather than a silent dead branch. (The clamp on `currentScore` above
+      // still guards scores stored before this change.)
+      const nextScore = 6 + Math.floor(Math.random() * 89);
       const guess = input.choice === "lower" ? "lower" : "higher";
       const tie = nextScore === currentScore;
       const actual = tie ? "equal" : nextScore > currentScore ? "higher" : "lower";
       // A tie used to be neither "higher" nor "lower", so it silently counted
       // as a full loss with no explanation. It now refunds the stake.
       const won = !tie && actual === guess;
+
+      // The player can SEE `currentScore` — the client renders it and carries it
+      // from the previous round — so the guess is informed, and a flat payout is
+      // beatable: picking the likelier side wins up to 89 of 91 values (0.989),
+      // which against 1.95x was ~1.93x EV per bet. The committed economy harness
+      // never caught it because it always sends `choice: "higher"` (a blind coin
+      // flip). Pay by the odds instead, so the payout matches the probability the
+      // player is shown; the cap keeps the multiplier finite. The EV bound is
+      // min(20p, 0.97) + 1/89 — the tie refunds, so it ADDS rather than vanishing
+      // — giving a worst case of 0.9812 < 1. (An earlier version of this comment
+      // said 0.97 and ignored the refund.)
+      // The spread must be the range actually DRAWN (6..94, 89 values), not the
+      // 5..95 the draw used before the clamp: with the stale range the odds were
+      // mispriced and the impossible-side guard below could never fire, because
+      // (95-cs)/91 and (cs-5)/91 are always ≥ 1/91 — so `currentScore = 6` with
+      // "lower" was accepted as if it had a 1/91 chance when it has NO winning
+      // value at all.
+      const spread = 89;
+      const winChance =
+        guess === "higher" ? (94 - currentScore) / spread : (currentScore - 6) / spread;
+      if (winChance <= 0) {
+        // The score sits at the edge, so the chosen side has no winning value at
+        // all. Refund rather than take a stake that cannot win.
+        return {
+          payout: bet,
+          result: {
+            currentScore,
+            nextScore,
+            guess,
+            actual,
+            won: false,
+            tie: false,
+            impossible: true,
+          },
+        };
+      }
+      const multiplier = Math.min(20, 0.97 / winChance);
       return {
-        payout: won ? Math.floor(bet * 1.95) : tie ? bet : 0,
+        payout: won ? Math.max(1, Math.floor(bet * multiplier)) : tie ? bet : 0,
         result: { currentScore, nextScore, guess, actual, won, tie },
       };
     }
@@ -447,7 +517,10 @@ export async function resolveGame(
       const won = Math.random() < chance;
       return {
         payout: won ? bet * 2 : 0,
-        result: { matches, chance, won, perfect: matches === 3 },
+        // `perfect` means all three needles landed AND the vault actually opened:
+        // the achievement reads it, and `matches` is a client claim, so gating on
+        // `won` keeps a forged `matches: 3` from banking it on a loss.
+        result: { matches, chance, won, perfect: won && matches === 3 },
       };
     }
 
@@ -466,7 +539,11 @@ export async function resolveGame(
           mult = Math.max(mult, symbol === "jackpot" ? Math.min(20, base * 2) : base);
         }
       }
-      const jackpot = (counts.get("jackpot") ?? 0) >= 3;
+      // The achievement used to say "20x", but the jackpot branch caps at
+      // `min(20, base * 2)` with base in {0.7, 2, 5}, so the largest jackpot win is
+      // 10x and 20x was unreachable. Key the flag on the payout actually won, so it
+      // fires on a real 10x instead of on a common 1.4x three-of-a-kind.
+      const jackpot = mult >= 10;
       return { payout: Math.floor(bet * mult), result: { cells, mult, jackpot } };
     }
 
@@ -498,7 +575,7 @@ export async function resolveGame(
           caught, missed,
           chance: Number(outcome.chance.toFixed(3)),
           won: outcome.won,
-          hundred: caught >= 100,
+          hundred: outcome.won && caught >= 100,
         },
       };
     }
@@ -529,6 +606,11 @@ function clampInt(value: unknown, min: number, max: number): number {
  *
  * An honest perfect run therefore reaches the same ceiling — skill still pays,
  * exploiting pays no better. `ratio` is 0..1.
+ *
+ * The achievement flags these games emit (`sharp`, `perfect`, `fast`, `streak10`,
+ * `hundred`) are gated on `outcome.won` for the same reason: a flag must not be a
+ * second payout path. A forged score used to write the flag on a LOSING round, so
+ * one 10-coin POST unlocked the achievement outright.
  */
 function skillPayout(bet: number, ratio: number, floorChance: number) {
   const chance = Math.min(0.45, floorChance + Math.max(0, Math.min(1, ratio)) * 0.35);
@@ -560,12 +642,18 @@ export interface SlotSymbol {
   value: number;
 }
 
-let symbolCache: SlotSymbol[] | null = null;
+let symbolCache: { pool: SlotSymbol[]; at: number } | null = null;
+/** A short-lived cache: a bad read must not poison the pool for the instance's
+ *  whole lifetime, which is how a single degraded query could serve one payout
+ *  to every user of that instance. */
+const SYMBOL_CACHE_MS = 10 * 60_000;
 
 export async function slotSymbols(
   supabase: ReturnType<typeof createAdminClient>,
 ): Promise<SlotSymbol[]> {
-  if (symbolCache) return symbolCache;
+  if (symbolCache && Date.now() - symbolCache.at < SYMBOL_CACHE_MS) {
+    return symbolCache.pool;
+  }
   const preferred = [
     "premium-v1", "turbo-v1", "bits-v1", "founder-v1",
     "subtember-2026-v1", "wsci-2026-v1",
@@ -576,6 +664,12 @@ export async function slotSymbols(
     .in("slug", preferred)
     .limit(6);
   const rows = (data ?? []) as Array<{ slug: string; title: string; image_url_2x: string | null }>;
+  // The weight/value tables below are indexed, so the row order decides which
+  // symbol gets which rarity — and a query with no ORDER BY returns rows in an
+  // arbitrary order that changes after a heap rewrite. Sort into the intended
+  // `preferred` ranking instead of trusting the response order.
+  const rank = new Map(preferred.map((slug, i) => [slug, i]));
+  rows.sort((a, b) => (rank.get(a.slug) ?? 99) - (rank.get(b.slug) ?? 99));
   const pool: SlotSymbol[] = rows.map((row, index) => ({
     id: row.slug,
     label: row.title,
@@ -583,9 +677,13 @@ export async function slotSymbols(
     weight: [30, 24, 20, 16, 12, 8][index] ?? 10,
     value: [1, 1.2, 1.4, 1.6, 2, 2.5][index] ?? 1,
   }));
-  // A failed DB lookup used to leave the pool holding only the scatter, so
-  // every reel showed the scatter and the 25x cap was won on every spin.
-  if (pool.length < 2) {
+  // A failed DB lookup used to leave the pool holding only the scatter, so every
+  // reel showed the scatter and the 25x cap was won on every spin. The guard has
+  // to require the COMPLETE pool, not merely two rows: with exactly two symbols
+  // the indexed weights (30/24) plus the scatter's 6 concentrate the reels to
+  // P≈0.5/0.4/0.1, which pays ~1.356x per spin — a silent coin pump, since a spin
+  // takes no player input at all. Any short pool uses the fallback instead.
+  if (pool.length < preferred.length) {
     const fallback: Array<{ id: string; label: string; value: number }> = [
       { id: "premium", label: "Premium Badge", value: 1 },
       { id: "turbo", label: "Turbo Badge", value: 1.2 },
@@ -600,7 +698,7 @@ export async function slotSymbols(
     }
   }
   pool.push({ id: "scatter", label: "Book of Badges", image: null, weight: 6, value: 1 });
-  symbolCache = pool;
+  symbolCache = { pool, at: Date.now() };
   return pool;
 }
 

@@ -54,8 +54,13 @@ Everything lives in `.env.local` (see `.env.example` for documentation):
 - `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` /
   `NEXT_PUBLIC_VAPID_PUBLIC_KEY` — web push keys. Generate with
   `node -e "console.log(require('web-push').generateVAPIDKeys())"`
-- `CRON_SECRET` — Bearer token required by `/api/cron/*`
+- `CRON_SECRET` — Bearer token required by `/api/cron/*`, and part of the
+  bootstrap-cookie signature in the admin panel
 - `ADMIN_LOGINS` — comma-separated Twitch logins allowed to manage content
+- `RESEND_API_KEY` — optional mail provider for the admin newsletter. Without
+  it the panel says so and delivers as a web push instead of pretending to send
+  mail.
+- `NEWSLETTER_FROM` — from-address for the newsletter (optional)
 
 ### Supabase Auth (Twitch login)
 
@@ -91,12 +96,27 @@ words) plus a 20-question FAQ in all languages. DB tables in
 | `npm run sync:badgebase` | drop windows + upcoming badges |
 | `npm run sync:potat` | owner stats time series + rarity + status sweeps |
 | `npm run send:push -- "Title" "Body" "/en/badges/slug"` | manual push broadcast |
+| `npm run shots` | render the admin/public views to `docs/screenshots/` (needs a dev server) |
 
 ## Deployment (Vercel)
 
 - Import the repo, set the same environment variables.
 - `vercel.json` registers the crons: catalog 2×/day, badgebase daily,
   potat every 15 minutes (Vercel sends `Authorization: Bearer $CRON_SECRET`).
+
+## Admin control panel
+
+`/[locale]/admin` is the operator surface: members, content, the badge catalog,
+syncs, settings, statistics, service status, newsletter, idea board and audit
+log. Access is by `profiles.role` (`moderator` / `admin` / `owner`) with a
+one-time bootstrap passcode for the first run — see **[docs/ACP.md](docs/ACP.md)**
+for how the gate works, what each tab does, the analytics privacy stance, the
+feature catalogue and exactly what was verified.
+
+**Register the owner promptly after deploying.** The bootstrap passcode's digest
+is in this repository, so anyone with a copy could brute-force a short code
+offline; the passcode only ever opens the owner-registration form and only while
+no owner exists, so setting the owner neutralises it.
 
 ## Architecture notes
 

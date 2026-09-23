@@ -104,7 +104,7 @@ export default function SlotsGame() {
           {lastWin && (
             <p className={`mt-3 text-center text-lg font-extrabold ${lastWin.payout > bet ? "text-success" : "text-muted"}`}>
               {lastWin.payout > bet
-                ? (<span>+{(lastWin.payout - bet).toLocaleString(locale)} <Coin size={14} /> — {lastWin.lines} {t("paylines")}{lastWin.scatter >= 3 ? ` · ${lastWin.scatter}x SCATTER!` : ""}</span>)
+                ? (<span><span dir="ltr">{`+${(lastWin.payout - bet).toLocaleString(locale)}`}</span> <Coin size={14} /> — {lastWin.lines} {t("paylines")}{lastWin.scatter >= 3 ? ` · ${lastWin.scatter}x ${t("scatter")}` : ""}</span>)
                 : t("noWin")}
             </p>
           )}

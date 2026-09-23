@@ -1,0 +1,85 @@
+{
+  "_comment": "Adjudication of the rewording screen from scripts/verify-new-ideas.ts. Each title here is a separate agent's version of an idea another agent (or the board) already covers, so it is not imported. Decisions are recorded with the reason, because the screen itself is a net and cannot tell a duplicate from a shared-vocabulary coincidence. Titles match on normalised form (lowercase, punctuation collapsed).",
+  "reviewed": [
+    {
+      "pair": "Zero-result search gap report (badge) vs Zero-result search to gap briefs (content)",
+      "decision": "drop the badge version",
+      "reason": "Same insight and same input (mine no-result searches for catalogue gaps). The content version is the superset: it clusters the queries into themes and produces both editorial briefs and alias/synonym work, whereas the badge version only triages single rows."
+    },
+    {
+      "pair": "Per-Game Mastery Unlocks (game) vs Per-game mastery tracks (addon) vs Per-Game Mastery Tracks (xp)",
+      "decision": "drop the game and xp versions, keep the addon one",
+      "reason": "Three agents independently produced per-game mastery scored from that game's rounds. The addon version is the most complete (the scoring formula with recency weighting, named tiers, and how it is displayed); the other two are the same system with one facet emphasised. The xp-scope copy is dropped by the importer's title dedup, since its normalised title is identical to the survivor's. Worth folding in when it is built: the game-scope variant's rule that unlocks are gameplay modifiers rather than currency."
+    },
+    {
+      "pair": "Cross-Game Variety Streak (game) vs Cross-game handoff streak (addon)",
+      "decision": "drop the game version",
+      "reason": "Same incentive (reward playing a different game than last time) with the same chain-and-reset shape. The addon version specifies how the bonus grows through distinct games and when the chain resets, so it is the one to keep. Worth folding in: the game variant's concrete enforcement rule (the server keeps the member's last five game ids)."
+    },
+    {
+      "pair": "Counter-heist revenge window (addon) vs Revenge Counter-Steal Window (coin)",
+      "decision": "drop the addon version",
+      "reason": "The same mechanic: a member who was robbed gets one boosted counter-attempt against that specific thief inside a short window, single-use so it cannot become a farm. Only the window length differs (24 h vs 1 h) and whether the attempt is free or discounted, which are parameters of one idea, not two ideas."
+    },
+    {
+      "pair": "Training-wheels loss rebate (addon) vs Session Loss Rebate (coin)",
+      "decision": "drop the addon version",
+      "reason": "Both are a loss rebate: coins returned after losing rounds. The audience and trigger differ (new accounts below level 5 vs a losing session for everyone), but the idea is the same one parameterised twice. Worth folding in: the level-5 expiry that makes the new-player version self-limiting."
+    },
+    {
+      "pair": "Wanted board with restitution (addon) vs Steal Bounty Board (coin)",
+      "decision": "drop the addon version",
+      "reason": "The same mechanic: a robbed member posts a bounty on the thief, claimed by successfully stealing from that thief, verified from steal_attempts, forfeited if unclaimed inside a window. Found by a pairwise body-similarity scan over all 444 imported ideas, not by the title screen (their titles share almost nothing, and their bodies scored 0.51 \u2014 just under the screen's 0.60 threshold, which is why the extra pass was worth running). Worth folding in: the addon variant's rolling 'most wanted' ranking and its aggregation floor, which keeps small heists out of a public shaming list."
+    }
+  ],
+  "kept_after_review": [
+    {
+      "pair": "Steal Bounty Board (coin) vs Data-Quality Bounty Board (game)",
+      "reason": "Share only the words 'bounty board'. One is a bounty on stealing coins, the other on reporting catalogue data problems."
+    },
+    {
+      "pair": "Community tags on badges (badge) vs Community museum of extinct badges (badge)",
+      "reason": "Member-applied tags for browsing versus a curated editorial exhibit of extinct badges."
+    },
+    {
+      "pair": "Badge search alias table (badge) vs Zero-result search to gap briefs (content)",
+      "reason": "The alias table is the search mechanism (synonyms that make a badge findable); the zero-result mining is the discovery process that suggests aliases. Related, not the same."
+    },
+    {
+      "pair": "Badge knowledge profile (addon) vs Profile Guestbook (badge stamp) (content)",
+      "reason": "A knowledge score derived from play versus a guestbook of member stamps."
+    },
+    {
+      "pair": "Rarity tier thresholds as chart reference rules (design) vs Contrast and colour-independence for rarity tiers and charts (design)",
+      "reason": "Reference lines marking tier boundaries on a chart versus a colour-blind-safe palette. Different mechanisms."
+    },
+    {
+      "pair": "Encircle Territory Duel (game) vs Duels (game, on board)",
+      "reason": "The board's Duels is a challenge wrapper (best-of-three across the existing games); this is a new territory-capture board game played against a server AI. Only the word 'duel' overlaps."
+    },
+    {
+      "pair": "Daily Badge Crossword (game) vs Silhouette, the daily badge guessing game (badge, on board)",
+      "reason": "A crossword over catalogue clues versus naming a silhouette. Different puzzle mechanics that happen to share a daily cadence."
+    },
+    {
+      "pair": "Guest Showcase Slots (profile) vs Silent auction for one showcase slot a month (game, on board)",
+      "reason": "Letting a visitor hold a slot on someone else's profile versus auctioning one site-wide podium slot for coins."
+    },
+    {
+      "pair": "Daily Catalog Solitaire (game) vs Daily Catalog Conditions (game)",
+      "reason": "A solitaire game versus daily modifiers applied to the arcade. The flag was purely the shared 'Daily Catalog' prefix."
+    },
+    {
+      "pair": "Badge rename tracker (badge) vs Badge Re-issue Tracker (stats)",
+      "reason": "Tracking a provider rename (and keeping the old name findable) versus detecting a badge returning after expiry and comparing its second-life owner curve."
+    }
+  ],
+  "titles": [
+    "Zero-result search gap report",
+    "Per-Game Mastery Unlocks",
+    "Cross-Game Variety Streak",
+    "Counter-heist revenge window",
+    "Training-wheels loss rebate",
+    "Wanted board with restitution"
+  ]
+}

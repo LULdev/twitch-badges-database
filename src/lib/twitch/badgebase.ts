@@ -1,8 +1,16 @@
 import { envOrNull } from "@/lib/env";
 import type { FeedBadgeDetail } from "./types";
 
-/** Upper bound for any single third-party request, in milliseconds. */
-const FETCH_TIMEOUT_MS = 15_000;
+/**
+ * Upper bound for any single third-party request, in milliseconds.
+ *
+ * 8 s rather than 15 s: the detail pass runs ceil(DETAIL_CAP/concurrency) waves
+ * inside /api/cron/global's one 60 s `maxDuration`, so the per-fetch ceiling sets
+ * the worst case (4 × 8 s = 32 s instead of 12 × 15 s = 180 s). A slow detail
+ * page costs end-date precision on that one card, never a badge's confirmation —
+ * that comes from the listing.
+ */
+const FETCH_TIMEOUT_MS = 8_000;
 
 
 const DEFAULT_BASE = "https://badgebase.de";

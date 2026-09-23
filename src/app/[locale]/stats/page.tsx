@@ -16,6 +16,7 @@ import { RARITY_COLORS, RARITY_TIERS, type RarityTier } from "@/lib/rarity";
 import { formatCompact } from "@/components/badges/BadgeCard";
 import Coin from "@/components/Coin";
 import CountUp from "@/components/stats/CountUp";
+import { getAnalytics } from "@/lib/analytics";
 import Reveal from "@/components/stats/Reveal";
 import TrendChart from "@/components/stats/TrendChart";
 import DonutChart from "@/components/stats/DonutChart";
@@ -26,8 +27,6 @@ import UptimeCalendar from "@/components/stats/UptimeCalendar";
 import AvailabilityStrip from "@/components/stats/AvailabilityStrip";
 import LiveStatus from "@/components/stats/LiveStatus";
 import { localeAlternates } from "@/lib/seo";
-
-export const revalidate = 300;
 
 export async function generateMetadata({
   params,
@@ -340,6 +339,10 @@ export default async function StatsPage({
     web: t("sourceWeb"),
   };
   const sourceLabel = (id: string) => SOURCE_LABELS[id] ?? t("sourceOther");
+  // Visitor analytics. A separate read from getPlatformStats because it comes
+  // from its own aggregate views, and it must degrade to empty rather than fail
+  // the whole page on a database that never had the beacon tables.
+  const visitors = await getAnalytics().catch(() => null);
 
   // The raw `source` id is destructured away on purpose: it keys the aggregation
   // upstream, but on a public page it otherwise survives in the serialized
@@ -414,6 +417,7 @@ export default async function StatsPage({
     { href: "#games", label: t("navGames") },
     { href: "#achievements", label: t("navAchievements") },
     { href: "#uptime", label: t("navUptime") },
+    { href: "#visitors", label: t("navVisitors") },
     { href: "#traffic", label: t("navTraffic") },
     { href: "#catalog", label: t("navCatalog") },
   ];
@@ -516,6 +520,53 @@ export default async function StatsPage({
             icon={ICONS.pulse}
           />
         </div>
+
+      {/* ---------------------------------------------------- visitors */}
+      <section id="visitors" className="scroll-mt-24">
+        <SectionHead
+          id="visitors-head"
+          title={t("visitorsTitle")}
+          subtitle={t("visitorsSubtitle")}
+        />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <Kpi
+            label={t("visitorsOnline")}
+            value={visitors?.summary?.online_now ?? 0}
+            hint={t("visitorsOnlineHint")}
+            locale={locale}
+            accent="var(--success)"
+            icon={ICONS.pulse}
+          />
+          <Kpi
+            label={t("visitorsTotal")}
+            value={visitors?.summary?.total_hits ?? 0}
+            hint={t("visitorsTotalHint")}
+            locale={locale}
+            accent="var(--accent)"
+            icon={ICONS.spark}
+          />
+          <Kpi
+            label={t("visitors24h")}
+            value={visitors?.summary?.hits_24h ?? 0}
+            locale={locale}
+            icon={ICONS.users}
+          />
+          <Kpi
+            label={t("visitors7d")}
+            value={visitors?.summary?.hits_7d ?? 0}
+            locale={locale}
+            icon={ICONS.users}
+          />
+          <Kpi
+            label={t("visitors30d")}
+            value={visitors?.summary?.hits_30d ?? 0}
+            hint={`${number.format(visitors?.summary?.unique_visitors_30d ?? 0)} ${t("visitorsUnique")}`}
+            locale={locale}
+            icon={ICONS.users}
+          />
+        </div>
+        <p className="mt-3 text-xs text-muted">{t("visitorsPrivacy")}</p>
+      </section>
 
         <nav className="stats-nav mt-6" aria-label={t("title")}>
           {navItems.map((item) => (

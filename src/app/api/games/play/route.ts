@@ -1,11 +1,17 @@
-import { authUserId } from "@/lib/gamification/session";
+import { playerGate } from "@/lib/admin";
+import { getFeatures } from "@/lib/settings";
 import { playGame, type PlayInput } from "@/lib/gamification/games";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-  const userId = await authUserId();
-  if (!userId) return Response.json({ error: "not authenticated" }, { status: 401 });
+  const gate = await playerGate();
+  if (!gate.ok) return Response.json({ error: gate.code }, { status: gate.status });
+  const userId = gate.userId;
+  const features = await getFeatures();
+  if (!features.games) {
+    return Response.json({ error: "feature disabled" }, { status: 403 });
+  }
 
   const body = (await request.json().catch(() => null)) as
     | { game?: string; bet?: number; input?: PlayInput }

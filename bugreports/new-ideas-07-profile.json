@@ -1,0 +1,276 @@
+{
+  "agent": "profile",
+  "scope": "Profile, identity and the social layer: what a member's presence on the site is and does — profile structure and self-expression, collection display, member-to-member interaction, reputation and trust signals, and privacy controls.",
+  "ideas": [
+    {
+      "category": "profile",
+      "title": "Showcase Provenance Captions",
+      "body": "Each of the six showcase slots gets an optional caption (about 90 characters) where the member records how the badge was earned — 'TwitchCon 2019 booth', 'gifted by @name', 'subbed in the final hour'. Captions live as a bounded array inside the existing customization document, render under the tile on the profile and inside the profile OG card, and are saved through the same customizer route. Visitors stop seeing six unexplained icons; the server length-checks and stores the text so no markup travels with it. Effort: S. Risk if built badly: captions become unmoderated free text carrying links or slurs, and the customization blob grows past its 4 KB cap.",
+      "why": "It turns a showcase of images into a set of small personal histories, which is exactly the storytelling the catalog alone cannot provide."
+    },
+    {
+      "category": "profile",
+      "title": "Collection Cover and Dedication",
+      "body": "A collection gets a cover: a title ('The Long Winter'), an optional one-line dedication, and one owned badge chosen as the cover mark, rendered as a header band above the shelves and into the profile OG image. All three fields sit in customization with hard size limits, and the cover badge must resolve against the member's latest synced inventory so a stale claim cannot point at a badge they do not own. The catalog pages keep the facts; this is the member's own framing. Effort: S. Risk if built badly: an unmoderated title and dedication become a defacement surface, and a skipped ownership check lets a member headline a badge they never earned.",
+      "why": "Naming a collection is the cheapest way to make a profile feel authored rather than generated."
+    },
+    {
+      "category": "profile",
+      "title": "Collector Milestone Spine",
+      "body": "An automatic permanent chronicle built from rows the site already has: join date, first synced badge, each level bracket crossed in user_progress, each tier gain, first legendary owned, longest streak. Every entry carries the catalog context at that moment — the catalog size then, the badge's owner count then — so it reads as a story rather than a dump, and it lives at a stable profile sub-page. It is an event chronicle, not an inventory diff: there is no scrubber and no reconstruction of past ownership state. Effort: M. Risk if built badly: snapshot history is thin for older accounts, so the early spine is mostly empty and the feature looks broken instead of young.",
+      "why": "A collector's history is the thing they retell anyway, and the site is the only place that can date it accurately."
+    },
+    {
+      "category": "profile",
+      "title": "Thirty-Day Commitment Pin",
+      "body": "A member pins one badge above the showcase for a fixed 30-day term, and the pin cannot be swapped or removed until the term expires; the profile shows 'pinned 12/30 days' next to it. Implementation is one row per profile with a locked_until timestamp, a swap endpoint that rejects early changes, and a logged admin unlock for genuine mistakes. The value is the cost: the pin says this badge, not this week's favourite. Effort: S. Risk if built badly: the lock becomes a trap when a member wants the badge gone, so an audited admin release path must exist from day one.",
+      "why": "A signal nobody can cheaply change is worth more than another free text field on a profile."
+    },
+    {
+      "category": "profile",
+      "title": "Verified Collecting Style",
+      "body": "From the synced inventory a member is classified into one style — completionist, rarity hunter, event chaser, set loyalist, newcomer — by simple thresholds over category concentration, TBRI skew and the share of limited-window badges, recomputed monthly by the existing sync. The style is a chip on the profile with a 'why' tooltip naming the two numbers that decided it, it is a filter in the new collector directory, and races and relays can be scoped to one style. It is a deterministic classification of a collection, never a horoscope: the same inputs always give the same label, and a member can dispute it once per period. Effort: M. Risk if built badly: lazy thresholds label almost everyone a rarity hunter, or the chip shames casual collectors and quietly becomes a ranking.",
+      "why": "A verified collecting style gives the social features something concrete to match on beyond level and raw rarity."
+    },
+    {
+      "category": "profile",
+      "title": "Verified Collector Oaths",
+      "body": "A member swears one standing collecting rule from a fixed vocabulary — 'I claim no paid badges', 'I never break a set', 'I always claim TwitchCon badges' — plus an optional free clause, and the site re-verifies it against the synced inventory on every run, showing the oath as kept or broken with the date it broke. A broken oath stays visible until a new one is sworn. Verification needs only badges the member already has, so it is one pass inside the existing potat sync. Effort: M. Risk if built badly: a verification edge case brands honest members as oath-breakers, so every verdict must come with the list of rows that produced it.",
+      "why": "A self-declared collecting principle that the server actually checks is a trust signal no profile field can fake."
+    },
+    {
+      "category": "profile",
+      "title": "Rejection Pile Shelf",
+      "body": "A deliberately unflattering second shelf: badges the member owns but has chosen not to display, each tagged with a one-word reason from a fixed list ('common', 'grindy', 'ugly', 'region-locked'). It renders collapsed under the showcase and makes a collection an edited opinion rather than a dump. Because reasons are chips rather than free text, nothing new needs moderating. Effort: S. Risk if built badly: the pile reads as a public insult to designers, so the vocabulary stays neutral and no badge-level aggregate of rejections is ever published.",
+      "why": "What a collector refuses to show says more about taste than what they show, and no badge site currently captures it."
+    },
+    {
+      "category": "profile",
+      "title": "Named Shelves with Rotation",
+      "body": "Instead of one fixed six-slot showcase, a member keeps several named shelves ('Rarest', 'TwitchCon', 'Given to me') and schedules which is featured and when — by weekday or by month. The profile shows the featured shelf plus a switcher, each shelf is a bounded array in customization, and every tile goes through the same ownership check as the showcase. Rotation means a returning visitor sees something new without the member touching anything. Effort: M. Risk if built badly: six shelves per member multiply the ownership lookups on every render; shelves must resolve in one query, not one per shelf.",
+      "why": "Collectors already group their badges mentally; letting them publish several curated views makes a profile worth revisiting."
+    },
+    {
+      "category": "profile",
+      "title": "Collector Ordinal Numbers",
+      "body": "Every member gets an immutable ordinal from join order ('#142 of 8,913'), assigned by a database sequence at first profile creation and shown next to the handle on the profile, in compare and in the directory. A founders board lists the first 500 by join date, and the ordinal doubles as a stable numeric permalink that survives a handle change. It is an honest identity fact the site can compute exactly once. Effort: S. Risk if built badly: backfilling from created_at collides under concurrent writes, so a sequence — not a row count — must mint the number.",
+      "why": "A permanent membership number is the simplest durable identity a community site can offer, and it makes the earliest members legible."
+    },
+    {
+      "category": "profile",
+      "title": "Guest Showcase Slots",
+      "body": "A member can lend one of their six slots to another member's badge: the tile renders as usual but attributed ('@name's badge, shown by consent'), and the guest can withdraw from their own profile at any time. Both sides opt in — the owner invites, the guest accepts — and the guest's ownership is re-checked against their latest sync before the tile renders. It makes a showcase a place where other people's finds can be exhibited. Effort: M. Risk if built badly: withdrawn consent lingering in a cached profile keeps showing a badge the guest no longer agrees to, so the tile must resolve from a live row with a short cache.",
+      "why": "Cross-member display is a genuinely social act on a site whose whole economy is about owning and showing badges."
+    },
+    {
+      "category": "profile",
+      "title": "Tile Admiration Marks",
+      "body": "A visitor can mark one tile on a profile per day as admired — no text, no score. Marks aggregate per tile into a small count and drive a 'most admired here' line above the shelves; the owner sees the daily curve of marks on their own profile, and a visitor's own profile lists how many collections they have admired. It gives the many visitors who will never write a guestbook note something to do. Effort: M. Risk if built badly: mark farming inflates the counts, so daily caps per salted IP and per account plus owner-visible raw counts are required.",
+      "why": "A one-click reaction is the lowest-friction social gesture, and on a badge site the badge itself is the natural object of admiration."
+    },
+    {
+      "category": "profile",
+      "title": "Collection Review Window",
+      "body": "A member opens a 72-hour window in which others submit a rubric score for the collection on three axes — breadth, rarity, curation — each with a required one-line justification; when it closes, the owner gets a digest with the median per axis, the strongest and weakest line, and reviewers attributed only if they opted in. One review per reviewer per window, and windows are capped to a few per year so the digest stays worth reading. It reviews a collection at a moment, unlike a standing endorsement of a person. Effort: M. Risk if built badly: the justifications are unmoderated free text and repeated windows turn into a popularity contest, so both need caps and a report path.",
+      "why": "Collectors want a real second opinion on their haul, and a time-boxed review is a stronger ritual than an endless comment box."
+    },
+    {
+      "category": "profile",
+      "title": "Collection Trajectory Chart",
+      "body": "Plot the member's own history: owned-badge count and mean TBRI per month from the inventory snapshots the syncs already write, with the two steepest months annotated ('+63 badges in March, mean rarity fell 4 points'). It sits on the profile with a share-card export, and a compare mode overlays a second member's trajectory on the same axes. This is a time series of one collection, not the cross-sectional rarity distribution against the catalog. Effort: M. Risk if built badly: sparse snapshot history produces misleading straight lines, so gaps must render as gaps rather than being interpolated.",
+      "why": "Every collector believes their collection has a shape over time, and the snapshots to prove it are already stored."
+    },
+    {
+      "category": "profile",
+      "title": "Pinned Benchmark Card",
+      "body": "A member pins one other member's headline stats — owned count, mean TBRI, level — as a benchmark card on their own profile with a live delta ('14 badges behind, 3 TBRI ahead'). The benchmarked member is told once and can decline, after which the card renders anonymised ('a member at level 62'), and the card updates from the same queries the compare view uses. The card is the target; the delta is the motivation. Effort: S. Risk if built badly: it becomes passive-aggressive when strong members get pinned repeatedly, so the decline option and a per-member benchmark cap are essential.",
+      "why": "Comparison is the emotional core of collecting, and making it a chosen, revocable relationship rather than a hidden ranking is healthier."
+    },
+    {
+      "category": "profile",
+      "title": "Opt-in Owner Roster",
+      "body": "On a badge page, members whose inventory is public can appear in a sparse roster — avatar, level, 'owned since' — beside a 'recently claimed' strip, ordered by claim recency rather than owner count. The roster is opted into once per member through a single toggle, is paginated, and reads the visibility flag at render time. It is the catalog pointed back at people, the mirror of a public collection page. Effort: M. Risk if built badly: it exposes ownership of members who meant to stay private, so the surface must exist only for explicit opt-ins and re-check the flag on every render.",
+      "why": "It closes the loop between a badge and the collectors who have it, which is the discovery the catalog alone cannot give."
+    },
+    {
+      "category": "profile",
+      "title": "Claim Credit Attribution",
+      "body": "When a sync adds a badge to a member's inventory, the site offers one prompt: who put you onto this? — a member picker plus a 'found it myself' option, recorded in a claim_credits table. A profile then shows 'put 42 collectors onto 17 badges', a badge page shows the members most credited for it, and a credited member receives one consolidated thanks rather than a stream of notifications. It grows a real social graph out of finding badges for each other. Effort: M. Risk if built badly: self-crediting and mass-crediting friends turn the counter into vanity, so credit is allowed only once per newly synced badge and re-credit is blocked.",
+      "why": "The most valuable social act on this site is telling someone a badge is live, and nothing currently records it."
+    },
+    {
+      "category": "profile",
+      "title": "Category Completion Race",
+      "body": "Two members opt into a race over one category, each choosing a target from badges both of them lack, and the site tracks who syncs the missing badges first on a shared page with two progress bars and days elapsed. The race ends when one side completes the target, both profiles record the result as a friendly head-to-head, and a member can hold only one active race. Unlike the games, the outcome is decided by real syncs over days rather than a server round. Effort: M. Risk if built badly: a side can win unopposed if the other's target is unreachable, so targets must be validated from both inventories when the race opens.",
+      "why": "It turns the catalog's coverage data into a long-running, personal contest instead of another leaderboard row."
+    },
+    {
+      "category": "profile",
+      "title": "Guest Curator Week",
+      "body": "A member can hand a friend the featured shelf for a week: the guest chooses which of the owner's badges are shown, writes a short curatorial line, and is bylined on the profile for the duration. Picks must be badges the owner actually has, the owner can veto individual ones, and the arrangement expires automatically leaving a dated note behind. It is a two-person creative act, not a schedule change. Effort: M. Risk if built badly: the curatorial line is free text under someone else's name, so it needs a length cap, the veto and only one active curator at a time.",
+      "why": "Letting a friend curate your shelf is a social ritual that produces content neither member could make alone."
+    },
+    {
+      "category": "profile",
+      "title": "Follow a Collector",
+      "body": "Members can follow each other to receive a narrow, chosen set of signals — a tier-crossing unlock, a level bracket, a completed set, a public milestone — never every claim. Followers and following are counted separately on the profile, the relationship is private by default with a public toggle, and a follower gets at most one digest notification per member per day. The activity feed stays site-wide; this is the member-scoped slice of it. Effort: M. Risk if built badly: it becomes a notification engagement loop and a popularity score; the digest cap and the event scoping are what keep it useful instead of noisy.",
+      "why": "Following is the missing primitive of a community site — you cannot currently say 'I want to know what this collector does'."
+    },
+    {
+      "category": "profile",
+      "title": "Shared Coincidence Moments",
+      "body": "After each sync the site looks for pairs of members whose new inventory rows contain the same badge inside the same claim window, and offers both a shared 'we both claimed this' card with the badge, the window and the two names. If both accept, the moment is listed permanently on both profiles as a small joint exhibit; if either declines, neither learns who the other was. It is discovered from sync timestamps, never scheduled. Effort: S. Risk if built badly: the pairing reveals a private member's ownership, so a match may only be offered where both inventories are visible to a shared audience.",
+      "why": "Shared moments are what turn a database of owners into a community, and the site can detect them for free from data it already syncs."
+    },
+    {
+      "category": "profile",
+      "title": "Collector Relay Chains",
+      "body": "A member starts a relay by naming a badge and passing it on; the next member adds one related badge — same set, same era, or a deliberate contrast — with a one-line reason, then passes it again. The chain lives at its own URL showing every hop with attribution, and profiles list the chains a member contributed to. Chains end after a set number of hops or on request, with one badge and a capped note per hop. Effort: M. Risk if built badly: chains degrade into incoherent name walls, so hop caps, a fixed relationship vocabulary and starter moderation keep the artifact readable.",
+      "why": "A relay is a collaborative artifact the catalog can produce and the games cannot, and it gives members a reason to look at badges they would never chase."
+    },
+    {
+      "category": "profile",
+      "title": "Help Exchange Ledger",
+      "body": "A member posts a specific small request — 'can someone in Brazil confirm this window is open', 'which of these two should I claim first' — and another fulfils it with a short answer; the fulfilment is logged as a completed exchange attributed to both. The profile shows a help record ('13 answered, 4 asked') and the history is searchable by badge, so the answer outlives its moment. Requests expire after a week and unfulfilled ones leave no trace. Effort: M. Risk if built badly: it becomes a second comment section, so hard limits — one open request per member, no nested replies inside a fulfilment — must be enforced.",
+      "why": "The site's real value is other collectors' knowledge, and an exchange ledger makes that help visible and reusable."
+    },
+    {
+      "category": "profile",
+      "title": "Visitor Showcase Vote",
+      "body": "A member can offer three of their owned badges as candidates and let visitors vote on which becomes the profile's featured hero for the month, with the winner applied automatically when the poll closes and the tally visible to everyone. One vote per account, a fixed closing date, and the owner can always decide the outcome themselves instead. It hands one display decision to the people who visit. Effort: M. Risk if built badly: voting rings decide the slot and polls clog profiles, so one active poll per profile, per-account votes and a monthly cap are needed.",
+      "why": "It gives visitors a real stake in a collection and gives the owner a reason to ask people to come back."
+    },
+    {
+      "category": "profile",
+      "title": "Synchronised Claim Pools",
+      "body": "Members join a pool for a specific badge and hour; the site reminds everyone at the time and, after the next potat sync, publishes the measured owner-count step for that badge during the pool hour plus the pool's contribution ('137 owners in one hour'). The deliverable is evidence — a coordinated claim becomes a recorded catalog event with a chart, not just an RSVP list. Pool pages keep the badge's window, the participant count and the resulting chart as a small public record. Effort: M. Risk if built badly: the pool claims credit for organic claims landing in the same hour, so the measurement must compare against the badge's own rolling hourly baseline rather than against zero.",
+      "why": "It is the one social mechanic only this site can offer: a group action that visibly moves a number in the catalog."
+    },
+    {
+      "category": "profile",
+      "title": "Badge Pen Pals",
+      "body": "An opt-in pairing where the site matches two members whose collections are complementary — each owns a large share of what the other lacks — without revealing who they are, and the pair exchanges curated gap lists of five badges through a structured form. After two exchanges either side can reveal, and if both agree the profiles are linked as pen pals; otherwise the pairing simply ends. The matching uses the same overlap arithmetic the compare view already needs. Effort: M. Risk if built badly: in a small member base matches identify people by elimination, so pairing requires a minimum candidate pool and must never show a partial match.",
+      "why": "Complementary collections are the most interesting relationship the data can find, and anonymity makes it approachable."
+    },
+    {
+      "category": "profile",
+      "title": "Profile Gallery Trail",
+      "body": "An editorial route through member profiles: a curator strings several public collections into an ordered trail with a line of text at each stop ('start with the set loyalist, end with the one who owns three badges nobody else does'). Visitors walk it with next and previous, every stop is an ordinary profile link, and trails are built only from collections whose owners opted in. It makes the social layer explorable rather than search-only. Effort: M. Risk if built badly: trails quietly become a hall of fame concentrating attention on a handful of members, so opt-in plus a rotation rule keeps them open.",
+      "why": "It gives new members a guided way into the community using the collections themselves as the exhibit."
+    },
+    {
+      "category": "profile",
+      "title": "Invite Lattice Tree",
+      "body": "Members invite others and both ends of the invite are recorded, producing a visible generation tree that shows how the community grew; an invitee starts with a small welcome grant and the inviter earns a purely cosmetic mark for each generation that stays active. The lattice is browsable ('see my branch'), every node is a normal profile, and an invite cannot be reattributed after the fact. Effort: M. Risk if built badly: it creates a status hierarchy and invite farming, so grants are one per verified Twitch account and the tree must never display anything a profile keeps private.",
+      "why": "Growth has a shape, and letting members see their own branch makes the community feel like something with a history."
+    },
+    {
+      "category": "profile",
+      "title": "Lighthouse Helper Directory",
+      "body": "A senior member can switch on a lighthouse flag declaring they are open to drop-in questions about specific topics — a region, an era of drops, a game — and appear in a small directory of available helpers with a response-time note they set themselves. A new member picks a lighthouse and sends one structured question; the lighthouse answers or declines, and unanswered questions expire. It is drop-in help, not a paired mentorship. Effort: M. Risk if built badly: a few lighthouses absorb every question and burn out, so per-topic caps, a queue, expiring questions and hiding stale flags are all required.",
+      "why": "Expertise about regions and old drops is the scarcest resource on the site, and a directory makes it findable."
+    },
+    {
+      "category": "profile",
+      "title": "Streamer Channel Link",
+      "body": "A member who streams can link their Twitch channel to their profile, which then shows a cached live-or-offline pill, a pinned note they write for their viewers, and the badges currently claimable so a viewer can act while watching. The pill resolves through a five-minute cache — one Helix stream lookup per channel per window, well inside the existing hourly budget — and linking requires re-authenticating with Twitch so nobody can claim someone else's channel. The link is part of the public profile, not a separate widget page. Effort: M. Risk if built badly: live lookups blow past the rate budget on popular channels, so the cache window and a per-channel lock are the guard.",
+      "why": "Streamers and their viewers are already the site's audience, and the profile is where that relationship should resolve."
+    },
+    {
+      "category": "profile",
+      "title": "Peer Endorsements with Decay",
+      "body": "A member can endorse another for one of a fixed set of strengths — 'finds rare windows', 'answers questions', 'good sport', 'curates well' — one endorsement per giver, decaying unless refreshed after 90 days. Endorsements appear on the profile with the givers' names or anonymously if the giver prefers, and a member cannot endorse someone they have had no traceable interaction with. It is a slow, deliberate signal rather than a like. Effort: M. Risk if built badly: reciprocal endorsement rings game the counts, so decay, the interaction requirement and a per-day endorse cap bound the damage.",
+      "why": "It lets the community name what a collector is actually good at, which no level or rarity number expresses."
+    },
+    {
+      "category": "profile",
+      "title": "Vouch Chain Provenance",
+      "body": "An established member can vouch for a newer one, and the vouch appears on the newcomer's profile as a chain ('vouched by @a, who was vouched by @b'). A vouch unlocks a small set of social surfaces — guestbook stamps, relay hops, race entry — for accounts too new to qualify on their own; vouches are one-way, attributed, revocable with a reason, and an established member may hold only a few live at once. Effort: M. Risk if built badly: vouch farming as a growth hack, so the small per-voucher limit plus revocation and the visible chain keep it costly.",
+      "why": "New members cannot use the social layer until someone trusts them, and a visible chain makes that trust a real commitment."
+    },
+    {
+      "category": "profile",
+      "title": "Tipster Credibility Mark",
+      "body": "Members can post a tip that a badge is likely to go live soon; when the catalog or badgebase feed later confirms it, the tip settles as a hit with the lead time recorded. A profile shows the settled record ('7 tips, median 31 hours early') plus a verified tipster mark once a threshold of hits is crossed, and tips that never land stay in the history as misses. Effort: M. Risk if built badly: the tip channel becomes a scored rumour mill, so only tips naming a concrete badge and window are accepted and misses must be displayed as prominently as hits.",
+      "why": "Being early is this site's whole game, and the members who are reliably early deserve a record."
+    },
+    {
+      "category": "profile",
+      "title": "Commitment Reliability Record",
+      "body": "A profile-facing log of the social commitments a member accepted and completed — races finished, relays continued, review windows honoured, introductions taken up — with abandoned ones listed too. It is a plain dated list with outcomes, deliberately not a single score, and it gates nothing: visibility is the only consequence. The rows come from the commitment features themselves, so it is a read model rather than new tracking. Effort: S. Risk if built badly: it becomes a shame wall punishing one busy week, so it lists a bounded recent window and never reduces to a number.",
+      "why": "On a site where members now make each other promises, keeping a record of who follows through is the cheapest fairness available."
+    },
+    {
+      "category": "profile",
+      "title": "Annual Community Awards",
+      "body": "Once a year members nominate and vote in a small fixed set of categories — most helpful, best curator, best data catch, friendliest newcomer — and winners carry a dated award line on their profile permanently, with the nomination text quoted. The ballot is capped at one nomination per category per member, votes are per account, and results publish only after a reveal date so interim tallies cannot be watched. It is the community rewarding behaviour rather than data ranking collectors. Effort: M. Risk if built badly: coordinated voting and winner cliques, so a minimum account age to vote and unpublished interim counts are the guard.",
+      "why": "It is the one annual ritual that recognises the member behaviour the leaderboards are blind to."
+    },
+    {
+      "category": "profile",
+      "title": "Nominated Custodian Continuity",
+      "body": "A member can nominate a custodian who, after 180 days without a sync or login, may take over the public side of the dormant profile: keeping the featured shelf current, maintaining the cover and answering the guestbook, clearly labelled as a custodian. Ownership, inventory and private data are never transferred, the custodian sees exactly what a visitor sees, and the original member reclaiming the account ends the arrangement immediately. Effort: M. Risk if built badly: a custodian misrepresents someone or quietly edits history, so the label must be prominent, every custodian action public, and reclaim instant.",
+      "why": "Active collections going silent is a real loss when the showcases are the site's content, and consent-based continuity preserves them without taking anything away."
+    },
+    {
+      "category": "profile",
+      "title": "Per-Badge Visibility Controls",
+      "body": "Beyond the single public-or-private inventory switch, a member can mark individual badges as spotlight — visible and verified-owned even while the rest of the inventory stays private — or hidden, excluded from a public collection. The controls are per badge, capped (say 20 spotlights), and resolved by one shared function every inventory-rendering surface calls, so the same badge behaves consistently on profiles, the owner roster and guest slots. It lets a private collector take part in social features without opening everything. Effort: M. Risk if built badly: a surface forgets the resolver and a hidden badge leaks through a cached page, so the shared resolver must be mandatory rather than best-effort.",
+      "why": "The current private-or-public toggle forces an all-or-nothing choice that keeps private collectors out of the social layer entirely."
+    },
+    {
+      "category": "profile",
+      "title": "Open House Windows",
+      "body": "A member can schedule a window — announced up to a week ahead, lasting 24 or 48 hours — during which their inventory is public and then closes itself; the profile shows a countdown and a visitor counter that resets each time. Because it is time-based rather than a standing preference, a member can show off for a weekend without going permanently public, and visitors see a normal collection during the window and the usual notice after it. Effort: M. Risk if built badly: a forgotten window leaves an inventory public indefinitely, so closure must be enforced at query time from the timestamp, never by a cron that can fail.",
+      "why": "It gives private collectors a safe, bounded way to be seen, which the current binary setting cannot."
+    },
+    {
+      "category": "profile",
+      "title": "Per-Panel Audience Scopes",
+      "body": "Each profile panel — inventory, trajectory chart, followers, guestbook, review digest — gets its own audience instead of one global flag: everyone, signed-in members, my crew, or private. The audience vocabulary is small and fixed, one shared resolver serves every read path, and a hidden panel renders a boundary notice rather than collapsing the page. Effort: M. Risk if built badly: a panel scoped to crew is read by a query that never joins crew membership and leaks, so the resolver has to be on every read path, not most of them.",
+      "why": "Members want to show their inventory to their crew and their trajectory to everyone, and a single switch cannot express that."
+    },
+    {
+      "category": "profile",
+      "title": "Aggregate Profile Traffic Insight",
+      "body": "The profile owner sees a panel built from the anonymous analytics rows already stored: visits per day, referrer hosts, locale and client buckets, average time on the page — never a visitor identity and never a who. The panel is visible only to the owner and is cached like the rest of the profile surface, and it answers 'is anyone actually looking?', which is currently invisible. Effort: M. Risk if built badly: at low volumes the buckets identify individuals, so each bucket must require a minimum daily sample before it renders.",
+      "why": "A profile is a performance with no audience feedback, and the site already collects exactly enough data to give aggregate feedback safely."
+    },
+    {
+      "category": "profile",
+      "title": "Pseudonymous Participation Profile",
+      "body": "A member can create one pseudonym used on the social surfaces — guestbook stamps, relay hops, race entries, review windows, claim pools — while their Twitch handle stays attached to their own pages; the two are linked internally and by no public route. The pseudonym carries its own display name and level chip, can be retired at will, and interactions it made keep the pseudonym rather than retroactively revealing identity. Effort: M. Risk if built badly: pseudonyms become a shield for bad behaviour, so the internal link must exist for moderation, only one pseudonym per account is allowed, and abuse revokes it publicly.",
+      "why": "It lets shy or modest members join the social layer without attaching everything they do to their Twitch identity."
+    },
+    {
+      "category": "profile",
+      "title": "Audience Preview Mode",
+      "body": "From the customizer a member can preview their own profile as four audiences — a stranger, a signed-in member, a follower, a muted visitor — and each preview renders exactly the fields that audience would see, with hidden ones replaced by a boundary marker rather than omitted silently. The same audience resolver drives the real render, so preview and reality cannot drift apart. Effort: M. Risk if built badly: a second code path makes the preview reassuring while the live page leaks, so the resolver must be shared, not reimplemented.",
+      "why": "Privacy controls are only trustworthy if members can see what they actually produce, and this is the cheapest way to make them trustworthy."
+    },
+    {
+      "category": "profile",
+      "title": "Ephemeral Social Traces",
+      "body": "A member sets a retention for their own social output — guestbook stamps they leave, admiration marks, relay notes, review justifications — choosing 7, 30 or 90 days, after which the row is deleted and the trace disappears from everyone's view. A page lists exactly what is scheduled to vanish and when. Effort: M. Risk if built badly: deleting a trace breaks another member's chain or reply, so removals must degrade gracefully (a hop becomes 'a retired member') instead of breaking the artifact.",
+      "why": "It gives members control over their own trail without forcing the site into a full moderation-and-deletion project."
+    },
+    {
+      "category": "profile",
+      "title": "Identity Continuity and Name History",
+      "body": "The profile keeps a name history: when a sync sees a different login for the same account, the previous handle is stored and shown as 'formerly known as', old profile URLs keep resolving through an alias table, and the numeric ordinal permalink stays permanent. The member can hide the history from visitors while the links still resolve, and a rename is only accepted when it comes from the same authenticated account. Effort: M. Risk if built badly: alias resolution merges two accounts into one identity or publicly exposes a rename the member wanted forgotten, so matching must be authenticated and hiding must be a member choice.",
+      "why": "Twitch handles change between drops, and without an identity record every old link and every old reputation dies with the name."
+    },
+    {
+      "category": "profile",
+      "title": "Inventory Health Check",
+      "body": "A member-facing diagnostic over their own synced inventory: badges no longer present in the catalog, duplicate image UUIDs across two set ids, badges whose set was dissolved, rows whose last sync is much older than the rest, and any gap between inventory counts and the public collection. Every finding links to the badge or the relevant how-to-earn line, and the panel separates 'we think this is a data problem' from 'we think this is your account'. Effort: M. Risk if built badly: it alarms members about normal catalog churn, so findings must be phrased as possibilities with the underlying rows shown.",
+      "why": "Members are the first to notice a sync looking wrong, and giving them a diagnostic beats every bug report that currently starts with a screenshot."
+    },
+    {
+      "category": "profile",
+      "title": "Opt-in Collector Directory",
+      "body": "A browsable opt-in directory of members with filters over verified style, level band, category strength, region and last activity, each row a compact card linking to the profile. It is a discovery surface and not a ranking: there is no strength ordering, default sort is alphabetical or by join ordinal, and each field is opted in separately so a level can be visible while a region is not. It also gives races, relays and pools a place to find a partner. Effort: M. Risk if built badly: it becomes a de facto leaderboard or a scrape target, so the default sort must not be by strength and filtering needs rate limits.",
+      "why": "The site has thousands of members and no way to find one of them, which makes every social feature above harder to use."
+    }
+  ]
+}

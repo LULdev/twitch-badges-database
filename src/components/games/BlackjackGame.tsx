@@ -48,7 +48,11 @@ export default function BlackjackGame() {
               <div className="flex flex-wrap justify-center gap-1">
                 {last.playerCards.map((card, index) => (
                   <span key={index} className="grid size-9 place-items-center rounded-lg border border-line bg-surface-2 font-black tabular-nums">
-                    {card === 1 ? "A" : card}
+                    {/* The deck is 1..11 and the server counts a 1 as one, so
+                        labelling it "A" implied an ace value the rules never
+                        apply — an "A + 10" hand read 11 under a 2.5× blackjack
+                        payout. Show the number that is actually counted. */}
+                    {card}
                   </span>
                 ))}
               </div>
@@ -60,7 +64,7 @@ export default function BlackjackGame() {
               <div className="flex flex-wrap justify-center gap-1">
                 {last.dealerCards.map((card, index) => (
                   <span key={index} className="grid size-9 place-items-center rounded-lg border border-line bg-surface-2 font-black tabular-nums">
-                    {card === 1 ? "A" : card}
+                    {card}
                   </span>
                 ))}
               </div>

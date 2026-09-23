@@ -9,6 +9,25 @@ export const revalidate = 3600;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl();
 
+  // `/feed` 404s when its feature flag is off, and advertising a 404 is worse than
+  // omitting the page. Read the flag with the admin client directly rather than
+  // through `getFeatures()`: that accessor uses the anon server client, which
+  // awaits `cookies()` and would turn this route dynamic — losing the hourly ISR
+  // cache and adding a DB round-trip to every crawl.
+  let feedEnabled = true;
+  try {
+    const supabase = createAdminClient();
+    const { data } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "features")
+      .maybeSingle();
+    const feed = (data?.value as { feed?: unknown } | null)?.feed;
+    if (typeof feed === "boolean") feedEnabled = feed;
+  } catch {
+    // Settings unavailable: keep the entry rather than dropping a live page.
+  }
+
   const staticPaths = [
     "",
     "/badges",
@@ -24,20 +43,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/games",
     "/achievements",
     "/wheel",
-    "/feed",
+    ...(feedEnabled ? ["/feed"] : []),
   ];
 
   // Load the dynamic rows first: their newest `updated_at` also becomes the
   // lastModified of the static pages. `new Date()` per entry made every URL
   // claim it had just changed on every revalidation, which search engines learn
   // to ignore.
+  // PostgREST caps a response at 1000 rows regardless of the requested limit, so
+  // every sweep below pages explicitly.
+  const PAGE = 1000;
+
   const badges: Array<{ slug: string; updated_at: string }> = [];
   const posts: Array<{ slug: string; updated_at: string }> = [];
+  // Public profiles were absent from the sitemap although the pages are
+  // indexable and emit canonical + hreflang — a whole page family crawlers never
+  // saw. Only rows with a usable username, ordered deterministically.
+  const profiles: string[] = [];
   try {
     const supabase = createAdminClient();
-    // Paged, because PostgREST caps a response at 1000 rows regardless of the
-    // requested limit — a single request silently dropped everything past 1000.
-    const PAGE = 1000;
+    for (let offset = 0; ; offset += PAGE) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username")
+        .not("username", "is", null)
+        .neq("username", "")
+        .order("id")
+        .range(offset, offset + PAGE - 1);
+      if (error) throw error;
+      profiles.push(
+        ...(data ?? []).map((row) => String(row.username)).filter(Boolean),
+      );
+      if (!data || data.length < PAGE) break;
+    }
+  } catch {
+    // DB unavailable for profiles — the other families still build below.
+  }
+  try {
+    const supabase = createAdminClient();
     for (let offset = 0; ; offset += PAGE) {
       const { data, error } = await supabase
         .from("badges")
@@ -120,6 +163,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "weekly",
         priority: 0.5,
         alternates: { languages: localeAlternates(`/blog/${post.slug}`) },
+      });
+    }
+  }
+
+  for (const username of profiles) {
+    for (const locale of routing.locales) {
+      entries.push({
+        url: `${base}/${locale}/profile/${username}`,
+        lastModified: newest ?? undefined,
+        changeFrequency: "weekly",
+        priority: 0.4,
+        alternates: { languages: localeAlternates(`/profile/${username}`) },
       });
     }
   }

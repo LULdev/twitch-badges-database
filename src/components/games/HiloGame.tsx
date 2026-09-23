@@ -51,7 +51,8 @@ export default function HiloGame() {
               state.tie ? "text-warning" : state.won ? "text-success" : "text-danger"
             }`}
           >
-            {state.tie ? t("tie") : state.won ? t("youWin") : t("youLose")} ({state.actual})
+            {state.tie ? t("tie") : state.won ? t("youWin") : t("youLose")}{" "}
+            ({state.actual === "higher" ? t("higher") : state.actual === "lower" ? t("lower") : t("tie")})
           </p>
         )}
         <div className="flex justify-center gap-3">

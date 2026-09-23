@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isUserBanned } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -56,15 +57,28 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // A banned member is stopped at every mutating route (see `isUserBanned`'s
+  // docblock in lib/admin.ts) — this one was missed, so a ban did not stop a
+  // banned browser from subscribing and continuing to receive broadcasts.
+  if (user && (await isUserBanned(user.id))) {
+    return Response.json({ error: "banned" }, { status: 403 });
+  }
+
   const admin = createAdminClient();
 
   // An anonymous request must not be able to detach someone else's browser:
   // re-registering an owned endpoint without a session is refused.
-  const { data: existing } = await admin
+  const { data: existing, error: lookupError } = await admin
     .from("push_subscriptions")
     .select("user_id")
     .eq("endpoint", endpoint)
     .maybeSingle();
+  // Fail CLOSED: the ownership guard is worth nothing if a failed lookup lets the
+  // upsert below rewrite `user_id` to the caller's (null for an anonymous
+  // request), detaching someone else's browser.
+  if (lookupError) {
+    return Response.json({ error: "subscription lookup failed" }, { status: 500 });
+  }
   if (existing?.user_id && existing.user_id !== user?.id) {
     return Response.json({ error: "endpoint already registered" }, { status: 409 });
   }

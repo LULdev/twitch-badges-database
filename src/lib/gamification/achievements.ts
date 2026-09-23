@@ -55,6 +55,8 @@ export interface AchStats {
   moodSet: boolean;
   activityCount: number;
   dailyCount: number;
+  /** UTC hour of the most recent daily-bonus claim, or null if none yet. */
+  lastDailyHour: number | null;
   userCount: number;
   /** Whole days since the profile row was created (0 for today). */
   accountAgeDays: number;
@@ -153,8 +155,14 @@ export const ACHIEVEMENTS: Achievement[] = [
   COMMON("c_feed_first", "On the Record", "Appear in the live activity feed.", (s) => s.activityCount >= 1),
 
   // ---------- 50 creative ----------
-  CREATIVE("k_night_owl", "Night Owl", "Claim a daily bonus between 0 and 5 AM.", (s) => new Date().getUTCHours() < 5),
-  CREATIVE("k_early_bird", "Early Bird", "Claim a daily bonus before 7 AM UTC.", (s) => new Date().getUTCHours() < 7 && new Date().getUTCHours() >= 5),
+  // Both read the hour of the member's LATEST daily claim. They used to read the
+  // clock at evaluation time and ignore their stats argument, so any award between
+  // 00:00 and 07:00 UTC unlocked "claimed a daily bonus at that hour" without a
+  // claim — a game round at 3 AM was enough.
+  CREATIVE("k_night_owl", "Night Owl", "Claim a daily bonus between 0 and 5 AM.",
+    (s) => s.lastDailyHour !== null && s.lastDailyHour < 5),
+  CREATIVE("k_early_bird", "Early Bird", "Claim a daily bonus before 7 AM UTC.",
+    (s) => s.lastDailyHour !== null && s.lastDailyHour >= 5 && s.lastDailyHour < 7),
   CREATIVE("k_weekend_warrior", "Weekend Warrior", "Play 10 rounds on a weekend day.", (s) => [0, 6].includes(new Date().getUTCDay()) && s.roundsToday >= 10),
   CREATIVE("k_lucky_2500", "Jackpot!", "Win the 2,500 XP wheel top prize.", (s) => s.wheelBest >= 2500, 0, 1000),
   CREATIVE("k_unlucky_10", "Cursed Dice", "Lose 10 games in a row.", (s) => s.lossStreak >= 10),
@@ -162,16 +170,36 @@ export const ACHIEVEMENTS: Achievement[] = [
   CREATIVE("k_high_roller", "High Roller", "Place a single bet of 1,000+ coins.", (s) => s.maxBet >= 1000),
   CREATIVE("k_cautious", "Cautious Gambler", "Win 10 games without ever betting more than 10 coins.", (s) => s.progress.games_won >= 10 && s.maxBet <= 10),
   CREATIVE("k_marathon_day", "Marathon", "Play 100 rounds in a single day.", (s) => s.roundsToday >= 100, 750, 500),
-  CREATIVE("k_perfect_memory", "Photographic", "Finish Badge Memory with zero mismatches.", (s) => hasFlag(s, "memory", "perfect")),
-  CREATIVE("k_sharpshooter", "Sharpshooter", "Reach 90% accuracy in Shoot the Badges.", (s) => hasFlag(s, "shoot", "sharp")),
-  CREATIVE("k_speedrunner", "Speedrunner", "Finish Badge Memory in under 30 seconds.", (s) => hasFlag(s, "memory", "fast")),
+  // The seven below used to read CLIENT-ASSERTED flags (`perfect`, `sharp`,
+  // `fast`, `hundred`, `top`, `streak10` on quiz/memory) that the resolver set
+  // from numbers the payload supplied. The flag was gated on the round's own
+  // coin-flip win, so a forged payload — "hits 300, shots 300" — fired it on
+  // ~45% of attempts and paid 250 coins + 500 XP for a ~1-coin round: cheaper to
+  // forge than to earn. They now count rounds the SERVER graded as won
+  // (game_rounds.won, aggregated per game over ALL rounds — `gamesByType` is a
+  // paged read, not the 60-row window, so the counts are lifetime and the
+  // descriptions are literal).
+  CREATIVE("k_perfect_memory", "Photographic", "Win 10 rounds of Badge Memory.",
+    (s) => (s.gamesByType["memory"]?.won ?? 0) >= 10),
+  CREATIVE("k_sharpshooter", "Sharpshooter", "Win 10 rounds of Shoot the Badges.",
+    (s) => (s.gamesByType["shoot"]?.won ?? 0) >= 10),
+  CREATIVE("k_speedrunner", "Speedrunner", "Play 50 rounds of Badge Memory.",
+    (s) => (s.gamesByType["memory"]?.played ?? 0) >= 50),
   CREATIVE("k_blackjack_5", "Card Shark", "Win 5 Blackjack hands in a row.", (s) => hasFlag(s, "blackjack", "streak5")),
-  CREATIVE("k_tower_top", "Tower Climber", "Reach level 10 of the Tower of Badges.", (s) => hasFlag(s, "tower", "top")),
-  CREATIVE("k_vault_master", "Vault Cracker", "Crack the vault perfectly three times.", (s) => hasFlag(s, "vault", "perfect3")),
-  CREATIVE("k_scratch_jackpot", "Golden Scratch", "Win a 20× payout on a scratch card.", (s) => hasFlag(s, "scratch", "jackpot")),
-  CREATIVE("k_quiz_10", "Badge Professor", "Answer 10 quiz questions correctly in a row.", (s) => hasFlag(s, "quiz", "streak10")),
+  CREATIVE("k_tower_top", "Tower Climber", "Win 10 rounds of Tower of Badges.",
+    (s) => (s.gamesByType["tower"]?.won ?? 0) >= 10),
+  // See the note above: this counted a client-asserted `perfect` flag.
+  CREATIVE("k_vault_master", "Vault Cracker", "Crack the vault three times.",
+    (s) => (s.gamesByType["vault"]?.won ?? 0) >= 3),
+  CREATIVE("k_scratch_jackpot", "Golden Scratch", "Win a 10× payout on a scratch card.", (s) => hasFlag(s, "scratch", "jackpot")),
+  CREATIVE("k_quiz_10", "Badge Professor", "Win 10 rounds of Badge Quiz.",
+    (s) => (s.gamesByType["quiz"]?.won ?? 0) >= 10),
   CREATIVE("k_hilo_10", "Rarity Sense", "Predict 10 higher/lower rounds in a row.", (s) => hasFlag(s, "hilo", "streak10")),
-  CREATIVE("k_roulette_green", "Green Zero", "Hit the green slot on Badge Roulette.", (s) => hasFlag(s, "roulette", "green")),
+  // The `green` flag reports the DRAW, not the player's result — a red/black
+  // bettor whose spin landed green unlocked "Hit the green slot" on a LOSING
+  // round. The round must also have been won (server-graded).
+  CREATIVE("k_roulette_green", "Green Zero", "Win on the green slot on Badge Roulette.",
+    (s) => s.recentResults.some((r) => r.game === "roulette" && r.won && r.flags?.green === true)),
   CREATIVE("k_coinflip_7", "Lucky Streak", "Win the 7-step coin flip ladder.", (s) => hasFlag(s, "coinflip", "ladder7")),
   CREATIVE("k_collector_active", "Fully Current", "Own every currently active badge.", (s) => s.activeOwned >= 20 && s.activeOwned === s.badgesOwned, 1000, 1000),
   CREATIVE("k_legend_own", "Legendary Touch", "Own a legendary-rarity badge.", (s) => s.legendaryOwned >= 1),
@@ -192,9 +220,13 @@ export const ACHIEVEMENTS: Achievement[] = [
   CREATIVE("k_ghost", "Ghost Login", "Keep a 10-day streak with fewer games than login days.", (s) => s.progress.login_streak >= 10 && s.progress.games_played < s.progress.login_streak),
   CREATIVE("k_gambler_1000", "Thousand Bets", "Play 1,000 rounds total.", (s) => s.progress.games_played >= 1000, 1000, 500),
   CREATIVE("k_comeback", "Comeback Kid", "Recover from 500+ coins lost to net positive.", (s) => s.progress.coins_lost >= 500 && s.progress.coins_won > s.progress.coins_lost),
-  CREATIVE("k_slots_scatter", "Scatter! ", "Land 3+ scatter badges in Badges of Ra.", (s) => hasFlag(s, "slots", "scatter")),
+  // `scatter` is the column COUNT (0-5) and hasFlag tests truthiness, so a single
+  // scatter column unlocked a "3+" achievement. `scatterHit` is `scatter >= 3`,
+  // computed by the resolver and until now read by nothing.
+  CREATIVE("k_slots_scatter", "Scatter! ", "Land 3+ scatter badges in Badges of Ra.", (s) => hasFlag(s, "slots", "scatterHit")),
   CREATIVE("k_rps_mindreader", "Mind Reader", "Win 5 RPS duels in a row.", (s) => hasFlag(s, "rps", "streak5")),
-  CREATIVE("k_catcher_100", "Golden Gloves", "Catch 100 badges in one Drops Catcher run.", (s) => hasFlag(s, "catcher", "hundred")),
+  CREATIVE("k_catcher_100", "Golden Gloves", "Win 10 rounds of Drops Catcher.",
+    (s) => (s.gamesByType["catcher"]?.won ?? 0) >= 10),
   CREATIVE("k_shoot_500", "Badge Hunter", "Play 50 rounds of Shoot the Badges.", (s) => (s.gamesByType["shoot"]?.played ?? 0) >= 50),
   CREATIVE("k_reactor", "Reactor", "React to 5 blog posts.", (s) => s.reactionsGiven >= 5),
   // Retired (see RETIRED_ACHIEVEMENT_IDS): the conditions are unreachable on
@@ -405,12 +437,23 @@ async function pageAll<T>(
 async function buildStats(userId: string): Promise<AchStats> {
   const supabase = createAdminClient();
   const progress = await getProgress(userId);
+  const todayStr = new Date().toISOString().slice(0, 10);
 
-  const [badgesRes, gamesRes, roundsRes, wheelRes, turboRes, profileRes,
+  const [badgesRes, gamesRes, roundsRes, todayRoundsRes, wheelRes, turboRes, profileRes,
     rainRes, stealRes, reactRes, visitsRes, usersRes, topCoinsRes, achRes, visitorsRes,
-    maxBetRes] =
+    maxBetRes, lastDailyRes] =
     await Promise.all([
-      supabase.from("user_inventory").select("badges(rarity_tier,status,set_id,first_seen_at,rarity_score)").eq("user_id", userId),
+      // Paged: PostgREST caps one response at 1000 rows and these grow without
+      // bound (a collector's inventory; wheel spins; coin-rain events), so an
+      // unbounded select silently truncated the aggregates below.
+      pageAll<{ badges: Record<string, unknown> | null }>((from, to) =>
+        supabase
+          .from("user_inventory")
+          .select("badges(rarity_tier,status,set_id,first_seen_at,release_date,rarity_score)")
+          .eq("user_id", userId)
+          .order("badge_id")
+          .range(from, to),
+      ),
       pageAll<{ game: string; won: boolean }>((from, to) =>
         supabase
           .from("game_rounds")
@@ -420,10 +463,35 @@ async function buildStats(userId: string): Promise<AchStats> {
           .range(from, to),
       ),
       supabase.from("game_rounds").select("game,won,bet,payout,result,created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(60),
-      supabase.from("activity_events").select("xp_amount").eq("user_id", userId).eq("kind", "wheel"),
+      // A TRUE count of today's rounds. `roundsToday` used to be derived from the
+      // 60-row window above, which is bounded at 60, so k_marathon_day's "100 rounds
+      // in a single day" could never pass; a head-count is not clamped by
+      // PostgREST's 1000-row response cap.
+      supabase
+        .from("game_rounds")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .gte("created_at", `${todayStr}T00:00:00.000Z`),
+      pageAll<{ xp_amount: number | null }>((from, to) =>
+        supabase
+          .from("activity_events")
+          .select("xp_amount")
+          .eq("user_id", userId)
+          .eq("kind", "wheel")
+          .order("id")
+          .range(from, to),
+      ),
       supabase.from("turbo_wins").select("id", { count: "exact", head: true }).eq("user_id", userId),
       supabase.from("profiles").select("view_count, customization, mood, twitch_created_at, showcase_slots, created_at").eq("id", userId).maybeSingle(),
-      supabase.from("activity_events").select("payload").eq("kind", "coin_rain").eq("user_id", userId),
+      pageAll<{ payload: Record<string, unknown> | null }>((from, to) =>
+        supabase
+          .from("activity_events")
+          .select("payload")
+          .eq("kind", "coin_rain")
+          .eq("user_id", userId)
+          .order("id")
+          .range(from, to),
+      ),
       pageAll<{
         thief_id: string;
         victim_id: string;
@@ -457,7 +525,14 @@ async function buildStats(userId: string): Promise<AchStats> {
         .select("user_id")
         .order("coins", { ascending: false })
         .limit(3),
-      supabase.from("activity_events").select("kind").eq("user_id", userId),
+      pageAll<{ kind: string }>((from, to) =>
+        supabase
+          .from("activity_events")
+          .select("kind")
+          .eq("user_id", userId)
+          .order("id")
+          .range(from, to),
+      ),
       pageAll<{ ip_hash: string }>((from, to) =>
         supabase
           .from("profile_visits")
@@ -470,6 +545,17 @@ async function buildStats(userId: string): Promise<AchStats> {
       // answer "never bet more than 10 coins", and an unfiltered round list is
       // capped by PostgREST. Ordering server-side returns the true maximum.
       supabase.from("game_rounds").select("bet").eq("user_id", userId).order("bet", { ascending: false }).limit(1).maybeSingle(),
+      // The hour of the LATEST daily claim, for k_night_owl / k_early_bird: the
+      // check must key off when the bonus was claimed, not off the clock at
+      // evaluation time.
+      supabase
+        .from("activity_events")
+        .select("created_at")
+        .eq("user_id", userId)
+        .eq("kind", "daily")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ]);
 
   const badges = ((badgesRes.data ?? []) as Array<Record<string, unknown>>).map((b) => b.badges as Record<string, unknown>).filter(Boolean);
@@ -478,9 +564,15 @@ async function buildStats(userId: string): Promise<AchStats> {
   const newestAgeH = firstSeens.length
     ? (Date.now() - new Date(firstSeens[firstSeens.length - 1]).getTime()) / 3_600_000
     : 9999;
-  const oldestYear = firstSeens.length
-    ? new Date(firstSeens[0]).getUTCFullYear()
-    : 9999;
+  // k_retro_2017 wants the badge's real release year, not the year this database
+  // detected it: `first_seen_at` is 2026 for the whole catalogue (it was built in
+  // 2026), so `<= 2017` could never fire no matter which badge was held.
+  // `newestAgeH` above keeps first_seen_at — "within 48 h of its detection" is
+  // exactly what that achievement says.
+  const releaseYears = badges
+    .map((b) => (b.release_date ? new Date(String(b.release_date)).getUTCFullYear() : NaN))
+    .filter((year) => Number.isFinite(year));
+  const oldestYear = releaseYears.length ? Math.min(...releaseYears) : 9999;
 
   const gamesByType: Record<string, { played: number; won: number }> = {};
   for (const row of (gamesRes.data ?? []) as Array<{ game: string; won: boolean }>) {
@@ -508,14 +600,17 @@ async function buildStats(userId: string): Promise<AchStats> {
   }
   let lossStreak = 0;
   for (const r of recentRounds) {
-    if (!r.won) lossStreak += 1;
+    // Only a round that actually LOST coins counts as a loss. A tie (hilo),
+    // blackjack push or any other refund pays exactly the stake — counting it
+    // meant ten refunded rounds in a row earned "Cursed Dice" without a coin lost.
+    if (!r.won && r.payout < r.bet) lossStreak += 1;
     else break;
   }
 
   const wheelBest = Math.max(0, ...((wheelRes.data ?? []) as Array<{ xp_amount: number | null }>).map((r) => r.xp_amount ?? 0));
-  const todayStr = new Date().toISOString().slice(0, 10);
   const rawRounds = (roundsRes.data ?? []) as Array<Record<string, unknown>>;
-  const roundsToday = rawRounds.filter((r) => String(r.created_at).slice(0, 10) === todayStr).length;
+  // The full-day count, not the 60-row window (see the query above).
+  const roundsToday = todayRoundsRes.count ?? 0;
   const hoursToday = new Set(
     rawRounds
       .filter((r) => String(r.created_at).slice(0, 10) === todayStr)
@@ -597,6 +692,10 @@ async function buildStats(userId: string): Promise<AchStats> {
     moodSet: Boolean(profileRes.data?.mood),
     activityCount: (achRes.data ?? []).length,
     dailyCount: (achRes.data ?? []).filter((k) => (k as { kind?: string }).kind === "daily").length,
+    lastDailyHour: (() => {
+      const at = (lastDailyRes.data as { created_at?: string } | null)?.created_at;
+      return at ? new Date(String(at)).getUTCHours() : null;
+    })(),
     userCount: usersRes.count ?? 0,
     accountAgeDays: (() => {
       const created = profileRes.data?.created_at as string | null | undefined;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { BadgeImage } from "@/components/badges/BadgeImage";
@@ -28,6 +28,7 @@ export default function AccountSettings({
   ownedBadges: OwnedBadgeOption[];
 }) {
   const t = useTranslations("account");
+  const te = useTranslations("errors");
   const router = useRouter();
 
   const [displayName, setDisplayName] = useState(profile.displayName ?? "");
@@ -40,6 +41,15 @@ export default function AccountSettings({
   );
   const [pickerOpen, setPickerOpen] = useState(false);
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Cancel the pending state update on unmount: React 18 no longer warns about
+  // setting state on an unmounted component, so nothing surfaced this.
+  useEffect(
+    () => () => {
+      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+    },
+    [],
+  );
 
   function toggleShowcase(slug: string) {
     setShowcaseSlots((current) => {
@@ -67,10 +77,12 @@ export default function AccountSettings({
       if (!res.ok) throw new Error(String(res.status));
       setState("saved");
       router.refresh();
-      setTimeout(() => setState("idle"), 3000);
+      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => setState("idle"), 3000);
     } catch {
       setState("error");
-      setTimeout(() => setState("idle"), 3000);
+      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => setState("idle"), 3000);
     }
   }
 
@@ -234,12 +246,14 @@ export default function AccountSettings({
         >
           {state === "saving" ? t("saving") : t("save")}
         </button>
-        {state === "saved" && (
-          <span className="text-sm font-semibold text-success">{t("saved")}</span>
-        )}
-        {state === "error" && (
-          <span className="text-sm font-semibold text-danger">✗</span>
-        )}
+        {/* Both outcomes live in one live region. The failure used to be a bare
+            "✗" that appeared and cleared on its own: a screen reader announced
+            nothing useful, and a sighted member was told a save failed without
+            being told anything else. */}
+        <span role="status" aria-live="polite" className="text-sm font-semibold">
+          {state === "saved" ? <span className="text-success">{t("saved")}</span> : null}
+          {state === "error" ? <span className="text-danger">{te("generic")}</span> : null}
+        </span>
       </div>
     </div>
   );

@@ -1,15 +1,19 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { award, bumpCoins, ensureProgress, getProgress, logActivity } from "./xp";
+import { award, bumpCoins, ensureProgress, getProgress, logActivity, readProgress } from "./xp";
 import { evaluateAchievements } from "./achievements";
+import { getEconomy } from "@/lib/settings";
 
 /**
- * Daily login bonus: +10 XP (+5 per streak day, capped at +50) and +50 coins.
- * One claim per UTC day.
+ * Daily login bonus. Base amounts and per-streak increments come from the admin
+ * panel's economy settings; their defaults (+10 XP, +50 coins, +5 XP and +25
+ * coins per streak day, capped at +50 and +250) reproduce exactly what this
+ * used to hardcode. One claim per UTC day.
  */
 export async function claimDaily(userId: string): Promise<
   { ok: false; reason: "already" } | { ok: true; xp: number; coins: number; streak: number }
 > {
   const supabase = createAdminClient();
+  const economy = await getEconomy();
   const todayStr = new Date().toISOString().slice(0, 10);
 
   // The gate only UPDATEs, so a user with no `user_progress` row would match 0
@@ -28,18 +32,41 @@ export async function claimDaily(userId: string): Promise<
   const streak = Number(claimed.data ?? -1);
   if (streak < 0) return { ok: false, reason: "already" };
 
-  const bonus = Math.min(50, (streak - 1) * 5);
-  const xp = 10 + bonus;
-  const coins = 50 + Math.min(250, (streak - 1) * 25);
+  const bonus = Math.min(
+    economy.streakXpCap,
+    (streak - 1) * economy.streakXpPerDay,
+  );
+  const xp = economy.dailyXp + bonus;
+  const coins =
+    economy.dailyCoins +
+    Math.min(economy.streakCoinsCap, (streak - 1) * economy.streakCoinsPerDay);
 
-  await award(userId, {
-    xp,
-    coins,
-    source: "daily",
-    feedKind: "daily",
-    feedTitle: `claimed the daily bonus (day ${streak} streak)`,
-    payload: { streak, bonus },
-  });
+  try {
+    await award(userId, {
+      xp,
+      coins,
+      source: "daily",
+      feedKind: "daily",
+      feedTitle: `claimed the daily bonus (day ${streak} streak)`,
+      payload: { streak, bonus },
+    });
+  } catch (error) {
+    // The gate and the reward are two transactions. A failed award would spend the
+    // whole day's bonus — the gate is committed, nothing was paid, and the retry is
+    // answered "already" — so release the gate and rethrow; the client's retry then
+    // succeeds. A release that itself fails is only logged: the original failure is
+    // the one the caller must see.
+    try {
+      const release = await supabase.rpc("release_daily_gate", {
+        p_user_id: userId,
+        p_today: todayStr,
+      });
+      if (release.error) throw release.error;
+    } catch (releaseError) {
+      console.warn("[daily] could not release the gate after a failed award:", releaseError);
+    }
+    throw error;
+  }
 
   return { ok: true, xp, coins, streak };
 }
@@ -76,6 +103,7 @@ export async function attemptSteal(
     }
 > {
   const supabase = createAdminClient();
+  const economy = await getEconomy();
 
   // The username arrives from the client and is used as a LIKE pattern, so the
   // wildcards `%` and `_` must be escaped — otherwise `%` (or `_`) matches an
@@ -84,7 +112,11 @@ export async function attemptSteal(
     .trim()
     .replace(/\\/g, "\\\\")
     .replace(/%/g, "\\%")
-    .replace(/_/g, "\\_");
+    .replace(/_/g, "\\_")
+    // PostgREST aliases `*` to `%` in like/ilike, so it has to be escaped exactly
+    // like `%` — otherwise `a*` resolves the victim by prefix instead of by name,
+    // which is the one thing this escaping exists to prevent.
+    .replace(/\*/g, "\\*");
   const { data: victimProfile } = await supabase
     .from("profiles")
     .select("id, username, steal_enabled, steal_price, steal_max")
@@ -93,10 +125,12 @@ export async function attemptSteal(
   if (!victimProfile || !victimProfile.id) return { ok: false, error: "Victim not found." };
   if (victimProfile.id === thiefId) return { ok: false, error: "You cannot steal from yourself." };
 
+  // A member's own configuration wins; the panel's economy settings are the
+  // fallback for everyone who never set one.
   const settings: StealSettings = {
     enabled: victimProfile.steal_enabled ?? STEAL_DEFAULTS.enabled,
-    price: Math.max(0, victimProfile.steal_price ?? STEAL_DEFAULTS.price),
-    maxAmount: Math.max(10, victimProfile.steal_max ?? STEAL_DEFAULTS.maxAmount),
+    price: Math.max(0, victimProfile.steal_price ?? economy.stealPrice),
+    maxAmount: Math.max(10, victimProfile.steal_max ?? economy.stealMax),
   };
   if (!settings.enabled) return { ok: false, error: "This collector disabled stealing." };
 
@@ -105,8 +139,9 @@ export async function attemptSteal(
     return { ok: false, error: `An attempt costs ${settings.price} coins.` };
   }
 
-  // Flood checks: one attempt per victim per 5 min, max 6 victims per hour.
-  const fiveMinAgo = new Date(Date.now() - 5 * 60_000).toISOString();
+  // Flood checks: one attempt per victim per window, capped per hour.
+  const floodMinutes = Math.max(0, economy.stealFloodMinutes);
+  const fiveMinAgo = new Date(Date.now() - floodMinutes * 60_000).toISOString();
   const { count: recentPair } = await supabase
     .from("steal_attempts")
     .select("id", { count: "exact", head: true })
@@ -114,7 +149,7 @@ export async function attemptSteal(
     .eq("victim_id", victimProfile.id)
     .gte("created_at", fiveMinAgo);
   if ((recentPair ?? 0) > 0) {
-    return { ok: false, error: "Flood check: wait 5 minutes between attempts on the same collector." };
+    return { ok: false, error: `Flood check: wait ${floodMinutes} minutes between attempts on the same collector.` };
   }
   const hourAgo = new Date(Date.now() - 3_600_000).toISOString();
   const { count: recentHour } = await supabase
@@ -122,12 +157,18 @@ export async function attemptSteal(
     .select("id", { count: "exact", head: true })
     .eq("thief_id", thiefId)
     .gte("created_at", hourAgo);
-  if ((recentHour ?? 0) >= 6) {
-    return { ok: false, error: "Flood check: max 6 steal attempts per hour." };
+  if ((recentHour ?? 0) >= economy.stealPerHour) {
+    return { ok: false, error: `Flood check: max ${economy.stealPerHour} steal attempts per hour.` };
   }
 
-  const victim = await getProgress(victimProfile.id);
-  if (victim.coins <= 0) return { ok: false, error: "Victim has no coins to steal." };
+  // `readProgress`, never `getProgress`: the victim is only being targeted, and
+  // getProgress INSERTS a user_progress row on miss — a service-role write on a
+  // request that usually ends in "no coins", which inflated the public player
+  // count and dragged the average level toward 1.
+  const victim = await readProgress(victimProfile.id);
+  if (!victim || victim.coins <= 0) {
+    return { ok: false, error: "Victim has no coins to steal." };
+  }
 
   // Success chance: 50% base ± 1% per level difference, clamped 20–80%.
   const chance = Math.min(0.8, Math.max(0.2, 0.5 + (thief.level - victim.level) * 0.01));
@@ -165,7 +206,7 @@ export async function attemptSteal(
     .select("id", { count: "exact", head: true })
     .eq("thief_id", thiefId)
     .gte("created_at", hourAgo);
-  if ((racedPair ?? 0) > 1 || (racedHour ?? 0) > 6) {
+  if ((racedPair ?? 0) > 1 || (racedHour ?? 0) > economy.stealPerHour) {
     if (attempt?.id != null) {
       // Same reasoning as the game-round cleanup: a surviving attempt row would
       // pollute the flood window for the next five minutes.
@@ -198,7 +239,25 @@ export async function attemptSteal(
     p_b: victimProfile.id,
     p_b_delta: -stolen + settings.price,
   });
-  if (transferred.error) throw transferred.error;
+  if (transferred.error) {
+    // The attempt row already exists (the flood guards above need it). A failed
+    // transfer moved no coins, so it must not consume the 5-minute or hourly
+    // window either — void it before rethrowing, the same cleanup playGame
+    // applies to a raced round.
+    if (attempt?.id != null) {
+      const { error: voidError } = await supabase
+        .from("steal_attempts")
+        .delete()
+        .eq("id", attempt.id);
+      if (voidError) {
+        console.warn(
+          "[steal] could not void the attempt after a failed transfer:",
+          voidError.message,
+        );
+      }
+    }
+    throw transferred.error;
+  }
   const pairRow = Array.isArray(transferred.data) ? transferred.data[0] : transferred.data;
   const balance = Number(
     (pairRow as { a_coins?: number } | null)?.a_coins ??
@@ -274,7 +333,7 @@ export async function prunedCoinRainGate(olderThanDays = 7): Promise<number> {
   }
 }
 
-/** Coin rain easter egg: a visitor gifts the profile owner 1 coin (once/day). */
+/** Coin rain easter egg: a visitor gifts the profile owner coins (once/day). */
 export async function coinRain(
   giverId: string | null,
   profileOwnerId: string,
@@ -286,6 +345,7 @@ export async function coinRain(
   anonymousKey?: string,
 ): Promise<{ ok: boolean; already?: boolean }> {
   const supabase = createAdminClient();
+  const economy = await getEconomy();
 
   // The id arrives from the client — verify it is a real profile before the
   // gate insert below, whose foreign key would otherwise turn a bad request into
@@ -325,22 +385,37 @@ export async function coinRain(
     throw gateError;
   }
 
-  // Atomic +1: an absolute write would discard any award that landed between
+  // Atomic +N: an absolute write would discard any award that landed between
   // the read and the write.
-  await bumpCoins(profileOwnerId, 1);
+  const rain = Math.max(1, economy.coinRainCoins);
+  try {
+    await bumpCoins(profileOwnerId, rain);
+  } catch (error) {
+    // Release the gate. The row already claimed today, so a failed award burned
+    // the day: the retry hit 23505 and answered already:true while the owner never
+    // received the coin. Mirrors the claim_/release_ gate pair used by the daily
+    // bonus and the wheel (migration 0034).
+    await supabase
+      .from("coin_rain_gate")
+      .delete()
+      .eq("owner_id", profileOwnerId)
+      .eq("giver_key", giverKey)
+      .eq("day", day);
+    throw error;
+  }
 
   await logActivity({
     userId: profileOwnerId,
     kind: "coin_rain",
-    title: "received a coin rain (+1 coin)",
-    coinsAmount: 1,
+    title: `received a coin rain (+${rain} coin${rain === 1 ? "" : "s"})`,
+    coinsAmount: rain,
     payload: { role: "receiver", giver: giverId ?? "anonymous" },
   });
   if (giverId) {
     await logActivity({
       userId: giverId,
       kind: "coin_rain",
-      title: "sent a coin rain (+1 coin to the collector)",
+      title: `sent a coin rain (+${rain} coin${rain === 1 ? "" : "s"} to the collector)`,
       coinsAmount: 0,
       payload: { role: "giver", receiver: profileOwnerId },
     });

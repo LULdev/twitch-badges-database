@@ -32,7 +32,8 @@
     "faqNav": "FAQ",
     "wheel": "Wheel of Fortune",
     "mainNav": "Main navigation",
-    "mobileNav": "Mobile navigation"
+    "mobileNav": "Mobile navigation",
+    "acp": "Admin panel"
   },
   "common": {
     "search": "Search badges…",
@@ -82,7 +83,8 @@
     "errorTitle": "Something went wrong",
     "errorBody": "The page could not be loaded. This is usually temporary — please try again.",
     "errorRetry": "Try again",
-    "levelAria": "Level {level}"
+    "levelAria": "Level {level}",
+    "breadcrumb": "Breadcrumb"
   },
   "home": {
     "heroTitle": "Every Twitch badge. One database.",
@@ -262,7 +264,14 @@
     "empty": "No posts yet.",
     "autoTag": "Auto-generated",
     "notFound": "This post does not exist.",
-    "react": "React"
+    "react": "React",
+    "reactions": {
+      "like": "Like",
+      "love": "Love",
+      "laugh": "Laugh",
+      "fire": "Fire",
+      "wow": "Wow"
+    }
   },
   "changelog": {
     "title": "Changelog",
@@ -429,7 +438,19 @@
     "sourceSyncEnrichment": "Drop-window enrichment",
     "sourceSyncOwners": "Owner statistics",
     "sourceWeb": "Web requests",
-    "sourceOther": "Other source"
+    "sourceOther": "Other source",
+    "navVisitors": "Visitors",
+    "visitorsTitle": "Visitors",
+    "visitorsSubtitle": "Anonymous page views, counted without IP addresses or cookies.",
+    "visitorsOnline": "Online now",
+    "visitorsOnlineHint": "Distinct visitors in the last 5 minutes",
+    "visitorsTotal": "Total views",
+    "visitorsTotalHint": "Since tracking began",
+    "visitors24h": "Views 24h",
+    "visitors7d": "Views 7d",
+    "visitors30d": "Views 30d",
+    "visitorsUnique": "unique visitors",
+    "visitorsPrivacy": "No IP addresses, no cookies, no full referrer URLs. Visitors who send Do Not Track are counted as a page view and nothing else."
   },
   "notifications": {
     "title": "Notifications",
@@ -518,7 +539,7 @@
     "currentRarity": "Current rarity score",
     "higher": "Higher",
     "lower": "Lower",
-    "hiloHint": "Will the next badge's rarity score be higher or lower? Win pays 1.95x.",
+    "hiloHint": "Will the next badge's rarity score be higher or lower? The payout scales with the odds — a likely call pays little, a long shot up to 20x. A tie refunds your bet.",
     "red": "Red",
     "black": "Black",
     "green": "Green",
@@ -529,8 +550,8 @@
     "stop": "STOP",
     "again": "Play again",
     "newCard": "New card",
-    "scratchHint": "Scratch all 9 fields — 3 matching symbols win. Jackpot triple pays 20x.",
-    "vaultHint": "Stop each needle in the green zone: 0/0.5x, 1/1.5x, 2/3x, 3/3x multiplier.",
+    "scratchHint": "Scratch all 9 fields — 3 matching symbols win. Jackpot triple pays up to 10x.",
+    "vaultHint": "More needles in the green zone (0/1/2/3) raise the win chance. A win pays 2x.",
     "floor": "Floor",
     "cashout": "Cash out",
     "cashoutAt": "Cash out at",
@@ -557,7 +578,7 @@
     "dailyComeBack": "Come back tomorrow for the next bonus.",
     "streak": "Streak",
     "rpsTitle": "Rock-Paper-Scissors",
-    "rpsDesc": "The classic duel against the bot. Double or nothing per round.",
+    "rpsDesc": "The classic duel against the bot. A win pays 1.9x; a tie refunds your bet.",
     "slotsTitle": "Badges of Ra 6 Deluxe",
     "slotsDesc": "5 reels, 3 rows, real Twitch badge symbols and a scatter jackpot.",
     "shootTitle": "Shoot the Badges",
@@ -569,21 +590,25 @@
     "coinflipTitle": "BadgesCoin Flip Ladder",
     "coinflipDesc": "Heads or tails up a 7-step ladder — every step doubles the win.",
     "hiloTitle": "Higher or Lower",
-    "hiloDesc": "Bet on the rarity score of the next badge — 1.95x per correct call.",
+    "hiloDesc": "Bet on the rarity score of the next badge. The payout scales with the odds of the call you make (up to 20x); a tie refunds your bet.",
     "rouletteTitle": "Badge Roulette",
     "rouletteDesc": "Red, black or the green zero at 14x. 37 pockets, pure suspense.",
     "blackjackTitle": "Badge Blackjack",
     "blackjackDesc": "21 against the dealer — pick your draw strategy and deal.",
     "vaultTitle": "Crack the Vault",
-    "vaultDesc": "Stop three needles in the green zone. Three perfect stops = 3x.",
+    "vaultDesc": "Stop three needles in the green zone — more needles mean a higher win chance, and a win pays 2x.",
     "scratchTitle": "Scratch the Badge",
-    "scratchDesc": "Scratch nine fields — three matching symbols win up to 20x.",
+    "scratchDesc": "Scratch nine fields — three matching symbols win up to 10x.",
     "towerTitle": "Tower of Badges",
     "towerDesc": "Climb ten floors of rising risk — cash out before the guards get you.",
     "catcherTitle": "Drops Catcher",
     "catcherDesc": "Catch falling badges in your basket, dodge the bombs.",
     "notEnoughBadges": "There are not enough badges in the catalog to build a quiz yet.",
-    "streakDay": "Day {streak}"
+    "streakDay": "Day {streak}",
+    "disabled": "The arcade is currently switched off. Please check back later.",
+    "scatter": "SCATTER!",
+    "scratchFounder": "Founder",
+    "scratchJackpot": "JACKPOT"
   },
   "wheel": {
     "title": "Wheel of Fortune",
@@ -655,7 +680,7 @@
     "freeQ": "Is all of this free?",
     "gamesA": "All luck-based outcomes (slots, roulette, wheel, coin flips, blackjack, scratch, tower) are rolled on the server and cannot be manipulated. Skill games (shooting, memory, catching) check scores server-side with caps.",
     "gamesQ": "Are the games fair?",
-    "levelsA": "Level 1 starts at 0 XP. Each level needs 100 + (level-1) x 50 XP — level 100 totals 254,900 XP. Every level has a unique sparkle-animated level badge in your profile that is always visible and cannot be hidden.",
+    "levelsA": "Level 1 starts at 0 XP. Each level needs 100 + (level-1) x 50 XP — level 100 totals 252,450 XP. Every level has a unique sparkle-animated level badge in your profile that is always visible and cannot be hidden.",
     "levelsQ": "How do levels 1 to 100 work?",
     "profileA": "35 settings: 20 common (colors, fonts, banner, card style, frames, privacy toggles, social links) and 15 creative extras (aura, particle background, rainbow name, 3D tilt, pixel avatar, achievement ticker and more).",
     "profileQ": "How customizable is my profile?",
@@ -727,6 +752,480 @@
     "stealHint": "Higher prices scare off casual thieves; failed attempts pay the price to you.",
     "saving": "Saving…",
     "saved": "Saved!",
-    "save": "Save changes"
+    "save": "Save changes",
+    "titlePlaceholder": "Badge Hunter",
+    "usernamePlaceholder": "username",
+    "statusBubblePlaceholder": "hunting SUBtember…",
+    "options": {
+      "font": {
+        "sans": "Sans",
+        "serif": "Serif",
+        "mono": "Mono",
+        "rounded": "Rounded"
+      },
+      "cardStyle": {
+        "glass": "Glass",
+        "solid": "Solid",
+        "outline": "Outline"
+      },
+      "radius": {
+        "sharp": "Sharp",
+        "soft": "Soft",
+        "round": "Round"
+      },
+      "avatarFrame": {
+        "none": "None",
+        "ring": "Ring",
+        "double": "Double",
+        "glow": "Glow",
+        "crown": "Crown"
+      },
+      "showcaseLayout": {
+        "grid": "Grid",
+        "row": "Row",
+        "carousel": "Carousel"
+      },
+      "density": {
+        "cozy": "Cozy",
+        "compact": "Compact"
+      },
+      "profileTheme": {
+        "auto": "Auto",
+        "violet": "Violet",
+        "emerald": "Emerald",
+        "sapphire": "Sapphire",
+        "gold": "Gold"
+      },
+      "effectsIntensity": {
+        "off": "Off",
+        "subtle": "Subtle",
+        "full": "Full"
+      }
+    }
+  },
+  "admin": {
+    "title": "Admin panel",
+    "common": {
+      "working": "Working…"
+    },
+    "gate": {
+      "title": "Admin access",
+      "intro": "No owner is registered yet. Enter the bootstrap passcode to claim the installation.",
+      "passcodeLabel": "Passcode",
+      "submit": "Unlock",
+      "hint": "This door closes permanently as soon as an owner is registered.",
+      "invalid": "That passcode is not correct.",
+      "throttled": "Too many attempts. Try again in a few minutes.",
+      "closed": "The passcode door is closed — an owner already exists.",
+      "network": "Network error. Please try again."
+    },
+    "setup": {
+      "title": "Register the owner",
+      "intro": "The profile you name here becomes the owner and can manage everything.",
+      "usernameLabel": "Twitch username",
+      "twitchIdLabel": "Twitch user ID (optional)",
+      "twitchIdPlaceholder": "Numeric ID — recommended",
+      "submit": "Register owner",
+      "notFound": "No profile with that name — log in with Twitch once, then try again.",
+      "failed": "Registration failed.",
+      "doneTitle": "Owner registered",
+      "doneBody": "The bootstrap passcode no longer works. Reload to open the dashboard."
+    },
+    "dashboard": {
+      "title": "Admin control panel",
+      "signedInAs": "Signed in as {role}.",
+      "intro": "Modules are being rolled out — users, content, sync, settings, statistics and more arrive in the coming phases."
+    },
+    "forbidden": {
+      "title": "Not available",
+      "body": "The admin panel is restricted to the owner and administrators."
+    },
+    "tabs": {
+      "label": "Sections",
+      "users": "Users",
+      "content": "Content",
+      "sync": "Sync",
+      "settings": "Settings",
+      "stats": "Statistics",
+      "status": "Status",
+      "newsletter": "Newsletter",
+      "brainstorm": "Ideas",
+      "audit": "Audit log",
+      "soon": "This section arrives in a later phase.",
+      "badges": "Badges"
+    },
+    "users": {
+      "searchLabel": "Search",
+      "searchPlaceholder": "Username, display name or Twitch ID",
+      "bannedOnly": "Banned only",
+      "count": "{count} members",
+      "loadFailed": "Could not load the list.",
+      "loading": "Loading…",
+      "empty": "No members match this search.",
+      "actionFailed": "The action failed.",
+      "saved": "Profile saved.",
+      "progressSaved": "Progress saved.",
+      "roleSaved": "Role updated.",
+      "close": "Close",
+      "banned": "Banned",
+      "active": "Active",
+      "cols": {
+        "user": "Member",
+        "role": "Role",
+        "level": "Level",
+        "xp": "XP",
+        "coins": "Coins",
+        "status": "Status",
+        "joined": "Joined"
+      },
+      "profile": {
+        "title": "Profile",
+        "save": "Save profile"
+      },
+      "field": {
+        "username": "Username",
+        "display_name": "Display name",
+        "bio": "Bio",
+        "color": "Color",
+        "banner_url": "Banner URL",
+        "theme": "Theme",
+        "mood": "Mood",
+        "steal_price": "Steal price",
+        "steal_max": "Steal maximum",
+        "inventory_public": "Inventory public",
+        "steal_enabled": "Stealing enabled"
+      },
+      "progress": {
+        "title": "Progress",
+        "xp": "XP",
+        "coins": "Coins",
+        "level": "Level",
+        "login_streak": "Login streak",
+        "save": "Save progress"
+      },
+      "role": {
+        "title": "Role",
+        "apply": "Apply role"
+      },
+      "ban": {
+        "title": "Ban",
+        "reason": "Reason",
+        "days": "Days",
+        "apply": "Ban",
+        "lift": "Lift ban",
+        "hint": "Zero days means a permanent ban.",
+        "active": "Banned: {reason} — until {until}",
+        "noReason": "no reason given",
+        "permanent": "permanently",
+        "saved": "Ban applied.",
+        "removed": "Ban lifted.",
+        "confirmPermanent": "Ban {username} permanently? This ban has no expiry."
+      },
+      "achievements": {
+        "title": "Achievements",
+        "grant": "Grant",
+        "revoke": "Revoke",
+        "granted": "Achievement granted.",
+        "revoked": "Achievement revoked."
+      },
+      "danger": {
+        "title": "Danger zone",
+        "delete": "Delete member",
+        "confirm": "Delete {username} and all their data? This cannot be undone.",
+        "deleted": "Member deleted."
+      }
+    },
+    "content": {
+      "tabs": {
+        "blog": "Blog",
+        "changelog": "Changelog"
+      },
+      "search": "Search",
+      "new": "New entry",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "confirmDelete": "Delete this entry? This cannot be undone.",
+      "saved": "Saved.",
+      "deleted": "Deleted.",
+      "saveFailed": "Could not save.",
+      "loadFailed": "Could not load.",
+      "loading": "Loading…",
+      "empty": "Nothing here yet.",
+      "auto": "auto",
+      "badJson": "The payload is not valid JSON.",
+      "col": {
+        "title": "Title",
+        "slug": "Slug",
+        "status": "Status",
+        "date": "Date"
+      },
+      "field": {
+        "title": "Title",
+        "slug": "Slug",
+        "slugHint": "Derived from the title when empty",
+        "author": "Author",
+        "locale": "Locale",
+        "status": "Status",
+        "cover": "Cover image URL",
+        "tags": "Tags",
+        "tagsHint": "Comma separated",
+        "excerpt": "Excerpt",
+        "content": "Content",
+        "contentHint": "Markdown is supported"
+      },
+      "changelog": {
+        "kind": "Kind",
+        "body": "Explanation",
+        "payload": "Payload (JSON)"
+      }
+    },
+    "badges": {
+      "search": "Search",
+      "searchPlaceholder": "Title, set id or slug",
+      "customOnly": "Custom only",
+      "new": "New badge",
+      "hint": "Hand-made entries are shielded from the catalog sync: it never overwrites or removes them, and a provider badge that would collide on set id and version is skipped instead.",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "confirmDelete": "Delete this badge? This cannot be undone.",
+      "saved": "Badge saved.",
+      "deleted": "Badge deleted.",
+      "saveFailed": "Could not save the badge.",
+      "loadFailed": "Could not load the badges.",
+      "empty": "No badges found.",
+      "providerHint": "This entry came from the provider. Its title and artwork are refreshed by every sync, and only hand-made entries can be deleted.",
+      "col": {
+        "badge": "Badge",
+        "setId": "Set / version",
+        "category": "Category",
+        "status": "Status",
+        "source": "Source"
+      },
+      "field": {
+        "setId": "Set id",
+        "version": "Version",
+        "title": "Title",
+        "category": "Category",
+        "status": "Status",
+        "start": "Start",
+        "end": "End",
+        "image": "Image URL",
+        "clickUrl": "Click URL",
+        "description": "Description",
+        "howToEarn": "How to earn",
+        "paid": "Paid / subscription badge"
+      }
+    },
+    "sync": {
+      "intro": "These buttons run the same engines as the daily cron jobs, immediately and by hand. A manual run is recorded in the uptime history as its own row, so it never disguises a missed scheduled run.",
+      "run": "Run now",
+      "running": "Running…",
+      "results": "Recent runs",
+      "ok": "ok",
+      "failed": "The sync could not be started.",
+      "global": {
+        "title": "Catalog diff",
+        "hint": "Compares the live Twitch catalog against the database: adds new badges, refreshes changed ones, marks disappeared ones as removed."
+      },
+      "badgebase": {
+        "title": "Drop windows",
+        "hint": "Reads badges.blog's active and upcoming listings to confirm which badges are currently obtainable and sets their start and end dates."
+      },
+      "potat": {
+        "title": "Owner statistics",
+        "hint": "Refreshes owner counts, rarity scores and the status sweeps from potat."
+      }
+    },
+    "settings": {
+      "loading": "Loading settings…",
+      "loadFailed": "Could not load the settings.",
+      "saved": "Settings saved.",
+      "saveFailed": "Could not save the settings.",
+      "save": "Save",
+      "features": {
+        "title": "Feature flags",
+        "hint": "A switched-off feature loses its navigation entry, and the matching endpoint refuses the action.",
+        "feed": "Live feed",
+        "wheel": "Wheel of Fortune",
+        "steals": "Coin stealing",
+        "coinRain": "Coin rain",
+        "compare": "Badge comparison",
+        "games": "Arcade"
+      },
+      "economy": {
+        "title": "Economy",
+        "hint": "These values drive the daily bonus, the games and stealing. Defaults are the numbers the site shipped with.",
+        "dailyXp": "Daily XP",
+        "dailyCoins": "Daily coins",
+        "streakXpPerDay": "Streak XP per day",
+        "streakXpCap": "Streak XP cap",
+        "streakCoinsPerDay": "Streak coins per day",
+        "streakCoinsCap": "Streak coins cap",
+        "gameWinXp": "XP for a won round",
+        "gameLoseXp": "XP for a lost round",
+        "coinRainCoins": "Coins per coin rain",
+        "stealPrice": "Default steal price",
+        "stealMax": "Default steal maximum",
+        "stealFloodMinutes": "Steal wait (minutes)",
+        "stealPerHour": "Steal attempts per hour"
+      },
+      "games": {
+        "title": "Games",
+        "hint": "Switch single games off, or move their betting range. The hub hides a disabled game and the engine refuses it.",
+        "master": "Arcade enabled (master switch)",
+        "col": {
+          "game": "Game",
+          "enabled": "On",
+          "min": "Min bet",
+          "max": "Max bet"
+        }
+      },
+      "admins": {
+        "title": "Admins and moderators",
+        "hint": "Grant panel access by Twitch username. The member has to have logged in once so a profile exists.",
+        "owner": "Owner: {username} — set by the bootstrap passcode and never removable here.",
+        "username": "Twitch username",
+        "role": "Role",
+        "add": "Grant access",
+        "remove": "Remove",
+        "empty": "No additional admins or moderators yet."
+      }
+    },
+    "stats": {
+      "loading": "Loading statistics…",
+      "loadFailed": "Could not load the statistics.",
+      "noData": "No visitor data yet.",
+      "kpi": {
+        "online": "Online now",
+        "views24": "Views today",
+        "views7": "Views 7 days",
+        "views30": "Views 30 days",
+        "total": "Total views",
+        "unique": "Unique visitors"
+      },
+      "chart": {
+        "title": "Views and visitors, last 30 days",
+        "hits": "Views",
+        "visitors": "Visitors"
+      },
+      "devices": "Devices",
+      "browsers": "Browsers",
+      "topPaths": "Most visited pages",
+      "referrers": "Referrers",
+      "locales": "Languages",
+      "privacy": "Average time on page: {avg} s. Counted without IP addresses, cookies or full referrer URLs."
+    },
+    "status": {
+      "loading": "Checking services…",
+      "loadFailed": "Could not load the service status.",
+      "title": "Services",
+      "probing": "Probing…",
+      "reprobe": "Probe again",
+      "uptime24": "Availability, 24 h",
+      "live": "Live probe",
+      "checkedAt": "Probed at {time}",
+      "col": {
+        "service": "Service",
+        "last": "Last run",
+        "status": "Status",
+        "24h": "24 h",
+        "7d": "7 days",
+        "30d": "30 days",
+        "avg": "Ø duration"
+      },
+      "empty": "No heartbeats recorded yet.",
+      "messages": "Last messages",
+      "noMessages": "No messages — every service reported clean."
+    },
+    "newsletter": {
+      "intro": "Write an announcement and choose how it goes out. Recipient counts are read from the accounts that have an email address and from the browsers subscribed to push.",
+      "audienceEmails": "Accounts with an email",
+      "audiencePush": "Subscribed browsers",
+      "provider": "Mail provider",
+      "providerResend": "Configured",
+      "providerNone": "Not configured",
+      "noProviderHint": "No mail provider is configured, so pushing is the only delivery that can actually happen. A draft set to email will be sent as a web push instead, and the result will say so — it will not report mail that never left.",
+      "delivery": "Delivery: {channel}, {sent} sent, {failed} failed",
+      "loadFailed": "Could not load the newsletters.",
+      "failed": "The action failed.",
+      "saved": "Draft saved.",
+      "sent": "Sent.",
+      "deleted": "Draft deleted.",
+      "new": "New draft",
+      "edit": "Edit",
+      "save": "Save",
+      "send": "Send now",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "confirmSend": "Send this newsletter to everyone now?",
+      "confirmDelete": "Delete this draft?",
+      "sendHint": "A draft can only be sent once; it is marked sent only when something was actually delivered.",
+      "empty": "No drafts yet.",
+      "col": {
+        "subject": "Subject",
+        "channel": "Channel",
+        "status": "Status",
+        "recipients": "Recipients",
+        "date": "Date"
+      },
+      "field": {
+        "subject": "Subject",
+        "body": "Message",
+        "channel": "Channel"
+      }
+    },
+    "ideas": {
+      "intro": "The idea board for the site: collect, rank and triage. The board is readable by anyone, written only from here.",
+      "filter": "Category",
+      "allCategories": "All categories",
+      "new": "New idea",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "upvote": "Upvote",
+      "downvote": "Downvote",
+      "confirmDelete": "Delete this idea?",
+      "loadFailed": "Could not load the ideas.",
+      "failed": "The action failed.",
+      "saved": "Idea saved.",
+      "deleted": "Idea deleted.",
+      "empty": "No ideas yet.",
+      "field": {
+        "category": "Category",
+        "status": "Status",
+        "title": "Title",
+        "body": "Notes"
+      }
+    },
+    "audit": {
+      "intro": "Every admin action, newest first. Each entry records who did it, what they touched and, where relevant, the values involved.",
+      "filterAction": "Action",
+      "allActions": "All actions",
+      "filterActor": "Actor",
+      "count": "{count} entries",
+      "loadFailed": "Could not load the audit log.",
+      "empty": "Nothing recorded yet.",
+      "details": "Details",
+      "hide": "Hide",
+      "col": {
+        "when": "When",
+        "actor": "Actor",
+        "action": "Action",
+        "target": "Target"
+      }
+    }
+  },
+  "roles": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "moderator": "Moderator",
+    "ownerHint": "Runs this installation",
+    "adminHint": "Administrator with full panel access",
+    "moderatorHint": "Moderator — can manage members and content"
   }
 }

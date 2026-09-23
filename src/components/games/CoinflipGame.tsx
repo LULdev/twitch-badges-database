@@ -38,7 +38,11 @@ export default function CoinflipGame() {
         <label className="block text-center text-sm">
           <span className="text-muted">{t("ladderTarget")}: </span>
           <span className="font-bold">
-            {target}× ({t("payout")}: {Math.floor(bet * Math.pow(2, target) * 0.97).toLocaleString(locale)})
+            {/* The server pays bet · 2^target · 0.97, so labelling the step "3×"
+                promised a multiplier it never paid (target 3 pays 7.76×). Show the
+                multiplier that is actually applied. */}
+            {(Math.pow(2, target) * 0.97).toFixed(2)}× ({t("payout")}:{" "}
+            {Math.floor(bet * Math.pow(2, target) * 0.97).toLocaleString(locale)})
           </span>
           <input
             type="range"

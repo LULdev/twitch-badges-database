@@ -188,7 +188,12 @@ async function CompareResult({
             <h2 id={`col-${column.id}`} className="text-sm font-bold">
               {column.title}
             </h2>
-            <span className="chip pointer-events-none">{column.rows.length}</span>
+            {/* The grid renders at most 48 tiles, so the raw count claimed
+                badges the column does not show. "48+" is honest about the cap
+                without inventing a translation for every locale. */}
+            <span className="chip pointer-events-none">
+              {column.rows.length > 48 ? "48+" : column.rows.length}
+            </span>
           </div>
           {column.rows.length > 0 ? (
             <div className="grid grid-cols-3 gap-2 p-4 sm:grid-cols-6 md:grid-cols-8">
