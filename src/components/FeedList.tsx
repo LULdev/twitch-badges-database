@@ -131,6 +131,13 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
                 )}{" "}
                 {event.title}
               </p>
+              {/* The `body` column was written by every producer (an achievement's
+                  description, the level badge it unlocked) and selected by both feed
+                  readers, but never rendered — so "unlocked: Ghost Town" had no
+                  explanation anywhere. */}
+              {event.body ? (
+                <p className="mt-0.5 text-xs text-muted">{event.body}</p>
+              ) : null}
               <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted">
                 <span>{t(event.kind)}</span>
                 {nowTick !== null ? <span>· {timeAgo(event.created_at, nowTick)}</span> : null}

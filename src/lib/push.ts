@@ -114,6 +114,12 @@ export async function recordNotification(
   payload: PushPayload & { kind: string },
 ): Promise<void> {
   const supabase = createAdminClient();
+  // `kind` and `payload.tag` are PROVENANCE, not a feature: /notifications renders
+  // title, body, url and date only, and nothing reads the tag (the service
+  // worker's collapse tag comes from the push JSON, not this row). They are kept
+  // deliberately — the row says what the alert was and how it was grouped — but a
+  // future change that wants to filter or de-duplicate on them must first surface
+  // them, and there are no translated labels for the kind values today.
   const { error } = await supabase.from("notifications").insert({
     kind: payload.kind,
     title: payload.title,
