@@ -70,6 +70,10 @@ export async function POST(request: Request) {
     // it is set once by the bootstrap flow and is what keeps the panel open.
     if (section === "admins") {
       const action = String(body?.action ?? "");
+      // The settings family gates economy/games/features on admin+, and this
+      // section mints STAFF: without the same gate a moderator could create
+      // moderator grants for any plain user. Strict `outranks`, matching the
+      // removal path below — peer-admin grants are the owner's call.
       // The identity read is the substrate of the write. A FAILED read is not an
       // empty document: spreading `{}` here persisted a document without
       // `profileId`, which reopens the bootstrap passcode door and defeats the
@@ -154,7 +158,18 @@ export async function POST(request: Request) {
         // click can strip every peer at once, and the users route already uses the
         // strict ladder, so a plain admin must not strip a peer here either. An
         // admin still removes moderators; removing a peer admin is the owner's call.
-        if (!outranks(ctx.role, entry.role)) {
+        // Authorize against the LIVE profile role, not the roster entry: the
+        // users route changes profiles.role without touching the roster, so the
+        // roster can say "moderator" for a member who is now an admin — and
+        // trusting it let a plain admin demote that admin.
+        const supabaseForRole = createAdminClient();
+        const { data: liveRoleRow } = await supabaseForRole
+          .from("profiles")
+          .select("role")
+          .eq("id", profileId)
+          .maybeSingle();
+        const liveRole = String(liveRoleRow?.role ?? "user");
+        if (!outranks(ctx.role, liveRole)) {
           return { error: "forbidden: that member is not below you" };
         }
         // The owner can never be removed or demoted from here.

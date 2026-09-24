@@ -116,6 +116,17 @@ export default async function BadgeDetailPage({ params }: PageProps) {
     description: badge.description ?? badge.how_to_earn ?? badge.title,
     image: badge.image_url_4x ?? badge.image_url_2x ?? undefined,
     category: badge.category,
+    // A Product without `offers` is rejected by Google's rich-results test
+    // ("Missing field offers"), which forfeits eligibility for every badge page.
+    // Badges are documented here, not sold, so the offer states the real price to
+    // a visitor: nothing.
+    offers: {
+      "@type": "Offer",
+      price: 0,
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+      url: `/${locale}/badges/${badge.slug}`,
+    },
   };
 
   return (

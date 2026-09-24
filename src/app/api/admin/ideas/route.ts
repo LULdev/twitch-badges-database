@@ -14,6 +14,9 @@ export async function GET(request: Request) {
     // PostgREST rejects a NaN range with an error, which surfaced as a 500; a
     // missing or non-numeric value falls back to the default instead.
     const num = (raw: string | null, fallback: number) => {
+      // An ABSENT parameter is missing, not zero: Number(null) is 0, so a missing
+      // ?limit reached listIdeas as 0 and the panel rendered exactly one idea.
+      if (raw === null || raw.trim() === "") return fallback;
       const parsed = Number(raw);
       return Number.isFinite(parsed) ? parsed : fallback;
     };

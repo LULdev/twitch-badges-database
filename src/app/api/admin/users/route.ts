@@ -85,14 +85,12 @@ export async function POST(request: Request) {
     const targetRole = (detail?.profile.role as string | null) ?? "user";
     const ownerProtected = targetRole === "owner" && ctx.role !== "owner";
 
-    // The rank ladder applies to EVERY mutating action here, not just `role`.
-    // It used to guard the role branch alone, so a moderator could ban or delete
-    // an admin, rewrite a peer's profile and XP/coins, or grant achievements —
-    // `requireAdmin()` accepts the moderator role by design, which made all of
-    // that reachable. `unban` is the deliberate exception: it only ever restores
-    // access, and refusing it could leave a member stuck because the actor who
-    // banned them was later demoted.
-    if (!self && body.action !== "unban" && !outranks(ctx.role, targetRole)) {
+    // The rank ladder applies to EVERY mutating action here, including `unban`:
+    // without it a banned moderator could lift their own ban (banning writes the
+    // bans row but never the role, so banned staff still authenticate to every
+    // admin route), and a moderator could unban an admin. A member whose banner
+    // was later demoted is an owner call, which outranks always satisfies.
+    if (!self && !outranks(ctx.role, targetRole)) {
       return Response.json(
         { error: "forbidden: that member is not below you" },
         { status: 403 },

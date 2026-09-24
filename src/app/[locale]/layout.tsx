@@ -39,12 +39,19 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       siteName: t("siteTitle"),
-      title: t("siteTitle"),
+      // NO `title` here on purpose: Next only falls back to the page's own title
+      // when openGraph.title is unset, so setting it here froze every page that
+      // does not define its own openGraph — thirteen routes emitted the site name
+      // as their og:title. The page title serves as the og:title instead.
       description: t("siteDescription"),
+      // summary_large_image cards need an image; without one the card renders
+      // empty for every page that does not declare its own.
+      images: ["/icon-512.png"],
     },
     twitter: {
       card: "summary_large_image",
-      title: t("siteTitle"),
+      // Same fallback rule: without twitter.title, X reads og:title — which is the
+      // page's own title now that openGraph.title is unset above.
       description: t("siteDescription"),
     },
   };

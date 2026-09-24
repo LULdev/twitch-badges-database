@@ -20,7 +20,10 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, slug } = await params;
   const post = await getPostBySlug(slug).catch(() => null);
-  if (!post) return {};
+  // A draft is 404'd by the page body below, but generateMetadata ran first and
+  // advertised a self-canonical plus a twelve-entry hreflang set for a page that
+  // does not exist. Only published posts emit metadata.
+  if (!post || post.status !== "published") return {};
   const t = await getTranslations({ locale, namespace: "meta" });
   const title = t("postTitle", { title: post.title });
   return {
@@ -32,6 +35,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     openGraph: {
       type: "article",
+      // A page-level openGraph REPLACES the layout's, so siteName/url must be
+      // restated here or the page emits no og:siteName and no og:url.
+      siteName: t("siteTitle"),
+      url: `/${locale}/blog/${post.slug}`,
       title,
       description: post.excerpt ?? post.title,
       publishedTime: post.published_at,

@@ -42,6 +42,7 @@ const SCRIPT_FAMILIES: Array<[RegExp, string]> = [
   [/\p{Script=Georgian}/u, "Noto+Sans+Georgian"],
   [/\p{Script=Armenian}/u, "Noto+Sans+Armenian"],
   [/\p{Script=Thaana}/u, "Noto+Sans+Thaana"],
+  [/\p{Script=Greek}/u, "Noto+Sans"],
   [/\p{Script=Cyrillic}/u, "Noto+Sans"],
 ];
 

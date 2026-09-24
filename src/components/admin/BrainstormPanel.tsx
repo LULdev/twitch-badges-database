@@ -112,6 +112,7 @@ export default function BrainstormPanel() {
                 <button
                   type="button"
                   className="btn px-2 py-0.5 text-[0.6875rem]"
+                  disabled={busy}
                   aria-label={t("upvote")}
                   onClick={() => void post({ action: "vote", id: idea.id, up: true })}
                 >
@@ -121,6 +122,7 @@ export default function BrainstormPanel() {
                 <button
                   type="button"
                   className="btn px-2 py-0.5 text-[0.6875rem]"
+                  disabled={busy}
                   aria-label={t("downvote")}
                   onClick={() => void post({ action: "vote", id: idea.id, up: false })}
                 >

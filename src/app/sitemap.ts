@@ -130,8 +130,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // Every playable game has its own page and was absent from the sitemap.
-  for (const game of GAMES) {
+  // Every playable game has its own page — but a game switched off in the admin
+  // panel 404s (the hub hides the tile and the page calls notFound), and
+  // advertising a 404 is worse than omitting the page (same rule as /feed).
+  let gamesSettings: Record<string, { enabled?: boolean }> | null = null;
+  try {
+    const supabase = createAdminClient();
+    const { data } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "games")
+      .maybeSingle();
+    gamesSettings =
+      ((data?.value as { games?: Record<string, { enabled?: boolean }> } | null)?.games ??
+        null);
+  } catch {
+    // Settings unavailable: list every game rather than dropping live pages.
+  }
+  const playable = GAMES.filter(
+    (game) => gamesSettings?.[game.id]?.enabled !== false,
+  );
+
+  for (const game of playable) {
     for (const locale of routing.locales) {
       entries.push({
         url: `${base}/${locale}/games/${game.id}`,

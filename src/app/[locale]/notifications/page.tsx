@@ -4,7 +4,6 @@ import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { listNotifications } from "@/lib/queries";
 import PushToggle from "@/components/PushToggle";
-import { localeAlternates } from "@/lib/seo";
 
 // `Link` here is next-intl's, and it prepends the active locale to any local href
 // (`localePrefix: "always"`) — so a notification stored as `/en/badges/x` rendered
@@ -27,10 +26,12 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "notifications" });
   return {
-    alternates: {
-      canonical: `/${locale}/notifications`,
-      languages: localeAlternates("/notifications"),
-    }, title: t("title"), robots: { index: false } };
+    // Noindex: a private per-user list. No canonical and no alternates on a
+    // noindexed page — Google treats canonical/hreflang there as unverifiable,
+    // and the alternates advertised twelve noindex pages as equivalents.
+    title: t("title"),
+    robots: { index: false },
+  };
 }
 
 export default async function NotificationsPage({
