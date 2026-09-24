@@ -172,14 +172,13 @@ export const ACHIEVEMENTS: Achievement[] = [
   CREATIVE("k_marathon_day", "Marathon", "Play 100 rounds in a single day.", (s) => s.roundsToday >= 100, 750, 500),
   // The seven below used to read CLIENT-ASSERTED flags (`perfect`, `sharp`,
   // `fast`, `hundred`, `top`, `streak10` on quiz/memory) that the resolver set
-  // from numbers the payload supplied. The flag was gated on the round's own
-  // was gated on the round's coin-flip win, so a forged payload — "hits 300,
-  // shots 300" — fired it on EVERY attempt (the old conditions read the raw
-  // numbers, not the outcome) and paid 250 coins + 500 XP for a ~1-coin round:
-  // forge than to earn. They now count rounds the SERVER graded as won
-  // (game_rounds.won, aggregated per game over ALL rounds — `gamesByType` is a
-  // paged read, not the 60-row window, so the counts are lifetime and the
-  // descriptions are literal).
+  // from numbers the payload supplied, with no outcome gate at all — so a forged
+  // payload such as "hits 300, shots 300" fired them on EVERY attempt and paid
+  // 250 coins + 500 XP for a round that costs about one coin in expectation:
+  // cheaper to forge than to earn. (The sole exception was tower's `top`, which
+  // was outcome-gated server-side.) They now count rounds the SERVER graded as
+  // won — game_rounds.won, aggregated per game over ALL rounds via the paged
+  // gamesByType read, so the counts are lifetime and the descriptions are literal.
   CREATIVE("k_perfect_memory", "Photographic", "Win 10 rounds of Badge Memory.",
     (s) => (s.gamesByType["memory"]?.won ?? 0) >= 10),
   CREATIVE("k_sharpshooter", "Sharpshooter", "Win 10 rounds of Shoot the Badges.",
