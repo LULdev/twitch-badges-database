@@ -202,8 +202,14 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
 
     const tierChanged = rarity.tier !== badge.rarity_tier;
     if (valuesChanged || lastOld || nextStatus !== badge.status || tierChanged) {
+      // Only the columns THIS sync owns. Spreading the full select("*") row
+      // reverted status/start_date/end_date/how_to_earn/release_date and
+      // is_confirmed_active that global and badgebase own — and at 06:00 UTC the
+      // potat workflow fires in the same minute as the global cron, so the
+      // potat write could land after theirs and undo the day's confirmation.
+      // `status` is the sole exception: potat's own sweep may retire a badge.
       upsertRows.push({
-        ...badge,
+        id: badge.id,
         owner_count: totalOwners,
         active_count: activeUsers,
         percentage,

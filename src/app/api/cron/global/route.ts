@@ -94,8 +94,8 @@ export async function GET(request: Request) {
     },
   });
 
-  // 207 signals a partial success: exactly one half failed (or the enrichment
-  // deliberately did nothing). 500 is reserved for both halves failing. The only
+  // 207 signals a partial failure. A SKIPPED enrichment (the incident guard) is
+  // deliberately 200, not 207: the run is healthy, the enrichment did nothing. The only
   // consumer that inspects a cron status code is the potat GitHub workflow, which
   // hits a different route; Vercel cron ignores it.
   const status =

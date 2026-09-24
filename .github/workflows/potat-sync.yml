@@ -5,7 +5,10 @@ name: Stats sync (potat)
 # schedule and calls the same authenticated endpoint.
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    # Offset minutes (never :00/:30) so the GH run cannot collide with the
+    # Vercel crons at 06:00/06:30 — two concurrent potat runs doubled the
+    # badge_stats time-series points and wrote duplicate changelog rows.
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch: {}
 
 concurrency:

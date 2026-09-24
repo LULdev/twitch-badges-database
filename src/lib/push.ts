@@ -66,7 +66,18 @@ export async function sendPushToAll(payload: PushPayload): Promise<PushResult> {
   // fan-out inside its share of the budget.
   const BATCH = 50;
   const TIMEOUT_MS = 5_000;
+  // The wall-clock cap: 250 s of fan-out fits the cron's 60 s budget only while
+  // the subscriber count is small, and an invocation killed mid-fan-out loses the
+  // heartbeat, the prune and the badgebase half. Beyond ~500 subscribers the
+  // oldest batches are silently skipped instead.
+  const DEADLINE = Date.now() + 25_000;
   for (let i = 0; i < subscriptions.length; i += BATCH) {
+    if (i > 0 && Date.now() > DEADLINE) {
+      console.warn(
+        `[push] wall-clock cap reached after ${i}/${subscriptions.length} subscriptions — skipping the rest`,
+      );
+      break;
+    }
     await Promise.allSettled(
       subscriptions.slice(i, i + BATCH).map(async (sub) => {
         try {

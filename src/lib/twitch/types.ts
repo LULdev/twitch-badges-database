@@ -164,7 +164,10 @@ const CATEGORY_RULES: Array<[RegExp, string]> = [
   [/^bits|^cheer/, "bits"],
   [/^(turbo|premium)/, "premium"],
   [/^(subscriber|founder|sub-?git|leader)/, "subscriber"],
-  [/^(moderator|vip|broadcaster|staff|admin|global.?mod|ambassador|partner|verified|artist-badge|artist|game.?developer|extensions?|chat.?bot|clip.?champ|moments)/, "status"],
+  // Same boundary as isStatusSetId below: without ([-_]|$) a provider set id
+  // like "moderatorial-2026" was categorized "status" but never filtered, so the
+  // next status sweep deleted it and the upsert re-created it with a fresh id.
+  [/^(moderator|vip|broadcaster|staff|admin|global.?mod|ambassador|partner|verified|artist-badge|artist|game.?developer|extensions?|chat.?bot|clip.?champ|moments)([-_]|$)/, "status"],
   [/^hype/, "hype-train"],
   [/^(bloom|blossom|watch|streak)/, "rewards"],
   [/drop|campaign|launch/i, "drops"],

@@ -349,9 +349,24 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
       // stays removed. This also recovers rows outside the detail cap.
       if (!onActiveList) continue;
       if (!updates.has(key)) {
+        // resolveStatus, not a hardcoded "active": a confirmed row with a future
+        // start_date is "upcoming", and hardcoding it made potat flip the row
+        // back on its next sweep.
         updates.set(
           key,
-          strip({ ...row, is_confirmed_active: true, status: "active", removed_at: null }),
+          strip({
+            ...row,
+            is_confirmed_active: true,
+            status: resolveStatus(
+              {
+                start_date: row.start_date as string | null,
+                end_date: row.end_date as string | null,
+                is_confirmed_active: true,
+              },
+              now,
+            ),
+            removed_at: null,
+          }),
         );
       }
       continue;

@@ -284,33 +284,55 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     removed.push({ id: ex.id, title: ex.title });
   }
 
-  for (const batch of chunk(upsertsNew, 200)) {
-    const { error } = await supabase
-      .from("badges")
-      .upsert(batch, { onConflict: "set_id,version" });
-    if (error) throw error;
-  }
-  for (const batch of chunk(upsertsExisting, 200)) {
-    const { error } = await supabase
-      .from("badges")
-      .upsert(batch, { onConflict: "set_id,version" });
-    if (error) throw error;
-  }
-
-  if (removed.length > 0) {
-    for (const batch of chunk(removed, 200)) {
+  // The upserts and removals below commit per 200-row chunk, so a failure in a
+  // later step leaves the earlier chunks live with no changelog row — the same
+  // documented-or-not contract badgebase enforces. The compensating row states
+  // what landed before the error and rethrows so the heartbeat records a failure.
+  try {
+    for (const batch of chunk(upsertsNew, 200)) {
       const { error } = await supabase
         .from("badges")
-        .update({
-          status: "removed",
-          removed_at: now.toISOString(),
-        })
-        .in(
-          "id",
-          batch.map((r) => r.id),
-        );
+        .upsert(batch, { onConflict: "set_id,version" });
       if (error) throw error;
     }
+    for (const batch of chunk(upsertsExisting, 200)) {
+      const { error } = await supabase
+        .from("badges")
+        .upsert(batch, { onConflict: "set_id,version" });
+      if (error) throw error;
+    }
+
+    if (removed.length > 0) {
+      for (const batch of chunk(removed, 200)) {
+        const { error } = await supabase
+          .from("badges")
+          .update({
+            status: "removed",
+            removed_at: now.toISOString(),
+          })
+          .in(
+            "id",
+            batch.map((r) => r.id),
+          );
+        if (error) throw error;
+      }
+    }
+  } catch (writeError) {
+    await logChange(
+      {
+        kind: "data_sync",
+        title: "Catalog sync failed mid-write",
+        body: `The catalog sync aborted on a database error after committing earlier chunks: ${addedTitles.length} badge additions and ${removed.length} removals were in flight. Error: ${writeError instanceof Error ? writeError.message : String(writeError)}`,
+        payload: {
+          source,
+          addedCount: addedTitles.length,
+          removedCount: removed.length,
+          failed: true,
+        },
+      },
+      supabase,
+    );
+    throw writeError;
   }
 
   // History events + changelog + blog + push for newly added badges.
