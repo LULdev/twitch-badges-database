@@ -608,7 +608,9 @@
     "disabled": "The arcade is currently switched off. Please check back later.",
     "scatter": "SCATTER!",
     "scratchFounder": "Founder",
-    "scratchJackpot": "JACKPOT"
+    "scratchJackpot": "JACKPOT",
+    "roundFailed": "Round failed",
+    "networkError": "Network error"
   },
   "wheel": {
     "title": "Wheel of Fortune",
@@ -668,7 +670,7 @@
     "blogQ": "Where can I read more about features?",
     "coinsA": "BadgesCoins are bet in all 13 arcade games, paid as attempt costs for coin heists, and earned from daily bonuses, badge unlocks, achievements and game wins.",
     "coinsQ": "What do I do with BadgesCoins?",
-    "dailyA": "Claim it once per day in the arcade hub or your inventory page: +10 XP and +50 BadgesCoins. Consecutive days build a streak that adds up to +50 bonus XP and +250 bonus BadgesCoins per day.",
+    "dailyA": "Claim it once per day in the arcade hub: +10 XP and +50 BadgesCoins. Consecutive days build a streak that adds up to +50 bonus XP and +250 bonus BadgesCoins per day.",
     "dailyQ": "How does the daily login bonus work?",
     "dataA": "Badges sync from the official Twitch catalog, owner statistics come from public community trackers, and the badges you own are resolved live from your public Twitch profile. BadgesCoins and XP are this site's own playful economy and have no monetary value.",
     "dataQ": "Where does my data come from?",
@@ -698,9 +700,9 @@
     "visitorsQ": "Who visited my profile?",
     "whatA": "Every logged-in collector earns XP and BadgesCoins: daily login (+10 XP, +50 BadgesCoins), unlocking Twitch badges (+1,000 XP, +500 BadgesCoins each), achievements (up to +5,000 XP) and games (+2 XP per round, +10 per win, capped at 100 XP per day). XP raises your level from 1 to 100; BadgesCoins are the currency for games and heists.",
     "whatQ": "What is the XP and coin system?",
-    "wheelA": "Once per day. Prizes range from +25 XP (most common) to +2,500 XP (very rare), each with bonus BadgesCoins.",
+    "wheelA": "Once per day. Prizes range from +25 XP (most common) to +5,000 XP (very rare), each with bonus BadgesCoins.",
     "wheelQ": "How often can I spin the Wheel of Fortune?",
-    "xpA": "Daily login +10 XP plus +5 per streak day (max +50). Each synced Twitch badge +1,000 XP. Achievements pay up to 5,000 XP. Games pay +2 XP per round and +10 XP per win, capped at 100 XP per day to prevent farming. The Wheel of Fortune pays 25 to 2,500 XP per spin.",
+    "xpA": "Daily login +10 XP plus +5 per streak day (max +50). Each synced Twitch badge +1,000 XP. Achievements pay up to 5,000 XP. Games pay +2 XP per round and +10 XP per win, capped at 100 XP per day to prevent farming. The Wheel of Fortune pays 25 to 5,000 XP per spin.",
     "xpQ": "How exactly is XP awarded?"
   },
   "customizer": {

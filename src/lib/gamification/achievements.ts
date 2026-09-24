@@ -202,7 +202,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   CREATIVE("k_roulette_green", "Green Zero", "Win on the green slot on Badge Roulette.",
     (s) => s.recentResults.some((r) => r.game === "roulette" && r.won && r.flags?.green === true)),
   CREATIVE("k_coinflip_7", "Lucky Streak", "Win the 7-step coin flip ladder.", (s) => hasFlag(s, "coinflip", "ladder7")),
-  CREATIVE("k_collector_active", "Fully Current", "Own every currently active badge.", (s) => s.activeOwned >= 20 && s.activeOwned === s.badgesOwned, 1000, 1000),
+  CREATIVE("k_collector_active", "Fully Current", "Own at least 20 badges, all currently active.", (s) => s.activeOwned >= 20 && s.activeOwned === s.badgesOwned, 1000, 1000),
   CREATIVE("k_legend_own", "Legendary Touch", "Own a legendary-rarity badge.", (s) => s.legendaryOwned >= 1),
   CREATIVE("k_mythic_own", "Myth Keeper", "Own a mythic-rarity badge.", (s) => s.mythicOwned >= 1, 750, 750),
   CREATIVE("k_all_tiers", "Full Spectrum", "Own badges of all six rarity tiers.", (s) => s.tiersOwned >= 6),

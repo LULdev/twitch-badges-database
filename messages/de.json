@@ -608,7 +608,9 @@
     "disabled": "Die Spielhalle ist derzeit abgeschaltet. Bitte später noch einmal vorbeischauen.",
     "scatter": "SCATTER!",
     "scratchFounder": "Gründer",
-    "scratchJackpot": "JACKPOT"
+    "scratchJackpot": "JACKPOT",
+    "roundFailed": "Runde fehlgeschlagen",
+    "networkError": "Netzwerkfehler"
   },
   "wheel": {
     "title": "Glücksrad",
@@ -698,9 +700,9 @@
     "visitorsQ": "Wer hat mein Profil besucht?",
     "whatA": "Jeder angemeldete Sammler verdient XP und BadgesCoins: Tageslogin (+10 XP, +50 BadgesCoins), Twitch-Badges freischalten (+1.000 XP, +500 BadgesCoins pro Badge), Errungenschaften (bis +5.000 XP) und Spiele (+2 XP pro Runde, +10 pro Sieg, max. 100 XP/Tag). XP hebt dein Level von 1 auf 100; BadgesCoins sind die Währung für Spiele und Überfälle.",
     "whatQ": "Was ist das XP- und BadgesCoin-System?",
-    "wheelA": "Einmal pro Tag. Gewinne reichen von +25 XP (sehr häufig) bis +2.500 XP (sehr selten), jeweils mit Bonus-BadgesCoins.",
+    "wheelA": "Einmal pro Tag. Gewinne reichen von +25 XP (sehr häufig) bis +5,000 XP (sehr selten), jeweils mit Bonus-BadgesCoins.",
     "wheelQ": "Wie oft kann ich das Glücksrad drehen?",
-    "xpA": "Tageslogin +10 XP plus +5 pro Serientag (max. +50). Jedes synchronisierte Twitch-Badge +1.000 XP. Errungenschaften zahlen bis zu 5.000 XP. Spiele geben +2 XP pro Runde und +10 XP pro Sieg, gedeckelt auf 100 XP pro Tag gegen Farming. Das Glücksrad zahlt 25 bis 2.500 XP pro Dreh.",
+    "xpA": "Tageslogin +10 XP plus +5 pro Serientag (max. +50). Jedes synchronisierte Twitch-Badge +1.000 XP. Errungenschaften zahlen bis zu 5.000 XP. Spiele geben +2 XP pro Runde und +10 XP pro Sieg, gedeckelt auf 100 XP pro Tag gegen Farming. Das Glücksrad zahlt 25 bis 5,000 XP pro Dreh.",
     "xpQ": "Wie genau wird XP vergeben?"
   },
   "customizer": {

@@ -58,7 +58,7 @@ export default async function InventoryPage({
       .eq("user_id", user.id)
       .maybeSingle(),
     getInventory(user.id).catch(() => []),
-    listBadges({ perPage: 96, sort: "rarity" }).catch(() => null),
+    listBadges({ perPage: 96, sort: "rarity", status: "active" }).catch(() => null),
   ]);
 
   const ownedIds = new Set(

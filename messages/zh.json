@@ -608,7 +608,9 @@
     "disabled": "游戏厅目前已关闭，请稍后再来。",
     "scatter": "SCATTER!",
     "scratchFounder": "创始人",
-    "scratchJackpot": "头奖"
+    "scratchJackpot": "头奖",
+    "roundFailed": "回合失败",
+    "networkError": "网络错误"
   },
   "wheel": {
     "title": "命运转盘",
@@ -698,9 +700,9 @@
     "visitorsQ": "谁访问了我的主页？",
     "whatA": "每位登录的收藏者都能获得 XP 与 BadgesCoins：每日登录（+10 XP、+50 BadgesCoins）、解锁 Twitch 徽章（每枚 +1,000 XP 与 +500 BadgesCoins）、成就（最高 +5,000 XP）以及游戏（每局 +2 XP，胜利 +10 XP，每日上限 100 XP）。XP 让你的等级从 1 升到 100；BadgesCoins 是游戏与偷取的货币。",
     "whatQ": "什么是 XP 与硬币系统？",
-    "wheelA": "每天一次。奖励从 +25 XP（最常见）到 +2,500 XP（极稀有），各自还附带 BadgesCoins。",
+    "wheelA": "每天一次。奖励从 +25 XP（最常见）到 +5,000 XP（极稀有），各自还附带 BadgesCoins。",
     "wheelQ": "我可以多久转一次命运转盘？",
-    "xpA": "每日登录 +10 XP，连击每天再 +5 XP（上限 +50）。每枚同步的 Twitch 徽章 +1,000 XP。成就发放 最高 5,000 XP。游戏每局 +2 XP、胜利 +10 XP，每日上限 100 XP 以防刷分。命运转盘每次旋转发放 25 至 2,500 XP。",
+    "xpA": "每日登录 +10 XP，连击每天再 +5 XP（上限 +50）。每枚同步的 Twitch 徽章 +1,000 XP。成就发放 最高 5,000 XP。游戏每局 +2 XP、胜利 +10 XP，每日上限 100 XP 以防刷分。命运转盘每次旋转发放 25 至 5,000 XP。",
     "xpQ": "XP 究竟如何发放？"
   },
   "customizer": {

@@ -608,7 +608,9 @@
     "disabled": "O fliperama está desativado no momento. Volte mais tarde.",
     "scatter": "SCATTER!",
     "scratchFounder": "Fundador",
-    "scratchJackpot": "JACKPOT"
+    "scratchJackpot": "JACKPOT",
+    "roundFailed": "Rodada falhou",
+    "networkError": "Erro de rede"
   },
   "wheel": {
     "title": "Roleta da fortuna",
@@ -698,9 +700,9 @@
     "visitorsQ": "Quem visitou meu perfil?",
     "whatA": "Todo colecionador logado ganha XP e BadgesCoins: login diário (+10 XP, +50 BadgesCoins), desbloquear emblemas da Twitch (+1.000 XP e +500 BadgesCoins cada), conquistas (até +5.000 XP) e jogos (+2 XP por rodada, +10 por vitória, limitado a 100 XP por dia). O XP sobe seu nível de 1 a 100; os BadgesCoins são a moeda dos jogos e dos roubos.",
     "whatQ": "O que é o sistema de XP e moedas?",
-    "wheelA": "Uma vez por dia. Os prêmios vão de +25 XP (mais comum) a +2.500 XP (muito raro), cada um com BadgesCoins extras.",
+    "wheelA": "Uma vez por dia. Os prêmios vão de +25 XP (mais comum) a +5,000 XP (muito raro), cada um com BadgesCoins extras.",
     "wheelQ": "Com que frequência posso girar a Roleta da fortuna?",
-    "xpA": "Login diário +10 XP mais +5 por dia de sequência (máx. +50). Cada emblema da Twitch sincronizado +1.000 XP. As conquistas pagam até 5.000 XP. Os jogos pagam +2 XP por rodada e +10 XP por vitória, limitado a 100 XP por dia para evitar farm. A Roleta da fortuna paga de 25 a 2.500 XP por giro.",
+    "xpA": "Login diário +10 XP mais +5 por dia de sequência (máx. +50). Cada emblema da Twitch sincronizado +1.000 XP. As conquistas pagam até 5.000 XP. Os jogos pagam +2 XP por rodada e +10 XP por vitória, limitado a 100 XP por dia para evitar farm. A Roleta da fortuna paga de 25 a 5,000 XP por giro.",
     "xpQ": "Como o XP é concedido exatamente?"
   },
   "customizer": {

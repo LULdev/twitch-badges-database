@@ -608,7 +608,9 @@
     "disabled": "게임장이 현재 꺼져 있습니다. 나중에 다시 방문해 주세요.",
     "scatter": "SCATTER!",
     "scratchFounder": "파운더",
-    "scratchJackpot": "잭팟"
+    "scratchJackpot": "잭팟",
+    "roundFailed": "라운드 실패",
+    "networkError": "네트워크 오류"
   },
   "wheel": {
     "title": "운명의 수레바퀴",
@@ -698,9 +700,9 @@
     "visitorsQ": "누가 내 프로필을 방문했나요?",
     "whatA": "로그인한 수집가는 XP와 BadgesCoins를 얻습니다: 일일 로그인(+10 XP, +50 BadgesCoins), Twitch 배지 해금(개당 +1,000 XP와 +500 BadgesCoins), 업적(최대 +5,000 XP), 게임(라운드당 +2 XP, 승리 시 +10 XP, 하루 100 XP 상한). XP로 레벨이 1에서 100까지 오르고, BadgesCoins는 게임과 강탈의 화폐입니다.",
     "whatQ": "XP와 코인 시스템이란?",
-    "wheelA": "하루 한 번. 상금은 +25 XP(가장 흔함)부터 +2,500 XP(매우 희귀)까지이며 각각 BadgesCoins가 함께 지급됩니다.",
+    "wheelA": "하루 한 번. 상금은 +25 XP(가장 흔함)부터 +5,000 XP(매우 희귀)까지이며 각각 BadgesCoins가 함께 지급됩니다.",
     "wheelQ": "운명의 수레바퀴는 얼마나 자주 돌릴 수 있나요?",
-    "xpA": "일일 로그인 +10 XP, 연속 접속 하루당 +5 XP(최대 +50). 동기화한 Twitch 배지 1개당 +1,000 XP. 업적은 최대 5,000 XP. 게임은 라운드당 +2 XP, 승리 시 +10 XP이며 어뷰징 방지를 위해 하루 100 XP 상한. 운명의 수레바퀴는 회전당 25~2,500 XP.",
+    "xpA": "일일 로그인 +10 XP, 연속 접속 하루당 +5 XP(최대 +50). 동기화한 Twitch 배지 1개당 +1,000 XP. 업적은 최대 5,000 XP. 게임은 라운드당 +2 XP, 승리 시 +10 XP이며 어뷰징 방지를 위해 하루 100 XP 상한. 운명의 수레바퀴는 회전당 25~5,000 XP.",
     "xpQ": "XP는 정확히 어떻게 지급되나요?"
   },
   "customizer": {

@@ -608,7 +608,9 @@
     "disabled": "La salle de jeux est actuellement désactivée. Revenez plus tard.",
     "scatter": "SCATTER!",
     "scratchFounder": "Fondateur",
-    "scratchJackpot": "JACKPOT"
+    "scratchJackpot": "JACKPOT",
+    "roundFailed": "Manche échouée",
+    "networkError": "Erreur réseau"
   },
   "wheel": {
     "title": "Roue de la fortune",

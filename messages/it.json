@@ -608,7 +608,9 @@
     "disabled": "La sala giochi è al momento disattivata. Torna più tardi.",
     "scatter": "SCATTER!",
     "scratchFounder": "Fondatore",
-    "scratchJackpot": "JACKPOT"
+    "scratchJackpot": "JACKPOT",
+    "roundFailed": "Round fallito",
+    "networkError": "Errore di rete"
   },
   "wheel": {
     "title": "Ruota della fortuna",
@@ -698,9 +700,9 @@
     "visitorsQ": "Chi ha visitato il mio profilo?",
     "whatA": "Ogni collezionista connesso guadagna XP e BadgesCoins: accesso giornaliero (+10 XP, +50 BadgesCoins), sblocco di badge Twitch (+1.000 XP e +500 BadgesCoins ciascuno), obiettivi (fino a +5.000 XP) e giochi (+2 XP per partita, +10 per vittoria, con un tetto di 100 XP al giorno). L'XP aumenta il tuo livello da 1 a 100; i BadgesCoins sono la valuta di giochi e furti.",
     "whatQ": "Che cos'è il sistema di XP e monete?",
-    "wheelA": "Una volta al giorno. I premi vanno da +25 XP (più comune) a +2.500 XP (molto raro), ciascuno con BadgesCoins extra.",
+    "wheelA": "Una volta al giorno. I premi vanno da +25 XP (più comune) a +5,000 XP (molto raro), ciascuno con BadgesCoins extra.",
     "wheelQ": "Quanto spesso posso girare la Ruota della fortuna?",
-    "xpA": "Accesso giornaliero +10 XP più +5 per giorno di serie (max +50). Ogni badge Twitch sincronizzato +1.000 XP. Gli obiettivi pagano fino a 5.000 XP. I giochi pagano +2 XP per partita e +10 XP per vittoria, con un tetto di 100 XP al giorno per evitare il farming. La Ruota della fortuna paga da 25 a 2.500 XP per giro.",
+    "xpA": "Accesso giornaliero +10 XP più +5 per giorno di serie (max +50). Ogni badge Twitch sincronizzato +1.000 XP. Gli obiettivi pagano fino a 5.000 XP. I giochi pagano +2 XP per partita e +10 XP per vittoria, con un tetto di 100 XP al giorno per evitare il farming. La Ruota della fortuna paga da 25 a 5,000 XP per giro.",
     "xpQ": "Come viene assegnato esattamente l'XP?"
   },
   "customizer": {

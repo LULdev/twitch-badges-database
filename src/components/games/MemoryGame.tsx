@@ -33,7 +33,7 @@ export default function MemoryGame() {
   async function start() {
     const data = await fetch("/api/games/symbols").then((res) => res.json()).catch(() => null);
     const symbols: Array<{ id: string; image: string | null }> = (data?.symbols ?? [])
-      .filter((s: { image: string | null }) => s.image);
+      ;
     const picked = symbols.slice(0, 6);
     const deck = [...picked, ...picked]
       .map((symbol, index) => ({

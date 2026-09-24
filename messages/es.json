@@ -608,7 +608,9 @@
     "disabled": "La sala de juegos está desactivada por ahora. Vuelve más tarde.",
     "scatter": "SCATTER!",
     "scratchFounder": "Fundador",
-    "scratchJackpot": "BOTE"
+    "scratchJackpot": "BOTE",
+    "roundFailed": "Ronda fallida",
+    "networkError": "Error de red"
   },
   "wheel": {
     "title": "Ruleta de la fortuna",
@@ -698,9 +700,9 @@
     "visitorsQ": "¿Quién visitó mi perfil?",
     "whatA": "Todo coleccionista registrado gana XP y BadgesCoins: inicio de sesión diario (+10 XP, +50 BadgesCoins), desbloquear insignias de Twitch (+1.000 XP y +500 BadgesCoins cada una), logros (hasta +5.000 XP) y juegos (+2 XP por ronda, +10 por victoria, con un tope de 100 XP al día). El XP sube tu nivel del 1 al 100; los BadgesCoins son la moneda de los juegos y los robos.",
     "whatQ": "¿Qué es el sistema de XP y monedas?",
-    "wheelA": "Una vez al día. Los premios van de +25 XP (lo más común) a +2.500 XP (muy raro), cada uno con BadgesCoins extra.",
+    "wheelA": "Una vez al día. Los premios van de +25 XP (lo más común) a +5,000 XP (muy raro), cada uno con BadgesCoins extra.",
     "wheelQ": "¿Con qué frecuencia puedo girar la Ruleta de la fortuna?",
-    "xpA": "Inicio de sesión diario +10 XP más +5 por día de racha (máx. +50). Cada insignia de Twitch sincronizada +1.000 XP. Los logros pagan hasta 5.000 XP. Los juegos pagan +2 XP por ronda y +10 XP por victoria, con un tope de 100 XP al día para evitar el farmeo. La Ruleta de la fortuna paga de 25 a 2.500 XP por giro.",
+    "xpA": "Inicio de sesión diario +10 XP más +5 por día de racha (máx. +50). Cada insignia de Twitch sincronizada +1.000 XP. Los logros pagan hasta 5.000 XP. Los juegos pagan +2 XP por ronda y +10 XP por victoria, con un tope de 100 XP al día para evitar el farmeo. La Ruleta de la fortuna paga de 25 a 5,000 XP por giro.",
     "xpQ": "¿Cómo se otorga exactamente el XP?"
   },
   "customizer": {

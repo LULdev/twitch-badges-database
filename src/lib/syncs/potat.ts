@@ -238,15 +238,17 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
   // repeat a badge. Postgres rejects a batch that would update one conflict
   // key twice (SQLSTATE 21000) and the whole sync dies after `distribution`
   // already succeeded, so collapse to one row per key (last write wins).
+  // The key is `id` — the narrowed payload carries `id` (the PK), not
+  // `set_id`/`version`, and the upsert's conflict target matches it.
   const pendingByKey = new Map<string, Record<string, unknown>>();
   for (const row of upsertRows) {
-    pendingByKey.set(`${String(row.set_id)}:${String(row.version)}`, row);
+    pendingByKey.set(String(row.id), row);
   }
 
   for (const batch of chunk([...pendingByKey.values()], 200)) {
     const { error } = await supabase
       .from("badges")
-      .upsert(batch, { onConflict: "set_id,version" });
+      .upsert(batch, { onConflict: "id" });
     if (error) throw error;
   }
 

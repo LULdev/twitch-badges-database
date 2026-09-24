@@ -141,6 +141,7 @@ function merge<T extends object>(fallback: T, stored: unknown): T {
     if (!(key in fallback)) continue;
     const base = (fallback as Record<string, unknown>)[key];
     if (typeof base === "number") {
+      if (value === null || value === undefined || value === "") continue;
       const parsed = Number(value);
       if (Number.isFinite(parsed) && parsed >= 0) out[key] = parsed;
     } else if (typeof base === "boolean") {

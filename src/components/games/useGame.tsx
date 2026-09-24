@@ -58,21 +58,21 @@ export function useGame(gameId: string) {
         });
         const data = (await res.json()) as PlayResponse;
         if (!data.ok) {
-          setError(data.error ?? "Round failed");
+          setError(t("roundFailed"));
           return null;
         }
         setLast(data);
         setBalance(data.balance);
         return data;
       } catch {
-        setError("Network error");
+        setError(t("networkError"));
         return null;
       } finally {
         inFlight.current = false;
         setBusy(false);
       }
     },
-    [bet, gameId],
+    [bet, gameId, t],
   );
 
   return { balance, bet, setBet, busy, error, last, play, refresh, t };
