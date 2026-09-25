@@ -657,7 +657,7 @@
   "steal": {
     "attempt": "Überfall starten",
     "failed": "Abgewehrt! Der Versuch kostete dich {coins} BadgesCoins.",
-    "hint": "Versuch kostet {price} BadgesCoins (bei Misserfolg an das Opfer). Max-Beute: {max} BadgesCoins. Chance hängt vom Level-Unterschied ab.",
+    "hint": "Versuch kostet {price} BadgesCoins (erfolgreich oder nicht, an das Opfer). Max-Beute: {max} BadgesCoins. Chance hängt vom Level-Unterschied ab.",
     "success": "Überfall erfolgreich: +{coins} BadgesCoins!",
     "disabled": "Dieser Sammler hat das Stehlen von Coins deaktiviert."
   },
@@ -688,7 +688,7 @@
     "profileQ": "Wie anpassbar ist mein Profil?",
     "rainA": "Ein BadgesCoin-Regen ist ein kleines Geschenk: Jeder Besucher kann einmal täglich auf deinem Profil einen BadgesCoin-Regen auslösen und dir +1 BadgesCoin mit einer kleinen Animation schenken.",
     "rainQ": "Was ist ein BadgesCoin-Regen?",
-    "stealA": "Öffne das Profil eines anderen Sammlers und starte einen Überfall. Das Opfer setzt Versuchspreis und Maximalbeute; die Erfolgschance (20 bis 80 Prozent) verschiebt sich mit dem Level-Unterschied. Fehlversuche zahlen den Preis an das Opfer.",
+    "stealA": "Öffne das Profil eines anderen Sammlers und starte einen Überfall. Das Opfer setzt Versuchspreis und Maximalbeute; die Erfolgschance (20 bis 80 Prozent) verschiebt sich mit dem Level-Unterschied. Jeder Versuch zahlt den Preis an das Opfer, erfolgreich oder nicht.",
     "stealCostA": "In den Einstellungen kannst du Stehlen komplett deaktivieren, den Versuchspreis festlegen und die Maximalbeute begrenzen. Eine Flood-Sperre erlaubt nur einen Überfall pro Opfer alle 5 Minuten und max. 6 pro Stunde.",
     "stealCostQ": "Kann ich mich vor Dieben schützen?",
     "stealQ": "Wie funktioniert das Stehlen von BadgesCoins?",
@@ -751,7 +751,7 @@
     "stealEnabled": "BadgesCoin-Stehlen auf meinem Profil erlauben",
     "stealPrice": "Versuchspreis (BadgesCoins)",
     "stealMax": "Max-Beute pro Überfall",
-    "stealHint": "Höhere Preise schrecken Gelegenheitsdiebe ab; Fehlversuche zahlen den Preis an dich.",
+    "stealHint": "Höhere Preise schrecken Gelegenheitsdiebe ab; Jeder Versuch zahlt den Preis an dich.",
     "saving": "Speichere…",
     "saved": "Gespeichert!",
     "save": "Änderungen speichern",

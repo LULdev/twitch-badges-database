@@ -657,7 +657,7 @@
   "steal": {
     "attempt": "Intentar un golpe",
     "failed": "¡Defendido! El intento te costó {coins} BadgesCoins.",
-    "hint": "El intento cuesta {price} BadgesCoins (pagados a la víctima si fallas). Botín máximo: {max} BadgesCoins. La probabilidad depende de la diferencia de nivel.",
+    "hint": "El intento cuesta {price} BadgesCoins (pagados a la víctima, aciertes o no). Botín máximo: {max} BadgesCoins. La probabilidad depende de la diferencia de nivel.",
     "success": "¡Golpe exitoso: +{coins} BadgesCoins!",
     "disabled": "Este coleccionista ha desactivado el robo de monedas."
   },
@@ -688,7 +688,7 @@
     "profileQ": "¿Cuánto puedo personalizar mi perfil?",
     "rainA": "Una lluvia de monedas es un pequeño regalo: cualquier visitante puede activar una lluvia de monedas al día en tu perfil, dándote +1 moneda con una pequeña animación.",
     "rainQ": "¿Qué es una lluvia de monedas?",
-    "stealA": "Abre el perfil de otro coleccionista e intenta un golpe. La víctima fija el precio del intento y el botín máximo; la probabilidad de éxito (20 a 80 por ciento) varía según la diferencia de nivel entre ambos. Los intentos fallidos pagan el precio a la víctima.",
+    "stealA": "Abre el perfil de otro coleccionista e intenta un golpe. La víctima fija el precio del intento y el botín máximo; la probabilidad de éxito (20 a 80 por ciento) varía según la diferencia de nivel entre ambos. Cada intento paga el precio a la víctima, sea exitoso o no.",
     "stealCostA": "En tus ajustes puedes desactivar el robo por completo, fijar el precio del intento y limitar el botín máximo. Un control de flujo limita los golpes a uno por víctima cada 5 minutos y 6 por hora.",
     "stealCostQ": "¿Puedo protegerme de los ladrones?",
     "stealQ": "¿Cómo funciona robar BadgesCoins?",
@@ -751,7 +751,7 @@
     "stealEnabled": "Permitir robar monedas en mi perfil",
     "stealPrice": "Precio del intento (BadgesCoins)",
     "stealMax": "Botín máximo por golpe",
-    "stealHint": "Los precios altos ahuyentan a los ladrones casuales; los intentos fallidos te pagan el precio.",
+    "stealHint": "Los precios altos ahuyentan a los ladrones casuales; cada intento te paga el precio.",
     "saving": "Guardando…",
     "saved": "¡Guardado!",
     "save": "Guardar cambios",

@@ -194,7 +194,20 @@ export async function playGame(
       coins_lost: Math.max(0, -net),
     },
   });
-  if (counterError) throw counterError;
+  if (counterError) {
+    // Nothing has moved yet (no counters, no coins) — void the round so it
+    // cannot count for streaks, maxBet or the feed without ever being settled.
+    if (round?.id != null) {
+      const { error: voidError } = await supabase
+        .from("game_rounds")
+        .delete()
+        .eq("id", round.id);
+      if (voidError) {
+        console.warn("[game] could not void the unsettled round:", voidError.message);
+      }
+    }
+    throw counterError;
+  }
   // If settlement fails after the round row is committed, void it: no coins
   // moved, so it must not pollute the flood window, the streaks, or the feed.
   try {
@@ -202,7 +215,15 @@ export async function playGame(
       await bumpCoins(userId, net);
     }
   } catch (coinError) {
-    await supabase.from("game_rounds").delete().eq("id", round!.id);
+    if (round?.id != null) {
+      const { error: voidError } = await supabase
+        .from("game_rounds")
+        .delete()
+        .eq("id", round.id);
+      if (voidError) {
+        console.warn("[game] could not void the unsettled round:", voidError.message);
+      }
+    }
     throw coinError;
   }
 

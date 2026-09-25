@@ -657,7 +657,7 @@
   "steal": {
     "attempt": "Tentar um assalto",
     "failed": "Defendido! A tentativa custou {coins} BadgesCoins.",
-    "hint": "A tentativa custa {price} BadgesCoins (pagos à vítima em caso de falha). Saque máximo: {max} BadgesCoins. A chance depende da diferença de nível.",
+    "hint": "A tentativa custa {price} BadgesCoins (pagos à vítima, sucesso ou falha). Saque máximo: {max} BadgesCoins. A chance depende da diferença de nível.",
     "success": "Golpe bem-sucedido: +{coins} BadgesCoins!",
     "disabled": "Este colecionador desativou o roubo de moedas."
   },
@@ -688,7 +688,7 @@
     "profileQ": "Quanto posso personalizar meu perfil?",
     "rainA": "Uma chuva de moedas é um pequeno presente: qualquer visitante pode acionar uma chuva de moedas por dia no seu perfil, dando +1 moeda com uma pequena animação.",
     "rainQ": "O que é uma chuva de moedas?",
-    "stealA": "Abra o perfil de outro colecionador e tente um assalto. A vítima define o preço da tentativa e o saque máximo; a chance de sucesso (20 a 80 por cento) varia com a diferença de nível entre vocês. Tentativas falhas pagam o preço à vítima.",
+    "stealA": "Abra o perfil de outro colecionador e tente um assalto. A vítima define o preço da tentativa e o saque máximo; a chance de sucesso (20 a 80 por cento) varia com a diferença de nível entre vocês. Cada tentativa paga o preço à vítima, seja bem-sucedida ou não.",
     "stealCostA": "Nas suas configurações você pode desativar o roubo por completo, definir o preço da tentativa e limitar o saque máximo. Um controle de fluxo limita os assaltos a um por vítima a cada 5 minutos e 6 por hora.",
     "stealCostQ": "Posso me proteger de ladrões?",
     "stealQ": "Como funciona roubar BadgesCoins?",
@@ -751,7 +751,7 @@
     "stealEnabled": "Permitir roubo de moedas no meu perfil",
     "stealPrice": "Preço da tentativa (BadgesCoins)",
     "stealMax": "Saque máximo por assalto",
-    "stealHint": "Preços altos afastam ladrões casuais; tentativas falhas pagam o preço a você.",
+    "stealHint": "Preços altos afastam ladrões casuais; cada tentativa paga o preço a você.",
     "saving": "Salvando…",
     "saved": "Salvo!",
     "save": "Salvar alterações",

@@ -657,7 +657,7 @@
   "steal": {
     "attempt": "Attempt heist",
     "failed": "Defended! The attempt cost you {coins} BadgesCoins.",
-    "hint": "Attempt costs {price} BadgesCoins (paid to the victim on failure). Max haul: {max} BadgesCoins. Chance depends on level difference.",
+    "hint": "Attempt costs {price} BadgesCoins (paid to the victim whether it succeeds or not). Max haul: {max} BadgesCoins. Chance depends on level difference.",
     "success": "Heist successful: +{coins} BadgesCoins!",
     "disabled": "This collector turned coin stealing off."
   },
@@ -688,7 +688,7 @@
     "profileQ": "How customizable is my profile?",
     "rainA": "A coin rain is a small gift: any visitor can trigger one coin rain per day on your profile, giving you +1 coin with a little animation.",
     "rainQ": "What is a coin rain?",
-    "stealA": "Open another collector's profile and attempt a heist. The victim sets the attempt price and maximum haul; the success chance (20 to 80 percent) shifts with the level difference between you two. Failed attempts pay the price to the victim.",
+    "stealA": "Open another collector's profile and attempt a heist. The victim sets the attempt price and maximum haul; the success chance (20 to 80 percent) shifts with the level difference between you two. Every attempt pays the price to the victim, whether it succeeds or not.",
     "stealCostA": "In your settings you can disable stealing entirely, set the attempt price and cap the maximum haul. A flood check limits heists to one per victim per 5 minutes and 6 per hour.",
     "stealCostQ": "Can I protect myself from thieves?",
     "stealQ": "How does stealing BadgesCoins work?",
@@ -751,7 +751,7 @@
     "stealEnabled": "Allow coin stealing on my profile",
     "stealPrice": "Attempt price (BadgesCoins)",
     "stealMax": "Max haul per heist",
-    "stealHint": "Higher prices scare off casual thieves; failed attempts pay the price to you.",
+    "stealHint": "Higher prices scare off casual thieves; every attempt pays the price to you.",
     "saving": "Saving…",
     "saved": "Saved!",
     "save": "Save changes",

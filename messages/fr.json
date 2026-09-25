@@ -657,7 +657,7 @@
   "steal": {
     "attempt": "Tenter un braquage",
     "failed": "Défendu ! La tentative t'a coûté {coins} BadgesCoins.",
-    "hint": "La tentative coûte {price} BadgesCoins (versés à la victime en cas d'échec). Butin maximal : {max} BadgesCoins. La probabilité dépend de l'écart de niveau.",
+    "hint": "La tentative coûte {price} BadgesCoins (versés à la victime, réussite ou échec). Butin maximal : {max} BadgesCoins. La probabilité dépend de l'écart de niveau.",
     "success": "Coup réussi : +{coins} BadgesCoins !",
     "disabled": "Ce collectionneur a désactivé le vol de pièces."
   },
@@ -688,7 +688,7 @@
     "profileQ": "À quel point mon profil est-il personnalisable ?",
     "rainA": "Une pluie de pièces est un petit cadeau : n'importe quel visiteur peut déclencher une pluie de pièces par jour sur ton profil, te donnant +1 pièce avec une petite animation.",
     "rainQ": "Qu'est-ce qu'une pluie de pièces ?",
-    "stealA": "Ouvre le profil d'un autre collectionneur et tente un braquage. La victime fixe le prix de la tentative et le butin maximal ; la probabilité de réussite (20 à 80 %) varie selon l'écart de niveau. Les tentatives échouées versent le prix à la victime.",
+    "stealA": "Ouvre le profil d'un autre collectionneur et tente un braquage. La victime fixe le prix de la tentative et le butin maximal ; la probabilité de réussite (20 à 80 %) varie selon l'écart de niveau. Chaque tentative verse le prix à la victime, réussie ou non.",
     "stealCostA": "Dans tes réglages, tu peux désactiver complètement le vol, fixer le prix de la tentative et plafonner le butin maximal. Un contrôle de flux limite les braquages à un par victime toutes les 5 minutes et 6 par heure.",
     "stealCostQ": "Puis-je me protéger des voleurs ?",
     "stealQ": "Comment fonctionne le vol de BadgesCoins ?",
@@ -751,7 +751,7 @@
     "stealEnabled": "Autoriser le vol de pièces sur mon profil",
     "stealPrice": "Prix de la tentative (BadgesCoins)",
     "stealMax": "Butin maximal par braquage",
-    "stealHint": "Des prix élevés découragent les voleurs occasionnels ; les tentatives échouées te versent le prix.",
+    "stealHint": "Des prix élevés découragent les voleurs occasionnels ; chaque tentative te verse le prix.",
     "saving": "Enregistrement…",
     "saved": "Enregistré !",
     "save": "Enregistrer",
