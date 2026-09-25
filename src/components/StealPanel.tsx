@@ -34,9 +34,22 @@ export default function StealPanel({
       });
       const data = (await res.json()) as
         | { ok: true; success: boolean; stolen: number; cost: number; chance: number }
-        | { ok: false; error: string };
+        | { ok: false; error: string; code?: string };
       if (!data.ok) {
-        setResult(data.error);
+        // The server's `error` is an English sentence; the stable `code` maps to
+        // the locale files so no raw server text renders under another language.
+        const localized: Record<string, string> = {
+          notFound: t("notFound"),
+          self: t("self"),
+          victimDisabled: t("victimDisabled"),
+          tooPoor: t("tooPoor", { price: price.toLocaleString(locale) }),
+          floodPair: t("floodPair"),
+          floodHour: t("floodHour"),
+          floodRace: t("floodHour"),
+          victimBroke: t("victimBroke"),
+          disabled: t("stealDisabled"),
+        };
+        setResult((data.code && localized[data.code]) || data.error);
       } else if (data.success) {
         setResult(t("success", { coins: data.stolen.toLocaleString(locale) }));
         router.refresh();
@@ -45,7 +58,7 @@ export default function StealPanel({
         router.refresh();
       }
     } catch {
-      setResult("Network error");
+      setResult(t("networkError"));
     } finally {
       setState("idle");
     }

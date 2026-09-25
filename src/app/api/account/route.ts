@@ -149,7 +149,8 @@ export async function POST(request: Request) {
     .update(patch)
     .eq("id", user.id);
   if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    console.warn("[account] profile update failed:", error.message);
+    return Response.json({ error: "profile update failed" }, { status: 500 });
   }
   return Response.json({ ok: true });
 }

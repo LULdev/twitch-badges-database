@@ -619,7 +619,11 @@
     "spinning": "旋转中…",
     "already": "你今天已经转过了——明天再来！",
     "turboWon": "一份完整的 Twitch Turbo 订阅归你了！",
-    "turboOdds": "奖励格：Twitch Turbo 订阅。中奖概率 0.00000001（1 : 100,000,000）。"
+    "turboOdds": "奖励格：Twitch Turbo 订阅。中奖概率 0.00000001（1 : 100,000,000）。",
+    "networkError": "网络错误，请重试。",
+    "wheelDisabled": "幸运转盘目前已停用。",
+    "notAuthed": "请使用 Twitch 登录以旋转转盘。",
+    "banned": "你的账号已被封禁。"
   },
   "feed": {
     "title": "实时活动动态",
@@ -659,7 +663,16 @@
     "failed": "防守成功！这次尝试花掉了你 {coins} BadgesCoins。",
     "hint": "每次尝试花费 {price} BadgesCoins（无论成败均归受害者所有）。最大收获：{max} BadgesCoins。成功率取决于等级差。",
     "success": "得手：+{coins} BadgesCoins！",
-    "disabled": "该收藏者已关闭硬币偷取。"
+    "disabled": "该收藏者已关闭硬币偷取。",
+    "networkError": "网络错误，请重试。",
+    "notFound": "未找到该收藏者。",
+    "self": "不能偷取自己。",
+    "victimDisabled": "该收藏者已关闭被偷取功能。",
+    "tooPoor": "一次尝试需要 {price} 枚硬币。",
+    "floodPair": "请等待几分钟后再对该收藏者发起尝试。",
+    "floodHour": "尝试次数过多，请稍后再试。",
+    "victimBroke": "该收藏者没有可偷取的硬币。",
+    "stealDisabled": "偷取功能目前已停用。"
   },
   "faq": {
     "achievementsA": "{total} 个：{common} 个普通里程碑、{creative} 个创意挑战和 {special} 个真正意想不到的特殊成就。每个都奖励 XP、BadgesCoins 和积分，并在主页成就展柜中显示一枚闪亮徽章。",

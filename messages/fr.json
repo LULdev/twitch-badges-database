@@ -619,7 +619,11 @@
     "spinning": "Rotation…",
     "already": "Tu as déjà tourné aujourd'hui — reviens demain !",
     "turboWon": "Un abonnement Twitch Turbo complet est à toi !",
-    "turboOdds": "Case bonus : abonnement Twitch Turbo. Probabilité 0,00000001 (1 : 100 000 000)."
+    "turboOdds": "Case bonus : abonnement Twitch Turbo. Probabilité 0,00000001 (1 : 100 000 000).",
+    "networkError": "Erreur réseau — réessaie.",
+    "wheelDisabled": "La roue est désactivée pour le moment.",
+    "notAuthed": "Connecte-toi avec Twitch pour faire tourner la roue.",
+    "banned": "Ton compte est banni."
   },
   "feed": {
     "title": "Fil d'activité en direct",
@@ -659,7 +663,16 @@
     "failed": "Défendu ! La tentative t'a coûté {coins} BadgesCoins.",
     "hint": "La tentative coûte {price} BadgesCoins (versés à la victime, réussite ou échec). Butin maximal : {max} BadgesCoins. La probabilité dépend de l'écart de niveau.",
     "success": "Coup réussi : +{coins} BadgesCoins !",
-    "disabled": "Ce collectionneur a désactivé le vol de pièces."
+    "disabled": "Ce collectionneur a désactivé le vol de pièces.",
+    "networkError": "Erreur réseau — réessaie.",
+    "notFound": "Collectionneur introuvable.",
+    "self": "Tu ne peux pas voler ton propre profil.",
+    "victimDisabled": "Ce collectionneur a désactivé le vol.",
+    "tooPoor": "Une tentative coûte {price} pièces.",
+    "floodPair": "Attends quelques minutes avant de cibler à nouveau ce collectionneur.",
+    "floodHour": "Trop de tentatives — réessaie plus tard.",
+    "victimBroke": "Ce collectionneur n'a aucune pièce à voler.",
+    "stealDisabled": "Le vol est désactivé pour le moment."
   },
   "faq": {
     "achievementsA": "{total} : {common} jalons communs, {creative} défis créatifs et {special} spéciaux vraiment inattendus. Chacun donne de l'XP, des BadgesCoins et des points, plus un badge scintillant dans la vitrine de succès de ton profil.",

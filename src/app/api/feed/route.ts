@@ -37,7 +37,10 @@ export async function GET(request: Request) {
   if (cursor > 0) query = query.lt("id", cursor);
 
   const { data, error } = await query;
-  if (error) return Response.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.warn("[feed] query failed:", error.message);
+    return Response.json({ error: "feed unavailable" }, { status: 500 });
+  }
   const events = (data ?? []) as Array<Record<string, unknown>>;
   const nextCursor = events.length > 0 ? Number(events[events.length - 1].id) : null;
   return Response.json(

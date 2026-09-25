@@ -244,18 +244,47 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
   for (const row of upsertRows) {
     pendingByKey.set(String(row.id), row);
   }
+  // Count from the COLLAPSED rows: the loop above tallies per distribution
+  // entry, so a repeated badge inflated `rarityUpdated` and `statusSweeps` in
+  // the changelog while the database only ever received one row.
+  const finalRows = [...pendingByKey.values()];
+  rarityUpdated = finalRows.length;
+  statusSweeps = finalRows.filter((row) => "status" in row).length;
 
-  for (const batch of chunk([...pendingByKey.values()], 200)) {
-    const { error } = await supabase
-      .from("badges")
-      .upsert(batch, { onConflict: "id" });
-    if (error) throw error;
-  }
+  // Chunked commits again: a failure in a later chunk leaves earlier ones live
+  // with no changelog row — the undocumented-mutation case the other syncs
+  // guard against. Log what was in flight (flagged) before rethrowing.
+  try {
+    for (const batch of chunk(finalRows, 200)) {
+      const { error } = await supabase
+        .from("badges")
+        .upsert(batch, { onConflict: "id" });
+      if (error) throw error;
+    }
 
-  for (const batch of chunk(statRows, 200)) {
-    const { error } = await supabase.from("badge_stats").insert(batch);
-    if (error) throw error;
-    statsInserted += batch.length;
+    for (const batch of chunk(statRows, 200)) {
+      const { error } = await supabase.from("badge_stats").insert(batch);
+      if (error) throw error;
+      statsInserted += batch.length;
+    }
+  } catch (writeError) {
+    await logChange(
+      {
+        kind: "data_sync",
+        title: "Stats sync failed mid-write",
+        body: `The potat sync aborted on a database error after committing earlier chunks: ${rarityUpdated} badge updates and ${statsInserted} stats points were in flight. Error: ${writeError instanceof Error ? writeError.message : String(writeError)}`,
+        payload: {
+          distribution: distribution.length,
+          matched,
+          rarityUpdated,
+          statsInserted,
+          failed: true,
+          ranAt: now.toISOString(),
+        },
+      },
+      supabase,
+    );
+    throw writeError;
   }
 
   await logChange(

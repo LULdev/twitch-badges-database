@@ -172,6 +172,11 @@ export async function POST(request: Request) {
         break;
       }
       case "unban":
+        // No self-service, ever: a banned staff member keeps their role while
+        // banned, so without this the `!self` ladder exemption above would let
+        // them delete their own ban row — exactly what the ladder comment
+        // promises cannot happen.
+        if (self) return Response.json({ error: "cannot unban yourself" }, { status: 409 });
         await unbanUser(ctx, userId);
         break;
       case "delete":

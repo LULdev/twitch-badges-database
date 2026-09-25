@@ -85,11 +85,14 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
     return () => clearInterval(interval);
   }, [paused, poll]);
 
-  function timeAgo(iso: string, now: number): string {
+  // Locale-aware units via Intl: hardcoded "s"/"m"/"h" rendered English
+  // abbreviations under every language.
+  function timeAgo(iso: string, now: number, locale: string): string {
     const seconds = Math.floor((now - new Date(iso).getTime()) / 1000);
-    if (seconds < 60) return `${seconds}s`;
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
-    return `${Math.floor(seconds / 3600)}h`;
+    const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+    if (seconds < 60) return rtf.format(-seconds, "second");
+    if (seconds < 3600) return rtf.format(-Math.floor(seconds / 60), "minute");
+    return rtf.format(-Math.floor(seconds / 3600), "hour");
   }
 
   return (
@@ -140,7 +143,7 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
               ) : null}
               <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted">
                 <span>{t(event.kind)}</span>
-                {nowTick !== null ? <span>· {timeAgo(event.created_at, nowTick)}</span> : null}
+                {nowTick !== null ? <span>· {timeAgo(event.created_at, nowTick, locale)}</span> : null}
                 {event.xp_amount ? <span className="font-bold text-accent">+{event.xp_amount} XP</span> : null}
                 {event.coins_amount ? (
                   <span dir="ltr" className={`inline-flex items-center gap-1 font-bold ${event.coins_amount > 0 ? "text-success" : "text-danger"}`}>

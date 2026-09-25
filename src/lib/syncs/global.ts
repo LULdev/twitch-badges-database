@@ -339,26 +339,34 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
   // The very first run populates the whole catalog at once — treat it as a
   // seed, not as a drop wave (no per-badge blog posts, no push blast).
   const isInitialSeed = existing.size === 0 && addedTitles.length > 0;
+  // Declared here so the deferred rethrow after the removal block can see it:
+  // the added-path fan-out must not abort the run before the other committed
+  // mutations have their changelog rows.
+  let fanoutError: unknown = null;
   if (addedTitles.length > 0) {
-    // Look the inserted rows up by their deterministic slug
-    // (badgeSlug(setId, version)) — the same value written into the row above.
+    // The catalog rows are committed by now, so a fan-out failure here must not
+    // skip the changelog row below — that was the undocumented-mutation case the
+    // mid-write catch guards against. The fresh-row lookup is part of that
+    // fan-out: its throw used to fire before the changelog for already-committed
+    // additions. Log what landed (flagged), then rethrow so the heartbeat still
+    // records a failure.
     const freshBatches: Array<Record<string, unknown>> = [];
-    for (const batch of chunk(newSlugs, 200)) {
-      const { data, error } = await supabase
-        .from("badges")
-        .select(
-          "id,slug,title,set_id,image_url_2x,category,is_paid,how_to_earn,start_date,end_date,rarity_tier,rarity_score",
-        )
-        .in("slug", batch);
-      // A dropped lookup error used to leave `freshRows` empty: the durable
-      // badge_events history and every drop post were skipped silently while the
-      // changelog, notification and push still went out with a dead link.
-      if (error) throw error;
-      freshBatches.push(...((data ?? []) as Array<Record<string, unknown>>));
+    try {
+      for (const batch of chunk(newSlugs, 200)) {
+        const { data, error } = await supabase
+          .from("badges")
+          .select(
+            "id,slug,title,set_id,image_url_2x,category,is_paid,how_to_earn,start_date,end_date,rarity_tier,rarity_score",
+          )
+          .in("slug", batch);
+        if (error) throw error;
+        freshBatches.push(...((data ?? []) as Array<Record<string, unknown>>));
+      }
+    } catch (error) {
+      fanoutError = error;
     }
-    const fresh = freshBatches;
 
-    const freshRows = (fresh ?? []) as Array<{
+    const freshRows = freshBatches as Array<{
       id: string;
       slug: string;
       title: string;
@@ -373,35 +381,39 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
       rarity_score: number;
     }>;
 
-    if (freshRows.length > 0) {
-      const { error: eventsError } = await supabase.from("badge_events").insert(
-        freshRows.map((row) => ({
-          badge_id: row.id,
-          kind: "added" as const,
-          detail: { source, set_id: row.set_id },
-        })),
-      );
-      if (eventsError) throw eventsError;
-      if (!isInitialSeed) {
-        for (const row of freshRows) {
-          await createDropPost(
-            {
-              slug: row.slug,
-              title: row.title,
-              setId: row.set_id,
-              imageUrl2x: row.image_url_2x,
-              category: row.category,
-              isPaid: row.is_paid,
-              howToEarn: row.how_to_earn,
-              startDate: row.start_date,
-              endDate: row.end_date,
-              rarityTier: row.rarity_tier,
-              rarityScore: row.rarity_score,
-            },
-            supabase,
-          );
+    try {
+      if (freshRows.length > 0) {
+        const { error: eventsError } = await supabase.from("badge_events").insert(
+          freshRows.map((row) => ({
+            badge_id: row.id,
+            kind: "added" as const,
+            detail: { source, set_id: row.set_id },
+          })),
+        );
+        if (eventsError) throw eventsError;
+        if (!isInitialSeed) {
+          for (const row of freshRows) {
+            await createDropPost(
+              {
+                slug: row.slug,
+                title: row.title,
+                setId: row.set_id,
+                imageUrl2x: row.image_url_2x,
+                category: row.category,
+                isPaid: row.is_paid,
+                howToEarn: row.how_to_earn,
+                startDate: row.start_date,
+                endDate: row.end_date,
+                rarityTier: row.rarity_tier,
+                rarityScore: row.rarity_score,
+              },
+              supabase,
+            );
+          }
         }
       }
+    } catch (error) {
+      fanoutError = error;
     }
 
     await logChange(
@@ -415,10 +427,24 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
         body: isInitialSeed
           ? `First catalog import from the Twitch API (source: ${source}).`
           : addedTitles.slice(0, 12).join(", "),
-        payload: { source, initialSeed: isInitialSeed, titles: addedTitles.slice(0, 50) },
+        payload: {
+          source,
+          initialSeed: isInitialSeed,
+          titles: addedTitles.slice(0, 50),
+          // Status transitions committed by the same run's upserts: without
+          // this count they went unlogged whenever additions co-occurred (the
+          // dedicated pure-status row is skipped) and the fan-out then failed
+          // (the summary row is skipped by the deferred rethrow).
+          statusChanged,
+          fanoutFailed: fanoutError !== null,
+        },
       },
       supabase,
     );
+    // No early rethrow: the update and removal blocks below must still log
+    // their own committed mutations — an early throw left committed removals
+    // without a changelog row when a run had additions AND removals. The
+    // fan-out error is rethrown after them.
 
     // Desktop notification: "new badge is live" — skipped on initial seed.
     if (!isInitialSeed) {
@@ -465,24 +491,39 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     );
   }
   if (removed.length > 0) {
-    const { error: removedEventsError } = await supabase.from("badge_events").insert(
-      removed.map((r) => ({
-        badge_id: r.id,
-        kind: "removed" as const,
-        detail: null,
-      })),
-    );
-    if (removedEventsError) throw removedEventsError;
+    // The removal updates already committed above — the history insert must not
+    // be allowed to leave them unlogged.
+    let eventsError: unknown = null;
+    try {
+      const { error } = await supabase.from("badge_events").insert(
+        removed.map((r) => ({
+          badge_id: r.id,
+          kind: "removed" as const,
+          detail: null,
+        })),
+      );
+      if (error) throw error;
+    } catch (error) {
+      eventsError = error;
+    }
     await logChange(
       {
         kind: "badge_removed",
         title: `${removed.length} badge${removed.length === 1 ? "" : "s"} no longer available`,
         body: removed.slice(0, 12).map((r) => r.title).join(", "),
-        payload: { titles: removed.slice(0, 50).map((r) => r.title) },
+        payload: {
+          titles: removed.slice(0, 50).map((r) => r.title),
+          historyFailed: eventsError !== null,
+        },
       },
       supabase,
     );
+    if (eventsError !== null) throw eventsError;
   }
+
+  // Now that every committed mutation has its changelog row, the added-path
+  // fan-out failure finally propagates (the heartbeat records the failure).
+  if (fanoutError !== null) throw fanoutError;
   if (statusChanged > 0 && addedTitles.length === 0 && updated === 0 && removed.length === 0) {
     // Only log pure status sweeps when nothing else was logged this run.
     await logChange(

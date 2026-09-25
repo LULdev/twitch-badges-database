@@ -619,7 +619,11 @@
     "spinning": "回転中…",
     "already": "今日はもう回しました — また明日！",
     "turboWon": "Twitch Turboのフル定期購読を獲得！",
-    "turboOdds": "ボーナス枠：Twitch Turbo定期購読。確率 0.00000001（1 : 100,000,000）。"
+    "turboOdds": "ボーナス枠：Twitch Turbo定期購読。確率 0.00000001（1 : 100,000,000）。",
+    "networkError": "ネットワークエラーです。もう一度お試しください。",
+    "wheelDisabled": "現在、ルーレットは無効です。",
+    "notAuthed": "Twitch でログインしてルーレットを回してください。",
+    "banned": "あなたのアカウントは停止されています。"
   },
   "feed": {
     "title": "ライブアクティビティフィード",
@@ -659,7 +663,16 @@
     "failed": "防衛成功！試行で{coins} BadgesCoinsを失った。",
     "hint": "試行には{price} BadgesCoinsが必要（成否にかかわらず相手に支払われる）。最大獲得：{max} BadgesCoins。成功率はレベル差で変動。",
     "success": "強奪成功：+{coins} BadgesCoins！",
-    "disabled": "このコレクターはコイン強奪を無効にしています。"
+    "disabled": "このコレクターはコイン強奪を無効にしています。",
+    "networkError": "ネットワークエラーです。もう一度お試しください。",
+    "notFound": "コレクターが見つかりません。",
+    "self": "自分からは奪えません。",
+    "victimDisabled": "このコレクターは強奪を無効にしています。",
+    "tooPoor": "試行には {price} コインが必要です。",
+    "floodPair": "同じコレクターへの次の試行まで数分お待ちください。",
+    "floodHour": "試行が多すぎます。しばらくしてからもう一度お試しください。",
+    "victimBroke": "このコレクターには奪えるコインがありません。",
+    "stealDisabled": "現在、強奪機能は無効です。"
   },
   "faq": {
     "achievementsA": "{total}種：コモンの節目{common}、クリエイティブな挑戦{creative}、まさかのスペシャル{special}。それぞれXP・BadgesCoins・ポイントがもらえ、プロフィールの実績ショーケースにキラキラバッジが並びます。",

@@ -52,14 +52,20 @@ export function outranks(actor: AdminRole | "bootstrap", targetRole: string): bo
 
 /**
  * True when `actor` may assign `nextRole`. Only an owner may create another
- * owner, and nobody may promote someone past their own rank — so a moderator can
- * promote nobody, and an admin can promote at most an admin.
+ * owner, nobody may promote someone past their own rank, and a moderator may
+ * not mint peers — so a moderator can promote nobody (a "user" assignment is a
+ * demotion and stays allowed), and an admin can promote at most an admin.
  */
 export function mayAssignRole(actor: AdminRole | "bootstrap", nextRole: string): boolean {
   if (actor === "bootstrap") return false;
   if (nextRole === "owner") return actor === "owner";
   if (nextRole === "user") return true;
-  return roleRank(actor) >= roleRank(nextRole);
+  // Equal-rank minting (`>=`) let a moderator create another moderator — the
+  // exact promotion this docblock forbids. Above "user" the actor must now
+  // outrank the role, with the documented admin→admin ceiling as the one
+  // exception.
+  if (nextRole === "admin") return roleRank(actor) >= 2;
+  return roleRank(actor) > roleRank(nextRole);
 }
 
 export interface AdminContext {

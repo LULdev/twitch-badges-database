@@ -85,11 +85,17 @@ export default function WheelOfFortune() {
             slot: { id: string; label: string; xp: number; coins: number; turbo?: boolean };
             turboWon: boolean;
           }
-        | { error: string };
+        | { error: string; code?: string };
       if ("error" in data) {
         if (data.error === "already-spun-today") {
           setUsedToday(true);
           setError(t("already"));
+        } else if (data.code === "disabled") {
+          setError(t("wheelDisabled"));
+        } else if (data.code === "not authenticated") {
+          setError(t("notAuthed"));
+        } else if (data.code === "banned") {
+          setError(t("banned"));
         } else {
           setError(data.error);
         }
@@ -114,7 +120,7 @@ export default function WheelOfFortune() {
         });
       }, 4200);
     } catch {
-      setError("Network error");
+      setError(t("networkError"));
       setSpinning(false);
     }
   }

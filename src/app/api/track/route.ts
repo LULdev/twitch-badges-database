@@ -115,7 +115,14 @@ export async function POST(request: Request) {
       return new Response(null, { status: 204 });
     }
 
-    if (isDurationBeacon && !dnt) {
+    if (isDurationBeacon) {
+      if (dnt) {
+        // A DNT duration beacon without an id carries nothing (its duration is
+        // nulled below) and its hash is shared by every DNT visitor, so it can
+        // attach to no row safely: insert it and one page view becomes two rows.
+        // The mount row already records the view — drop the beacon.
+        return new Response(null, { status: 204 });
+      }
       // The pagehide beacon raced ahead of the mount response, so the client never
       // learned its row id. Attach the duration to the most recent row this visitor
       // created for this path inside a short window instead of inserting a SECOND

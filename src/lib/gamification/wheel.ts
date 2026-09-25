@@ -63,13 +63,30 @@ export async function spinWheel(userId: string): Promise<
     return { ok: false, reason: "already" };
   }
 
-  // Turbo jackpot: drawn separately at exactly 1:100,000,000.
+  // Turbo jackpot: drawn separately at exactly 1:100,000,000. The turbo_wins
+  // row is written BEFORE the payout: inserting it after the award left a
+  // paid-but-unrecorded window with no compensation (gate burned, client shown
+  // an error). If anything below fails, the row is deleted again and the gate
+  // released, so no unpaid spin can leave a jackpot record — or burn the day.
   const turboWon = Math.random() < TURBO_PROBABILITY;
   const slot = turboWon
     ? WHEEL_SLOTS[WHEEL_SLOTS.length - 1]
     : weightedPick(WHEEL_SLOTS.slice(0, -1));
 
+  let turboRowId: number | undefined;
   try {
+    if (turboWon) {
+      // `.single()` rather than `.maybeSingle()`: an insert that returns no row
+      // must be an error — a silently missing id would disable the compensating
+      // delete below and strand a jackpot record behind an unpaid spin.
+      const { data: turboRow, error: turboError } = await supabase
+        .from("turbo_wins")
+        .insert({ user_id: userId })
+        .select("id")
+        .single();
+      if (turboError) throw turboError;
+      turboRowId = (turboRow as { id: number }).id;
+    }
     await award(userId, {
       xp: slot.xp,
       coins: slot.coins,
@@ -81,10 +98,19 @@ export async function spinWheel(userId: string): Promise<
     });
   } catch (error) {
     // Same reasoning as the daily gate: the gate already advanced `last_wheel_date`
-    // and `wheel_spins`, so a failed award would burn the day's spin with nothing
-    // paid and no way to retry. Release it (date AND the counter, atomically) and
-    // rethrow. Only the award is wrapped — the turbo path below must not re-open the
-    // gate after a paid spin.
+    // and `wheel_spins`, so a failed award — or a failed jackpot insert — would
+    // burn the day's spin with nothing paid and no way to retry. Release it (date
+    // AND the counter, atomically) and rethrow. A pre-inserted jackpot row goes
+    // with it — the spin ends unpaid, so no jackpot record may survive it.
+    if (turboRowId != null) {
+      const { error: voidError } = await supabase
+        .from("turbo_wins")
+        .delete()
+        .eq("id", turboRowId);
+      if (voidError) {
+        console.warn("[wheel] could not void the jackpot row after a failed award:", voidError.message);
+      }
+    }
     try {
       const release = await supabase.rpc("release_wheel_gate", {
         p_user_id: userId,
@@ -98,12 +124,8 @@ export async function spinWheel(userId: string): Promise<
   }
 
   if (turboWon) {
-    // The jackpot must be recorded before the UI is told about it: discarding
-    // this error let the client celebrate a win that was never persisted.
-    const { error: turboError } = await supabase
-      .from("turbo_wins")
-      .insert({ user_id: userId });
-    if (turboError) throw turboError;
+    // The row is already persisted; the activity log and the feature post are
+    // best-effort garnish (logActivity swallows internally, the post catches).
     await logActivity({
       userId,
       kind: "turbo_win",

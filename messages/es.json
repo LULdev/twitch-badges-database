@@ -619,7 +619,11 @@
     "spinning": "Girando…",
     "already": "Ya giraste hoy — ¡vuelve mañana!",
     "turboWon": "¡Una suscripción completa a Twitch Turbo es tuya!",
-    "turboOdds": "Casilla bono: suscripción a Twitch Turbo. Probabilidad 0,00000001 (1 : 100.000.000)."
+    "turboOdds": "Casilla bono: suscripción a Twitch Turbo. Probabilidad 0,00000001 (1 : 100.000.000).",
+    "networkError": "Error de red: inténtalo de nuevo.",
+    "wheelDisabled": "La ruleta está desactivada ahora mismo.",
+    "notAuthed": "Inicia sesión con Twitch para girar la ruleta.",
+    "banned": "Tu cuenta está baneada."
   },
   "feed": {
     "title": "Feed de actividad en vivo",
@@ -659,7 +663,16 @@
     "failed": "¡Defendido! El intento te costó {coins} BadgesCoins.",
     "hint": "El intento cuesta {price} BadgesCoins (pagados a la víctima, aciertes o no). Botín máximo: {max} BadgesCoins. La probabilidad depende de la diferencia de nivel.",
     "success": "¡Golpe exitoso: +{coins} BadgesCoins!",
-    "disabled": "Este coleccionista ha desactivado el robo de monedas."
+    "disabled": "Este coleccionista ha desactivado el robo de monedas.",
+    "networkError": "Error de red: inténtalo de nuevo.",
+    "notFound": "Coleccionista no encontrado.",
+    "self": "No puedes robar a tu propio perfil.",
+    "victimDisabled": "Este coleccionista ha desactivado los robos.",
+    "tooPoor": "Un intento cuesta {price} monedas.",
+    "floodPair": "Espera unos minutos antes de volver a atacar a este coleccionista.",
+    "floodHour": "Demasiados intentos: inténtalo más tarde.",
+    "victimBroke": "Este coleccionista no tiene monedas que robar.",
+    "stealDisabled": "Los robos están desactivados ahora mismo."
   },
   "faq": {
     "achievementsA": "{total}: {common} hitos comunes, {creative} retos creativos y {special} especiales realmente inesperados. Cada uno otorga XP, BadgesCoins y puntos, además de una insignia brillante en la vitrina de logros de tu perfil.",

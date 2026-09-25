@@ -619,7 +619,11 @@
     "spinning": "Spinning…",
     "already": "You already spun today — come back tomorrow!",
     "turboWon": "A full Twitch Turbo subscription is yours!",
-    "turboOdds": "Bonus slot: Twitch Turbo subscription. Win probability 0.00000001 (1 : 100,000,000)."
+    "turboOdds": "Bonus slot: Twitch Turbo subscription. Win probability 0.00000001 (1 : 100,000,000).",
+    "networkError": "Network error — try again.",
+    "wheelDisabled": "The wheel is disabled right now.",
+    "notAuthed": "Log in with Twitch to spin the wheel.",
+    "banned": "Your account is banned."
   },
   "feed": {
     "title": "Live Activity Feed",
@@ -659,7 +663,16 @@
     "failed": "Defended! The attempt cost you {coins} BadgesCoins.",
     "hint": "Attempt costs {price} BadgesCoins (paid to the victim whether it succeeds or not). Max haul: {max} BadgesCoins. Chance depends on level difference.",
     "success": "Heist successful: +{coins} BadgesCoins!",
-    "disabled": "This collector turned coin stealing off."
+    "disabled": "This collector turned coin stealing off.",
+    "networkError": "Network error — try again.",
+    "notFound": "Collector not found.",
+    "self": "You cannot steal from yourself.",
+    "victimDisabled": "This collector disabled stealing.",
+    "tooPoor": "An attempt costs {price} coins.",
+    "floodPair": "Wait a few minutes before targeting this collector again.",
+    "floodHour": "Too many attempts — try again later.",
+    "victimBroke": "This collector has no coins to steal.",
+    "stealDisabled": "Stealing is disabled right now."
   },
   "faq": {
     "achievementsA": "{total}: {common} common milestones, {creative} creative challenges and {special} truly unexpected specials. Each one awards XP, BadgesCoins and points, plus a sparkle badge in your profile's achievement showcase.",

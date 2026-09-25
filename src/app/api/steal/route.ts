@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const userId = gate.userId;
   const features = await getFeatures();
   if (!features.steals) {
-    return Response.json({ error: "feature disabled" }, { status: 403 });
+    return Response.json({ error: "feature disabled", code: "disabled" }, { status: 403 });
   }
   const body = (await request.json().catch(() => null)) as { victim?: string } | null;
   if (!body?.victim) return Response.json({ error: "victim required" }, { status: 400 });

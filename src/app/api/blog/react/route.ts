@@ -57,7 +57,8 @@ export async function POST(request: Request) {
     // Lost a race with a concurrent identical reaction. The row is there, which
     // is what the caller asked for — report it as added rather than 500 on it.
     if (error.code !== "23505") {
-      return Response.json({ error: error.message }, { status: 500 });
+      console.warn("[blog-react] reaction failed:", error.message);
+      return Response.json({ error: "reaction failed" }, { status: 500 });
     }
   }
   return Response.json({ ok: true, added: true });

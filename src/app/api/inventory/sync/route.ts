@@ -99,9 +99,9 @@ export async function POST() {
     const degraded = !result.potatEnriched;
     return Response.json({ ok: !degraded, degraded, result });
   } catch (error) {
-    return Response.json(
-      { ok: false, error: error instanceof Error ? error.message : "failed" },
-      { status: 502 },
-    );
+    // The raw message can carry Supabase constraint/column text — keep the
+    // detail in the server log, give the session owner a generic string.
+    console.warn("[inventory-sync] failed:", error);
+    return Response.json({ ok: false, error: "inventory sync failed" }, { status: 502 });
   }
 }

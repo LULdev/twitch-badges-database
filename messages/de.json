@@ -619,7 +619,11 @@
     "spinning": "Dreht…",
     "already": "Du hast heute schon gedreht — komm morgen wieder!",
     "turboWon": "Ein ganzes Twitch-Turbo-Abo gehört dir!",
-    "turboOdds": "Bonus-Feld: Twitch-Turbo-Abo. Gewinnwahrscheinlichkeit 0,00000001 (1 : 100.000.000)."
+    "turboOdds": "Bonus-Feld: Twitch-Turbo-Abo. Gewinnwahrscheinlichkeit 0,00000001 (1 : 100.000.000).",
+    "networkError": "Netzwerkfehler – versuche es erneut.",
+    "wheelDisabled": "Das Glücksrad ist derzeit deaktiviert.",
+    "notAuthed": "Melde dich mit Twitch an, um zu drehen.",
+    "banned": "Dein Konto ist gesperrt."
   },
   "feed": {
     "title": "Live-Aktivitätsfeed",
@@ -659,7 +663,16 @@
     "failed": "Abgewehrt! Der Versuch kostete dich {coins} BadgesCoins.",
     "hint": "Versuch kostet {price} BadgesCoins (erfolgreich oder nicht, an das Opfer). Max-Beute: {max} BadgesCoins. Chance hängt vom Level-Unterschied ab.",
     "success": "Überfall erfolgreich: +{coins} BadgesCoins!",
-    "disabled": "Dieser Sammler hat das Stehlen von Coins deaktiviert."
+    "disabled": "Dieser Sammler hat das Stehlen von Coins deaktiviert.",
+    "networkError": "Netzwerkfehler – versuche es erneut.",
+    "notFound": "Sammler nicht gefunden.",
+    "self": "Du kannst nicht von dir selbst stehlen.",
+    "victimDisabled": "Dieser Sammler hat das Stehlen deaktiviert.",
+    "tooPoor": "Ein Versuch kostet {price} Münzen.",
+    "floodPair": "Warte ein paar Minuten, bevor du diesen Sammler erneut ins Visier nimmst.",
+    "floodHour": "Zu viele Versuche – versuche es später erneut.",
+    "victimBroke": "Dieser Sammler hat keine Münzen zu stehlen.",
+    "stealDisabled": "Das Stehlen ist derzeit deaktiviert."
   },
   "faq": {
     "achievementsA": "{total}: {common} gewöhnliche Meilensteine, {creative} kreative Herausforderungen und {special} völlig unerwartete Spezielle. Jede bringt XP, BadgesCoins und Punkte plus ein Funkel-Badge in der Errungenschaften-Vitrine deines Profils.",

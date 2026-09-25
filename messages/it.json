@@ -619,7 +619,11 @@
     "spinning": "Rotazione…",
     "already": "Hai già girato oggi — torna domani!",
     "turboWon": "Un abbonamento Twitch Turbo completo è tuo!",
-    "turboOdds": "Slot bonus: abbonamento Twitch Turbo. Probabilità 0,00000001 (1 : 100.000.000)."
+    "turboOdds": "Slot bonus: abbonamento Twitch Turbo. Probabilità 0,00000001 (1 : 100.000.000).",
+    "networkError": "Errore di rete: riprova.",
+    "wheelDisabled": "La ruota è disattivata al momento.",
+    "notAuthed": "Accedi con Twitch per far girare la ruota.",
+    "banned": "Il tuo account è bannato."
   },
   "feed": {
     "title": "Feed attività in diretta",
@@ -659,7 +663,16 @@
     "failed": "Difeso! Il tentativo ti è costato {coins} BadgesCoins.",
     "hint": "Il tentativo costa {price} BadgesCoins (pagati alla vittima, riesca o meno). Bottino massimo: {max} BadgesCoins. La probabilità dipende dal divario di livello.",
     "success": "Colpo riuscito: +{coins} BadgesCoins!",
-    "disabled": "Questo collezionista ha disattivato il furto di monete."
+    "disabled": "Questo collezionista ha disattivato il furto di monete.",
+    "networkError": "Errore di rete: riprova.",
+    "notFound": "Collezionista non trovato.",
+    "self": "Non puoi rubare a te stesso.",
+    "victimDisabled": "Questo collezionista ha disattivato i furti.",
+    "tooPoor": "Un tentativo costa {price} monete.",
+    "floodPair": "Attendi qualche minuto prima di prendere di mira di nuovo questo collezionista.",
+    "floodHour": "Troppi tentativi: riprova più tardi.",
+    "victimBroke": "Questo collezionista non ha monete da rubare.",
+    "stealDisabled": "I furti sono disattivati al momento."
   },
   "faq": {
     "achievementsA": "{total}: {common} traguardi comuni, {creative} sfide creative e {special} speciali davvero inaspettati. Ognuno dà XP, BadgesCoins e punti, più un badge scintillante nella vetrina obiettivi del profilo.",

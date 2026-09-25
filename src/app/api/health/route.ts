@@ -63,13 +63,17 @@ export async function GET() {
       source: "web",
       status,
       durationMs: totalMs,
-      message: error,
-      payload: {
-        dbLatencyMs,
-        catalogTotal,
-        catalogLastSeen,
-        region: envOrNull("VERCEL_REGION"),
-      },
+    message: dbOk ? null : "database unavailable",
+    payload: {
+      dbLatencyMs,
+      catalogTotal,
+      catalogLastSeen,
+      region: envOrNull("VERCEL_REGION"),
+      // Raw database message (schema/table/hint text) — system_heartbeats is
+      // service-role-read only. The public stats_uptime_sources view exposes
+      // `message`, not `payload`, so the detail must ride in the payload.
+      dbError: error,
+    },
     });
   }
 
@@ -79,7 +83,15 @@ export async function GET() {
       status,
       checkedAt: new Date().toISOString(),
       responseMs: totalMs,
-      db: { ok: dbOk, latencyMs: dbLatencyMs, error },
+      db: {
+        ok: dbOk,
+        latencyMs: dbLatencyMs,
+        // The raw database message (schema/table/hint text) is kept in the
+        // heartbeat payload and out of both the public body and the heartbeat
+        // `message` column — the public stats view exposes `message`, not the
+        // payload, and this endpoint is unauthenticated.
+        error: dbOk ? null : "database unavailable",
+      },
       catalog: { total: catalogTotal, lastSeenAt: catalogLastSeen },
       runtime: {
         region: envOrNull("VERCEL_REGION") ?? "local",

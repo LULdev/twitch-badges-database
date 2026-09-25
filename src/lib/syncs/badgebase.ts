@@ -393,6 +393,10 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
   // Inserts first, counted from what the database actually inserted: a conflict
   // discarded by ignoreDuplicates must not inflate the number (the old code
   // incremented once per loop turn regardless).
+  // The enriched count comes from the deduplicated map: pass 1 tallied it per
+  // card before the set_id:version collapse, so repeated listings inflated it,
+  // while pass-2 patches were never counted at all.
+  enriched = updates.size;
   // The writes are chunked, so a failure in chunk 2 leaves chunk 1 committed and
   // live. Every committed chunk is a sync mutation, so a partial run MUST still
   // leave a changelog row (AGENTS: every sync mutation writes one). Document the
@@ -423,7 +427,7 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
       {
         kind: "data_sync",
         title: "Drop-window listing sync failed mid-sweep",
-        body: `The catalog sweep aborted on a write error. Committed chunks are already live: ${inserted} badges inserted before the failure, ${demotedToExpired} badges demoted to expired. Error: ${error instanceof Error ? error.message : String(error)}`,
+        body: `The catalog sweep aborted on a write error. Committed chunks are already live: ${inserted} badges inserted before the failure, up to ${demotedToExpired} badges demoted to expired (in-flight count — only some demotion chunks may have committed). Error: ${error instanceof Error ? error.message : String(error)}`,
         payload: {
           activeCards: activeList.length,
           upcomingCards: upcomingList.length,

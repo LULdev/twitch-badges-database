@@ -44,6 +44,14 @@ export async function POST(request: Request) {
     return Response.json({ error: "invalid subscription" }, { status: 400 });
   }
 
+  // The keys are cryptographic material: a truncated one is garbage that fails
+  // silently at every broadcast, so oversized values are rejected outright.
+  // `user_agent` is informational and merely truncated.
+  if (p256dh.length > 512 || auth.length > 128) {
+    return Response.json({ error: "invalid subscription keys" }, { status: 400 });
+  }
+  const userAgent = body?.userAgent?.slice(0, 300) ?? null;
+
   // The endpoint is later fetched by the push service server-side, so it must
   // be a real public HTTPS URL — not an internal host, a redirector or an
   // unbounded string (SSRF / storage abuse).
@@ -88,12 +96,13 @@ export async function POST(request: Request) {
       endpoint,
       p256dh,
       auth,
-      user_agent: body?.userAgent ?? null,
+      user_agent: userAgent,
     },
     { onConflict: "endpoint" },
   );
   if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    console.warn("[push] subscribe failed:", error.message);
+    return Response.json({ error: "subscription failed" }, { status: 500 });
   }
   return Response.json({ ok: true });
 }
@@ -122,7 +131,8 @@ export async function DELETE(request: Request) {
   query = user ? query.eq("user_id", user.id) : query.is("user_id", null);
   const { error } = await query;
   if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    console.warn("[push] unsubscribe failed:", error.message);
+    return Response.json({ error: "unsubscribe failed" }, { status: 500 });
   }
   return Response.json({ ok: true });
 }

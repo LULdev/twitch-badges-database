@@ -13,13 +13,13 @@ import { usePathname } from "@/i18n/navigation";
  * still what carries the duration — a `fetch` in an unload handler is dropped by
  * the browser.
  *
- * Deliberately quiet: nothing is sent when the browser reports Do Not Track
- * (the endpoint honours the same header), the request never blocks rendering,
- * and every failure is swallowed.
+ * Deliberately quiet: the endpoint honours `DNT: 1` by nulling every
+ * identifying field server-side (the beacon itself still fires, so the page
+ * view still counts), the request never blocks rendering, and every failure is
+ * swallowed.
  */
 export default function AnalyticsBeacon({ locale }: { locale: string }) {
   const pathname = usePathname();
-  const startedAt = useRef<number>(0);
   const enteredAt = useRef<number>(0);
 
   useEffect(() => {
@@ -66,7 +66,6 @@ export default function AnalyticsBeacon({ locale }: { locale: string }) {
       }
     };
 
-    startedAt.current = Date.now();
     void send();
 
     const onHide = () => {

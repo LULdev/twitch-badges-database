@@ -141,9 +141,16 @@ function merge<T extends object>(fallback: T, stored: unknown): T {
     if (!(key in fallback)) continue;
     const base = (fallback as Record<string, unknown>)[key];
     if (typeof base === "number") {
-      if (value === null || value === undefined || value === "") continue;
-      const parsed = Number(value);
-      if (Number.isFinite(parsed) && parsed >= 0) out[key] = parsed;
+      // Only a real number or a numeric string may override the default:
+      // `Number` coerces `false`/`[]`/`" "` to 0 and `true`/`[5]` to 1/5, so a
+      // stored junk value silently zeroed a key instead of falling back.
+      const numeric =
+        typeof value === "number"
+          ? value
+          : typeof value === "string" && value.trim() !== ""
+            ? Number(value)
+            : NaN;
+      if (Number.isFinite(numeric) && numeric >= 0) out[key] = numeric;
     } else if (typeof base === "boolean") {
       out[key] = value === true;
     } else if (typeof base === "string") {

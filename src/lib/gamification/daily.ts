@@ -76,6 +76,22 @@ export async function claimDaily(userId: string): Promise<
  * chance depends on the level difference between thief and victim.
  * Flood check: 5 minutes between attempts on the same victim, max 6/hour.
  */
+/**
+ * Stable failure codes for the steal flow: the API returns the English `error`
+ * sentence for backwards compatibility, but the UI maps `code` through the
+ * locale files so no server sentence renders raw under another language.
+ */
+export type StealErrorCode =
+  | "notFound"
+  | "self"
+  | "victimDisabled"
+  | "tooPoor"
+  | "floodPair"
+  | "floodHour"
+  | "floodRace"
+  | "victimBroke"
+  | "disabled";
+
 export interface StealSettings {
   enabled: boolean;
   price: number; // what an attempt costs the thief
@@ -92,7 +108,7 @@ export async function attemptSteal(
   thiefId: string,
   victimUsername: string,
 ): Promise<
-  | { ok: false; error: string }
+  | { ok: false; error: string; code: StealErrorCode }
   | {
       ok: true;
       success: boolean;
@@ -122,8 +138,12 @@ export async function attemptSteal(
     .select("id, username, steal_enabled, steal_price, steal_max")
     .ilike("username", victimPattern)
     .maybeSingle();
-  if (!victimProfile || !victimProfile.id) return { ok: false, error: "Victim not found." };
-  if (victimProfile.id === thiefId) return { ok: false, error: "You cannot steal from yourself." };
+  if (!victimProfile || !victimProfile.id) {
+    return { ok: false, error: "Victim not found.", code: "notFound" };
+  }
+  if (victimProfile.id === thiefId) {
+    return { ok: false, error: "You cannot steal from yourself.", code: "self" };
+  }
 
   // A member's own configuration wins; the panel's economy settings are the
   // fallback for everyone who never set one.
@@ -132,11 +152,13 @@ export async function attemptSteal(
     price: Math.max(0, victimProfile.steal_price ?? economy.stealPrice),
     maxAmount: Math.max(10, victimProfile.steal_max ?? economy.stealMax),
   };
-  if (!settings.enabled) return { ok: false, error: "This collector disabled stealing." };
+  if (!settings.enabled) {
+    return { ok: false, error: "This collector disabled stealing.", code: "victimDisabled" };
+  }
 
   const thief = await getProgress(thiefId);
   if (thief.coins < settings.price) {
-    return { ok: false, error: `An attempt costs ${settings.price} coins.` };
+    return { ok: false, error: `An attempt costs ${settings.price} coins.`, code: "tooPoor" };
   }
 
   // Flood checks: one attempt per victim per window, capped per hour.
@@ -149,7 +171,11 @@ export async function attemptSteal(
     .eq("victim_id", victimProfile.id)
     .gte("created_at", fiveMinAgo);
   if ((recentPair ?? 0) > 0) {
-    return { ok: false, error: `Flood check: wait ${floodMinutes} minutes between attempts on the same collector.` };
+    return {
+      ok: false,
+      error: `Flood check: wait ${floodMinutes} minutes between attempts on the same collector.`,
+      code: "floodPair",
+    };
   }
   const hourAgo = new Date(Date.now() - 3_600_000).toISOString();
   const { count: recentHour } = await supabase
@@ -158,7 +184,11 @@ export async function attemptSteal(
     .eq("thief_id", thiefId)
     .gte("created_at", hourAgo);
   if ((recentHour ?? 0) >= economy.stealPerHour) {
-    return { ok: false, error: `Flood check: max ${economy.stealPerHour} steal attempts per hour.` };
+    return {
+      ok: false,
+      error: `Flood check: max ${economy.stealPerHour} steal attempts per hour.`,
+      code: "floodHour",
+    };
   }
 
   // `readProgress`, never `getProgress`: the victim is only being targeted, and
@@ -167,7 +197,7 @@ export async function attemptSteal(
   // count and dragged the average level toward 1.
   const victim = await readProgress(victimProfile.id);
   if (!victim || victim.coins <= 0) {
-    return { ok: false, error: "Victim has no coins to steal." };
+    return { ok: false, error: "Victim has no coins to steal.", code: "victimBroke" };
   }
 
   // Success chance: 50% base ± 1% per level difference, clamped 20–80%.
@@ -218,7 +248,7 @@ export async function attemptSteal(
         console.warn("[steal] could not void the raced attempt:", voidError.message);
       }
     }
-    return { ok: false, error: "Flood check: too many attempts at once." };
+    return { ok: false, error: "Flood check: too many attempts at once.", code: "floodRace" };
   }
 
   // Thief pays the attempt cost; the victim keeps it. Both coin moves are
