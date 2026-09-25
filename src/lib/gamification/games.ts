@@ -195,8 +195,15 @@ export async function playGame(
     },
   });
   if (counterError) throw counterError;
-  if (net !== 0) {
-    await bumpCoins(userId, net);
+  // If settlement fails after the round row is committed, void it: no coins
+  // moved, so it must not pollute the flood window, the streaks, or the feed.
+  try {
+    if (net !== 0) {
+      await bumpCoins(userId, net);
+    }
+  } catch (coinError) {
+    await supabase.from("game_rounds").delete().eq("id", round!.id);
+    throw coinError;
   }
 
   const economy = await getEconomy();

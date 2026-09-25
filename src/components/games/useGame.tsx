@@ -113,7 +113,7 @@ export function BetBar({
     <div className="card flex flex-wrap items-center gap-3 p-4">
       <span className="text-xs font-semibold text-muted">{t("bet")}</span>
       <div className="flex items-center gap-1.5">
-        {[min, 50, 100, 500].map((step) => (
+        {[...new Set([min, 50, 100, 500])].map((step) => (
           <button
             key={step}
             type="button"

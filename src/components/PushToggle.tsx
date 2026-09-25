@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
-type PushState = "unsupported" | "off" | "enabling" | "on" | "denied";
+type PushState = "unsupported" | "off" | "idle" | "enabling" | "on" | "denied";
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -74,6 +74,10 @@ export default function PushToggle() {
     setError(false);
     try {
       const permission = await Notification.requestPermission();
+      if (permission === "default") {
+        setState("idle");
+        return;
+      }
       if (permission !== "granted") {
         setState("denied");
         return;

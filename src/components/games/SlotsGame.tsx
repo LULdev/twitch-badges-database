@@ -20,7 +20,7 @@ export default function SlotsGame() {
     Array.from({ length: 3 }, () => Array(5).fill("")),
   );
   const [spinning, setSpinning] = useState(false);
-  const [lastWin, setLastWin] = useState<{ payout: number; lines: number; scatter: number } | null>(null);
+  const [lastWin, setLastWin] = useState<{ payout: number; bet: number; lines: number; scatter: number } | null>(null);
   const spinTimer = useRef<number>(0);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function SlotsGame() {
       scatter: number;
     };
     setReels(r.reels);
-    setLastWin({ payout: result.payout, lines: r.lineWins?.length ?? 0, scatter: r.scatter });
+    setLastWin({ payout: result.payout, bet, lines: r.lineWins?.length ?? 0, scatter: r.scatter });
   }
 
   function renderSymbol(id: string) {

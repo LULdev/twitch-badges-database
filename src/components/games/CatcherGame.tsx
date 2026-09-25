@@ -53,7 +53,7 @@ export default function CatcherGame() {
 
       for (const item of itemsRef.current) {
         const y = item.y + item.speed;
-        if (y >= height - 36 && Math.abs(item.x - basketPx) < 42) {
+        if (y >= height - 36 && Math.abs(item.x + 16 - basketPx) < 40) {
           if (item.bomb) caughtNext = Math.max(0, caughtNext - 3);
           else caughtNext += 1;
           continue;
