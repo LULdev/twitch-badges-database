@@ -103,6 +103,7 @@ export default function WheelOfFortune() {
       setRotation((prev) => prev + target);
       spinTimer.current = window.setTimeout(() => {
         setSpinning(false);
+        setUsedToday(true);
         // The server-awarded amounts, not a local copy of the prize table.
         setResult({
           id: data.slot.id,

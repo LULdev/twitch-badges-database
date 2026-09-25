@@ -1,0 +1,20 @@
+node:internal/modules/esm/resolve:274
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\LUL\Twitch-Badges-Database\scripts\_tmp-export-ideas.mts' imported from C:\Users\LUL\Twitch-Badges-Database\
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:864:10)
+    at defaultResolve (node:internal/modules/esm/resolve:990:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:737:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:773:38)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at resolveBaseSync (file:///C:/Users/LUL/Twitch-Badges-Database/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:10932)
+    at resolveDirectorySync (file:///C:/Users/LUL/Twitch-Badges-Database/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:12238)
+    at resolveTsPathsSync (file:///C:/Users/LUL/Twitch-Badges-Database/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:13445)
+    at resolve (file:///C:/Users/LUL/Twitch-Badges-Database/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:15991) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/LUL/Twitch-Badges-Database/scripts/_tmp-export-ideas.mts'
+}
+
+Node.js v24.11.1

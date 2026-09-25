@@ -73,6 +73,9 @@ export default function BrainstormPanel() {
       if (successKey) setNotice(t(successKey));
       await load();
       return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("failed"));
+      return false;
     } finally {
       setBusy(false);
     }

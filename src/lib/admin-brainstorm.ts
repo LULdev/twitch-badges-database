@@ -153,11 +153,11 @@ export async function listAudit(options: {
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
   if (options.action) {
-    const safe = options.action.replace(/[,()%*]/g, "");
+    const safe = options.action.replace(/[,()%*_]/g, "");
     builder = builder.like("action", `${safe}%`);
   }
   if (options.actor) {
-    const safe = options.actor.replace(/[,()%*]/g, "");
+    const safe = options.actor.replace(/[,()%*_]/g, "");
     builder = builder.ilike("actor", `%${safe}%`);
   }
   const { data, error, count } = await builder;
