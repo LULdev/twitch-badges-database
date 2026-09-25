@@ -682,7 +682,7 @@
     "freeQ": "Is all of this free?",
     "gamesA": "All luck-based outcomes (slots, roulette, wheel, coin flips, blackjack, scratch, tower) are rolled on the server and cannot be manipulated. Skill games (shooting, memory, catching) check scores server-side with caps.",
     "gamesQ": "Are the games fair?",
-    "levelsA": "Level 1 starts at 0 XP. Each level needs 100 + (level-1) x 50 XP — level 100 totals 252,450 XP. Every level has a unique sparkle-animated level badge in your profile that is always visible and cannot be hidden.",
+    "levelsA": "Level 1 starts at 0 XP. Each level needs 100 + (level-1) x 50 XP — level 100 totals 252,450 XP. Every level has a unique sparkle-animated level badge in your profile that is toggleable in the profile customizer.",
     "levelsQ": "How do levels 1 to 100 work?",
     "profileA": "36 settings: 21 common (colors, fonts, banner, card style, frames, privacy toggles, social links) and 15 creative extras (aura, particle background, rainbow name, 3D tilt, pixel avatar, achievement ticker and more).",
     "profileQ": "How customizable is my profile?",

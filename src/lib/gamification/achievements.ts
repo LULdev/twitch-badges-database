@@ -130,7 +130,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   COMMON("c_wheel_first", "Let It Spin", "Spin the Wheel of Fortune once.", (s) => s.progress.wheel_spins >= 1),
   COMMON("c_wheel_10", "Wheel Fan", "Spin the wheel 10 times.", (s) => s.progress.wheel_spins >= 10),
   COMMON("c_wheel_50", "Wheel Addict", "Spin the wheel 50 times.", (s) => s.progress.wheel_spins >= 50, 300, 300),
-  COMMON("c_wheel_loyal", "Daily Ritual", "Spin the wheel on 7 days in a row.", (s) => s.progress.wheel_spins >= 7 && s.progress.login_streak >= 7, 200, 200),
+  COMMON("c_wheel_loyal", "Daily Ritual", "Spin the wheel 7 times with a 7-day login streak.", (s) => s.progress.wheel_spins >= 7 && s.progress.login_streak >= 7, 200, 200),
   COMMON("c_profile_customized", "Make It Yours", "Customize at least 5 profile settings.", (s) => s.customizationKeys >= 5),
   COMMON("c_views_10", "Getting Noticed", "10 profile views.", (s) => s.profileViews >= 10),
   COMMON("c_views_100", "Rising Star", "100 profile views.", (s) => s.profileViews >= 100, 200, 200),
@@ -138,8 +138,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   // It used to check `customizationKeys >= 0` — always true — so "Curator"
   // fired on the first owned badge, duplicating c_sync_first.
   COMMON("c_showcase_set", "Curator", "Fill your badge showcase.", (s) => s.showcaseSlots >= SHOWCASE_SLOTS),
-  COMMON("c_bio_written", "Storyteller", "Write a profile bio.", (s) => s.moodSet || s.customizationKeys >= 1),
-  COMMON("c_frame", "Framed", "Equip an avatar frame.", (s) => s.customizationKeys >= 3),
+  COMMON("c_bio_written", "Storyteller", "Set a mood status or add a profile customization.", (s) => s.moodSet || s.customizationKeys >= 1),
+  COMMON("c_frame", "Framed", "Save three profile customizations.", (s) => s.customizationKeys >= 3),
   COMMON("c_ach_1", "First Achievement", "Unlock 1 achievement.", () => false, 0, 0),
   COMMON("c_ach_10", "Achievement Hunter", "Unlock 10 achievements.", () => false, 150, 150),
   COMMON("c_ach_25", "Trophy Room", "Unlock 25 achievements.", () => false, 300, 300),
@@ -229,7 +229,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   CREATIVE("k_catcher_100", "Golden Gloves", "Win 10 rounds of Drops Catcher.",
     (s) => (s.gamesByType["catcher"]?.won ?? 0) >= 10),
   CREATIVE("k_shoot_500", "Badge Hunter", "Play 50 rounds of Shoot the Badges.", (s) => (s.gamesByType["shoot"]?.played ?? 0) >= 50),
-  CREATIVE("k_reactor", "Reactor", "React to 5 blog posts.", (s) => s.reactionsGiven >= 5),
+  CREATIVE("k_reactor", "Reactor", "React to blog posts 5 times.", (s) => s.reactionsGiven >= 5),
   // Retired (see RETIRED_ACHIEVEMENT_IDS): the conditions are unreachable on
   // purpose, because the signals they describe are recorded nowhere. Filtering
   // happens in one place; these lines keep the entries' metadata so an unlock

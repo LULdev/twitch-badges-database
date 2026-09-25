@@ -102,9 +102,9 @@ export default function SlotsGame() {
             {spinning ? t("spinning") : (<span>{t("spin")} (<span className="inline-flex items-center gap-1">{bet.toLocaleString(locale)} <Coin size={14} /></span>)</span>)}
           </button>
           {lastWin && (
-            <p className={`mt-3 text-center text-lg font-extrabold ${lastWin.payout > bet ? "text-success" : "text-muted"}`}>
-              {lastWin.payout > bet
-                ? (<span><span dir="ltr">{`+${(lastWin.payout - bet).toLocaleString(locale)}`}</span> <Coin size={14} /> — {lastWin.lines} {t("paylines")}{lastWin.scatter >= 3 ? ` · ${lastWin.scatter}x ${t("scatter")}` : ""}</span>)
+            <p className={`mt-3 text-center text-lg font-extrabold ${lastWin.payout > lastWin.bet ? "text-success" : "text-muted"}`}>
+              {lastWin.payout > lastWin.bet
+                ? (<span><span dir="ltr">{`+${(lastWin.payout - lastWin.bet).toLocaleString(locale)}`}</span> <Coin size={14} /> — {lastWin.lines} {t("paylines")}{lastWin.scatter >= 3 ? ` · ${lastWin.scatter}x ${t("scatter")}` : ""}</span>)
                 : t("noWin")}
             </p>
           )}
