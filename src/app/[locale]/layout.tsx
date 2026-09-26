@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Analytics } from "@vercel/analytics/next";
 import { routing, isRtl, localeHtmlLang } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
 import { siteUrl, localeAlternates } from "@/lib/seo";
@@ -126,8 +127,8 @@ export default async function LocaleLayout({
           <AnalyticsBeacon locale={locale} />
         </NextIntlClientProvider>
         <ServiceWorkerRegister />
+        <Analytics />
       </body>
     </html>
   );
 }
-
