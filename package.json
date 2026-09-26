@@ -12,6 +12,7 @@
     "sync:global": "tsx scripts/sync-global.ts",
     "sync:badgebase": "tsx scripts/sync-badgebase.ts",
     "sync:potat": "tsx scripts/sync-potat.ts",
+    "sync:archive": "tsx scripts/sync-archive.ts",
     "send:push": "tsx scripts/send-push.ts",
     "log:change": "tsx scripts/log-change.ts",
     "shots": "tsx scripts/screenshots.ts",

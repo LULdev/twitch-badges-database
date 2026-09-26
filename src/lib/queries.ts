@@ -355,6 +355,12 @@ export async function getBadgeStatsHistory(
   // Newest-first for the limit, then reversed for the chart: ordering ascending
   // took the OLDEST 250 points, so a badge with a longer history showed a chart
   // that stopped updating weeks ago.
+  //
+  // Unfiltered on purpose, and it selects no `source` column. A `source` filter
+  // here would ERROR (not match nothing) on a database the archive migration has
+  // not reached, and this is the pre-archive contract. It is NOT the chart's
+  // read any more — getBadgeOwnerSeries below is, because only that one splits
+  // the two sources.
   const { data } = await supabase
     .from("badge_stats")
     .select("polled_at, owner_count, active_count")
@@ -362,6 +368,131 @@ export async function getBadgeStatsHistory(
     .order("polled_at", { ascending: false })
     .limit(limit);
   return ((data ?? []) as StatsPoint[]).reverse();
+}
+
+export interface OwnerSeriesPoint {
+  polled_at: string;
+  owner_count: number | null;
+  active_count: number | null;
+  source: "measured" | "archive";
+}
+
+const OWNER_SERIES_COLUMNS = "polled_at, owner_count, active_count, source";
+
+// PostgREST answers a query naming a column its schema cache does not have with
+// an error, not with zero rows: PGRST204 for the select list, PGRST100 when the
+// missing column only appears in a filter, and Postgres' own 42703 underneath
+// both. `source` arrives with the archive migration, so this read has to
+// recognise that one failure — folding it into the generic "no data" path would
+// blank the owner chart on a database that simply is not migrated yet.
+const MISSING_COLUMN_CODES = new Set(["PGRST204", "PGRST100", "42703"]);
+
+function isMissingSourceColumn(error: { code: string; message: string } | null): boolean {
+  if (!error) return false;
+  if (MISSING_COLUMN_CODES.has(error.code)) return true;
+  // Some pooler paths drop the machine code and leave only the text.
+  return /column/i.test(error.message) && /does not exist|not found/i.test(error.message);
+}
+
+/**
+ * The owner curve as ONE ascending array in which every point keeps its
+ * `source`, so the chart can split the measured line from the archived one by
+ * field instead of reconciling two calls of its own.
+ *
+ * The limits are applied PER SOURCE. A single limit over the union lets the
+ * longer source eat the window — a decades-long archive tail would push the
+ * recent measured points off the end, which is the same "chart froze weeks ago"
+ * failure the ordering comment on `getBadgeStatsHistory` documents, one level up.
+ */
+export async function getBadgeOwnerSeries(
+  badgeId: string,
+  options?: { measuredLimit?: number; archivedLimit?: number },
+): Promise<OwnerSeriesPoint[]> {
+  // Measured keeps the existing 250 precedent: it is the live series. The
+  // archived side stays in the low tens on purpose — the chart draws a line,
+  // not a scatter of yearly dots, and recharts pays a DOM node per point.
+  const measuredLimit = options?.measuredLimit ?? 250;
+  const archivedLimit = options?.archivedLimit ?? 24;
+  const supabase = await createClient();
+
+  // Measured keeps the NEWEST points (that series is live and dense); archive
+  // keeps the OLDEST. The backfill invariant places every archived point
+  // strictly before the first measured one, so the archive set sits entirely to
+  // the left — taking its newest 24 would keep the points nearest the measured
+  // era and discard the early ones, which are the ones the recovery pass
+  // exists to find, and would leave the chart starting years after the "first
+  // archived count" fact printed above it.
+  const [measuredRes, archivedRes] = await Promise.all([
+    supabase
+      .from("badge_stats")
+      .select(OWNER_SERIES_COLUMNS)
+      .eq("badge_id", badgeId)
+      .eq("source", "measured")
+      .order("polled_at", { ascending: false })
+      .limit(measuredLimit),
+    supabase
+      .from("badge_stats")
+      .select(OWNER_SERIES_COLUMNS)
+      .eq("badge_id", badgeId)
+      .eq("source", "archive")
+      .order("polled_at", { ascending: true })
+      .limit(archivedLimit),
+  ]);
+
+  if (
+    isMissingSourceColumn(measuredRes.error) ||
+    isMissingSourceColumn(archivedRes.error)
+  ) {
+    // Pre-migration: with no `source` column no archive row can exist, so the
+    // unfiltered read IS the measured series. The branch is unreachable again the
+    // moment the column exists, which is what guarantees an archived point can
+    // never reach a caller asking for the measured line.
+    const legacy = await getBadgeStatsHistory(badgeId, measuredLimit);
+    return legacy.map((point) => ({ ...point, source: "measured" as const }));
+  }
+
+  // A failure on one side drops that series, not the page: the chart is
+  // progressive enhancement. Timestamps are Postgres timestamptz, so the
+  // lexicographic comparison on the ISO-8601 strings is the chronological one.
+  return [
+    ...((measuredRes.data ?? []) as OwnerSeriesPoint[]),
+    ...((archivedRes.data ?? []) as OwnerSeriesPoint[]),
+  ].sort((a, b) =>
+    a.polled_at < b.polled_at ? -1 : a.polled_at > b.polled_at ? 1 : 0,
+  );
+}
+
+export interface FirstArchivedPoint {
+  polled_at: string;
+  owner_count: number;
+  source_url: string | null;
+}
+
+/**
+ * The oldest archived capture that actually carries an owner count — the "first
+ * recorded" fact the badge page shows. An earlier archive row with a null
+ * owner_count is a capture the recovery pass could not read, not evidence of a
+ * badge nobody owns, so it must not become the headline number.
+ *
+ * It is not a peak, and must not be presented as one: Wayback captures are
+ * opportunistic, so the oldest one is simply where the recovered curve starts.
+ */
+export async function getFirstArchivedOwnerPoint(
+  badgeId: string,
+): Promise<FirstArchivedPoint | null> {
+  const supabase = await createClient();
+  // No error branch: a missing `source` column leaves `data` null, which is the
+  // correct answer on an un-migrated database — there are no archive rows yet.
+  const { data } = await supabase
+    .from("badge_stats")
+    .select("polled_at, owner_count, source_url")
+    .eq("badge_id", badgeId)
+    .eq("source", "archive")
+    .not("owner_count", "is", null)
+    .order("polled_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  return (data as FirstArchivedPoint | null) ?? null;
 }
 
 export interface HomeData {

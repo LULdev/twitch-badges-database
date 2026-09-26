@@ -4,7 +4,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
   getBadgeBySlug,
-  getBadgeStatsHistory,
+  getBadgeOwnerSeries,
+  getFirstArchivedOwnerPoint,
   listBadges,
 } from "@/lib/queries";
 import { BadgeImage } from "@/components/badges/BadgeImage";
@@ -87,8 +88,9 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   const badge = await getBadgeBySlug(slug);
   if (!badge) notFound();
 
-  const [history, related, live] = await Promise.all([
-    getBadgeStatsHistory(badge.id).catch(() => []),
+  const [ownerSeries, firstArchived, related, live] = await Promise.all([
+    getBadgeOwnerSeries(badge.id).catch(() => []),
+    getFirstArchivedOwnerPoint(badge.id).catch(() => null),
     // Without a category the filter would be a no-op and the section would
     // list the global newest badges under a "same category" heading.
     badge.category
@@ -97,15 +99,30 @@ export default async function BadgeDetailPage({ params }: PageProps) {
     fetchBadgeLiveStats(badge.set_id).catch(() => null),
   ]);
 
-  const chartData = history.map((point) => ({
-    label: new Date(point.polled_at).toLocaleString(locale, {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-    }),
-    owners: point.owner_count,
-    active: point.active_count,
-  }));
+  // Measured and archived points share ONE x-axis whose domain is the
+  // timestamp, so they have to be a single ascending array: a point's identity
+  // is carried by which field is populated (`owners`/`active` when measured,
+  // `ownersArchived` when archived) rather than by its position. Two arrays
+  // would need two x-axes and would misalign the two series against the same
+  // dates. Sorted explicitly because the series arrives ascending per source,
+  // not globally.
+  const chartData = [...ownerSeries]
+    .sort((a, b) => Date.parse(a.polled_at) - Date.parse(b.polled_at))
+    .map((point) => ({
+      label: new Date(point.polled_at).toLocaleString(locale, {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+      }),
+      owners: point.source === "measured" ? point.owner_count : null,
+      active: point.source === "measured" ? point.active_count : null,
+      ownersArchived: point.source === "archive" ? point.owner_count : null,
+      source: point.source,
+    }));
+
+  // Read from the series, not from `firstArchived`: the subtitle describes what
+  // the chart above it actually plots, and the series is limit-capped.
+  const hasArchivedPoints = ownerSeries.some((point) => point.source === "archive");
 
   const relatedBadges = (related?.items ?? []).filter((b) => b.id !== badge.id).slice(0, 6);
 
@@ -292,6 +309,45 @@ export default async function BadgeDetailPage({ params }: PageProps) {
                 </dd>
               </div>
             )}
+            {/* Recovered archive capture, rendered LAST and deliberately quieter
+                than the rows above: text-xs, the muted token, no semibold weight,
+                behind a hairline rule. It is a number observed years ago, not the
+                current owner count, so it must never read as the authoritative
+                figure. Nothing here feeds the live owner_count/active_count
+                display — the archive is provenance and the two stay independent.
+                The date links to the capture itself, so the "recovered" claim is
+                checkable rather than asserted. */}
+            {firstArchived !== null && (
+              <div className="flex justify-between gap-4 border-t border-line pt-3 text-xs">
+                <dt className="text-muted">
+                  {t("firstArchived")}
+                  <span className="mt-0.5 block text-[0.6875rem] leading-snug">
+                    {t("firstArchivedHint", {
+                      date: new Date(firstArchived.polled_at).toLocaleDateString(locale, {
+                        dateStyle: "medium",
+                      }),
+                    })}
+                  </span>
+                </dt>
+                <dd className="text-end tabular-nums text-muted">
+                  {new Intl.NumberFormat(locale).format(firstArchived.owner_count)}
+                  {firstArchived.source_url ? (
+                    <a
+                      className="mt-0.5 block text-[0.6875rem] leading-snug hover:text-foreground"
+                      href={firstArchived.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {formatDate(firstArchived.polled_at, locale)} ↗
+                    </a>
+                  ) : (
+                    <span className="mt-0.5 block text-[0.6875rem] leading-snug">
+                      {formatDate(firstArchived.polled_at, locale)}
+                    </span>
+                  )}
+                </dd>
+              </div>
+            )}
           </dl>
 
           <div className="rounded-[var(--radius-input)] border border-line bg-surface-2 p-4">
@@ -317,7 +373,14 @@ export default async function BadgeDetailPage({ params }: PageProps) {
             <div className="section-title">
               <h2>{t("ownerTrend")}</h2>
             </div>
-            <p className="-mt-4 mb-3 text-xs text-muted">{t("ownerTrendSubtitle")}</p>
+            {/* Conditional: a badge with no recovered history renders exactly as
+                before. Advertising an archive the chart does not contain would be
+                a promise the page does not keep. */}
+            <p className="-mt-4 mb-3 text-xs text-muted">
+              {hasArchivedPoints
+                ? t("ownerTrendArchivedSubtitle")
+                : t("ownerTrendSubtitle")}
+            </p>
             {chartData.length >= 2 ? (
               <OwnersChart data={chartData} />
             ) : (

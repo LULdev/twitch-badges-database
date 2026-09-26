@@ -336,6 +336,11 @@ export default async function StatsPage({
     "sync/global": t("sourceSyncCatalog"),
     "sync/badgebase": t("sourceSyncEnrichment"),
     "sync/potat": t("sourceSyncOwners"),
+    // Without these the archive backfill's two heartbeats both fall through to
+    // `sourceOther`, and the public uptime table grows two rows no visitor can
+    // tell apart.
+    "sync/archive": t("sourceSyncArchive"),
+    "cron/archive": t("sourceCronArchive"),
     web: t("sourceWeb"),
   };
   const sourceLabel = (id: string) => SOURCE_LABELS[id] ?? t("sourceOther");

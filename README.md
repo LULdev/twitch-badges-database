@@ -36,6 +36,7 @@ npm run db:apply             # create/replace the schema (needs SUPABASE_DB_URL)
 npm run sync:global          # populate the catalog from the Twitch API
 npm run sync:badgebase       # enrich with drop windows + insert upcoming badges
 npm run sync:potat           # owner counts, rarity, status sweeps
+npm run sync:archive         # owner history from web-archive captures (--dry-run first)
 npm run dev
 ```
 
@@ -95,6 +96,7 @@ words) plus a 20-question FAQ in all languages. DB tables in
 | `npm run sync:global` | catalog diff → new badges → changelog → blog → push |
 | `npm run sync:badgebase` | drop windows + upcoming badges |
 | `npm run sync:potat` | owner stats time series + rarity + status sweeps |
+| `npm run sync:archive [-- --dry-run] [-- --limit=N]` | recover older owner counts from public web-archive captures of badgebase/potat pages into `badge_stats` as `source='archive'`; one-time recovery pass, not scheduled |
 | `npm run send:push -- "Title" "Body" "/en/badges/slug"` | manual push broadcast |
 | `npm run shots` | render the admin/public views to `docs/screenshots/` (needs a dev server) |
 
