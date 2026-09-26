@@ -131,7 +131,7 @@
     "ownerCount": "{count, plural, one {# owner} other {# owners}}",
     "ownerTrend": "Owner trend",
     "ownerTrendArchivedSubtitle": "Solid line: counts this site measured. Dashed line: counts recovered from web-archive captures of the badge's public pages.",
-    "ownerTrendSubtitle": "Live owner counts, refreshed every 15 minutes",
+    "ownerTrendSubtitle": "Live owner counts, refreshed hourly",
     "owners": "owners",
     "percentageOfUsers": "{value}% of tracked users",
     "rarityFormula": "The TBRI v2 combines six signals: owner scarcity (40%), wear rate (10%), obtainability (20%), age (10%), 24h momentum (10%) and claim-window brevity (10%) — a 0–100 score mapped to six tiers. Badges that require buying a ticket (TwitchCon & co.) are always legendary.",

@@ -131,7 +131,7 @@
     "ownerCount": "{count, plural, other {# 位持有者}}",
     "ownerTrend": "持有者趋势",
     "ownerTrendArchivedSubtitle": "实线：本站实测的计数。虚线：从该徽章公开页面的网页存档快照中恢复的计数。",
-    "ownerTrendSubtitle": "实时持有者数量，每 15 分钟刷新",
+    "ownerTrendSubtitle": "实时持有者数量，每小时刷新",
     "owners": "人拥有",
     "percentageOfUsers": "占追踪用户的 {value}%",
     "rarityFormula": "TBRI v2 综合六个信号：所有者稀缺度（40%）、佩戴率（10%）、可获得性（20%）、年龄（10%）、24 小时增长势头（10%）以及领取窗口的短长度（10%）——0–100 分，映射到六个等级。需要购买门票的徽章（TwitchCon 等）始终为传说级。",

@@ -156,10 +156,20 @@ Blocked deployments can be DELETEd via the v13 API; the cancel API 400s.)
 **Sync schedule** (Vercel Hobby = max 2 cron jobs, daily only):
 - `/api/cron/global` (catalog diff + badgebase enrichment) — daily 06:00 UTC
 - `/api/cron/potat` (owner stats, rarity, status sweeps) — daily 06:30 UTC
-- **Every 15 minutes**: GitHub Actions `.github/workflows/potat-sync.yml`
-  hits `/api/cron/potat` with the `CRON_SECRET` repo secret (verified
-  working). Don't add sub-daily schedules to vercel.json (Hobby rejects
-  the deploy).
+- **Hourly at :07**: GitHub Actions `.github/workflows/potat-sync.yml`
+  hits `/api/cron/potat` with the `CRON_SECRET` repo secret. Don't add
+  sub-daily schedules to vercel.json (Hobby rejects the deploy).
+
+  **Do not "restore" the 15-minute cron.** It ran from 2025 to 2026-09-26
+  and executed 41 times in 161 hours — 6.4% of schedule, median gap 249
+  minutes, worst case 7.2 hours — because GitHub's scheduled-run queue lags
+  and coalesces. It looked like it worked because roughly one run a day did
+  land, which is also all the badgebase daily job managed (it ran ~5h
+  late). Requesting 96 events a day bought no extra data either: the sync
+  writes a point only when values changed or the last is over an hour old,
+  so 96 runs cannot produce more than 24 points. If sub-hourly sync is ever
+  genuinely required it needs a scheduler that keeps time — GitHub Actions
+  cron cannot provide it.
 
 The potat sync writes in chunked bulk upserts (~6s) — per-row PATCH loops
 would exceed the 60s serverless limit; keep it that way.

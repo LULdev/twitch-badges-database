@@ -1,14 +1,31 @@
 name: Stats sync (potat)
 
-# 15-minute owner-stats / rarity / status-sync cadence. The Vercel Hobby plan
-# only allows 2 daily cron jobs, so GitHub Actions carries the high-frequency
-# schedule and calls the same authenticated endpoint.
+# Hourly owner-stats / rarity / status-sync cadence. The Vercel Hobby plan only
+# allows 2 cron jobs and runs them daily, so GitHub Actions carries the
+# sub-daily schedule and calls the same authenticated endpoint.
+#
+# WHY HOURLY AND NOT EVERY 15 MINUTES — measured, not assumed. A 15-minute cron
+# (`7,22,37,52 * * * *`) was live from 2025 until 2026-09-26 and executed 41
+# times in 161 hours: 41 of an expected 645, a 6.4% hit rate, with a MEDIAN gap
+# of 249 minutes and a worst case of 7.2 hours. Runs were spread evenly across
+# all 24 UTC hours, so this is not a quota-reset artefact — it is the documented
+# lag and coalescing of GitHub's scheduled-run queue, and no workflow YAML
+# changes it. A daily job on this same account (badgebase-sync) also ran about
+# 5 hours late, which is the same queue.
+#
+# Requesting 96 events a day bought nothing: the sync writes a badge_stats point
+# only when the values changed or the last one is over an hour old
+# (`lastOld` in src/lib/syncs/potat.ts), so 96 runs a day cannot produce more
+# than 24 points regardless. They only crowded the queue further.
+#
+# At one event an hour the queue is no longer oversubscribed, which is the
+# cadence this schedule is now actually expected to deliver. The offset minute
+# (never :00/:30) keeps the run from colliding with the Vercel crons at
+# 06:00/06:30 — two concurrent potat runs doubled the badge_stats time-series
+# points and wrote duplicate changelog rows.
 on:
   schedule:
-    # Offset minutes (never :00/:30) so the GH run cannot collide with the
-    # Vercel crons at 06:00/06:30 — two concurrent potat runs doubled the
-    # badge_stats time-series points and wrote duplicate changelog rows.
-    - cron: "7,22,37,52 * * * *"
+    - cron: "7 * * * *"
   workflow_dispatch: {}
 
 concurrency:

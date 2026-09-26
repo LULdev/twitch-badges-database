@@ -131,7 +131,7 @@
     "ownerCount": "{count, plural, one {# propietario} other {# propietarios}}",
     "ownerTrend": "Tendencia de propietarios",
     "ownerTrendArchivedSubtitle": "Línea sólida: recuentos medidos por este sitio. Línea discontinua: recuentos recuperados de capturas del archivo web de las páginas públicas de la insignia.",
-    "ownerTrendSubtitle": "Recuentos de propietarios en vivo, actualizados cada 15 minutos",
+    "ownerTrendSubtitle": "Recuentos de propietarios en vivo, actualizados cada hora",
     "owners": "propietarios",
     "percentageOfUsers": "{value}% de los usuarios rastreados",
     "rarityFormula": "El TBRI v2 combina seis señales: escasez de propietarios (40%), tasa de uso (10%), obtenibilidad (20%), antigüedad (10%), impulso de 24h (10%) y brevedad de la ventana (10%) — una puntuación de 0–100 en seis niveles. Las insignias que requieren comprar una entrada (TwitchCon y afines) siempre son legendarias.",

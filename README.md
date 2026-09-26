@@ -20,7 +20,7 @@ languages.
 |---|---|---|
 | Badge catalog | Twitch Helix `chat/badges/global` (with own app credentials) or the public IVR mirror `api.ivr.fi` | 2×/day |
 | Drop windows (start/end, free/paid, how-to-earn) | badgebase.de RSS + detail pages | daily |
-| Owner/active counts, rarity inputs, worldwide leaderboards | `api.potat.app` (`/twitch/badges`, `?owners=true`, `?owned=true`) | every 15 min |
+| Owner/active counts, rarity inputs, worldwide leaderboards | `api.potat.app` (`/twitch/badges`, `?owners=true`, `?owned=true`) | hourly |
 | Badges a user owns (live) | `badges.blog /api/perfil?username=` with Twitch GQL as automatic fallback | on login / on demand |
 
 Rarity (TBRI) = 45% owner scarcity (log-scaled) + 15% wear (share of owners
@@ -103,8 +103,16 @@ words) plus a 20-question FAQ in all languages. DB tables in
 ## Deployment (Vercel)
 
 - Import the repo, set the same environment variables.
-- `vercel.json` registers the crons: catalog 2×/day, badgebase daily,
-  potat every 15 minutes (Vercel sends `Authorization: Bearer $CRON_SECRET`).
+- `vercel.json` registers the crons: catalog 2×/day, badgebase daily.
+  The potat sync runs hourly from GitHub Actions (`.github/workflows/potat-sync.yml`),
+  because Vercel Hobby allows only 2 daily cron jobs. Vercel and the workflow
+  both send `Authorization: Bearer $CRON_SECRET`.
+
+  GitHub's scheduled-run queue runs several hours late and drops most events on
+  a high-frequency schedule — a 15-minute cron there executed 6.4% of the time.
+  That is why the potat schedule is hourly: it is a cadence the queue actually
+  delivers, and the sync could not write more than one point per hour per badge
+  anyway.
 
 ## Admin control panel
 

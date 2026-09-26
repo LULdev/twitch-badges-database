@@ -131,7 +131,7 @@
     "ownerCount": "{count, plural, other {#人の所有者}}",
     "ownerTrend": "所有者数の推移",
     "ownerTrendArchivedSubtitle": "実線：このサイトが計測した数値。破線：バッジの公開ページのウェブアーカイブから復元した数値。",
-    "ownerTrendSubtitle": "所有者数のライブ値、15分ごとに更新",
+    "ownerTrendSubtitle": "所有者数のライブ値、1時間ごとに更新",
     "owners": "人が所持",
     "percentageOfUsers": "追跡ユーザーの{value}%",
     "rarityFormula": "TBRI v2は6つのシグナルを組み合わせます：所有者の希少性（40%）、装着率（10%）、入手容易性（20%）、経過期間（10%）、24時間の勢い（10%）、入手期間の短さ（10%）— 0〜100のスコアを6段階に判定します。チケット購入が必要なバッジ（TwitchConなど）は常にレジェンドです。",

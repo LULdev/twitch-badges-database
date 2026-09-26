@@ -131,7 +131,7 @@
     "ownerCount": "{count, plural, one {# proprietário} other {# proprietários}}",
     "ownerTrend": "Tendência de proprietários",
     "ownerTrendArchivedSubtitle": "Linha sólida: contagens medidas por este site. Linha tracejada: contagens recuperadas de capturas de arquivo da web das páginas públicas da insígnia.",
-    "ownerTrendSubtitle": "Contagem de proprietários ao vivo, atualizada a cada 15 minutos",
+    "ownerTrendSubtitle": "Contagem de proprietários ao vivo, atualizada a cada hora",
     "owners": "proprietários",
     "percentageOfUsers": "{value}% dos usuários rastreados",
     "rarityFormula": "O TBRI v2 combina seis sinais: escassez de proprietários (40%), taxa de uso (10%), obtibilidade (20%), idade (10%), momentum de 24h (10%) e brevidade da janela (10%) — uma pontuação de 0–100 em seis níveis. Badges que exigem a compra de ingresso (TwitchCon etc.) são sempre lendários.",

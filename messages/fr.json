@@ -131,7 +131,7 @@
     "ownerCount": "{count, plural, one {# détenteur} other {# détenteurs}}",
     "ownerTrend": "Évolution des détenteurs",
     "ownerTrendArchivedSubtitle": "Ligne continue : comptes mesurés par ce site. Ligne pointillée : comptes récupérés depuis des captures d'archive web des pages publiques du badge.",
-    "ownerTrendSubtitle": "Nombre de propriétaires en direct, actualisé toutes les 15 minutes",
+    "ownerTrendSubtitle": "Nombre de propriétaires en direct, actualisé toutes les heures",
     "owners": "propriétaires",
     "percentageOfUsers": "{value} % des utilisateurs suivis",
     "rarityFormula": "Le TBRI v2 combine six signaux : rareté des détenteurs (40%), taux de port (10%), accessibilité (20%), ancienneté (10%), momentum 24h (10%) et brièveté de la fenêtre (10%) — un score de 0 à 100 réparti en six niveaux. Les badges nécessitant l'achat d'un billet (TwitchCon etc.) sont toujours légendaires.",
