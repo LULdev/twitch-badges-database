@@ -87,6 +87,10 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
     id: string;
     set_id: string;
     version: string;
+    // slug + title are read only to satisfy the upsert's NOT NULL check (see
+    // the upsert comment) and are written back unchanged.
+    slug: string;
+    title: string;
     image_url_1x: string | null;
     status: string;
     start_date: string | null;
@@ -142,6 +146,11 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
   let statusSweeps = 0;
 
   const upsertRows: Array<Record<string, unknown>> = [];
+  // `status` now rides on every payload row (see the upsert comment), so
+  // "does this row carry a status key" no longer distinguishes a sweep from an
+  // unchanged badge. The ids that actually moved are tracked here instead, and
+  // the collapsed set below is what the summary reports.
+  const statusSweepIds = new Set<string>();
   const statRows: Array<{
     badge_id: string;
     owner_count: number | null;
@@ -202,24 +211,51 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
 
     const tierChanged = rarity.tier !== badge.rarity_tier;
     if (valuesChanged || lastOld || nextStatus !== badge.status || tierChanged) {
-      // Only the columns THIS sync owns. Spreading the full select("*") row
-      // reverted status/start_date/end_date/how_to_earn/release_date and
-      // is_confirmed_active that global and badgebase own — and at 06:00 UTC the
-      // potat workflow fires in the same minute as the global cron, so the
-      // potat write could land after theirs and undo the day's confirmation.
-      // `status` is the sole exception: potat's own sweep may retire a badge.
+      // ONLY the columns this sync owns, plus the four that carry no default.
+      //
+      // The narrowed payload is not optional. Postgres checks NOT NULL on the
+      // PROPOSED tuple before it resolves ON CONFLICT, so an upsert that omits
+      // a NOT NULL column without a default raises 23502 even when the row
+      // exists and the conflict would have taken the DO UPDATE branch. Narrowing
+      // the payload to exactly potat's columns therefore broke EVERY write:
+      // set_id/version/slug/title have no default, so the proposed tuple was
+      // always null there and the whole sync died at the first chunk. It ran
+      // this way for 12 consecutive heartbeats before being caught.
+      //
+      // `status` is written on EVERY row rather than only when it changes, for
+      // a different reason: PostgREST builds one INSERT whose column list is the
+      // union of the keys across the batch and fills the gaps with NULL, then
+      // sets every listed column in DO UPDATE. A batch where only some rows
+      // carried `status` would therefore null it for the others and trip the
+      // same constraint. One shape for every row is the only shape PostgREST
+      // handles correctly.
+      //
+      // The columns deliberately still EXCLUDED are the volatile ones the
+      // narrowing was for: start_date/end_date/how_to_earn/release_date/
+      // is_confirmed_active, which global and badgebase own. At 06:00 UTC the
+      // potat workflow fires in the same minute as the global cron, so a potat
+      // write landing after theirs would undo the day's confirmation. The
+      // identity columns added above are stable catalog identity that potat
+      // merely echoes back unchanged, not the volatile fields.
       upsertRows.push({
         id: badge.id,
+        set_id: badge.set_id,
+        version: badge.version,
+        slug: badge.slug,
+        title: badge.title,
         owner_count: totalOwners,
         active_count: activeUsers,
         percentage,
         last_polled_at: now.toISOString(),
         rarity_score: rarity.score,
         rarity_tier: rarity.tier,
-        ...(nextStatus !== badge.status ? { status: nextStatus } : {}),
+        status: nextStatus,
       });
       rarityUpdated += 1;
-      if (nextStatus !== badge.status) statusSweeps += 1;
+      if (nextStatus !== badge.status) {
+        statusSweeps += 1;
+        statusSweepIds.add(badge.id);
+      }
     }
 
     // Append a time-series point when values changed or the last point is old.
@@ -249,7 +285,22 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
   // the changelog while the database only ever received one row.
   const finalRows = [...pendingByKey.values()];
   rarityUpdated = finalRows.length;
-  statusSweeps = finalRows.filter((row) => "status" in row).length;
+  statusSweeps = finalRows.filter((row) => statusSweepIds.has(String(row.id))).length;
+
+  // PostgREST derives one column list from the union of the batch's keys, so a
+  // payload whose rows disagree on shape is not "mostly fine": the missing keys
+  // are sent as NULL and then written over the live row. A single unequal shape
+  // therefore has to fail HERE, loudly, rather than corrupting a column for the
+  // subset of rows that omitted it.
+  const payloadShape = Object.keys(finalRows[0] ?? {}).sort().join(",");
+  const uneven = finalRows.filter(
+    (row) => Object.keys(row).sort().join(",") !== payloadShape,
+  );
+  if (uneven.length > 0) {
+    throw new Error(
+      `potat upsert payload is not uniform: ${uneven.length} of ${finalRows.length} rows have a different column set than the first (${payloadShape})`,
+    );
+  }
 
   // Chunked commits again: a failure in a later chunk leaves earlier ones live
   // with no changelog row — the undocumented-mutation case the other syncs
