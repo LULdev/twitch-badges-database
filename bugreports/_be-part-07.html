@@ -4,12 +4,12 @@
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Add a global daily cap to stealing</h3>
-  <details><summary>Details</summary><p>The flood check is per victim, so a coordinated group can still drain the top collectors. A global daily cap closes that without touching the per-victim rule.
+  <h3>Ein globales Tageslimit für das Stehlen hinzufügen</h3>
+  <details><summary>Details</summary><p>Die Flood-Prüfung gilt pro Opfer, sodass eine koordinierte Gruppe weiterhin die Top-Sammler leerlegen kann. Ein globales Tageslimit schließt diese Lücke, ohne die Pro-Opfer-Regel anzutasten.
 
-Source: IMPROVEMENTS.md Part 1.9.
+Quelle: IMPROVEMENTS.md Part 1.9.
 
-Source: IMPROVEMENTS.md Part 1</p></details>
+Quelle: IMPROVEMENTS.md Part 1</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:100%;background:#22c55e"></span></div><span class="val">5/5 · sehr hoch</span></div>
@@ -23,16 +23,16 @@ Source: IMPROVEMENTS.md Part 1</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Silhouette Showdown</h3>
-  <details><summary>Details</summary><p>A daily quiz game built from the real catalog art: the page renders a badge PNG as a pure-black silhouette (or a 12-pixel downsample) and asks the user to name the badge from four catalog options. Correct answers award XP and a streak multiplier; the pool is drawn from badges the user has *seen* in the catalog so the difficulty is personalized.
+  <h3>Silhouetten-Showdown</h3>
+  <details><summary>Details</summary><p>Ein tägliches Quizspiel auf Basis der echten Kataloggrafiken: Die Seite rendert das PNG eines Badges als rein schwarze Silhouette (oder als 12-Pixel-Verkleinerung) und lässt den Nutzer den Badge aus vier Katalogoptionen erraten. Richtige Antworten bringen XP und einen Serien-Multiplikator; der Fragenpool wird aus Badges gebildet, die der Nutzer im Katalog bereits *gesehen* hat, damit der Schwierigkeitsgrad personalisiert ist.
 
-Why it fits: The catalog already ships every badge image plus its title, category and rarity, so the entire game content is derived, not authored. It turns the catalog itself into the game board rather than adding a disconnected mini-game, and the streak hook feeds the existing daily-login loop.
+Warum es passt: Der Katalog liefert bereits jedes Badge-Bild samt Titel, Kategorie und Seltenheit, sodass der gesamte Spielinhalt abgeleitet statt eigens verfasst wird. Damit wird der Katalog selbst zum Spielfeld, statt ein losgelöstes Minispiel zu ergänzen, und der Serien-Anreiz speist die bestehende tägliche Login-Schleife.
 
-Effort: S.
+Aufwand: S.
 
-Risk if built badly: Badge art is 14–28 px native, so a bad silhouette is either unrecognizable or trivially recognisable — the difficulty curve must be tuned per badge size or the game feels random.
+Risiko bei schlechter Umsetzung: Badge-Grafiken sind nativ 14–28 px groß, daher ist eine schlechte Silhouette entweder nicht erkennbar oder trivial erkennbar — die Schwierigkeitskurve muss pro Badge-Größe justiert werden, sonst wirkt das Spiel willkürlich.
 
-Source: bugreports/agent-idea-01.md</p></details>
+Quelle: bugreports/agent-idea-01.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -46,16 +46,16 @@ Source: bugreports/agent-idea-01.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Badge Futures Market</h3>
-  <details><summary>Details</summary><p>A prediction market where users stake BadgesCoins on claims about the catalog: &quot;badge X will cross 50,000 owners within 30 days&quot;, &quot;badge Y will drop out of the legendary tier this month&quot;. Positions are priced by the crowd, settled automatically from the `badge_stats` time series, and the market history for each badge is shown on its detail page.
+  <h3>Badge-Terminmarkt</h3>
+  <details><summary>Details</summary><p>Ein Prognosemarkt, auf dem Nutzer BadgesCoins auf Aussagen über den Katalog setzen: &quot;Badge X überschreitet innerhalb von 30 Tagen 50.000 Besitzer&quot;, &quot;Badge Y fällt diesen Monat aus der legendären Stufe&quot;. Positionen werden von der Masse bewertet, automatisch aus den `badge_stats`-Zeitreihen abgerechnet, und die Markthistorie jedes Badges wird auf seiner Detailseite angezeigt.
 
-Why it fits: The 15-minute potat sync already writes owner-count time series per badge and recomputes rarity (TBRI) each run, so every market is objectively resolvable without a human oracle — the exact precondition a prediction market needs.
+Warum es passt: Der 15-minütige potat-Sync schreibt bereits pro Badge Zeitreihen der Besitzerzahlen und berechnet bei jedem Lauf die Seltenheit (TBRI) neu, sodass jeder Markt objektiv auflösbar ist, ohne menschliches Orakel — genau die Voraussetzung, die ein Prognosemarkt braucht.
 
-Effort: L.
+Aufwand: L.
 
-Risk if built badly: If settlement windows are generous and oracle rules ambiguous, a handful of users with scripted potat reads can farm near-certain markets and drain the coin supply.
+Risiko bei schlechter Umsetzung: Sind Abrechnungsfenster großzügig und Orakel-Regeln mehrdeutig, können wenige Nutzer mit skriptgesteuerten potat-Abfragen nahezu sichere Märkte abgrasen und die Münzversorgung leerlaufen lassen.
 
-Source: bugreports/agent-idea-01.md</p></details>
+Quelle: bugreports/agent-idea-01.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -69,16 +69,16 @@ Source: bugreports/agent-idea-01.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Badge Time Machine</h3>
-  <details><summary>Details</summary><p>A global, scrubable timeline of the entire catalog: drag a slider to any past date and the badge grid, owner counts, rarity tiers and &quot;claimable now&quot; state re-render as they were on that day. A &quot;then vs now&quot; mode overlays two dates so you can see exactly which badges were added, expired or demoted in between.
+  <h3>Badge-Zeitmaschine</h3>
+  <details><summary>Details</summary><p>Eine globale, durchsteuerbare Zeitleiste des gesamten Katalogs: Zieht man einen Schieberegler auf ein beliebiges vergangenes Datum, rendern sich Badge-Raster, Besitzerzahlen, Seltenheitsstufen und der Zustand &quot;jetzt einlösbar&quot; so, wie sie an jenem Tag waren. Ein &quot;früher vs. jetzt&quot;-Modus überlagert zwei Daten, sodass man genau sehen kann, welche Badges dazwischen hinzugekommen, abgelaufen oder herabgestuft sind.
 
-Why it fits: Snapshot history from the 15-minute potat run plus every catalog diff already recorded in the changelog is a full event log; the time machine is a read-only projection over data that currently only powers the trend chart on one page.
+Warum es passt: Die Snapshot-Historie aus dem 15-minütigen potat-Lauf plus jeder bereits im Changelog festgehaltene Katalog-Diff ergeben ein vollständiges Ereignisprotokoll; die Zeitmaschine ist eine schreibgeschützte Projektion über Daten, die derzeit nur das Trenddiagramm auf einer einzigen Seite speisen.
 
-Effort: L.
+Aufwand: L.
 
-Risk if built badly: Point-in-time reconstruction from a sparse series will interpolate silently and present invented numbers as fact — every cell needs an explicit &quot;as of&quot; timestamp and a staleness marker.
+Risiko bei schlechter Umsetzung: Eine Rekonstruktion zu einem Zeitpunkt aus einer lückenhaften Reihe interpoliert stillschweigend und präsentiert erfundene Zahlen als Fakt — jede Zelle braucht einen expliziten &quot;Stand vom&quot;-Zeitstempel und eine Veraltungs-Kennzeichnung.
 
-Source: bugreports/agent-idea-01.md</p></details>
+Quelle: bugreports/agent-idea-01.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -92,16 +92,16 @@ Source: bugreports/agent-idea-01.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Leak Radar</h3>
-  <details><summary>Details</summary><p>A dedicated page that lists badges detected in the catalog feed *before* Twitch announces them — inserted via the badgebase sync's upcoming path — with a per-badge &quot;spotted N hours before official release&quot; counter and a confidence note on the source. A push topic lets people subscribe only to leaks, separate from the normal new-badge push.
+  <h3>Leak-Radar</h3>
+  <details><summary>Details</summary><p>Eine eigene Seite, die Badges listet, die im Katalog-Feed auftauchen, *bevor* Twitch sie ankündigt — eingepflegt über den Upcoming-Pfad des badgebase-Syncs — ergänzt um einen Zähler pro Badge (&quot;N Stunden vor der offiziellen Veröffentlichung entdeckt&quot;) und einen Vertrauenshinweis zur Quelle. Ein Push-Thema erlaubt es, nur Leaks zu abonnieren, getrennt vom normalen Neu-Badge-Push.
 
-Why it fits: The badgebase sync deliberately inserts upcoming badges ahead of their live window by matching image UUIDs; that early-warning side effect is currently invisible. Surfacing it turns an implementation detail of the sync into a genuinely distinctive feature no badge site offers.
+Warum es passt: Der badgebase-Sync pflegt kommende Badges bewusst vor ihrem Live-Fenster ein, indem er Bild-UUIDs abgleicht; dieser Frühwarn-Nebeneffekt ist derzeit unsichtbar. Ihn sichtbar zu machen, verwandelt ein Implementierungsdetail des Syncs in ein wirklich unverwechselbares Feature, das keine andere Badge-Seite bietet.
 
-Effort: M.
+Aufwand: M.
 
-Risk if built badly: If &quot;leak&quot; is used loosely, it becomes rumor-mongering — one false positive published as a leak destroys the credibility of the whole page, so the detection threshold must be conservative and sourced.
+Risiko bei schlechter Umsetzung: Wird &quot;Leak&quot; locker ausgelegt, artet es in Gerüchteküche aus — ein einziger als Leak veröffentlichter Fehlalarm zerstört die Glaubwürdigkeit der gesamten Seite, deshalb muss die Erkennungsschwelle konservativ und belegt sein.
 
-Source: bugreports/agent-idea-01.md</p></details>
+Quelle: bugreports/agent-idea-01.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -115,16 +115,16 @@ Source: bugreports/agent-idea-01.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Fading Badges</h3>
-  <details><summary>Details</summary><p>A leaderboard and per-badge status built on the gap between *owned* and *still displayed*: a badge whose owner count is flat while its wear share craters is flagged &quot;fading&quot;, a badge with both rising is &quot;rising&quot;. Each badge gets a small owned-vs-worn divergence chart with a &quot;worn by X% of owners today&quot; line.
+  <h3>Verblassende Badges</h3>
+  <details><summary>Details</summary><p>Eine Bestenliste und ein Status pro Badge auf Basis der Lücke zwischen *besessen* und *noch getragen*: Ein Badge, dessen Besitzerzahl konstant bleibt, während sein Trageanteil einbricht, wird als &quot;verblassend&quot; markiert; ein Badge, bei dem beides steigt, als &quot;aufsteigend&quot;. Jedes Badge bekommt ein kleines Divergenzdiagramm Besitzer-gegen-Träger mit der Linie &quot;heute von X % der Besitzer getragen&quot;.
 
-Why it fits: TBRI already computes wear as 15% of the score, but the site only ever shows the resulting number, never the divergence itself. Making the two inputs visible turns an internal rarity component into a browsable signal — &quot;badges people regret claiming&quot; is a story the data already holds.
+Warum es passt: Der TBRI rechnet Tragequote bereits mit 15 % in den Score ein, aber die Seite zeigt je nur das Ergebnis, nie die Divergenz selbst. Die beiden Eingangsgrößen sichtbar zu machen, verwandelt eine interne Seltenheitskomponente in ein durchklickbares Signal — &quot;Badges, deren Einlösung man bereut&quot; ist eine Geschichte, die die Daten bereits enthalten.
 
-Effort: S.
+Aufwand: S.
 
-Risk if built badly: Wear share is a single-source measurement (potat), so an outage looks like a mass abandonment event; the page needs to mark low-confidence windows rather than declaring every badge &quot;fading&quot;.
+Risiko bei schlechter Umsetzung: Die Tragequote ist eine Ein-Quellen-Messung (potat), daher sieht ein Ausfall wie ein Massen-Aussteige-Ereignis aus; die Seite muss Fenster mit geringer Konfidenz kennzeichnen, statt jedes Badge als &quot;verblassend&quot; zu deklarieren.
 
-Source: bugreports/agent-idea-01.md</p></details>
+Quelle: bugreports/agent-idea-01.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -138,16 +138,16 @@ Source: bugreports/agent-idea-01.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Drop Survival Lab</h3>
-  <details><summary>Details</summary><p>A statistics page that treats every claim window as a survival observation and renders Kaplan-Meier curves of &quot;how long badges stay claimable&quot;, split by category, free-vs-paid and year. A live table shows the median remaining claim time for badges currently open, so collectors can see which windows historically close fast.
+  <h3>Drop-Survival-Labor</h3>
+  <details><summary>Details</summary><p>Eine Statistikseite, die jedes Einlösefenster als Survival-Beobachtung behandelt und Kaplan-Meier-Kurven zu &quot;wie lange Badges einlösbar bleiben&quot; zeichnet, aufgeschlüsselt nach Kategorie, kostenlos-vs.-bezahlt und Jahr. Eine Live-Tabelle zeigt die mediane verbleibende Einlösezeit der aktuell offenen Badges, sodass Sammler sehen können, welche Fenster historisch schnell schließen.
 
-Why it fits: The badgebase sync stores start and end for every drop window (`data-reset` dates); that is a complete survival dataset nobody has ever analyzed. It gives the catalog a genuine quantitative-research artifact instead of another grid.
+Warum es passt: Der badgebase-Sync speichert Start und Ende jedes Drop-Fensters (`data-reset`-Daten); das ist ein vollständiges Survival-Dataset, das noch nie jemand analysiert hat. Es gibt dem Katalog ein echtes quantitatives Forschungsartefakt statt eines weiteren Rasters.
 
-Effort: M.
+Aufwand: M.
 
-Risk if built badly: Windows that are still open are right-censored data; treating them as completed (or dropping them) biases every curve, so the estimator must handle censoring correctly or the numbers are quietly wrong.
+Risiko bei schlechter Umsetzung: Noch offene Fenster sind rechtszensierte Daten; sie als abgeschlossen zu behandeln (oder sie zu verwerfen) verzerrt jede Kurve, sodass der Schätzer die Zensur korrekt behandeln muss, sonst sind die Zahlen stillschweigend falsch.
 
-Source: bugreports/agent-idea-01.md</p></details>
+Quelle: bugreports/agent-idea-01.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -161,16 +161,16 @@ Source: bugreports/agent-idea-01.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Achievement Composer</h3>
-  <details><summary>Details</summary><p>A page where users write their own achievement as a predicate over catalog fields — &quot;own every badge from category X released in 2024&quot;, &quot;own 3 badges in the legendary tier&quot; — and the self-evaluating achievement engine awards it when satisfied. Composed achievements appear on the profile next to the 125 built-in ones and are shareable by URL.
+  <h3>Achievement-Composer</h3>
+  <details><summary>Details</summary><p>Eine Seite, auf der Nutzer ihr eigenes Achievement als Prädikat über Katalogfelder formulieren — &quot;besitze jeden Badge aus Kategorie X, der 2024 erschienen ist&quot;, &quot;besitze 3 Badges der legendären Stufe&quot; — und die selbstauswertende Achievement-Engine verleiht es, sobald die Bedingung erfüllt ist. Komponierte Achievements erscheinen im Profil neben den 125 eingebauten und sind per URL teilbar.
 
-Why it fits: Achievements are already self-evaluating rather than hard-coded checks, so a user-authored predicate is an extension of the existing evaluator, and the catalog fields (category, tier, release date, owned) are exactly the vocabulary users want to write against.
+Warum es passt: Achievements sind bereits selbstauswertend statt fest einprogrammierter Prüfungen, sodass ein vom Nutzer formuliertes Prädikat eine Erweiterung des bestehenden Evaluators ist, und die Katalogfelder (Kategorie, Stufe, Veröffentlichungsdatum, im Besitz) sind genau das Vokabular, gegen das Nutzer schreiben wollen.
 
-Effort: M.
+Aufwand: M.
 
-Risk if built badly: User-expressed predicates are a query language, and a naive evaluator is both a DoS vector and a way to write impossible goals — the vocabulary must be a fixed allow-listed schema, never translated SQL.
+Risiko bei schlechter Umsetzung: Von Nutzern formulierte Prädikate sind eine Abfragesprache, und ein naiver Evaluator ist sowohl ein DoS-Vektor als auch ein Weg, unmögliche Ziele zu formulieren — das Vokabular muss ein festes, allowlist-beschränktes Schema sein, niemals übersetztes SQL.
 
-Source: bugreports/agent-idea-01.md</p></details>
+Quelle: bugreports/agent-idea-01.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -184,16 +184,16 @@ Source: bugreports/agent-idea-01.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>TBRI-100 — a market index for the rarest badges</h3>
-  <details><summary>Details</summary><p>A single charted index: the mean TBRI of the 100 rarest badges, rebased to 100 at launch, updated with each potat sync. A badge page states whether that badge is &quot;outperforming the index&quot; and a `/index` page shows the line with the biggest movers of the day.
+  <h3>TBRI-100 — ein Marktindex für die seltensten Badges</h3>
+  <details><summary>Details</summary><p>Ein einzelner, gezeichneter Index: der mittlere TBRI der 100 seltensten Badges, beim Start auf 100 rebasiert, mit jedem potat-Sync aktualisiert. Eine Badge-Seite gibt an, ob dieses Badge &quot;den Index schlägt&quot;, und eine `/index`-Seite zeigt die Linie samt den größten Tagesbewegungen.
 
-Why it fits: rarity inputs and their history already land in `badge_stats`; the index is one aggregate query and one Recharts chart. Collectors get the language of a market (&quot;my collection beat the index this month&quot;) without any real-money implication.
+Warum es passt: Seltenheits-Inputs und ihre Historie landen bereits in `badge_stats`; der Index ist eine Aggregatabfrage und ein Recharts-Diagramm. Sammler bekommen die Sprache eines Markts (&quot;meine Sammlung hat diesen Monat den Index geschlagen&quot;) ohne jegliche Echtgeld-Implikation.
 
-Effort: M.
+Aufwand: M.
 
-Risk if built badly: a moving index invites day-trading impulses; it must read as a curiosity, not as a score to defend, and never gate any reward.
+Risiko bei schlechter Umsetzung: ein bewegter Index weckt Daytrading-Impulse; er muss als Kuriosität wirken, nicht als zu verteidigender Score, und niemals eine Belohnung an ihn gekoppelt werden.
 
-Source: bugreports/agent-idea-02.md</p></details>
+Quelle: bugreports/agent-idea-02.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -207,16 +207,16 @@ Source: bugreports/agent-idea-02.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Collector Percentile Card</h3>
-  <details><summary>Details</summary><p>From the leaderboard and owner data, a profile header line: &quot;412 of 1,203 badges — top 6% of tracked collectors,&quot; plus a nudge (&quot;4 badges from the next percentile, cheapest gap: these three&quot;). Shareable as an OG card.
+  <h3>Sammler-Perzentil-Karte</h3>
+  <details><summary>Details</summary><p>Aus Bestenliste und Besitzerdaten ergibt sich eine Kopfzeile im Profil: &quot;412 von 1.203 Badges — Top 6 % der erfassten Sammler&quot;, plus einen Anreiz (&quot;4 Badges bis zum nächsten Perzentil, günstigste Lücke: diese drei&quot;). Als OG-Karte teilbar.
 
-Why it fits: worldwide leaderboards and per-badge owner counts already exist; a percentile is a rank-and-count query, and the &quot;cheapest gap&quot; is a join between the catalog and the user's missing set. It gives the same data a second, more personal reading.
+Warum es passt: Weltweite Bestenlisten und Besitzerzahlen pro Badge existieren bereits; ein Perzentil ist eine Rang-und-Zähl-Abfrage, und die &quot;günstigste Lücke&quot; ist ein Join zwischen Katalog und der fehlenden Menge des Nutzers. Sie gibt denselben Daten eine zweite, persönlichere Lesart.
 
-Effort: S.
+Aufwand: S.
 
-Risk if built badly: percentiles computed over a small or skewed set of tracked profiles mislead users; the copy must state the population, or the card becomes a false claim.
+Risiko bei schlechter Umsetzung: Perzentile, die über eine kleine oder verzerrte Menge erfasster Profile berechnet werden, täuschen Nutzer; der Text muss die Grundgesamtheit nennen, sonst wird die Karte zur falschen Behauptung.
 
-Source: bugreports/agent-idea-02.md</p></details>
+Quelle: bugreports/agent-idea-02.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -230,16 +230,16 @@ Source: bugreports/agent-idea-02.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Deadline Density Calendar</h3>
-  <details><summary>Details</summary><p>A month grid where each day is shaded by how many claim windows close that day and how rare those badges are, with a click to expand the list. A header blurb: &quot;this week closes 7 windows, 2 of them Legendary.&quot;
+  <h3>Deadline-Dichtekalender</h3>
+  <details><summary>Details</summary><p>Ein Monatsraster, in dem jeder Tag danach schattiert ist, wie viele Einlösefenster an jenem Tag schließen und wie selten diese Badges sind, mit einem Klick zum Aufklappen der Liste. Ein Kopfzeilentext: &quot;diese Woche schließen 7 Fenster, 2 davon legendär.&quot;
 
-Why it fits: claim-window end dates from badgebase plus TBRI give a per-day urgency score with no new collection. It is a planning surface the site lacks — the catalog answers &quot;what is live,&quot; not &quot;what is about to end.&quot;
+Warum es passt: Enddaten der Einlösefenster aus badgebase plus TBRI ergeben einen Dringlichkeits-Score pro Tag ohne jegliche Neuerhebung. Es ist eine Planungsoberfläche, die der Seite fehlt — der Katalog beantwortet &quot;was ist live&quot;, nicht &quot;was endet bald&quot;.
 
-Effort: S.
+Aufwand: S.
 
-Risk if built badly: if it sells urgency without accuracy, one wrong end date destroys trust in every countdown; it must degrade to &quot;date unknown&quot; rather than guess.
+Risiko bei schlechter Umsetzung: verkauft es Dringlichkeit ohne Genauigkeit, zerstört ein einziges falsches Enddatum das Vertrauen in jeden Countdown; es muss auf &quot;Datum unbekannt&quot; herunterstufen, statt zu raten.
 
-Source: bugreports/agent-idea-02.md</p></details>
+Quelle: bugreports/agent-idea-02.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -253,16 +253,16 @@ Source: bugreports/agent-idea-02.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Co-Ownership Recommendations</h3>
-  <details><summary>Details</summary><p>&quot;Collectors who own this badge also own…&quot; — a similarity graph built from the owner lists potat returns, rendered on badge pages and on a user's profile as three suggested next targets with a reason line.
+  <h3>Empfehlungen aus gemeinsamem Besitz</h3>
+  <details><summary>Details</summary><p>&quot;Sammler, die dieses Badge besitzen, besitzen auch …&quot; — ein Ähnlichkeitsgraph aus den Besitzerlisten, die potat zurückgibt, gerendert auf Badge-Seiten und im Profil eines Nutzers als drei vorgeschlagene nächste Ziele mit einer Begründungszeile.
 
-Why it fits: `?owners=true` responses are already the raw material for a co-occurrence matrix; the project currently uses them for counts only. It converts an existing sync payload into the site's first recommendation engine with no new data source.
+Warum es passt: `?owners=true`-Antworten sind bereits der Rohstoff für eine Co-Occurrence-Matrix; das Projekt nutzt sie derzeit nur für Zählungen. Es verwandelt ein bestehendes Sync-Payload in die erste Empfehlungs-Engine der Seite ohne neue Datenquelle.
 
-Effort: M.
+Aufwand: M.
 
-Risk if built badly: co-occurrence driven by a small, overlapping set of power users collapses every recommendation to the same five badges; popularity must be discounted or the feature looks broken.
+Risiko bei schlechter Umsetzung: Eine Co-Occurrence, die von einer kleinen, überlappenden Gruppe von Power-Usern getrieben wird, zerknüllt jede Empfehlung auf dieselben fünf Badges; Popularität muss abgewertet werden, sonst wirkt das Feature kaputt.
 
-Source: bugreports/agent-idea-02.md</p></details>
+Quelle: bugreports/agent-idea-02.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -276,16 +276,16 @@ Source: bugreports/agent-idea-02.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Badge Bingo</h3>
-  <details><summary>Details</summary><p>A monthly 5×5 card of achievable catalog objectives — &quot;claim a badge from a category you own none of,&quot; &quot;find a badge under 500 owners,&quot; &quot;be online when a window closes&quot; — verified server-side from the inventory diff, with XP for each line and a full-card reward.
+  <h3>Badge-Bingo</h3>
+  <details><summary>Details</summary><p>Eine monatliche 5×5-Karte mit erreichbaren Katalogzielen — &quot;löse einen Badge aus einer Kategorie ein, aus der du keinen besitzt&quot;, &quot;finde einen Badge mit unter 500 Besitzern&quot;, &quot;sei online, wenn ein Fenster schließt&quot; — serverseitig aus dem Inventar-Diff verifiziert, mit XP je Zeile und einer Belohnung für die volle Karte.
 
-Why it fits: categories, owner counts and the inventory snapshot diff already exist, and it reuses the achievement evaluation pattern instead of a new rules engine. It pushes collectors toward neglected corners of the catalog rather than toward the same popular badges.
+Warum es passt: Kategorien, Besitzerzahlen und der Inventar-Snapshot-Diff existieren bereits, und es greift das Achievement-Auswertungsmuster auf statt einer neuen Regel-Engine. Es stößt Sammler in vernachlässigte Ecken des Katalogs statt zu denselben beliebten Badges.
 
-Effort: M.
+Aufwand: M.
 
-Risk if built badly: if objectives are not verified against real events, the card becomes either trivially farmable or impossible; every square needs a server-checkable predicate and a stated deadline.
+Risiko bei schlechter Umsetzung: werden Ziele nicht gegen echte Ereignisse verifiziert, wird die Karte entweder trivial farmbar oder unmöglich; jedes Feld braucht ein serverseitig prüfbares Prädikat und eine genannte Frist.
 
-Source: bugreports/agent-idea-02.md</p></details>
+Quelle: bugreports/agent-idea-02.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -299,16 +299,16 @@ Source: bugreports/agent-idea-02.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Collector Net Worth</h3>
-  <details><summary>Details</summary><p>A single number on the profile derived from rarity and drop type — each owned badge contributes a TBRI-weighted value into a &quot;collection worth,&quot; with a public net-worth board alongside the existing XP leaderboard and a breakdown showing which badges drive it.
+  <h3>Sammler-Vermögen</h3>
+  <details><summary>Details</summary><p>Eine einzelne Zahl im Profil, abgeleitet aus Seltenheit und Drop-Typ — jedes besessene Badge trägt einen TBRI-gewichteten Wert in einen &quot;Sammlungswert&quot; ein —, mit einem öffentlichen Vermögens-Ranking neben der bestehenden XP-Bestenliste sowie einer Aufschlüsselung, welche Badges ihn bestimmen.
 
-Why it fits: TBRI, owner counts and the owned set are all in place; this is a weighted sum, not a new mechanic. It gives rarity a consequence beyond a tier label and creates an intrinsic reason to chase scarce badges.
+Warum es passt: TBRI, Besitzerzahlen und die Besitzmenge stehen alle bereit; dies ist eine gewichtete Summe, keine neue Mechanik. Sie gibt der Seltenheit eine Konsequenz über das Stufenlabel hinaus und schafft einen inneren Grund, seltenen Badges nachzujagen.
 
-Effort: M.
+Aufwand: M.
 
-Risk if built badly: it must never convert to BadgesCoins or any spendable asset, or rarity becomes an economy exploit; it stays a read-only stat with a published formula.
+Risiko bei schlechter Umsetzung: sie darf sich niemals in BadgesCoins oder einen ausgebaren Vermögenswert umwandeln lassen, sonst wird Seltenheit zum Wirtschaftsexloit; sie bleibt eine schreibgeschützte Statistik mit veröffentlichter Formel.
 
-Source: bugreports/agent-idea-02.md</p></details>
+Quelle: bugreports/agent-idea-02.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -322,16 +322,16 @@ Source: bugreports/agent-idea-02.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Collector Crews</h3>
-  <details><summary>Details</summary><p>Teams of up to 12 collectors form a crew with a shared name, emblem and combined XP/coin pool. A crew leaderboard ranks crews weekly, and a crew unlocks its own collective achievement when members together own a full category or a set number of legendary-tier badges. Crew chat is replaced by a crew activity strip on the profile.
+  <h3>Sammler-Crews</h3>
+  <details><summary>Details</summary><p>Teams aus bis zu 12 Sammlern bilden eine Crew mit gemeinsamem Namen, Emblem und gemeinsamem XP-/Münz-Pool. Eine Crew-Bestenliste ordnet Crews wöchentlich, und eine Crew schaltet ihr eigenes kollektives Achievement frei, wenn die Mitglieder zusammen eine ganze Kategorie oder eine feste Zahl legendärer Badges besitzen. Der Crew-Chat wird durch einen Crew-Aktivitätsstreifen im Profil ersetzt.
 
-Why it fits: builds directly on the existing XP/level system and the `achievements` evaluation loop, and gives the public `/feed` a second, team- sized narrative line. Rarity tiers give crews a concrete shared goal.
+Warum es passt: baut direkt auf dem bestehenden XP-/Level-System und der `achievements`-Auswertungsschleife auf und gibt dem öffentlichen `/feed` eine zweite, teamgroße Erzählebene. Seltenheitsstufen geben Crews ein konkretes gemeinsames Ziel.
 
-Effort: M.
+Aufwand: M.
 
-Risk if built badly: elitism and closed recruiting cliques; invite spam in profile pushes if there is no rate limit on crew invitations.
+Risiko bei schlechter Umsetzung: Elitismus und abgeschlossene Rekrutierungszirkel; Einladungsspam in Profil-Pushes, wenn es kein Rate-Limit für Crew-Einladungen gibt.
 
-Source: bugreports/agent-idea-04.md</p></details>
+Quelle: bugreports/agent-idea-04.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -345,16 +345,16 @@ Source: bugreports/agent-idea-04.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Palette Pull</h3>
-  <details><summary>Details</summary><p>Generates a site accent theme from the dominant colours of your rarest owned badge, applied to your profile and (optionally) the whole site for your session. A &quot;surprise me&quot; mode pulls from a random legendary in the catalog.
+  <h3>Farbpalette aus Badge ziehen</h3>
+  <details><summary>Details</summary><p>Erzeugt ein Akzentfarben-Theme der Seite aus den dominanten Farben deines seltensten besessenen Badges, angewendet auf dein Profil und (optional) die ganze Seite für deine Sitzung. Ein &quot;überrasch mich&quot;-Modus greift auf einen zufälligen legendären Badge im Katalog zurück.
 
-Why it fits: badge art is already served from the synced image assets, so the palette is derivable with no new data, and it plugs straight into the existing `--accent` token system in `globals.css`.
+Warum es passt: Badge-Grafiken werden bereits aus den synchronisierten Bild-Assets ausgeliefert, sodass sich die Palette ohne neue Daten ableiten lässt, und sie dockt direkt an das bestehende `--accent`-Token-System in `globals.css` an.
 
-Effort: S.
+Aufwand: S.
 
-Risk if built badly: unreadable dark/light contrast from arbitrary badge palettes — clamp luminance and contrast server- or client-side before apply.
+Risiko bei schlechter Umsetzung: unlesbare Dark-/Light-Kontraste durch beliebige Badge-Paletten — Luminanz und Kontrast vor dem Anwenden server- oder clientseitig begrenzen.
 
-Source: bugreports/agent-idea-04.md</p></details>
+Quelle: bugreports/agent-idea-04.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -368,12 +368,12 @@ Source: bugreports/agent-idea-04.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Weekly Themed Leaderboard Rotations</h3>
-  <details><summary>Details</summary><p>Feature one rotating ranking per week alongside the global boards — &quot;rarest single badge owned&quot;, &quot;biggest rank climb&quot;, &quot;fastest to claim this week's drop&quot; — each computed from data already collected, with the current theme pinned to the homepage.
+  <h3>Wöchentliche thematische Bestenlisten-Rotationen</h3>
+  <details><summary>Details</summary><p>Zeigt jede Woche ein rotierendes Ranking neben den globalen Tafeln — &quot;seltenster einzelner besessener Badge&quot;, &quot;größter Ranganstieg&quot;, &quot;schnellste Einlösung des Drops dieser Woche&quot; — jeweils aus bereits erhobenen Daten berechnet, mit dem aktuellen Thema auf der Startseite angepinnt.
 
-Effort: M.
+Aufwand: M.
 
-Source: bugreports/agent-idea-08.md</p></details>
+Quelle: bugreports/agent-idea-08.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -387,12 +387,12 @@ Source: bugreports/agent-idea-08.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Feed Cheers</h3>
-  <details><summary>Details</summary><p>Let the existing live XP feed (`/feed`) carry lightweight reactions — a cheer or congrats on another collector's unlock or level-up — reusing the blog's existing reaction storage pattern on a new surface, rate-limited per profile.
+  <h3>Feed-Beifall</h3>
+  <details><summary>Details</summary><p>Lässt den bestehenden Live-XP-Feed (`/feed`) leichte Reaktionen tragen — einen Jubel oder Glückwunsch zum Unlock oder Level-Up eines anderen Sammlers — unter Wiederverwendung des bestehenden Reaktionsspeicher-Musters des Blogs auf einer neuen Oberfläche, rate-limitiert pro Profil.
 
-Effort: S.
+Aufwand: S.
 
-Source: bugreports/agent-idea-08.md</p></details>
+Quelle: bugreports/agent-idea-08.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -406,12 +406,12 @@ Source: bugreports/agent-idea-08.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Serve badge images at the size they are displayed</h3>
-  <details><summary>Details</summary><p>Badge art is 14-28 px but ships at 1x/2x/4x. width/height are present; add decoding=&quot;async&quot; and a sizes attribute so a 56 px mobile tile does not fetch the 4x asset.
+  <h3>Badge-Grafiken in der Größe ausliefern, in der sie angezeigt werden</h3>
+  <details><summary>Details</summary><p>Badge-Grafiken sind 14-28 px groß, werden aber in 1x/2x/4x ausgeliefert. width/height sind vorhanden; decoding=&quot;async&quot; und ein sizes-Attribut ergänzen, damit eine mobile 56-px-Kachel nicht das 4x-Asset lädt.
 
-Source: IMPROVEMENTS.md Part 1.1.
+Quelle: IMPROVEMENTS.md Part 1.1.
 
-Source: IMPROVEMENTS.md Part 1</p></details>
+Quelle: IMPROVEMENTS.md Part 1</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -425,12 +425,12 @@ Source: IMPROVEMENTS.md Part 1</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Sitemap freshness from the newest badge event</h3>
-  <details><summary>Details</summary><p>Use lastModified from the newest badge_events row per badge instead of a build timestamp, so crawlers see real change dates.
+  <h3>Sitemap-Frische aus dem neuesten Badge-Ereignis</h3>
+  <details><summary>Details</summary><p>lastModified aus der neuesten badge_events-Zeile je Badge statt eines Build-Zeitstempels verwenden, damit Crawler echte Änderungsdaten sehen.
 
-Source: IMPROVEMENTS.md Part 1.8.
+Quelle: IMPROVEMENTS.md Part 1.8.
 
-Source: IMPROVEMENTS.md Part 1</p></details>
+Quelle: IMPROVEMENTS.md Part 1</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -444,12 +444,12 @@ Source: IMPROVEMENTS.md Part 1</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Open Graph cards for badges</h3>
-  <details><summary>Details</summary><p>The profile OG route exists; a badge card with image, rarity and owner count would make shares legible.
+  <h3>Open-Graph-Karten für Badges</h3>
+  <details><summary>Details</summary><p>Die Profil-OG-Route existiert bereits; eine Badge-Karte mit Bild, Seltenheit und Besitzerzahl würde geteilte Links lesbar machen.
 
-Source: IMPROVEMENTS.md Part 1.8.
+Quelle: IMPROVEMENTS.md Part 1.8.
 
-Source: IMPROVEMENTS.md Part 1</p></details>
+Quelle: IMPROVEMENTS.md Part 1</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -463,12 +463,12 @@ Source: IMPROVEMENTS.md Part 1</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Badge archaeology: a provenance page per badge</h3>
-  <details><summary>Details</summary><p>For every badge: first global sighting, when the claim window opened, how the owner count moved week by week. Nobody publishes a badge's life story.
+  <h3>Badge-Archäologie: eine Herkunftsseite pro Badge</h3>
+  <details><summary>Details</summary><p>Für jedes Badge: erste globale Sichtung, wann das Einlösefenster öffnete, wie sich die Besitzerzahl Woche für Woche bewegte. Niemand veröffentlicht die Lebensgeschichte eines Badges.
 
-Source: IMPROVEMENTS.md Part 2 #1.
+Quelle: IMPROVEMENTS.md Part 2 #1.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -482,12 +482,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Collection diffing against any past date</h3>
-  <details><summary>Details</summary><p>&quot;What did I own on 1 January?&quot; answered from the inventory snapshot history — a personal time machine for collectors.
+  <h3>Sammlungs-Diff gegen jedes beliebige vergangene Datum</h3>
+  <details><summary>Details</summary><p>&quot;Was besaß ich am 1. Januar?&quot; — beantwortet aus der Inventar-Snapshot-Historie — eine persönliche Zeitmaschine für Sammler.
 
-Source: IMPROVEMENTS.md Part 2 #2.
+Quelle: IMPROVEMENTS.md Part 2 #2.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -501,12 +501,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Badge genealogy by artwork family</h3>
-  <details><summary>Details</summary><p>Cluster badges by artwork family (same set or artist) and show the family tree, so collectors can chase a whole lineage.
+  <h3>Badge-Genealogie nach Grafikfamilie</h3>
+  <details><summary>Details</summary><p>Badges nach Grafikfamilie gruppieren (gleiches Set oder gleicher Künstler) und den Stammbaum zeigen, damit Sammler einer ganzen Linie nachjagen können.
 
-Source: IMPROVEMENTS.md Part 2 #3.
+Quelle: IMPROVEMENTS.md Part 2 #3.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -520,12 +520,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Predictive drop calendar</h3>
-  <details><summary>Details</summary><p>A model over past windows estimating the next drop date per category, with an explicit confidence band rather than a single confident date.
+  <h3>Prognostischer Drop-Kalender</h3>
+  <details><summary>Details</summary><p>Ein Modell über vergangene Fenster, das das nächste Drop-Datum pro Kategorie schätzt, mit einem expliziten Konfidenzband statt eines einzigen selbstbewussten Datums.
 
-Source: IMPROVEMENTS.md Part 2 #4.
+Quelle: IMPROVEMENTS.md Part 2 #4.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -539,12 +539,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Time-capsule profiles</h3>
-  <details><summary>Details</summary><p>A private message attached to a profile that unlocks automatically in a year, with a badge as the key.
+  <h3>Zeitkapsel-Profile</h3>
+  <details><summary>Details</summary><p>Eine private Nachricht, die an ein Profil angehängt ist und sich in einem Jahr automatisch freischaltet, mit einem Badge als Schlüssel.
 
-Source: IMPROVEMENTS.md Part 2 #9.
+Quelle: IMPROVEMENTS.md Part 2 #9.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -558,12 +558,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Session recap card</h3>
-  <details><summary>Details</summary><p>After each visit: XP earned, badges found, rank change — as a shareable card.
+  <h3>Session-Rückblickskarte</h3>
+  <details><summary>Details</summary><p>Nach jedem Besuch: verdiente XP, gefundene Badges, Rangänderung — als teilbare Karte.
 
-Source: IMPROVEMENTS.md Part 2 #17.
+Quelle: IMPROVEMENTS.md Part 2 #17.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -577,12 +577,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Badge weather map</h3>
-  <details><summary>Details</summary><p>A map view showing which regions are unlocking which badges right now, from anonymised owner deltas.
+  <h3>Badge-Wetterkarte</h3>
+  <details><summary>Details</summary><p>Eine Kartenansicht, die zeigt, welche Regionen gerade welche Badges freischalten, aus anonymisierten Besitzer-Deltas.
 
-Source: IMPROVEMENTS.md Part 2 #21.
+Quelle: IMPROVEMENTS.md Part 2 #21.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -596,12 +596,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Badge horoscope</h3>
-  <details><summary>Details</summary><p>A playful daily &quot;what your collection says about you&quot;, derived from the categories a member owns most.
+  <h3>Badge-Horoskop</h3>
+  <details><summary>Details</summary><p>Ein spielerisches tägliches &quot;was deine Sammlung über dich aussagt&quot;, abgeleitet aus den Kategorien, die ein Mitglied am häufigsten besitzt.
 
-Source: IMPROVEMENTS.md Part 2 #25.
+Quelle: IMPROVEMENTS.md Part 2 #25.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -615,12 +615,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Mystery profiles</h3>
-  <details><summary>Details</summary><p>Every Monday one random profile is highlighted with their rarest badge and a riddle about who they are.
+  <h3>Mystery-Profile</h3>
+  <details><summary>Details</summary><p>Jeden Montag wird ein zufälliges Profil hervorgehoben, mit seinem seltensten Badge und einem Rätsel, wer dahintersteckt.
 
-Source: IMPROVEMENTS.md Part 2 #26.
+Quelle: IMPROVEMENTS.md Part 2 #26.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -634,12 +634,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Rarity insurance</h3>
-  <details><summary>Details</summary><p>Pay BadgesCoins to freeze a badge's rarity tier for a week, so a sudden claim wave cannot demote a showcase entry.
+  <h3>Seltenheits-Versicherung</h3>
+  <details><summary>Details</summary><p>BadgesCoins zahlen, um die Seltenheitsstufe eines Badges für eine Woche einzufrieren, sodass eine plötzliche Einlösungswelle einen Showcase-Eintrag nicht herabstuft.
 
-Source: IMPROVEMENTS.md Part 2 #27.
+Quelle: IMPROVEMENTS.md Part 2 #27.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -653,12 +653,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Wishlist with push alerts</h3>
-  <details><summary>Details</summary><p>Watch a badge and get notified the moment it becomes claimable. The smallest high-value item on this list.
+  <h3>Wunschliste mit Push-Benachrichtigungen</h3>
+  <details><summary>Details</summary><p>Ein Badge beobachten und benachrichtigt werden, sobald es einlösbar wird. Der kleinste Posten mit hohem Wert auf dieser Liste.
 
-Source: IMPROVEMENTS.md Part 2 #31.
+Quelle: IMPROVEMENTS.md Part 2 #31.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -672,12 +672,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Compare more than two members</h3>
-  <details><summary>Details</summary><p>A table view across up to five usernames instead of the current pairwise compare.
+  <h3>Mehr als zwei Mitglieder vergleichen</h3>
+  <details><summary>Details</summary><p>Eine Tabellenansicht über bis zu fünf Benutzernamen statt des bisherigen Paarvergleichs.
 
-Source: IMPROVEMENTS.md Part 2 #33.
+Quelle: IMPROVEMENTS.md Part 2 #33.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -691,12 +691,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Search by badge image</h3>
-  <details><summary>Details</summary><p>Upload a badge screenshot and find the matching catalog entry by image similarity.
+  <h3>Suche nach Badge-Bild</h3>
+  <details><summary>Details</summary><p>Einen Badge-Screenshot hochladen und den passenden Katalogeintrag per Bildähnlichkeit finden.
 
-Source: IMPROVEMENTS.md Part 2 #35.
+Quelle: IMPROVEMENTS.md Part 2 #35.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -710,12 +710,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>A real account settings page with deletion and export</h3>
-  <details><summary>Details</summary><p>Account deletion (GDPR) and a data export, as a proper settings page rather than the current customizer alone.
+  <h3>Eine echte Kontoeinstellungsseite mit Löschung und Export</h3>
+  <details><summary>Details</summary><p>Kontolöschung (DSGVO) und ein Datenexport, als echte Einstellungsseite statt bisher nur des Customizers.
 
-Source: IMPROVEMENTS.md Part 2 #37.
+Quelle: IMPROVEMENTS.md Part 2 #37.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -729,12 +729,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Bulk badge imports via QR codes</h3>
-  <details><summary>Details</summary><p>Scanning a TwitchCon booth poster adds the badge to a &quot;seen in the wild&quot; collection.
+  <h3>Stapelimport von Badges per QR-Code</h3>
+  <details><summary>Details</summary><p>Das Scannen eines TwitchCon-Standposters fügt den Badge einer &quot;in freier Wildbahn gesehen&quot;-Sammlung hinzu.
 
-Source: IMPROVEMENTS.md Part 2 #45.
+Quelle: IMPROVEMENTS.md Part 2 #45.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -748,12 +748,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>An assistant that recommends the next badge to claim</h3>
-  <details><summary>Details</summary><p>Answers &quot;which currently claimable badge fits my collection best?&quot; from the catalog, citing the rows it used.
+  <h3>Ein Assistent, der den nächsten einzulösenden Badge empfiehlt</h3>
+  <details><summary>Details</summary><p>Beantwortet &quot;welcher derzeit einlösbare Badge passt am besten zu meiner Sammlung?&quot; aus dem Katalog und nennt die Zeilen, die er verwendet hat.
 
-Source: IMPROVEMENTS.md Part 2 #50.
+Quelle: IMPROVEMENTS.md Part 2 #50.
 
-Source: IMPROVEMENTS.md Part 2</p></details>
+Quelle: IMPROVEMENTS.md Part 2</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -767,12 +767,12 @@ Source: IMPROVEMENTS.md Part 2</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Window deadline change log</h3>
-  <details><summary>Details</summary><p>Record every observed start and end date per window at each sync, so any change becomes a dated event on the badge page ('end moved from 12 Sep to 19 Sep') with the previous value shown, and a catalog filter for badges whose deadline has moved this month. The same history scores providers on how often their first listed end date matched the observed expiry, per category. Effort: M. Risk if built badly: scoring on any reported date rather than the first observed one makes a provider that posts honest corrections look inaccurate, which is the opposite of the truth.
+  <h3>Änderungsprotokoll für Fenster-Deadlines</h3>
+  <details><summary>Details</summary><p>Bei jedem Sync jedes beobachtete Start- und Enddatum je Fenster festhalten, sodass jede Änderung zu einem datierten Ereignis auf der Badge-Seite wird ('Ende vom 12. Sep auf den 19. Sep verschoben'), mit angezeigtem Vorherwert, und ein Katalogfilter für Badges, deren Deadline sich diesen Monat verschoben hat. Dieselbe Historie bewertet Anbieter danach, wie oft ihr zuerst gelistetes Enddatum dem beobachteten Ablaufdatum entsprach, je Kategorie. Aufwand: M. Risiko bei schlechter Umsetzung: Bewertet man ein beliebiges gemeldetes Datum statt des zuerst beobachteten, wirkt ein Anbieter, der ehrliche Korrekturen nachreicht, ungenau — das Gegenteil der Wahrheit.
 
-Why: A deadline that moves is the most common way a collector misses a badge, and nothing records the movement today.
+Warum: Eine verschobene Deadline ist der häufigste Grund, warum ein Sammler einen Badge verpasst, und nichts zeichnet die Verschiebung heute auf.
 
-Source: new-ideas-01-badge.json</p></details>
+Quelle: new-ideas-01-badge.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -786,12 +786,12 @@ Source: new-ideas-01-badge.json</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Archived owner-series backfill</h3>
-  <details><summary>Details</summary><p>A recovery pass pulls dated public snapshots of badge owner pages (Wayback captures of badgebase and potat, plus any other public archives) and inserts the recovered date and owner count into badge_stats marked as source 'archive', with the marker visible on the owner chart. This extends owner curves years earlier than this site has been collecting, so age, rarity and momentum rest on more than a few weeks of observations. Effort: L. Risk if built badly: archive captures are inconsistent and sometimes wrong, so an 'archived' point must never be allowed to overwrite a measured one and the chart must separate the two.
+  <h3>Backfill archivierter Besitzerzeitreihen</h3>
+  <details><summary>Details</summary><p>Ein Wiederherstellungslauf zieht datierte öffentliche Snapshots von Badge-Besitzerseiten (Wayback-Captures von badgebase und potat, plus weitere öffentliche Archive) und trägt das wiederhergestellte Datum und die Besitzerzahl in badge_stats ein, markiert als Quelle 'archive', mit sichtbarer Markierung im Besitzerdiagramm. Das verlängert die Besitzerkurven um Jahre weiter zurück, als diese Seite erhebt, sodass Alter, Seltenheit und Momentum auf mehr als ein paar Wochen Beobachtung fußen. Aufwand: L. Risiko bei schlechter Umsetzung: Archiv-Captures sind inkonsistent und manchmal falsch, daher darf ein 'archive'-Punkt niemals einen gemessenen überschreiben, und das Diagramm muss beides trennen.
 
-Why: A badge's earliest weeks decide its rarity, and that is exactly the data a young database does not have.
+Warum: Die frühesten Wochen eines Badges entscheiden über seine Seltenheit, und genau diese Daten hat eine junge Datenbank nicht.
 
-Source: new-ideas-01-badge.json</p></details>
+Quelle: new-ideas-01-badge.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -805,12 +805,12 @@ Source: new-ideas-01-badge.json</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Badge head-to-head comparison</h3>
-  <details><summary>Details</summary><p>Pick any two badges and see them head to head: owner curves on one axis, windows drawn as bars, each rarity signal as a diverging bar, and a written diff ('opens three days earlier, four times fewer owners, one tier higher'), shareable by URL with both ids. Uses the catalog, badge_stats and window history. Effort: M. Risk if built badly: overlaying two curves with different observation spans makes the younger badge look flat, so each side must state its measured coverage and estimated spans must be drawn distinctly.
+  <h3>Badge-Direktvergleich</h3>
+  <details><summary>Details</summary><p>Zwei beliebige Badges auswählen und direkt gegenüberstellen: Besitzerkurven auf einer Achse, Fenster als Balken gezeichnet, jedes Seltenheitssignal als divergierender Balken, und ein schriftlicher Diff ('öffnet drei Tage früher, viermal weniger Besitzer, eine Stufe höher'), teilbar per URL mit beiden IDs. Nutzt Katalog, badge_stats und Fensterhistorie. Aufwand: M. Risiko bei schlechter Umsetzung: Zwei Kurven mit unterschiedlichen Beobachtungszeiträumen zu überlagern lässt das jüngere Badge flach wirken, daher muss jede Seite ihre gemessene Abdeckung angeben und geschätzte Zeiträume müssen klar unterscheidbar gezeichnet werden.
 
-Why: Collectors argue about which badge is harder or better and there is nowhere to settle it with data.
+Warum: Sammler streiten darüber, welches Badge schwerer oder besser ist, und nirgendwo lässt sich das mit Daten entscheiden.
 
-Source: new-ideas-01-badge.json</p></details>
+Quelle: new-ideas-01-badge.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -824,12 +824,12 @@ Source: new-ideas-01-badge.json</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Versioned rarity methodology page</h3>
-  <details><summary>Details</summary><p>Publish the TBRI formula exactly as implemented, with one real badge's numbers worked through it step by step, the formula version, and the change history of that version so a score from six months ago can still be explained. The numbers are computed live from a stable badge through the same module the syncs use, never hard-coded into the page. Effort: S. Risk if built badly: a worked example with hard-coded values breaks silently as the catalog changes, so it must be generated live and covered by a test that fails when the page and the formula disagree.
+  <h3>Seite zur versionierten Seltenheitsmethodik</h3>
+  <details><summary>Details</summary><p>Die TBRI-Formel exakt wie implementiert veröffentlichen, mit den Zahlen eines echten Badges, die Schritt für Schritt durchgerechnet werden, der Formelversion und der Änderungshistorie dieser Version, sodass sich auch ein Score von vor sechs Monaten noch erklären lässt. Die Zahlen werden live über ein stabiles Badge durch dasselbe Modul berechnet, das die Syncs nutzen, niemals hartkodiert in die Seite. Aufwand: S. Risiko bei schlechter Umsetzung: Ein Rechenbeispiel mit hartkodierten Werten bricht stillschweigend, wenn sich der Katalog ändert, daher muss es live generiert werden und von einem Test abgedeckt sein, der fehlschlägt, sobald Seite und Formel auseinanderlaufen.
 
-Why: Rarity is the site's central claim and a versioned public formula is the difference between a metric and a mystery.
+Warum: Seltenheit ist die zentrale Aussage der Seite, und eine versionierte öffentliche Formel ist der Unterschied zwischen einer Kennzahl und einem Rätsel.
 
-Source: new-ideas-01-badge.json</p></details>
+Quelle: new-ideas-01-badge.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -843,12 +843,12 @@ Source: new-ideas-01-badge.json</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Set completion board</h3>
-  <details><summary>Details</summary><p>For every set_id, compute what share of tracked members hold every version, show the set's completion share on its page and on each badge page, and publish an exhibit of sets nobody has completed with the single version that blocks them most often. Uses synced inventories against the set's version list. Effort: M. Risk if built badly: with a small member base most sets read as 0 percent, so the share must always show its denominator and the exhibit must require a minimum member count before naming a set.
+  <h3>Übersicht zur Set-Vervollständigung</h3>
+  <details><summary>Details</summary><p>Für jede set_id berechnen, welcher Anteil der erfassten Mitglieder jede Version besitzt, den Vervollständigungsanteil des Sets auf seiner Seite und auf jeder Badge-Seite zeigen und eine Ausstellung der Sets veröffentlichen, die niemand vollendet hat, samt der jeweils einzigen Version, die sie am häufigsten blockiert. Nutzt synchronisierte Inventare gegen die Versionsliste des Sets. Aufwand: M. Risiko bei schlechter Umsetzung: Bei kleiner Mitgliederbasis lesen sich die meisten Sets als 0 Prozent, daher muss der Anteil stets seinen Nenner zeigen und die Ausstellung braucht eine Mindestmitgliederzahl, bevor sie ein Set benennt.
 
-Why: Sets are the natural unit of badge collecting and the catalog has no notion of how close anyone is to one.
+Warum: Sets sind die natürliche Einheit des Badge-Sammelns, und der Katalog hat keine Vorstellung davon, wie nah jemand einem ist.
 
-Source: new-ideas-01-badge.json</p></details>
+Quelle: new-ideas-01-badge.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>

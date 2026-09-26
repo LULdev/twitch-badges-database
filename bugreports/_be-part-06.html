@@ -4,12 +4,12 @@
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Hide badges I own catalog toggle</h3>
-  <details><summary>Details</summary><p>Once a collector owns a few hundred badges the catalog is mostly noise. Add a hide-what-I-own toggle on the catalog, active and upcoming pages that subtracts the viewer's inventory id set from the query server-side, with the count line reading N shown of M, hiding your 412. When no sync has ever run, show the toggle disabled with a sync prompt instead of an empty grid. Effort: M. Risk if built badly: applying the exclusion without saying so makes the catalog look broken, and a large exclusion list must be passed as a set rather than a giant NOT IN string.
+  <h3>Umschalter zum Ausblenden eigener Badges im Katalog</h3>
+  <details><summary>Details</summary><p>Sobald ein Sammler einige hundert Badges besitzt, ist der Katalog größtenteils Rauschen. Auf den Katalog-, Aktiv- und Bevorstehend-Seiten einen Umschalter ergänzen, der das ausblendet, was man selbst besitzt, und serverseitig die Inventar-ID-Menge der Betrachtenden von der Abfrage abzieht; die Zählzeile liest sich dann als N von M angezeigt, 412 ausgeblendet. Wenn noch nie ein Sync gelaufen ist, den Umschalter deaktiviert mit einem Sync-Hinweis zeigen statt eines leeren Rasters. Aufwand: M. Risiko bei schlechter Umsetzung: Wird der Ausschluss ohne Hinweis angewendet, wirkt der Katalog defekt, und eine große Ausschlussliste muss als Set übergeben werden statt als gigantischer NOT-IN-String.
 
-Why: For a returning collector, filtering out the known is the single biggest reduction in catalog friction.
+Warum: Für einen wiederkommenden Sammler ist das Herausfiltern des Bekannten die größte einzelne Verringerung der Katalog-Reibung.
 
-Source: new-ideas-09-usability.json</p></details>
+Quelle: new-ideas-09-usability.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -23,12 +23,12 @@ Source: new-ideas-09-usability.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Inline autosave with a visible undo</h3>
-  <details><summary>Details</summary><p>Turn save-on-submit into debounced autosave for the customization document: write 800 ms after the last change, show a saved-at timestamp in place of the button state, and offer a ten-second undo that restores the previously stored document, while keeping the explicit save button for people who prefer it. Keep exactly one previous document per save so undo is a single well-defined restore. Effort: M. Risk if built badly: autosaving a half-typed banner URL or a partially typed hex colour writes junk that renders as a broken profile, and an undo landing after a later edit restores the wrong document.
+  <h3>Inline-Autosave mit sichtbarem Rückgängig</h3>
+  <details><summary>Details</summary><p>Das Speichern beim Absenden für das Anpassungsdokument in entprelltes Autosave verwandeln: 800 ms nach der letzten Änderung schreiben, anstelle des Button-Zustands einen gespeichert-am-Zeitstempel zeigen und ein zehnsekündiges Rückgängig anbieten, das das zuvor gespeicherte Dokument wiederherstellt — der explizite Speichern-Button bleibt für alle, die ihn bevorzugen. Pro Speicherung genau ein vorheriges Dokument aufbewahren, damit Rückgängig eine einzige klar definierte Wiederherstellung ist. Aufwand: M. Risiko bei schlechter Umsetzung: Ein halb getippter Banner-URL oder eine halb getippte Hex-Farbe, die automatisch gespeichert wird, schreibt Müll, der als kaputtes Profil gerendert wird, und ein Rückgängig nach einer späteren Änderung stellt das falsche Dokument wieder her.
 
-Why: Autosave removes the fear that closes the customizer, as long as the undo makes the change feel reversible.
+Warum: Autosave nimmt die Angst weg, die den Anpasser schließt, solange das Rückgängig die Änderung als umkehrbar erscheinen lässt.
 
-Source: new-ideas-09-usability.json</p></details>
+Quelle: new-ideas-09-usability.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -42,12 +42,12 @@ Source: new-ideas-09-usability.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Confirmation and undo for high-stakes actions</h3>
-  <details><summary>Details</summary><p>Heists, large wheel spins, showcase removal and reset-to-default all fire on one click with no statement of the stake. Add a confirmation that names the exact consequence and amount, such as the maximum steal from this member and the fact that a failed attempt is spent, and where the action is genuinely reversible offer a short undo window. Read the amounts from the same settings the engine uses so the dialog cannot promise a limit the server would refuse. Effort: M. Risk if built badly: confirmations on every small action become noise, so they need a threshold, and an undo for a coin action reopens the double-spend hole the atomic counters closed.
+  <h3>Bestätigung und Rückgängig für Aktionen mit hohem Einsatz</h3>
+  <details><summary>Details</summary><p>Heists, große Wheel-Drehs, das Entfernen aus dem Showcase und das Zurücksetzen auf den Standard feuern alle mit einem einzigen Klick, ohne den Einsatz zu nennen. Eine Bestätigung ergänzen, die die genaue Folge und den Betrag nennt — etwa den maximalen Steal von diesem Mitglied und die Tatsache, dass ein fehlgeschlagener Versuch verbraucht ist —, und wo die Aktion wirklich umkehrbar ist, ein kurzes Rückgängig-Fenster anbieten. Die Beträge aus denselben Einstellungen lesen, die die Engine nutzt, damit der Dialog kein Limit versprechen kann, das der Server ablehnen würde. Aufwand: M. Risiko bei schlechter Umsetzung: Bestätigungen bei jeder kleinen Aktion werden zu Lärm, daher brauchen sie eine Schwelle, und ein Rückgängig für eine Coin-Aktion öffnet das Double-Spend-Loch wieder, das die atomaren Zähler geschlossen haben.
 
-Why: Provable fairness is the site's promise for its games, and a dialog that states the exact stake is part of keeping it.
+Warum: Nachweisbare Fairness ist das Versprechen der Seite für ihre Spiele, und ein Dialog, der den genauen Einsatz nennt, gehört dazu.
 
-Source: new-ideas-09-usability.json</p></details>
+Quelle: new-ideas-09-usability.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -61,12 +61,12 @@ Source: new-ideas-09-usability.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Catalog-searching 404 page</h3>
-  <details><summary>Details</summary><p>The not-found page is sixteen lines of text, and a mistyped badge slug is the most likely 404 on the site. Turn it into a recovery page: take the last path segment, run one cheap similarity query against badge slugs and titles plus blog slugs, and offer the five closest badges, a prefilled search box and the three most likely destinations, keeping the query bounded and the page cacheable. Effort: M. Risk if built badly: a similarity query on every bot 404 is free database load for crawlers, and a recovery page that looks like a search result can be mistaken for the real page.
+  <h3>404-Seite mit Katalogsuche</h3>
+  <details><summary>Details</summary><p>Die Not-found-Seite besteht aus sechzehn Textzeilen, und ein vertippter Badge-Slug ist die wahrscheinlichste 404 der Seite. Sie in eine Rettungsseite verwandeln: das letzte Pfadsegment nehmen, eine billige Ähnlichkeitsabfrage gegen Badge-Slugs und -Titel plus Blog-Slugs ausführen und die fünf nächsten Badges, ein vorausgefülltes Suchfeld und die drei wahrscheinlichsten Ziele anbieten — mit begrenzter Abfrage und cachebarer Seite. Aufwand: M. Risiko bei schlechter Umsetzung: Eine Ähnlichkeitsabfrage bei jeder Bot-404 ist kostenlose Datenbanklast für Crawler, und eine Rettungsseite, die wie ein Suchergebnis aussieht, kann für die echte Seite gehalten werden.
 
-Why: Most 404s on a slug-driven catalog are one typo away from a real page, and today the site offers no way to find it.
+Warum: Die meisten 404s eines slug-getriebenen Katalogs sind einen Tippfehler von einer echten Seite entfernt, und die Seite bietet heute keinen Weg dorthin.
 
-Source: new-ideas-09-usability.json</p></details>
+Quelle: new-ideas-09-usability.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
@@ -80,8 +80,8 @@ Source: new-ideas-09-usability.json</p></details>
     <span class="badge-planned">geplant</span>
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Scheduled publishing</h3>
-  <details><summary>Details</summary><p>Give blog posts a future published_at and have them appear on their own. The column already exists and the public query already filters on status; what is missing is a scheduled flip. Effort: low.</p></details>
+  <h3>Geplante Veröffentlichung</h3>
+  <details><summary>Details</summary><p>Blog-Posts ein zukünftiges published_at geben und automatisch erscheinen lassen. Die Spalte existiert bereits und die öffentliche Abfrage filtert bereits nach Status; es fehlt nur eine geplante Umschaltung. Aufwand: niedrig.</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -95,12 +95,12 @@ Source: new-ideas-09-usability.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Rarity tier ramps as first-class tokens</h3>
-  <details><summary>Details</summary><p>The six TBRI tiers drive colour today, but the values are repeated as literals across tile borders, chips, distribution bars and the heatmap. Define one token per tier — `--tier-&lt;tier&gt;-bg`, `--tier-&lt;tier&gt;-line`, `--tier-&lt;tier&gt;-text` — and make every rarity surface read from them.
+  <h3>Rarity-Tier-Ramps als erstklassige Tokens</h3>
+  <details><summary>Details</summary><p>Die sechs TBRI-Tiers steuern heute die Farben, aber die Werte sind als Literale über Tile-Ränder, Chips, Verteilungsbalken und die Heatmap wiederholt. Pro Tier ein Token definieren — `--tier-&lt;tier&gt;-bg`, `--tier-&lt;tier&gt;-line`, `--tier-&lt;tier&gt;-text` — und jede Rarity-Fläche daraus lesen lassen.
 
-Effort: M.
+Aufwand: M.
 
-Source: bugreports/agent-idea-10.md</p></details>
+Quelle: bugreports/agent-idea-10.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -114,12 +114,12 @@ Source: bugreports/agent-idea-10.md</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>BadgeTile progressive reveal with a token-shaped skeleton</h3>
-  <details><summary>Details</summary><p>14–28 px badge images on a grid of hundreds flash in as each one loads, and the grid reflows while it happens. Give `.badge-tile` a fixed intrinsic box plus a low-contrast skeleton driven by `--line`, and fade the real image over it once decoded.
+  <h3>BadgeTile mit progressivem Einblenden und token-förmigem Skeleton</h3>
+  <details><summary>Details</summary><p>14–28 px große Badge-Bilder in einem Raster aus Hunderten blitzen beim Laden einzeln auf, und das Raster verschiebt sich dabei. `.badge-tile` eine feste intrinsische Box plus ein kontrastarmes Skeleton auf Basis von `--line` geben und das echte Bild nach dem Dekodieren darüber einblenden.
 
-Effort: S.
+Aufwand: S.
 
-Source: bugreports/agent-idea-10.md</p></details>
+Quelle: bugreports/agent-idea-10.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -133,12 +133,12 @@ Source: bugreports/agent-idea-10.md</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Countdown urgency states inside `.countdown`</h3>
-  <details><summary>Details</summary><p>`.countdown` renders every timer identically whether a drop closes in six days or forty minutes. Add three modifier states (`is-calm`, `is-soon`, `is-critical`) that shift the token-derived colour and weight, and pair the change with a static label so it never depends on colour alone.
+  <h3>Dringlichkeitszustände für den Countdown in `.countdown`</h3>
+  <details><summary>Details</summary><p>`.countdown` rendert jeden Timer gleich, egal ob ein Drop in sechs Tagen oder vierzig Minuten endet. Drei Modifikatorzustände (`is-calm`, `is-soon`, `is-critical`) ergänzen, die die aus Tokens abgeleitete Farbe und Schriftstärke verschieben, und die Änderung mit einem statischen Label koppeln, damit sie nie allein von der Farbe abhängt.
 
-Effort: S.
+Aufwand: S.
 
-Source: bugreports/agent-idea-10.md</p></details>
+Quelle: bugreports/agent-idea-10.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -152,12 +152,12 @@ Source: bugreports/agent-idea-10.md</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Persistent filter chip rail with URL-backed state</h3>
-  <details><summary>Details</summary><p>The catalog's active filters are scattered between the search input, a status control and the URL. Consolidate them into one sticky chip rail that shows every active filter, each removable in place, with the URL as the single source of truth.
+  <h3>Persistentes Filter-Chip-Board mit URL-gestütztem Zustand</h3>
+  <details><summary>Details</summary><p>Die aktiven Filter des Katalogs sind zwischen Suchfeld, Status-Steuerung und URL verstreut. In einem einzigen fixierten Chip-Board bündeln, das jeden aktiven Filter zeigt — jeder einzeln an Ort und Stelle entfernbar —, mit der URL als alleiniger Quelle der Wahrheit.
 
-Effort: M.
+Aufwand: M.
 
-Source: bugreports/agent-idea-10.md</p></details>
+Quelle: bugreports/agent-idea-10.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -171,16 +171,16 @@ Source: bugreports/agent-idea-10.md</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Collection Binder</h3>
-  <details><summary>Details</summary><p>A trading-card-binder view of a profile: badge icons snapped into pocketed sheets, with empty sockets for the badges in a chosen category the collector has not unlocked yet. Flipping a page animates the badges in.
+  <h3>Sammler-Binder</h3>
+  <details><summary>Details</summary><p>Eine Trading-Card-Binder-Ansicht eines Profils: Badge-Icons, eingeklickt in Taschenblättern, mit leeren Steckplätzen für die Badges einer gewählten Kategorie, die der Sammler noch nicht freigeschaltet hat. Beim Umblättern animieren die Badges hinein.
 
-Why it fits: the owned/missing split is already computed at login via the perfil path, and the &quot;empty sockets&quot; make missing badges as visible and motivating as owning them.
+Warum es passt: Die Aufteilung besessen/fehlend wird beim Login bereits über den perfil-Pfad berechnet, und die &quot;leeren Steckplätze&quot; machen fehlende Badges genauso sichtbar und motivierend wie besessene.
 
-Effort: M.
+Aufwand: M.
 
-Risk if built badly: a purely cosmetic feature that inflates profile page weight; keep it lazy and off the default path.
+Risiko bei schlechter Umsetzung: Ein rein kosmetisches Feature, das das Gewicht der Profilseite aufbläht; lazy laden und aus dem Standardpfad halten.
 
-Source: bugreports/agent-idea-04.md</p></details>
+Quelle: bugreports/agent-idea-04.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -194,12 +194,12 @@ Source: bugreports/agent-idea-04.md</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Arabic/RTL mirroring via CSS logical properties</h3>
-  <details><summary>Details</summary><p>`ar` is RTL but the layout ships Tailwind physical utilities (`left-*`/`right-*`, `ml-*`/`mr-*`, `text-left`), so mirrored content drifts: the header cluster, countdown badges and grid gutters sit on the wrong side while text is right-aligned. Convert the shell and the shared component classes in `src/app/globals.css` (`.card`, `.chip`, `.badge-tile`, `.data-table`) to logical properties (`ms-`/`me-`, `inset-inline-start`, `text-start`) so one rule set serves all 11 locales.
+  <h3>Arabisch/RTL-Spiegelung über CSS-logische Eigenschaften</h3>
+  <details><summary>Details</summary><p>`ar` ist RTL, aber das Layout setzt Tailwinds physische Utilities ein (`left-*`/`right-*`, `ml-*`/`mr-*`, `text-left`), daher wandert gespiegelter Inhalt: Header-Cluster, Countdown-Badges und Rasterabstände sitzen auf der falschen Seite, während der Text rechtsbündig ist. Shell und die gemeinsamen Komponentenklassen in `src/app/globals.css` (`.card`, `.chip`, `.badge-tile`, `.data-table`) auf logische Eigenschaften umstellen (`ms-`/`me-`, `inset-inline-start`, `text-start`), damit ein Regelsatz alle 11 Locales bedient.
 
-Effort: M.
+Aufwand: M.
 
-Source: bugreports/agent-idea-07.md</p></details>
+Quelle: bugreports/agent-idea-07.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -213,12 +213,12 @@ Source: bugreports/agent-idea-07.md</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Respect `prefers-reduced-motion` in decorative animation</h3>
-  <details><summary>Details</summary><p>sparkle-animated level badges, the stats `Reveal`/`CountUp` set and the chart intro animations all run unconditionally, which can trigger motion sickness and add main-thread work. Gate every animation behind a `prefers-reduced-motion: reduce` media query (CSS) and a JS matchMedia check so reduced-motion users get static finals.
+  <h3>`prefers-reduced-motion` in dekorativen Animationen respektieren</h3>
+  <details><summary>Details</summary><p>Die sparkle-animierten Level-Badges, das `Reveal`/`CountUp`-Set der Stats und die Chart-Intro-Animationen laufen alle bedingungslos, was Bewegungsübelkeit auslösen und Main-Thread-Arbeit erzeugen kann. Jede Animation hinter einer `prefers-reduced-motion: reduce`-Media-Query (CSS) und einem JS-matchMedia-Check abfragen, damit Nutzer mit reduzierter Bewegung statische Endzustände bekommen.
 
-Effort: S.
+Aufwand: S.
 
-Source: bugreports/agent-idea-07.md</p></details>
+Quelle: bugreports/agent-idea-07.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -232,12 +232,12 @@ Source: bugreports/agent-idea-07.md</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Index the hot read paths the feed, progress and momentum queries use</h3>
-  <details><summary>Details</summary><p>the feed filters, leaderboards and momentum read `activity_events` by `(kind, created_at)`, `user_progress` by `updated_at`, and the per-badge owner series grows unbounded. Add the missing composite/partial indexes and a nightly rollup of `badge_stats` into daily rows, then verify with `EXPLAIN` that the planned index is actually used.
+  <h3>Die heißen Lese-Pfade von Feed-, Progress- und Momentum-Abfragen indizieren</h3>
+  <details><summary>Details</summary><p>Die Feed-Filter, Leaderboards und Momentum lesen `activity_events` nach `(kind, created_at)`, `user_progress` nach `updated_at`, und die Owner-Serie pro Badge wächst unbegrenzt. Die fehlenden Composite-/Partial-Indizes ergänzen plus ein nächtliches Rollup von `badge_stats` in Tageszeilen, dann mit `EXPLAIN` verifizieren, dass der geplante Index tatsächlich benutzt wird.
 
-Effort: M.
+Aufwand: M.
 
-Source: bugreports/agent-idea-07.md</p></details>
+Quelle: bugreports/agent-idea-07.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -251,12 +251,12 @@ Source: bugreports/agent-idea-07.md</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Make rarity readable without colour</h3>
-  <details><summary>Details</summary><p>Rarity is colour plus text today, but the distribution bars and heatmap cells rely on colour alone. Add patterns or labels, and a labelled heatmap legend.
+  <h3>Rarity auch ohne Farbe lesbar machen</h3>
+  <details><summary>Details</summary><p>Rarity besteht heute aus Farbe plus Text, aber die Verteilungsbalken und Heatmap-Zellen verlassen sich allein auf Farbe. Muster oder Labels ergänzen, dazu eine beschriftete Heatmap-Legende.
 
-Source: IMPROVEMENTS.md Part 1.2.
+Quelle: IMPROVEMENTS.md Part 1.2.
 
-Source: IMPROVEMENTS.md Part 1</p></details>
+Quelle: IMPROVEMENTS.md Part 1</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -270,12 +270,12 @@ Source: IMPROVEMENTS.md Part 1</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Badge glossary of Twitch terminology</h3>
-  <details><summary>Details</summary><p>A /glossary page defining the vocabulary the catalog silently assumes: Prime Gaming, Turbo, Hype Train, sub, bit and cheer badges, affiliate versus partner, TwitchCon drops, charity badges, OG sub, plus the site's own terms (TBRI, claim window, drop, set_id, version). Each entry is a two-part definition (one line plus a longer explanation) with a link into the matching catalog filter or the badge that exemplifies the term, so a definition doubles as a discovery path. Entries are stored rows (term, slug, short, long, related badge IDs) rather than a hardcoded list, so each gets a stable anchor and DefinedTerm structured data. Data: hand-authored rows plus catalog rows for the example badges. Effort: M. Risk if built badly: entries drift from the catalog as categories are renamed and example badges expire, and a DefinedTerm block pointing at a deleted badge is worse than no markup; keep the example references validated against the catalog on render.
+  <h3>Badge-Glossar der Twitch-Terminologie</h3>
+  <details><summary>Details</summary><p>Eine /glossary-Seite, die das Vokabular definiert, das der Katalog stillschweigend voraussetzt: Prime Gaming, Turbo, Hype Train, Sub-, Bit- und Cheer-Badges, Affiliate versus Partner, TwitchCon-Drops, Charity-Badges, OG-Sub, dazu die eigenen Begriffe der Seite (TBRI, Claim-Fenster, Drop, set_id, version). Jeder Eintrag ist eine zweiteilige Definition (eine Zeile plus eine längere Erklärung) mit einem Link in den passenden Katalogfilter oder zum Badge, das den Begriff exemplifiziert, sodass eine Definition zugleich ein Entdeckungspfad ist. Einträge sind gespeicherte Zeilen (term, slug, short, long, zugehörige Badge-IDs) statt einer hartkodierten Liste, damit jeder eine stabile Anker-URL und DefinedTerm-Strukturdaten bekommt. Daten: handgeschriebene Zeilen plus Katalogzeilen für die Beispiel-Badges. Aufwand: M. Risiko bei schlechter Umsetzung: Einträge driften vom Katalog weg, wenn Kategorien umbenannt werden und Beispiel-Badges ablaufen, und ein DefinedTerm-Block, der auf ein gelöschtes Badge zeigt, ist schlimmer als gar kein Markup; die Beispiel-Referenzen beim Rendern gegen den Katalog validieren.
 
-Why: Every visitor who does not know what a Hype Train badge is bounces, and a glossary is the cheapest way to turn that confusion into an internal link.
+Warum: Jede Besucherin und jeder Besucher, der nicht weiß, was ein Hype-Train-Badge ist, springt ab, und ein Glossar ist der billigste Weg, diese Verwirrung in einen internen Link zu verwandeln.
 
-Source: new-ideas-02-content.json</p></details>
+Quelle: new-ideas-02-content.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -289,12 +289,12 @@ Source: new-ideas-02-content.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Catalog Eras editorial hubs</h3>
-  <details><summary>Details</summary><p>Named historical periods of badge releases — the closed-beta years, the Prime Gaming era, the Hype Train era, the affiliate-era explosion — each with an editorial page explaining what changed about how badges were earned and a grid of the badges released inside it. Eras are explicit date ranges in a small table (name, slug, start, end, intro copy) and the grid is an ordinary catalog query filtered to that range, so the page stays correct as new badges arrive. Each era links to its predecessor and successor to form a readable history. Data: first-sighting and release dates from badge_events and the catalog, plus authored copy. Effort: M. Risk if built badly: the era boundaries are arguable and a wrong one becomes a factual claim the site publishes with authority; keep the ranges in data with a note explaining how they were chosen.
+  <h3>Editoriale Hubs für Katalog-Epochen</h3>
+  <details><summary>Details</summary><p>Benannte historische Perioden der Badge-Releases — die Closed-Beta-Jahre, die Prime-Gaming-Ära, die Hype-Train-Ära, die Explosion der Affiliate-Ära — jeweils mit einer editoriellen Seite, die erklärt, was sich am Erwerb von Badges geändert hat, plus einem Raster der in dieser Periode veröffentlichten Badges. Epochen sind explizite Datumsbereiche in einer kleinen Tabelle (name, slug, start, end, Einleitungstext) und das Raster ist eine gewöhnliche Katalogabfrage, gefiltert auf diesen Bereich, sodass die Seite korrekt bleibt, wenn neue Badges eintreffen. Jede Epoche verlinkt auf ihren Vorgänger und Nachfolger und bildet so eine lesbare Geschichte. Daten: Erstauftauch- und Release-Daten aus badge_events und dem Katalog, plus geschriebene Texte. Aufwand: M. Risiko bei schlechter Umsetzung: Die Epochen-Grenzen sind umstritten, und eine falsche wird zur Sachaussage, die die Seite mit Autorität veröffentlicht; die Bereiche in Daten halten, mit einem Hinweis, wie sie gewählt wurden.
 
-Why: It turns a flat catalog of 476 items into a story a newcomer can read in order, which is exactly the narrative the badge world has never had written down.
+Warum: Es verwandelt einen flachen Katalog mit 476 Einträgen in eine Geschichte, die ein Neuling der Reihe nach lesen kann — genau die Erzählung, die die Badge-Welt nie aufgeschrieben hatte.
 
-Source: new-ideas-02-content.json</p></details>
+Quelle: new-ideas-02-content.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -308,12 +308,12 @@ Source: new-ideas-02-content.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Learn hub for claiming basics</h3>
-  <details><summary>Details</summary><p>A /learn section of long-form tutorials answering what a new viewer actually types: what a global badge is, how to claim a Prime badge, why a badge does not appear in the picker, how channel sub badges differ from global ones, and how to check which global badges an account owns. Each tutorial is a real article with numbered steps, catalog examples and HowTo structured data where the steps are procedural, ending by pointing at the catalog surface that performs the action. Articles are content rows with locale, so they translate like the rest of the site. Data: authored copy plus cited catalog rows and badge images. Effort: M. Risk if built badly: the tutorials duplicate the per-badge how-to text and rot whenever Twitch changes its UI; keep platform mechanics in one place, date-stamp every article, and link rather than restate.
+  <h3>Learn-Hub für die Grundlagen des Einlösens</h3>
+  <details><summary>Details</summary><p>Ein /learn-Bereich mit ausführlichen Tutorials, die beantworten, was ein neuer Zuschauer wirklich eintippt: was ein globales Badge ist, wie man ein Prime-Badge einlöst, warum ein Badge nicht im Picker erscheint, wie sich Channel-Sub-Badges von globalen unterscheiden und wie man prüft, welche globalen Badges ein Konto besitzt. Jedes Tutorial ist ein echter Artikel mit nummerierten Schritten, Katalogbeispielen und HowTo-Strukturdaten, wo die Schritte prozedural sind, und endet mit einem Verweis auf die Katalogfläche, die die Aktion ausführt. Artikel sind Inhaltszeilen mit Locale und lassen sich also wie der Rest der Seite übersetzen. Daten: geschriebene Texte plus zitierte Katalogzeilen und Badge-Bilder. Aufwand: M. Risiko bei schlechter Umsetzung: Die Tutorials duplizieren den Pro-Badge-Anleitungstext und verrotten, sobald Twitch seine UI ändert; Plattform-Mechanik an einem Ort halten, jeden Artikel mit Datum versehen und verlinken statt wiederholen.
 
-Why: It captures the highest-volume search intent in this niche and converts it into a visit to the claimable view instead of a bounce.
+Warum: Es fängt die Suchintention mit dem höchsten Volumen in dieser Nische ein und wandelt sie in einen Besuch der Einlösbar-Ansicht statt eines Absprungs.
 
-Source: new-ideas-02-content.json</p></details>
+Quelle: new-ideas-02-content.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -327,12 +327,12 @@ Source: new-ideas-02-content.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Internal-link suggestion engine</h3>
-  <details><summary>Details</summary><p>While an editor writes a draft, a side panel scans the body for badge names, set names, categories, tier vocabulary and glossary terms and suggests the internal target for each match — a badge detail page, a filtered catalog view, a glossary anchor — with the anchor text taken from the draft itself. It also flags mentions with no target yet (an un-glossed term, a badge absent from the catalog) as content gaps, and reports the draft's internal link count against its length. Data: a term index built from badge names, set ids, categories, FAQ keys and glossary terms, matched against the draft's plain text. Effort: M. Risk if built badly: it over-links common words and turns prose into a link farm; require a confidence threshold and let the editor accept suggestions individually rather than auto-inserting them.
+  <h3>Engine für interne Link-Vorschläge</h3>
+  <details><summary>Details</summary><p>Während ein Redakteur einen Entwurf schreibt, scannt ein Seitenpanel den Text nach Badge-Namen, Set-Namen, Kategorien, Tier-Vokabular und Glossar-Begriffen und schlägt für jeden Treffer das interne Ziel vor — eine Badge-Detailseite, eine gefilterte Katalogansicht, einen Glossar-Anker —, wobei der Ankertext dem Entwurf selbst entstammt. Er markiert außerdem Erwähnungen ohne bisheriges Ziel (ein unglossarter Begriff, ein im Katalog fehlendes Badge) als Inhaltslücken und meldet die interne Link-Anzahl des Entwurfs im Verhältnis zu seiner Länge. Daten: ein Begriffsindex aus Badge-Namen, Set-IDs, Kategorien, FAQ-Keys und Glossar-Begriffen, abgeglichen mit dem Fließtext des Entwurfs. Aufwand: M. Risiko bei schlechter Umsetzung: Er verlinkt gängige Wörter übermäßig und macht Prosa zur Link-Farm; eine Konfidenzschwelle verlangen und den Redakteur Vorschläge einzeln annehmen lassen, statt sie automatisch einzufügen.
 
-Why: Internal links are what let 476 badge pages and a growing blog hold each other up in search, and doing it by hand is what nobody does.
+Warum: Interne Links sind das, was 476 Badge-Seiten und einen wachsenden Blog in der Suche gegenseitig stützt, und es von Hand zu machen, macht niemand.
 
-Source: new-ideas-02-content.json</p></details>
+Quelle: new-ideas-02-content.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -346,12 +346,12 @@ Source: new-ideas-02-content.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Keyword-to-page map</h3>
-  <details><summary>Details</summary><p>An internal map assigning each target query cluster to exactly one canonical page — a badge detail page, a category landing page, a tutorial, a glossary term — with its current owner page and a cannibalization flag when two pages compete for the same intent. It is generated by matching queries against page titles, headings and copy already in the repo and shows clusters with no page at all as the editorial backlog. Data: per-route text extracted from the content rows plus, where available, the zero-result search log and referrer hosts. Effort: M. Risk if built badly: it hardens into a stale spreadsheet claiming ownership of pages that were renamed; regenerate it from routable content rather than maintaining it by hand.
+  <h3>Zuordnung von Keywords zu Seiten</h3>
+  <details><summary>Details</summary><p>Eine interne Zuordnung, die jedes Ziel-Query-Cluster auf genau eine kanonische Seite legt — eine Badge-Detailseite, eine Kategorie-Landingpage, ein Tutorial, einen Glossar-Begriff —, mit der derzeitigen Besitzerseite und einer Kannibalisierungs-Markierung, wenn zwei Seiten um dieselbe Intention konkurrieren. Sie entsteht, indem Queries gegen Seitentitel, Überschriften und bereits im Repo vorhandene Texte gematcht werden, und zeigt Cluster ohne irgendeine Seite als editorielles Backlog. Daten: pro Route extrahierter Text aus den Inhaltszeilen plus, wo verfügbar, das Null-Treffer-Suchprotokoll und Referrer-Hosts. Aufwand: M. Risiko bei schlechter Umsetzung: Sie verhärtet zu einer veralteten Tabelle, die Besitzansprüche auf umbenannte Seiten erhebt; aus routbaren Inhalten neu generieren statt von Hand pflegen.
 
-Why: With this much overlapping content, the fastest ranking win is stopping two of the site's own pages from fighting over one query.
+Warum: Bei so viel überlappendem Inhalt ist der schnellste Ranking-Gewinn, zwei eigene Seiten der Site daran zu hindern, um ein Query zu kämpfen.
 
-Source: new-ideas-02-content.json</p></details>
+Quelle: new-ideas-02-content.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -365,12 +365,12 @@ Source: new-ideas-02-content.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Newsletter archive as web pages</h3>
-  <details><summary>Details</summary><p>Every issue the site sends becomes a public indexable page at its own URL with a title, description and Article markup, plus an archive index ordered by date and an RSS feed of issues. Each archive page also links the badges and posts it featured, so old issues keep working as internal-link sources, and the send action writes the archive row from the same payload that went out. Data: the newsletter payloads the admin tab already stores plus the badges and posts they reference. Effort: M. Risk if built badly: an issue containing a personal greeting or a subscriber-only offer publishes verbatim; require an explicit archive step and strip every personalization field before the row is written.
+  <h3>Newsletter-Archiv als Webseiten</h3>
+  <details><summary>Details</summary><p>Jede Ausgabe, die die Seite verschickt, wird zu einer öffentlichen indexierbaren Seite unter eigener URL mit Titel, Beschreibung und Article-Markup, dazu ein nach Datum sortierter Archiv-Index und ein RSS-Feed der Ausgaben. Jede Archivseite verlinkt zudem die Badges und Posts, die sie vorgestellt hat, sodass alte Ausgaben als Quellen interner Links weiterwirken, und die Sende-Aktion schreibt die Archivzeile aus demselben Payload, der rausging. Daten: die Newsletter-Payloads, die der Admin-Tab bereits speichert, plus die Badges und Posts, auf die sie verweisen. Aufwand: M. Risiko bei schlechter Umsetzung: Eine Ausgabe mit persönlicher Begrüßung oder einem nur-Abonnenten-Angebot wird wörtlich veröffentlicht; einen expliziten Archivierungsschritt verlangen und jedes Personalisierungsfeld entfernen, bevor die Zeile geschrieben wird.
 
-Why: Newsletters are written once and read once, while an archive page keeps earning search traffic forever.
+Warum: Newsletter werden einmal geschrieben und einmal gelesen, während eine Archivseite für immer Suchtraffic einfährt.
 
-Source: new-ideas-02-content.json</p></details>
+Quelle: new-ideas-02-content.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -384,12 +384,12 @@ Source: new-ideas-02-content.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Guest contributor program</h3>
-  <details><summary>Details</summary><p>Outside writers — collector bloggers, fansite editors, well-known community members — can pitch and publish under the site's editor, each with an author profile page listing their posts, a short bio and a link to their collector profile, plus an author entity in the Article markup. Pitches and drafts move through the content tab with a status per stage, and authorship is a real relation on the post row so a writer's body of work gathers in one place. Data: post rows with an author relation, member profiles for the linked collector identity, editorial status fields. Effort: M. Risk if built badly: it becomes an unvetted link channel writers farm for backlinks; require editor approval, nofollow outbound links, and a visible disclosure on any paid or sponsored contribution.
+  <h3>Gastautoren-Programm</h3>
+  <details><summary>Details</summary><p>Externe Autoren — Sammler-Blogger, Fansite-Redakteure, bekannte Community-Mitglieder — können einreichen und unter der Redaktion der Seite veröffentlichen, jeweils mit einer Autoren-Profilseite, die ihre Posts listet, einer kurzen Bio und einem Link zu ihrem Sammlerprofil, plus einer Autor-Entität im Article-Markup. Pitches und Entwürfe laufen durch den Content-Tab mit einem Status pro Phase, und Autorenschaft ist eine echte Relation an der Post-Zeile, sodass das Werk eines Autors an einem Ort zusammenläuft. Daten: Post-Zeilen mit Autor-Relation, Mitgliedsprofile für die verlinkte Sammler-Identität, editoriale Statusfelder. Aufwand: M. Risiko bei schlechter Umsetzung: Es wird ein ungeprüfter Link-Kanal, den Autoren für Backlinks abfarmen; Redaktionsfreigabe verlangen, ausgehende Links mit nofollow versehen und bei jeder bezahlten oder gesponserten Mitwirkung eine sichtbare Kennzeichnung fordern.
 
-Why: Domain expertise about badges lives in the community, and this is how it becomes original on-site content instead of a Reddit thread.
+Warum: Domänenwissen über Badges steckt in der Community, und so wird daraus origineller Inhalt auf der Seite statt eines Reddit-Threads.
 
-Source: new-ideas-02-content.json</p></details>
+Quelle: new-ideas-02-content.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -403,12 +403,12 @@ Source: new-ideas-02-content.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Last call deadline column</h3>
-  <details><summary>Details</summary><p>A short forward-looking post on a fixed cadence naming the badges whose claim windows close in the next few days, with one line of commentary each and a live countdown beside every entry. It is the inverse of a retrospective digest: it exists to be read in the next 72 hours, so it is dated, cheap to write (a template pulls the closing list and the writer adds a sentence and a priority order), and links straight into the claimable view. Data: windows closing soon, badge rows, owner counts. Effort: S. Risk if built badly: it becomes auto-generated filler that is identical every week; require a human editorial choice of what to lead with and skip weeks when nothing closes.
+  <h3>Last-Call-Deadline-Kolumne</h3>
+  <details><summary>Details</summary><p>Ein kurzer, nach vorn gerichteter Post in festem Takt, der die Badges nennt, deren Claim-Fenster in den nächsten Tagen schließen, mit je einer Kommentarzeile und einem Live-Countdown neben jedem Eintrag. Er ist das Gegenstück zu einem rückblickenden Digest: Er existiert, um in den nächsten 72 Stunden gelesen zu werden, ist also datiert, billig zu schreiben (eine Vorlage zieht die Schließungsliste, und der Autor ergänzt einen Satz und eine Prioritätsreihenfolge) und verlinkt direkt in die Einlösbar-Ansicht. Daten: bald schließende Fenster, Badge-Zeilen, Owner-Zahlen. Aufwand: S. Risiko bei schlechter Umsetzung: Er wird zu automatisch erzeugtem Füllstoff, der jede Woche identisch ist; eine menschliche redaktionelle Entscheidung verlangen, womit er anführt, und Wochen auslassen, in denen nichts schließt.
 
-Why: It is the one piece of writing that has an immediate reason to be read, and it converts a reader into a claim the same day.
+Warum: Es ist der eine Text mit einem unmittelbaren Grund, gelesen zu werden, und er wandelt einen Leser noch am selben Tag in eine Einlösung.
 
-Source: new-ideas-02-content.json</p></details>
+Quelle: new-ideas-02-content.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -422,12 +422,12 @@ Source: new-ideas-02-content.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Five-email collector course</h3>
-  <details><summary>Details</summary><p>A short automated email course over a week that takes a curious visitor from what a global badge is to claiming their first: message one explains the catalog, two walks through claiming, three explains rarity and why some badges are hard, four introduces the games and XP, five invites them to link Twitch and see their own inventory. Each message carries one live catalog example resolved at send time and exactly one call to action, and replies route into the mailbag column. Data: subscriber record and step progress, one example badge per message chosen by tier, the existing send path. Effort: M. Risk if built badly: it becomes a nagging sequence that burns the list; cap it at five messages, stop the sequence on engagement, and keep the send path unsubscribe-compliant.
+  <h3>Sammlerkurs in fünf E-Mails</h3>
+  <details><summary>Details</summary><p>Ein kurzer automatisierter E-Mail-Kurs über eine Woche, der einen neugierigen Besucher von dem, was ein globales Badge ist, bis zur ersten Einlösung führt: Nachricht eins erklärt den Katalog, zwei führt durch die Einlösung, drei erklärt Rarity und warum manche Badges schwer sind, vier stellt die Spiele und XP vor, fünf lädt ein, Twitch zu verknüpfen und das eigene Inventar zu sehen. Jede Nachricht trägt ein Katalogbeispiel, das zum Sendezeitpunkt live aufgelöst wird, und genau einen Call to Action, und Antworten laufen in die Mailbag-Kolumne. Daten: Abonnenten-Eintrag und Schrittfortschritt, ein Beispiel-Badge pro Nachricht, gewählt nach Tier, der bestehende Sende-Pfad. Aufwand: M. Risiko bei schlechter Umsetzung: Er wird zu einer nervenden Sequenz, die die Liste verbrennt; auf fünf Nachrichten begrenzen, die Sequenz bei Interaktion stoppen und den Sende-Pfad mit sauberer Abmeldeoption halten.
 
-Why: It converts a visitor who read one tutorial into a member with a synced inventory, using the same writing the learn hub already produces.
+Warum: Er wandelt einen Besucher, der ein Tutorial gelesen hat, in ein Mitglied mit synchronisiertem Inventar — mit denselben Texten, die der Learn-Hub ohnehin erzeugt.
 
-Source: new-ideas-02-content.json</p></details>
+Quelle: new-ideas-02-content.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -441,12 +441,12 @@ Source: new-ideas-02-content.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Reader mailbag column</h3>
-  <details><summary>Details</summary><p>A recurring column answering questions real readers ask, sourced from newsletter replies, unanswered FAQ submissions and community channels, each answered properly and linked to the catalog surface or tutorial that resolves it. Questions that recur graduate into a glossary entry or a tutorial, so the mailbag doubles as the content-discovery loop, and each instalment credits the asker by first name only. Data: submitted questions, the catalog and FAQ for answers, the glossary and tutorials as graduation targets. Effort: S. Risk if built badly: it publishes an asker's identifying details or an unverified guess as fact; anonymize by default and label anything the team could not verify as an open question rather than a settled answer.
+  <h3>Leser-Mailbag-Kolumne</h3>
+  <details><summary>Details</summary><p>Eine wiederkehrende Kolumne, die Fragen echter Leser beantwortet, gespeist aus Newsletter-Antworten, unbeantworteten FAQ-Einsendungen und Community-Kanälen, jede ordentlich beantwortet und mit der Katalogfläche oder dem Tutorial verlinkt, das sie löst. Sich wiederholende Fragen wandern in einen Glossar-Eintrag oder ein Tutorial, sodass die Kolumne zugleich die Inhalts-Entdeckungsschleife ist, und jede Ausgabe nennt den Fragenden nur mit Vornamen. Daten: eingereichte Fragen, der Katalog und die FAQ für Antworten, Glossar und Tutorials als Aufstiegsziele. Aufwand: S. Risiko bei schlechter Umsetzung: Sie veröffentlicht identifizierende Details eines Fragenden oder eine ungeprüfte Vermutung als Fakt; standardmäßig anonymisieren und alles, was das Team nicht verifizieren konnte, als offene Frage statt als geklärte Antwort kennzeichnen.
 
-Why: Reader questions are free keyword research with intent attached, and answering them in public is content nobody else has.
+Warum: Leserfragen sind kostenlose Keyword-Recherche mit eingebauter Intention, und sie öffentlich zu beantworten ist Inhalt, den niemand sonst hat.
 
-Source: new-ideas-02-content.json</p></details>
+Quelle: new-ideas-02-content.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -460,12 +460,12 @@ Source: new-ideas-02-content.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Lifecycle-adaptive badge detail header</h3>
-  <details><summary>Details</summary><p>The badge detail page renders one header composition (image, name, rarity chip, status pill) whatever the badge's stage, so an upcoming badge, an open one and an extinct one all lead with the same weight. Define four header compositions selected server-side from the existing status/is_confirmed_active fields and end_date: upcoming leads with the countdown and a remind action, claimable-now leads with the claim link and time remaining, closed leads with final owner count and tier, extinct leads with the archive framing and its provenance context. No client state, just a prop choosing the composition. Effort: M. Risk if built badly: four near-identical headers that differ only in colour, which is worse than one, or a header that keeps claiming 'open' after the sweep has moved on.
+  <h3>Lebenszyklus-adaptiver Badge-Detail-Header</h3>
+  <details><summary>Details</summary><p>Die Badge-Detailseite rendert eine Header-Komposition (Bild, Name, Rarity-Chip, Status-Pill), egal in welcher Phase das Badge steckt, sodass ein bevorstehendes, ein offenes und ein ausgestorbenes Badge mit gleichem Gewicht anführen. Vier Header-Kompositionen definieren, serverseitig aus den vorhandenen status- und is_confirmed_active-Feldern sowie end_date gewählt: Bevorstehende führen mit dem Countdown und einer Erinnerungs-Aktion, jetzt einlösbare mit dem Claim-Link und der Restzeit, geschlossene mit finaler Owner-Zahl und Tier, ausgestorbene mit dem Archiv-Rahmen und ihrem Herkunfts-Kontext. Kein Client-Zustand, nur ein Prop, das die Komposition wählt. Aufwand: M. Risiko bei schlechter Umsetzung: Vier nahezu identische Header, die sich nur in der Farbe unterscheiden — was schlechter als einer ist —, oder ein Header, der nach dem Sweep behauptet, das Badge sei noch offen.
 
-Why: It makes the page answer the visitor's real question, can I still get this, in the first screen instead of the fifth.
+Warum: Die Seite beantwortet die eigentliche Frage der Besucher — kann ich das noch bekommen — auf dem ersten Bildschirm statt auf dem fünften.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -479,12 +479,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Scroll-spy category header in the grid</h3>
-  <details><summary>Details</summary><p>When the catalog is sorted or grouped by category, insert a sticky sub-header per group that pins under the site header while its group is in view, carrying the category name, its count and a jump list of the other groups. The header is derived from the ordered rows the grid already receives (no new query), the pin uses position: sticky with the header height as its top offset, and the active group is resolved by one IntersectionObserver over the group headings. Effort: M. Risk if built badly: a sticky bar stacking under the sticky site header and eating a third of a phone screen, or jump counts that lie while the sync changes group sizes.
+  <h3>Scroll-Spy-Kategorien-Header im Raster</h3>
+  <details><summary>Details</summary><p>Wenn der Katalog nach Kategorie sortiert oder gruppiert ist, pro Gruppe einen fixierten Sub-Header einfügen, der unter dem Seiten-Header klebt, solange seine Gruppe im Blick ist, und Kategoriename, Anzahl und eine Sprungliste der anderen Gruppen trägt. Der Header leitet sich aus den sortierten Zeilen ab, die das Raster bereits erhält (keine neue Abfrage), das Anpinnen nutzt position: sticky mit der Header-Höhe als Top-Offset, und die aktive Gruppe wird von einem einzigen IntersectionObserver über die Gruppen-Überschriften aufgelöst. Aufwand: M. Risiko bei schlechter Umsetzung: Ein fixierter Balken, der sich unter den fixierten Seiten-Header stapelt und ein Drittel eines Handy-Bildschirms frisst, oder Sprungzahlen, die lügen, während der Sync die Gruppengrößen ändert.
 
-Why: A long catalog needs an index that travels with you, and category is the axis collectors actually scan by.
+Warum: Ein langer Katalog braucht ein Inhaltsverzeichnis, das mitwandert, und Kategorie ist die Achse, nach der Sammler tatsächlich scannen.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -498,12 +498,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Disclosure accordion for badge detail on phones</h3>
-  <details><summary>Details</summary><p>Badge detail stacks six to eight sections in one narrow column, so on a phone the drop window, rarity breakdown, owner trend and ownership sit below the fold in an undifferentiated wall. Below the tablet breakpoint render the sections as a disclosure accordion with the answer-critical section (window and claimability) open and the rest collapsed behind a one-line summary each, keeping the URL hash contract so a shared anchor still lands open. Wider viewports render the same markup expanded, so there is one section list and two presentations. Effort: M. Risk if built badly: hiding the very data the visitor came for behind a tap, or collapsed summaries that drift out of date with the section they summarise.
+  <h3>Aufklapp-Akkordeon für die Badge-Detailseite auf Handys</h3>
+  <details><summary>Details</summary><p>Die Badge-Detailseite stapelt sechs bis acht Sektionen in einer schmalen Spalte, sodass auf dem Handy Drop-Fenster, Rarity-Aufschlüsselung, Owner-Trend und Besitz unterhalb des Falzes in einer ununterscheidbaren Wand liegen. Unterhalb des Tablet-Breakpoints die Sektionen als Aufklapp-Akkordeon rendern, mit der antwortkritischen Sektion (Fenster und Einlösbarkeit) offen und dem Rest hinter je einer einzeiligen Zusammenfassung eingeklappt — der URL-Hash-Vertrag bleibt erhalten, sodass ein geteilter Anker weiterhin offen landet. Breitere Viewports rendern dasselbe Markup ausgeklappt, es gibt also eine Sektionsliste und zwei Darstellungen. Aufwand: M. Risiko bei schlechter Umsetzung: Genau die Daten, derentwegen die Besucherin kommt, hinter einem Tipp verstecken, oder eingeklappte Zusammenfassungen, die mit der Sektion, die sie zusammenfassen, veralten.
 
-Why: Badge pages are dense by nature, and a phone visitor should reach the answer before the bibliography.
+Warum: Badge-Seiten sind von Natur aus dicht, und ein Handy-Besucher sollte die Antwort vor der Bibliografie erreichen.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -517,12 +517,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Home page answer zones</h3>
-  <details><summary>Details</summary><p>The home page currently presents the same catalog grid /badges does. Restructure it into three stacked answer zones with fixed vertical budgets: claimable now with the live count and the two soonest-closing badges, just added from the newest badge_events rows, and rarest movers from the momentum view, each zone one row tall with a link into the full surface. Every zone is server-rendered from queries that already exist, and each has a defined quiet-day state rather than collapsing. Effort: M. Risk if built badly: a home page that duplicates /badges with extra chrome, or zones that are empty and unexplained on a day when nothing dropped.
+  <h3>Antwortzonen auf der Startseite</h3>
+  <details><summary>Details</summary><p>Die Startseite zeigt derzeit dasselbe Katalograster wie /badges. In drei gestapelte Antwortzonen mit festen vertikalen Budgets umstrukturieren: jetzt einlösbar, mit der Live-Zahl und den zwei am baldigsten schließenden Badges; gerade hinzugefügt, aus den neuesten badge_events-Zeilen; und seltenste Mover, aus der Momentum-Ansicht — jede Zone eine Zeile hoch, mit Link in die jeweilige Vollfläche. Jede Zone wird servergerendert aus Abfragen, die bereits existieren, und hat einen definierten Zustand für ruhige Tage, statt zusammenzubrechen. Aufwand: M. Risiko bei schlechter Umsetzung: Eine Startseite, die /badges mit zusätzlichem Chrom dupliziert, oder Zonen, die an einem Tag ohne Drop leer und unerklärt bleiben.
 
-Why: A live catalog's front door should answer what is happening right now before it shows a wall of tiles.
+Warum: Die Haustür eines Live-Katalogs sollte beantworten, was gerade passiert, bevor sie eine Wand aus Kacheln zeigt.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -536,12 +536,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Shared-element transition from tile to detail</h3>
-  <details><summary>Details</summary><p>Clicking a tile hard-cuts to the detail page even though the same image is at both ends. Use the View Transitions API, which the Next 16 App Router supports, to give the badge image a view-transition-name keyed to the badge id so it morphs from the 28 px tile into the detail hero while the rest of the page cross-fades, falling back to the current navigation where the API is absent and to a plain cut under the motion preference. Only the image and the title carry names, so the transition count stays small. Effort: M. Risk if built badly: duplicate view-transition-name warnings across a long list, a morph that runs on a reduced-motion device, or a transition that delays first paint of the destination on a slow phone.
+  <h3>Shared-Element-Übergang von Kachel zu Detail</h3>
+  <details><summary>Details</summary><p>Ein Klick auf eine Kachel schneidet hart zur Detailseite, obwohl dasselbe Bild an beiden Enden steht. Die View Transitions API — die der App Router von Next 16 unterstützt — nutzen, um dem Badge-Bild einen an die Badge-ID gebundenen view-transition-name zu geben, sodass es von der 28-px-Kachel in den Detail-Hero morpht, während der Rest der Seite überblendet; ohne die API greift die aktuelle Navigation, bei reduzierter Bewegung ein schlichter Schnitt. Nur Bild und Titel tragen Namen, damit die Anzahl der Übergänge klein bleibt. Aufwand: M. Risiko bei schlechter Umsetzung: Doppelte view-transition-name-Warnungen über eine lange Liste, ein Morph, der auf einem Gerät mit reduzierter Bewegung läuft, oder ein Übergang, der den First Paint des Ziels auf einem langsamen Handy verzögert.
 
-Why: The badge art is the site's one uninterrupted visual thread, and continuing it across the navigation makes the catalog feel like one object instead of pages.
+Warum: Die Badge-Grafik ist der eine ununterbrochene visuelle Faden der Seite, und ihn über die Navigation fortzuführen lässt den Katalog wie ein einziges Objekt statt wie Seiten wirken.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -555,12 +555,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Server-honest suspense reveal for game rounds</h3>
-  <details><summary>Details</summary><p>The 13 games and the wheel are server-authoritative, so the client does not know the outcome until the response lands and any spin or flip is theatre of unknown length. Design the reveal to be honest about that: the wheel's easing is computed to land on the server's slot within the time the request actually takes, with a minimum spin so a fast response still reads as deliberate, and the games use a fixed-length reveal that continues while the response is in flight and resolves when it arrives, never announcing a result the client invented. The pending phase is designed suspense, not a spinner covering the board. Effort: M. Risk if built badly: an animation that resolves client-side and then contradicts the server payload, or a reveal that overruns on a slow response and looks frozen exactly when the player is most invested.
+  <h3>Server-ehrliche Suspense-Auflösung für Spielrunden</h3>
+  <details><summary>Details</summary><p>Die 13 Spiele und das Wheel sind server-autoritativ, daher kennt der Client das Ergebnis erst, wenn die Antwort ankommt, und jeder Dreh oder Flip ist Theater unbekannter Länge. Die Auflösung so gestalten, dass sie das zugibt: Das Easing des Wheels ist so berechnet, dass es innerhalb der tatsächlichen Anfragezeit auf dem Server-Slot landet, mit einer Mindestdrehzeit, damit eine schnelle Antwort trotzdem überlegt wirkt, und die Spiele nutzen eine Auflösung fester Länge, die weiterläuft, während die Antwort unterwegs ist, und auflöst, wenn sie eintrifft — ohne je ein Ergebnis zu verkünden, das der Client erfunden hat. Die Wartephase ist gestaltete Suspense, kein Spinner über dem Brett. Aufwand: M. Risiko bei schlechter Umsetzung: Eine Animation, die clientseitig auflöst und dann dem Server-Payload widerspricht, oder eine Auflösung, die bei einer langsamen Antwort überläuft und genau dann eingefroren wirkt, wenn der Spieler am stärksten involviert ist.
 
-Why: For games whose whole promise is server-decided fairness, the reveal should look like it is waiting for the truth rather than inventing it.
+Warum: Bei Spielen, deren ganzes Versprechen serverentschiedene Fairness ist, sollte die Auflösung so aussehen, als warte sie auf die Wahrheit, statt sie zu erfinden.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -574,12 +574,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Print stylesheet for badges and sets</h3>
-  <details><summary>Details</summary><p>A collector wants a badge on paper: a club handout, a classroom sheet, a wall of the set they are chasing. Add a print stylesheet for badge detail and for a filtered catalog list where the ambient gradient and all shadows drop, the layout becomes a single column at a printable measure, each badge prints with its name, set, window dates and a QR to the canonical URL reusing the existing URL shapes, page breaks land between badges, and art is kept with print-color-adjust where the browser allows. It is a media print block over the same markup, so nothing is duplicated. Effort: S. Risk if built badly: a print view that carries the sticky header and nav onto every page, or art that prints as an empty box because it is a CSS background.
+  <h3>Druck-Stylesheet für Badges und Sets</h3>
+  <details><summary>Details</summary><p>Ein Sammler will ein Badge auf Papier: ein Vereins-Handout, ein Blatt für den Klassenraum, eine Wand des Sets, dem er hinterherjagt. Ein Druck-Stylesheet für die Badge-Detailseite und eine gefilterte Katalogliste ergänzen, bei dem der Ambiente-Gradient und alle Schatten wegfallen, das Layout zu einer Spalte in druckbarer Zeilenlänge wird, jedes Badge mit Name, Set, Fensterdaten und einem QR zur kanonischen URL druckt (die bestehenden URL-Formen wiederverwendend), Seitenumbrüche zwischen Badges landen und die Grafik mit print-color-adjust erhalten bleibt, wo der Browser es erlaubt. Es ist ein Block für media print über dasselbe Markup, also wird nichts doppelt. Aufwand: S. Risiko bei schlechter Umsetzung: Eine Druckansicht, die fixierten Header und Navigation auf jede Seite trägt, oder Grafik, die als leere Box druckt, weil sie ein CSS-Hintergrund ist.
 
-Why: The catalog is reference material, and reference material that cannot be printed is only half a reference.
+Warum: Der Katalog ist Nachschlagewerk, und Nachschlagewerk, das sich nicht drucken lässt, ist nur ein halbes.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -593,12 +593,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Numeric and date presentation layer</h3>
-  <details><summary>Details</summary><p>Numbers are formatted ad hoc across the site: owner counts, TBRI scores, coin balances, XP, percentages, dates and durations each have their own rounding and their alignment differs between a table, a tile and a chart label. Define one presentation layer with tabular figures wherever a number can change or align, locale-correct grouping and compact notation like 1.2M with the exact value in a title, a decimal policy per metric, right-alignment for measures inside .data-table, a consistent delta treatment with a direction glyph so meaning survives colour blindness, and dates in the visitor's locale with an explicit timezone label. Effort: M. Risk if built badly: compact notation collapsing two different values to the same 1.2M in a comparison, or locale formatting that breaks the truncation a tile layout depends on.
+  <h3>Darstellungsschicht für Zahlen und Daten</h3>
+  <details><summary>Details</summary><p>Zahlen werden auf der Seite ad hoc formatiert: Owner-Zahlen, TBRI-Scores, Coin-Salden, XP, Prozentwerte, Daten und Dauern haben jeweils eigene Rundungen, und ihre Ausrichtung unterscheidet sich zwischen Tabelle, Kachel und Chart-Label. Eine Darstellungsschicht definieren: tabellarische Ziffern, wo immer sich eine Zahl ändern oder ausrichten kann, locale-korrekte Gruppierung und kompakte Notation wie 1.2M mit dem exakten Wert im title-Attribut, eine Dezimalrichtlinie pro Metrik, Rechtsausrichtung für Messwerte innerhalb von .data-table, eine einheitliche Delta-Behandlung mit Richtungssymbol, damit Bedeutung Farbenblindheit übersteht, und Daten im Locale der Besucherin mit explizitem Zeitzonen-Label. Aufwand: M. Risiko bei schlechter Umsetzung: Kompakte Notation, die in einem Vergleich zwei verschiedene Werte auf dasselbe 1.2M kollabiert, oder Locale-Formatierung, die die Verkürzung zerbricht, von der ein Kachellayout abhängt.
 
-Why: This is a database site, so numbers and dates are the product, and it currently speaks them in a dozen dialects.
+Warum: Dies ist eine Datenbank-Seite, also sind Zahlen und Daten das Produkt — und die Seite spricht sie derzeit in einem Dutzend Dialekte.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -612,12 +612,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Wrapping, hyphenation and measure policy</h3>
-  <details><summary>Details</summary><p>Headings break mid-phrase, a long badge name orphans one word onto a third line, and prose runs the full width of a wide card. Add a typographic policy: text-wrap balance on headings and section titles, text-wrap pretty with widow control on lead paragraphs, hyphens auto with the correct lang per locale so long German and Russian badge names break sensibly, and a per-locale measure ceiling applied to .prose-content and the FAQ rather than inherited from the container width. This is about wrapping and measure specifically, not the type-scale and logical-inset work already on the board. Effort: S. Risk if built badly: hyphenation that splits a badge name into an unrecognisable fragment, or balanced headings that wrap into a taller and emptier block than the ragged one they replaced.
+  <h3>Richtlinie für Umbruch, Silbentrennung und Zeilenlänge</h3>
+  <details><summary>Details</summary><p>Überschriften brechen mitten in der Phrase, ein langer Badge-Name verwaist ein Wort auf eine dritte Zeile, und Prosa läuft über die volle Breite einer breiten Karte. Eine typografische Richtlinie ergänzen: text-wrap: balance für Überschriften und Sektionstitel, text-wrap: pretty mit Witwenkontrolle für Einleitungsabsätze, hyphens: auto mit korrekter lang pro Locale, damit lange deutsche und russische Badge-Namen vernünftig brechen, und eine Zeilenlängen-Obergrenze pro Locale, angewandt auf .prose-content und die FAQ, statt sie von der Containerbreite zu erben. Es geht hier speziell um Umbruch und Zeilenlänge, nicht um die bereits auf dem Brett liegende Arbeit an Schriftskala und logischen Einrückungen. Aufwand: S. Risiko bei schlechter Umsetzung: Silbentrennung, die einen Badge-Namen in ein unerkennbares Fragment zerreißt, oder ausgeglichene Überschriften, die in einen höheren und leereren Block umbrechen als den zerfetzten, den sie ersetzt haben.
 
-Why: This site is mostly text about small images, and clean wrapping is most of what separates a reference page from a wall.
+Warum: Diese Seite besteht größtenteils aus Text über kleine Bilder, und sauberer Umbruch ist das meiste, was eine Nachschlagsseite von einer Wand trennt.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -631,12 +631,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Deterministic placeholder for missing badge art</h3>
-  <details><summary>Details</summary><p>When a badge image 404s because a provider URL moved or an asset was never mirrored, the grid shows a broken-image icon and the OG render throws. Render a deterministic placeholder instead: a two-tone tile in the badge's tier colour carrying the set initial, hashed from the badge id alone so the same badge always yields the same glyph, sized to the same box so the grid does not shift, labelled art unavailable for assistive tech, with a discreet report link, and used by both the grid and the OG route so a share stays legible. Effort: S. Risk if built badly: a placeholder that looks close enough to real art to hide a broken provider for weeks, or a glyph with enough contrast to be mistaken for a badge in a screenshot.
+  <h3>Deterministischer Platzhalter für fehlende Badge-Grafik</h3>
+  <details><summary>Details</summary><p>Wenn ein Badge-Bild 404 liefert, weil eine Provider-URL umgezogen ist oder ein Asset nie gespiegelt wurde, zeigt das Raster ein Kaputt-Bild-Icon und das OG-Rendering wirft einen Fehler. Stattdessen einen deterministischen Platzhalter rendern: eine zweifarbige Kachel in der Tier-Farbe des Badges mit dem Set-Anfangsbuchstaben, gehasht allein aus der Badge-ID, damit dasselbe Badge immer dasselbe Zeichen liefert, auf dieselbe Box bemessen, damit das Raster nicht springt, für assistive Technik mit dem Label Grafik nicht verfügbar versehen, mit unaufdringlichem Melden-Link, und von Raster und OG-Route gleichermaßen benutzt, damit ein Share lesbar bleibt. Aufwand: S. Risiko bei schlechter Umsetzung: Ein Platzhalter, der echt genug aussieht, um einen kaputten Provider wochenlang zu verdecken, oder ein Zeichen mit genug Kontrast, um in einem Screenshot für ein Badge gehalten zu werden.
 
-Why: Missing art is a certainty in a catalog built from third-party feeds, and the broken-image icon is the one image this site never designed.
+Warum: Fehlende Grafik ist in einem aus Dritt-Feeds gebauten Katalog eine Gewissheit, und das Kaputt-Bild-Icon ist das eine Bild, das diese Seite nie entworfen hat.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -650,12 +650,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Drop-window annotation bands on the owner chart</h3>
-  <details><summary>Details</summary><p>The owner-trend chart on a badge page plots a bare line, but the events that explain it, the window opening, a mid-window re-drop, the closing date, are not on it. Read the badge_events rows and the start and end dates and render them as annotated bands and markers on the existing OwnersChart: a shaded band across the open window, a vertical rule at close with a dated label, and a legend line instead of the bands on narrow widths. It reuses the chart's own domain computation, so no new data source and no new query. Effort: M. Risk if built badly: a band covering the curve it is meant to explain, or annotations implying a precision the recorded event timestamps do not have.
+  <h3>Drop-Fenster-Anmerkungs-Bänder im Owner-Chart</h3>
+  <details><summary>Details</summary><p>Der Owner-Trend-Chart auf einer Badge-Seite zeichnet eine blanke Linie, aber die Ereignisse, die sie erklären — das Öffnen des Fensters, ein Re-Drop mittendrin, das Schließdatum —, sind nicht darauf. Die badge_events-Zeilen und die Start- und Enddaten lesen und als annotierte Bänder und Marker auf dem bestehenden OwnersChart rendern: ein schattiertes Band über dem offenen Fenster, eine vertikale Linie am Ende mit datiertem Label und eine Legendenzeile statt der Bänder bei schmalen Breiten. Er nutzt die eigene Domain-Berechnung des Charts erneut, also keine neue Datenquelle und keine neue Abfrage. Aufwand: M. Risiko bei schlechter Umsetzung: Ein Band, das die Kurve bedeckt, die es eigentlich erklären soll, oder Annotationen, die eine Präzision suggerieren, die die aufgezeichneten Ereignis-Zeitstempel nicht haben.
 
-Why: An owner curve without its drop window is a shape with no story, and the events are already sitting in the database.
+Warum: Eine Owner-Kurve ohne ihr Drop-Fenster ist eine Form ohne Geschichte, und die Ereignisse liegen bereits in der Datenbank.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -669,12 +669,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Linked crosshair across the stats dashboard</h3>
-  <details><summary>Details</summary><p>The /stats page stacks a dozen independent charts, so reading what happened the week of the 14th means hovering the same date twelve times and holding twelve numbers in your head. Add a linked crosshair: hovering or focusing any chart publishes the resolved bucket, day or week, to a shared context, every other chart draws a thin rule at that bucket and shows its value in the chart head, and moving to another chart moves the whole column. The bucket is the shared key, so it works across different series with no new queries. Effort: L. Risk if built badly: a handler publishing on every pixel of movement and re-rendering twelve charts per frame, or a linked rule landing on a bucket another chart does not have and silently reading nothing.
+  <h3>Verknüpftes Fadenkreuz über das Stats-Dashboard</h3>
+  <details><summary>Details</summary><p>Die /stats-Seite stapelt ein Dutzend unabhängige Charts, also bedeutet das Lesen dessen, was in der Woche des 14. geschah, dasselbe Datum zwölfmal zu hovern und zwölf Zahlen im Kopf zu behalten. Ein verknüpftes Fadenkreuz ergänzen: Beim Hovern oder Fokussieren eines Charts wird der aufgelöste Bucket — Tag oder Woche — in einen gemeinsamen Kontext veröffentlicht, jedes andere Chart zeichnet an diesem Bucket eine dünne Linie und zeigt seinen Wert im Chart-Kopf, und ein Wechsel zu einem anderen Chart verschiebt die ganze Spalte. Der Bucket ist der gemeinsame Schlüssel, also funktioniert es über verschiedene Serien hinweg ohne neue Abfragen. Aufwand: L. Risiko bei schlechter Umsetzung: Ein Handler, der bei jedem Pixel Bewegung publiziert und zwölf Charts pro Frame neu rendert, oder eine verknüpfte Linie, die auf einem Bucket landet, den ein anderes Chart nicht hat, und still nichts anzeigt.
 
-Why: The dashboard is a set of series over one time axis, and the only question worth asking of it is what several did at the same moment.
+Warum: Das Dashboard ist eine Menge von Serien über eine Zeitachse, und die einzige Frage, die sich bei ihm lohnt, lautet, was mehrere im selben Moment taten.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -688,12 +688,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Rarity tier thresholds as chart reference rules</h3>
-  <details><summary>Details</summary><p>TBRI tiers derive from owner count and window characteristics, so each tier implies an approximate owner threshold for a given badge profile, and the chart never shows where those boundaries sit. Add optional horizontal reference rules to the owner chart, one per tier boundary for the badge's own window profile, drawn in the tier token colour with a label and toggled from the chart head, so a visitor can see how close a badge is to the legendary line and whether the forecast crosses it. Derived from the same rarity inputs the badge page already loads. Effort: M. Risk if built badly: threshold lines implying a hard boundary where the score is continuous, or a chart so full of rules that the trend they annotate disappears.
+  <h3>Rarity-Tier-Schwellen als Chart-Referenzlinien</h3>
+  <details><summary>Details</summary><p>TBRI-Tiers leiten sich aus Owner-Zahl und Fenster-Eigenschaften ab, also impliziert jedes Tier eine ungefähre Owner-Schwelle für ein bestimmtes Badge-Profil, und der Chart zeigt nie, wo diese Grenzen liegen. Optionale horizontale Referenzlinien am Owner-Chart ergänzen, je eine pro Tier-Grenze für das eigene Fensterprofil des Badges, in der Tier-Token-Farbe gezeichnet, mit Label und vom Chart-Kopf aus umschaltbar, damit eine Besucherin sehen kann, wie nah ein Badge an der Legendary-Linie ist und ob die Prognose sie überschreitet. Abgeleitet aus denselben Rarity-Eingaben, die die Badge-Seite bereits lädt. Aufwand: M. Risiko bei schlechter Umsetzung: Schwellenlinien, die eine harte Grenze suggerieren, wo der Score kontinuierlich ist, oder ein Chart, so voller Linien, dass der Trend, den sie annotieren, verschwindet.
 
-Why: The tiers are the site's central abstraction and the chart that drives them should show where they actually fall.
+Warum: Die Tiers sind die zentrale Abstraktion der Seite, und der Chart, der sie antreibt, sollte zeigen, wo sie tatsächlich liegen.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -707,12 +707,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Inline micro-visualisation contract for data tables</h3>
-  <details><summary>Details</summary><p>The leaderboards, the category tables and the compare view are numbers in cells, with the shape behind each number invisible. Define one inline micro-viz column contract for .data-table: a 60 by 16 sparkline of the row's own history, a tick marking the column median, and a small delta chip for the period change, all inline SVG drawn from the row's data with no interaction of their own, degrading to the plain number below the tablet breakpoint, and applied only where a series actually exists (owner trends, XP over time, momentum) rather than as decoration on a single value. Effort: M. Risk if built badly: a sparkline on every row turning the table into visual noise, or a median tick computed over the visible page rather than the population.
+  <h3>Inline-Mikrovisualisierungs-Vertrag für Datentabellen</h3>
+  <details><summary>Details</summary><p>Die Leaderboards, die Kategorietabellen und die Vergleichsansicht sind Zahlen in Zellen, wobei die Form hinter jeder Zahl unsichtbar bleibt. Einen Inline-Micro-Viz-Spaltenvertrag für .data-table definieren: eine 60×16-Sparkline der eigenen Historie der Zeile, ein Tick, der den Spaltenmedian markiert, und ein kleiner Delta-Chip für die Periodenänderung — alles Inline-SVG, gezeichnet aus den Zeilendaten, ohne eigene Interaktion, unterhalb des Tablet-Breakpoints zur schlichten Zahl degenerierend, und nur angewandt, wo eine Serie tatsächlich existiert (Owner-Trends, XP über die Zeit, Momentum), statt als Dekoration an einem einzelnen Wert. Aufwand: M. Risiko bei schlechter Umsetzung: Eine Sparkline auf jeder Zeile, die die Tabelle zu visuellem Rauschen macht, oder ein Median-Tick, berechnet über die sichtbare Seite statt über die Gesamtheit.
 
-Why: Tables are where this site keeps its facts, and a fact with its shape beside it is read in a fraction of the time.
+Warum: Tabellen sind der Ort, an dem diese Seite ihre Fakten aufbewahrt, und ein Fakt mit seiner Form daneben ist in einem Bruchteil der Zeit gelesen.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -726,12 +726,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Compare view as a three-lane diff</h3>
-  <details><summary>Details</summary><p>The two-member compare view puts two inventories side by side, which turns the actual question, what do we share and what do I have that you do not, into a manual scan of two columns. Restructure it as a diff: a shared lane in the middle for badges both own, a lane left for only-A and a lane right for only-B, each badge a tile with its tier, all three lanes aligned by set so related badges line up, with a count per lane and a plain-text export of the delta. It reads the two inventories the compare view already resolves. Effort: M. Risk if built badly: a three-column tile layout unusable below the tablet breakpoint, or alignment by set scattering the lanes because most badges have no set.
+  <h3>Vergleichsansicht als Drei-Spalten-Diff</h3>
+  <details><summary>Details</summary><p>Die Zwei-Mitglieder-Vergleichsansicht stellt zwei Inventare nebeneinander, was die eigentliche Frage — was teilen wir, und was habe ich, das du nicht hast — zu einem manuellen Abgleich zweier Spalten macht. Als Diff umstrukturieren: eine gemeinsame Spalte in der Mitte für Badges, die beide besitzen, links eine Spalte für nur-A und rechts eine für nur-B, jedes Badge eine Kachel mit seinem Tier, alle drei Spalten nach Set ausgerichtet, damit verwandte Badges in einer Linie stehen, mit einer Zahl pro Spalte und einem Klartext-Export des Deltas. Sie liest die beiden Inventare, die die Vergleichsansicht bereits auflöst. Aufwand: M. Risiko bei schlechter Umsetzung: Ein Drei-Spalten-Kachellayout, das unterhalb des Tablet-Breakpoints unbrauchbar ist, oder Ausrichtung nach Set, die die Spalten zerstreut, weil die meisten Badges kein Set haben.
 
-Why: The compare view exists to answer a question about difference, and the current layout makes the visitor do the diffing by eye.
+Warum: Die Vergleichsansicht existiert, um eine Frage nach dem Unterschied zu beantworten, und das aktuelle Layout lässt die Besucherin das Diffing von Hand machen.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -745,12 +745,12 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#22c55e">Quick Win</span>
   </div>
-  <h3>Category pictogram set</h3>
-  <details><summary>Details</summary><p>Categories, subscription tiers, Bits, Prime, follower milestones, event drops, game-specific sets, are labelled with text-only chips. Draw a small consistent pictogram per top-level category, one grid size and one stroke weight following the icon contract, and place it in the filter chips, the category table rows, a corner mark on the tile and the RSS and OG output, so a category is recognisable before its label is read. The set is deliberately small and closed, and a new category without a pictogram fails the review check rather than shipping a generic dot. Effort: M. Risk if built badly: pictograms literal enough to read as emoji, or a set that keeps growing with mixed metaphors until it signifies nothing.
+  <h3>Kategorien-Piktogramm-Set</h3>
+  <details><summary>Details</summary><p>Kategorien, Subskriptions-Tiers, Bits, Prime, Follower-Meilensteine, Event-Drops, spielspezifische Sets — alles ist mit reinen Text-Chips gelabelt. Pro Top-Level-Kategorie ein kleines, konsistentes Piktogramm zeichnen, eine Rastergröße und eine Strichstärke nach dem Icon-Vertrag, und es in die Filter-Chips, die Kategorietabellen-Zeilen, eine Eckmarkierung auf der Kachel sowie die RSS- und OG-Ausgabe setzen, damit eine Kategorie erkennbar ist, bevor ihr Label gelesen wird. Das Set ist bewusst klein und geschlossen, und eine neue Kategorie ohne Piktogramm fällt beim Review-Check durch, statt einen generischen Punkt auszuliefern. Aufwand: M. Risiko bei schlechter Umsetzung: Piktogramme, die bildlich genug sind, um als Emoji gelesen zu werden, oder ein Set, das mit gemischten Metaphern weiterwächst, bis es nichts mehr bedeutet.
 
-Why: Category is one of this catalog's two axes and the one that currently has no visual language at all.
+Warum: Kategorie ist eine der beiden Achsen dieses Katalogs — und diejenige, die derzeit keinerlei visuelle Sprache hat.
 
-Source: new-ideas-03-design.json</p></details>
+Quelle: new-ideas-03-design.json</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
@@ -764,16 +764,16 @@ Source: new-ideas-03-design.json</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>Manual inventory re-sync with visible status</h3>
-  <details><summary>Details</summary><p>On the profile/inventory page, a &quot;Sync my badges&quot; button with the last-synced timestamp, which provider answered (badges.blog vs Twitch GQL fallback), and the count found/last run, plus a disabled/cooldown state while a sync is in flight. A failed sync states the reason instead of failing quietly.
+  <h3>Manueller Inventar-Resync mit sichtbarem Status</h3>
+  <details><summary>Details</summary><p>Auf der Profil-/Inventarseite ein &quot;Meine Badges synchronisieren&quot;-Button mit dem Zeitstempel des letzten Syncs, der Angabe, welcher Provider geantwortet hat (badges.blog vs. Twitch-GQL-Fallback), und der Zahl gefunden/letzter Lauf, plus einem deaktivierten/Abkling-Zustand, während ein Sync läuft. Ein fehlgeschlagener Sync nennt den Grund statt still zu scheitern.
 
-Why it fits: Ownership resolves through a third-party `/api/perfil` with a GQL fallback and varies per user; a new badge can be claimed on Twitch before the site knows. Giving the user the trigger plus a cooldown is the politeness boundary the AGENTS.md ToS note asks for.
+Warum es passt: Der Besitz löst sich über ein Dritt-`/api/perfil` mit GQL-Fallback auf und variiert pro Nutzer; ein neues Badge kann auf Twitch eingelöst werden, bevor die Seite es weiß. Der Nutzerin den Auslöser plus eine Abklingzeit zu geben, ist die Höflichkeitsgrenze, die der ToS-Hinweis in AGENTS.md verlangt.
 
-Effort: S.
+Aufwand: S.
 
-Risk if built badly: No cooldown turns the button into a click-loop hammering a third-party API and gets the project rate-limited or blocked.
+Risiko bei schlechter Umsetzung: Ohne Abklingzeit wird der Button zu einer Klick-Schleife, die eine Dritt-API hämmert, und bringt das Projekt in Rate-Limit oder Blockade.
 
-Source: bugreports/agent-idea-03.md</p></details>
+Quelle: bugreports/agent-idea-03.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:100%;background:#22c55e"></span></div><span class="val">5/5 · sehr hoch</span></div>
@@ -787,16 +787,16 @@ Source: bugreports/agent-idea-03.md</p></details>
     
     <span class="badge-qw" style="background:#fbbf24">Neutral</span>
   </div>
-  <h3>OBS / browser-source overlay of live drops</h3>
-  <details><summary>Details</summary><p>A minimal, chrome-free route (`?widget=1` on the claimable view) designed as an OBS browser source: current claimable badges with countdowns, transparent background, auto-refresh on the existing server refresh cadence, and query params for scale, theme and max rows.
+  <h3>OBS-/Browser-Quellen-Overlay für Live-Drops</h3>
+  <details><summary>Details</summary><p>Eine minimale, chromfreie Route (`?widget=1` auf der Einlösbar-Ansicht), entworfen als OBS-Browser-Quelle: aktuell einlösbare Badges mit Countdowns, transparenter Hintergrund, Auto-Refresh im bestehenden Server-Auffrischrhythmus und Query-Parameter für Skalierung, Theme und maximale Zeilenzahl.
 
-Why it fits: Twitch badges and streamers are the same audience, and the site already renders live countdown tiles and refreshes server data once a minute. A creator keeps this up for their whole stream, which is passive, continuous distribution.
+Warum es passt: Twitch-Badges und Streamer sind dasselbe Publikum, und die Seite rendert bereits Live-Countdown-Kacheln und frischt Serverdaten einmal pro Minute auf. Ein Creator lässt das den ganzen Stream über laufen — passive, kontinuierliche Distribution.
 
-Effort: L.
+Aufwand: L.
 
-Risk if built badly: A widget that polls too aggressively (or defeats the cache) multiplies the site's own traffic by every concurrent stream and can take the catalog down during a big drop.
+Risiko bei schlechter Umsetzung: Ein Widget, das zu aggressiv pollt (oder den Cache umgeht), multipliziert den eigenen Traffic der Seite mit jedem gleichzeitigen Stream und kann den Katalog während eines großen Drops lahmlegen.
 
-Source: bugreports/agent-idea-03.md</p></details>
+Quelle: bugreports/agent-idea-03.md</p></details>
   <div class="metrics">
     <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
     <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:100%;background:#22c55e"></span></div><span class="val">5/5 · sehr hoch</span></div>
