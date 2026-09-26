@@ -1,0 +1,797 @@
+<article class="card " data-category="stats" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Batch the catalog reads into one round trip</h3>
+  <details><summary>Details</summary><p>/badges runs several sequential PostgREST round trips (count, page, stats). One select with an embedded count, or a single SQL view, removes the largest TTFB contributor.
+
+Source: IMPROVEMENTS.md Part 1.1.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Read the badge page from a cached view instead of the base table</h3>
+  <details><summary>Details</summary><p>Keep the 15-minute potat cadence off the critical path: write into badge_stats in bulk as it already does, and let the badge page read a cached view.
+
+Source: IMPROVEMENTS.md Part 1.1.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Chart a per-sync metric payload on /stats</h3>
+  <details><summary>Details</summary><p>Extend system_heartbeats with rows written, API latency and error class per run, and chart it. The payload plumbing already exists.
+
+Source: IMPROVEMENTS.md Part 1.4.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Alert when a heartbeat goes quiet</h3>
+  <details><summary>Details</summary><p>A daily check that flags &quot;no heartbeat for 2 h&quot; or &quot;catalog older than 26 h&quot; and sends a push or mail. The Status tab shows this already; nothing raises it.
+
+Source: IMPROVEMENTS.md Part 1.4.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Rate-limit the public write endpoints per IP hash</h3>
+  <details><summary>Details</summary><p>/api/blog/react, /api/coinrain and /api/steal are limited per user but not per address, so a logged-out caller can rotate identities cheaply.
+
+Source: IMPROVEMENTS.md Part 1.5.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Add Content-Security-Policy and HSTS headers</h3>
+  <details><summary>Details</summary><p>Set both in next.config.ts. The app renders user-influenced strings in several places, which is exactly what CSP is for.
+
+Source: IMPROVEMENTS.md Part 1.5.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Rename message keys that carry a vendor name</h3>
+  <details><summary>Details</summary><p>The profile.potat* keys bake a third-party name into the rendered payload. Renaming them keeps the identifiers neutral if the data source ever changes.
+
+Source: IMPROVEMENTS.md Part 1.5.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Roll badge_stats up into daily rows</h3>
+  <details><summary>Details</summary><p>The per-badge time series grows without bound. A nightly rollup into daily rows keeps the owner-trend chart fast.
+
+Source: IMPROVEMENTS.md Part 1.6.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Delete the unreferenced message keys</h3>
+  <details><summary>Details</summary><p>The audit found 227 keys that nothing references. They can go once the dynamic-key sites are migrated to explicit maps.
+
+Source: IMPROVEMENTS.md Part 1.7.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Programmatic landing pages per rarity, category and status</h3>
+  <details><summary>Details</summary><p>/badges/legendary, /badges/twitchcon and similar, with real copy. The catalog already holds the data and the i18n scaffolding exists.
+
+Source: IMPROVEMENTS.md Part 1.8.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Collective goal events</h3>
+  <details><summary>Details</summary><p>A community-wide target (&quot;unlock 1M badge claims this month&quot;) with a shared progress bar in the header.
+
+Source: IMPROVEMENTS.md Part 2 #7.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Live drop room</h3>
+  <details><summary>Details</summary><p>A page that opens automatically when a new global badge appears, with a shared countdown and light live reactions.
+
+Source: IMPROVEMENTS.md Part 2 #11.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Collector obituary for expiring badges</h3>
+  <details><summary>Details</summary><p>When a badge finally expires, publish a short eulogy post with its stats — a melancholy archive of the catalog.
+
+Source: IMPROVEMENTS.md Part 2 #23.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Export the catalog and a personal inventory</h3>
+  <details><summary>Details</summary><p>CSV and JSON exports for both, useful for analysis and for members who want their own data.
+
+Source: IMPROVEMENTS.md Part 2 #34.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Discord and Telegram webhooks</h3>
+  <details><summary>Details</summary><p>Post new drops and tournament results into a channel, so the community hears about them where they already are.
+
+Source: IMPROVEMENTS.md Part 2 #36.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Moderated comment threads on badges</h3>
+  <details><summary>Details</summary><p>Comment threads with reactions, seeded by the community's knowledge of how each badge is earned.
+
+Source: IMPROVEMENTS.md Part 2 #38.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Server-rendered rarity simulations with a slider</h3>
+  <details><summary>Details</summary><p>&quot;If this badge gains 5,000 owners, its score becomes X&quot;, computed on the server and shown as a slider.
+
+Source: IMPROVEMENTS.md Part 2 #41.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Anomaly detection on the economy</h3>
+  <details><summary>Details</summary><p>Nightly statistics flag impossible coin flows and freeze the accounts involved automatically.
+
+Source: IMPROVEMENTS.md Part 2 #44.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>A public status page from the heartbeat data</h3>
+  <details><summary>Details</summary><p>The data is already collected; a standalone /status route with incident notes would make it public.
+
+Source: IMPROVEMENTS.md Part 2 #46.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Vector rarity map</h3>
+  <details><summary>Details</summary><p>A 2-D scatter of owner count against age with every badge plotted and zoomable — finding the lonely corner is the game.
+
+Source: IMPROVEMENTS.md Part 2 #47.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Edge-cached personal dashboards</h3>
+  <details><summary>Details</summary><p>Render per-member progress at the edge with stale-while-revalidate, so the header HUD never blocks a page.
+
+Source: IMPROVEMENTS.md Part 2 #49.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Structured-data coverage audit</h3>
+  <details><summary>Details</summary><p>A report that walks every indexable route type and records which structured-data blocks it emits — HowTo on badge pages, FAQPage on the generated FAQs, Article on posts, DefinedTerm on glossary entries, BreadcrumbList, ItemList on landing pages — and which are missing or invalid for that route type, with counts and the specific rows failing. It validates a sample, so a regression in the render path is visible before search results degrade. Data: a route-type registry in code plus the catalog and content rows it enumerates. Effort: M. Risk if built badly: it becomes a red dashboard nobody reads and its expectation table falls behind the pages; keep the expectation list next to the components that emit the markup.
+
+Why: Rich results are how a badge page wins a search click over the wiki, and they break silently the moment a component changes.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Content maintenance queue</h3>
+  <details><summary>Details</summary><p>A ranked list of published pages that need attention, scored from two signals the site already owns: the page's traffic decay, from the analytics table's per-path views over recent weeks, and fact drift, where a badge cited by the page has since expired, changed tier or left the catalog. Every row names the page, the reason it surfaced, the specific stale reference, and a one-click path to edit it. It runs after the syncs so the queue always reflects the catalog as it now is, and it excludes pages that legitimately never change. Data: analytics paths and views, badge rows and badge_events, and the references extracted from page bodies. Effort: M. Risk if built badly: it floods editors with hundreds of low-value rows until the queue is ignored; cap it per week and rank by traffic at risk rather than raw staleness count.
+
+Why: Content rots fastest on a site whose subject changes daily, and a decay queue is the only way an archive stays true.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Pre-publish fact-check gate</h3>
+  <details><summary>Details</summary><p>Before a post or glossary entry publishes, a check extracts every number and badge reference from the body, compares owner counts, dates and tier claims against the live database, and shows the editor a diff: what the draft claims versus what the catalog says today. The publish button stamps an as-of date by default so a number is never presented as permanently true, and the editor can pin a claim to a snapshot when the intent is deliberately historical. Data: the draft body, the referenced badge rows, and badge_stats for the cited metric. Effort: M. Risk if built badly: the extractor misfires on incidental numbers and trains editors to click through blindly; hard-block only sequential claims such as owner counts and dates, and warn on everything else.
+
+Why: A badge database publishing a written claim about its own data is the one place a wrong number is unforgivable.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>AI-answer readiness pack</h3>
+  <details><summary>Details</summary><p>A machine-readable, human-edited front door for answer engines: an llms.txt-style summary saying what the site is, what it tracks and where the data comes from, plus a small set of concise citable fact pages — catalog size, how rarity is defined, what is dropping this week, the biggest rarity movers — written as short prose with explicit as-of dates and stable anchors. Each fact page is regenerated from live data and carries a suggested citation line. Data: stats views and the current catalog for the numbers, authored prose for the framing. Effort: S. Risk if built badly: the summarized facts go stale and an assistant quotes the site's own outdated page back at users; regenerate numbers on each read and date every block.
+
+Why: When someone asks an assistant which badges exist, the site either supplies the citable answer or is paraphrased from a worse source.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Collection-aware newsletter sections</h3>
+  <details><summary>Details</summary><p>The digest is assembled from fixed sections — new drops, your categories, deadline warnings, rarity movers, new writing — and their order is chosen per subscriber from their own synced inventory, so someone who owns only Prime badges reads that section first and a category they own nothing in last. It reuses the existing send path and the inventory the potat sync already stores, computes the order at send time, and falls back to the default order when a subscriber has no synced badges. Data: per-user inventory, catalog category mix, closing drop windows, subscriber record. Effort: M. Risk if built badly: the reordering is so aggressive that a subscriber never sees a new category and stops discovering anything; keep every section present and change only the order.
+
+Why: The site already knows what each subscriber collects, and a digest that ignores that is a generic mailing list.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Editorial revision history with diffs</h3>
+  <details><summary>Details</summary><p>Every revision of a post, glossary entry or tutorial is stored as a versioned row (body, editor, timestamp, note), and each published page gains a quiet last-updated line with a diff view between any two versions. Editors can see who changed a fact and when, and a reader can see that a page citing owner numbers was actually re-checked, which is the difference between a decaying blog and a living reference. Data: content rows, an author relation, and the existing audit log for attribution. Effort: M. Risk if built badly: the diff exposes an unpublished draft or an internal note; scope diffs to published versions only and keep edit notes internal unless explicitly published.
+
+Why: On a data site, a page with a visible revision history reads as maintained, and a page without one reads as abandoned.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Data-story investigations</h3>
+  <details><summary>Details</summary><p>Occasional long-form analysis pieces that start from a question the catalog can actually answer and answer it with charts and a stated method: whether claim windows have shortened over the years, which categories have grown rarest, how one badge family's owner counts moved version by version. Each piece publishes its query, its sample size and the date the data was pulled so a reader can check the work, and its charts come from the same stats views the dashboard uses. Data: badge_stats series, badge_events window history, catalog fields. Effort: L. Risk if built badly: the analysis over-reads a third-party owner estimate as ground truth; every piece must state the margin of the underlying data and avoid causal claims about why a window moved.
+
+Why: Nobody publishes badge data journalism, so the site that holds the time series can own the definitive analysis pieces.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Translator termbase</h3>
+  <details><summary>Details</summary><p>A shared termbase for the eleven locales holding the tokens that must never be translated (Prime Gaming, TwitchCon, Hype Train, Turbo, badge set names, tier names) with their approved form per locale, plus the approved translation of recurring UI vocabulary so claimable is the same word in every file. A check runs over a draft or a message file and flags a term used outside its approved form or a do-not-translate token that was mutated. Data: a termbase table keyed by term and locale, message catalogs and editorial drafts to check. Effort: S. Risk if built badly: a do-not-translate rule blocks a legitimate local phrase and translators learn to ignore the whole check; keep the list short and reviewed, and warn rather than hard-fail except on brand names.
+
+Why: With eleven locales, one translator mistranslating Turbo or a tier name introduces the error into every locale at once.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Mentioned-in backlinks block</h3>
+  <details><summary>Details</summary><p>Badge and category pages gain a small block listing the writing that discusses them — mentioned in: the claim window analysis, the glossary entry on Prime Gaming — derived from an index of badge references extracted from published content. It closes the loop between editorial and catalog so a reader who arrives at a badge from search discovers the article about it, and it makes the internal-link graph auditable from either direction. Data: a references index built by scanning published bodies for badge slugs, UUIDs and set names, plus post metadata. Effort: M. Risk if built badly: the extractor matches a badge name inside an unrelated word and the block shows nonsense; store reference tokens at author time via the badge shortcode instead of guessing from prose.
+
+Why: It makes every article about a badge a permanent inbound link to that badge page, at no editorial cost after it is written.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Event landing pages</h3>
+  <details><summary>Details</summary><p>A curated landing page per recurring real-world moment — each TwitchCon, each anniversary of a landmark drop, an opening hype period — gathering the badges associated with it, the writing done around it and a live view of what is claimable during it. Unlike a generated landing page each one is introduced by an editor with a note on what to watch this year, and each is stamped with its own dates so an old event's page reads as archival rather than current. Data: badges tied to the event by date range and category, related posts, live drop windows. Effort: M. Risk if built badly: last year's page keeps ranking and presents expired windows as current; render an explicit archived state after the event and keep the live block out of the archived version.
+
+Why: TwitchCon and anniversary moments are when badge interest spikes, and a page that exists only for that week can rank for the year.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Per-game mastery tracks</h3>
+  <details><summary>Details</summary><p>Each of the 13 games gets its own mastery level, computed from that member's game_rounds rows for that game - rounds played, rounds won, best payout, and a shrinking weight on the oldest rounds so mastery reflects current form. The mastery level and title (Novice, Adept, Veteran, Master) render on the game tile in the hub and on a per-game mastery board beside the existing global one, and a mastery-up writes the usual feed entry and changelog row. This is distinct from the global XP level and the coverage-based Curator Level, both of which ignore which games a member actually plays. Effort: M. Risk if built badly: weighting by bet size turns mastery into a wealth score, so the formula must count rounds and outcomes rather than coins wagered, or a single whale outranks genuine players.
+
+Why: The site has 13 games but no way to show that someone is genuinely good at one of them rather than merely high level.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Self-authored arcade contracts</h3>
+  <details><summary>Details</summary><p>Before playing, a member writes a contract from a closed vocabulary - 'win 5 rounds of Tower of Badges at a bet of 100 or more within 7 days' - escrowing a coin deposit; the contract stores its window and is evaluated by the same server-side predicate style the achievements already use. Completing it returns the deposit plus a bonus scaled by difficulty, letting it expire returns the deposit minus a small fee, and a 'contracts written / kept' count sits on the profile. This differs from the server-issued daily trials and the fixed 125 achievements because the player sets the terms and stakes coins on them. Effort: M. Risk if built badly: the clause vocabulary must be closed and validated server-side, or a member words an impossible clause, keeps the bonus, and the contract system mints coins.
+
+Why: Collectors already set their own goals in the catalog; giving the arcade the same self-directed structure turns play into a personal commitment.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Persistent rivalry ledger</h3>
+  <details><summary>Details</summary><p>Two members declare a rivalry, and from then on every shared arena is scored into a persistent head-to-head record: rounds compared by net coins in the same game on the same day, heists between the pair, and wheel results, with wins, losses, biggest single margin and longest run. The rivalry card lives on both profiles behind a link only the pair can open, and either side can end it at any time. This is a standing record over time, unlike a duel's one-off best-of-three or the pairwise catalog compare. Effort: M. Risk if built badly: scoring must be computed from a cached daily aggregate rather than per page load, or the ledger runs a recompute over game_rounds and steal_attempts on every profile view.
+
+Why: Stealing and games already produce friction between members, and a rivalry ledger gives that friction a running score instead of a one-off event.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Spectator side-bets on rounds</h3>
+  <details><summary>Details</summary><p>On a broadcast round a watcher places a small stake, capped well below the game's own maximum, on the next round's outcome before it resolves; the stake is escrowed server-side, settled when the round lands, and the watcher's net goes through the normal coin path. Bets void if the caster stops, and the caster earns a small rake so being watched is worth something. Effort: M. Risk if built badly: this is a pure-chance betting surface, so the cap, the per-watcher daily limit and the rake belong in the settings document rather than in code, and settlement must happen only after the round is committed server-side or a spectator can bet on a known result.
+
+Why: Watching is currently worth nothing and costs nothing; a capped stake plus a rake to the player turns spectators into participants.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Community strategy playbooks</h3>
+  <details><summary>Details</summary><p>Each game gets a guide page where members publish short, attributed strategies ('cash out Tower at floor 4 - the expected value peaks there'), versioned and votable with the top-rated one pinned. Guides are length-capped plain text with a report control, votes are one per member per guide, and every guide records the engine-constants revision it was written against so the page can mark it stale after a rules change. Effort: M. Risk if built badly: it is user text, so escaping and a report path are required from day one, and without the constants revision every balance change silently turns the top guide into bad advice.
+
+Why: Nothing on the site tells a new player how a game is actually played well, and the arcade's regulars already know.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Hall of Fame record book</h3>
+  <details><summary>Details</summary><p>A nightly job reads game_rounds and steal_attempts to maintain an all-time record book: biggest single payout, longest coin-flip ladder, longest win streak, biggest heist, best day by net, longest wheel dry streak. Each record shows the holder, the value and the date it was set, with a 'beaten' entry when it falls; records live in their own small table so a holder keeps the title even after the underlying rows are pruned. Effort: M. Risk if built badly: recomputing extremes over a growing game_rounds table on every page load will not hold, so the nightly job must write a standing record and replace it only on a strictly better value.
+
+Why: Live leaderboards show who is ahead this week; a record book is the thing that makes an old result permanent.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>In-game round tape</h3>
+  <details><summary>Details</summary><p>Inside each game panel a strip shows the last 20 rounds of that game for the member - bet, outcome, payout, net and a sparkline of running net - flagging any round that was hinted or insured. The rows are already in game_rounds; the tape is the per-round record the aggregate counters throw away. Selecting a row opens the round detail with its inputs and result payload. Effort: S. Risk if built badly: it must read only the signed-in member's rows, or a round that member published, or the tape becomes a window into other people's betting.
+
+Why: Players remember rounds, not totals, and the round rows exist but are never shown back to the person who played them.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Best-value game recommender</h3>
+  <details><summary>Details</summary><p>From the member's own rounds, the per-game XP rules and the configured bet bounds, the hub computes where that member's XP per coin and observed net are best right now - 'Tower of Badges has returned 0.6 XP per coin over 214 rounds; roulette has returned 0.2' - and shows one suggestion. It recommends a game rather than a stake, which keeps it separate from the bet coach. Effort: M. Risk if built badly: a recommender that confidently points at a house-edge game encourages chasing, so it must report observed XP per coin and state plainly that coin expectation is negative.
+
+Why: Thirteen games with different value profiles and no guidance is a puzzle the site can answer from data it already has.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Weekly game mutators</h3>
+  <details><summary>Details</summary><p>Every week the panel picks one mutator that changes the rules of an existing game for everyone - double-or-nothing blackjack, slots that pay on two of a kind with a halved bet, a roulette green-zero bonus - announced on the hub with the affected game and reverted automatically at the week's end. A mutator is a small server-side override read from the settings document by the resolver the games already use, so it needs no new game code. Effort: M. Risk if built badly: a mutator that improves expected value becomes a week-long farming route, so each one must be checked against the payout maths before it ships and the settings document must stay the only source so a bad one can be switched off mid-week.
+
+Why: The same 13 games every day is the arcade's biggest retention problem, and rule twists buy novelty without shipping new games.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Career trophy room</h3>
+  <details><summary>Details</summary><p>A profile section accumulates competitive results - Grand Prix placements, season championships, circuit wins, top reviewer marks - each as a dated trophy naming the event it came from, kept even after the season resets. It reads a small results table written when an event closes, so trophies survive both the seasonal reset and any pruning. Effort: M. Risk if built badly: trophy rows must be written only by the closing job, or a client can insert its own honours, and the room must not become a second leaderboard of badge counts.
+
+Why: Competitive results currently expire with the season, which makes winning something the site then forgets.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Post-round skill diagnostic</h3>
+  <details><summary>Details</summary><p>After a skill round that was lost, or that ended below a configured threshold, the result panel shows a short server-generated explanation of the decisive input - 'you called it at floor 6 with a 22 percent bust chance; cashing at floor 4 was the value line' - built from the recorded inputs and the same probability constants the engine used. It is generated for that round only, never stored as advice, and never shown for the luck games where no decision existed. Effort: M. Risk if built badly: an explanation that is wrong or post-hoc destroys trust, so only inputs with a known optimal line should produce a diagnostic and the rest must say there was no decision to review.
+
+Why: Skill games currently return a score and nothing else, so a loss teaches a player nothing about the next round.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (3/5) übersteigt den unmittelbaren Nutzen (3/5) nur leicht — ein Kandidat für später.</p>
+</article>

@@ -1,0 +1,797 @@
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Hash-chained first-sighting registry</h3>
+  <details><summary>Details</summary><p>Append every badge's first observation as an entry that hashes the previous entry, and expose a public page plus a JSON endpoint that verifies a badge's entry against the chain, so anyone can prove when this site first saw a badge and that the record was not rewritten afterwards. Effort: L. Risk if built badly: a chain over a dataset that still legitimately gets corrected (merged rows, renamed badges) must support explicit, chained amendments instead of pretending history never changed.
+
+Why: Leak claims and rarity history are only worth citing if the observation log cannot be edited later.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Badge search alias table</h3>
+  <details><summary>Details</summary><p>A curated alias table maps colloquial names to badges and categories ('prime', 'turbo', 'twitchcon 2019', 'sub badge'), so search resolves them instead of returning nothing; the admin adds aliases, sees which are actually used, and each badge page shows 'also known as'. Feeds the existing search and the catalog facets. Effort: S. Risk if built badly: an alias pointing at the wrong set produces confident wrong answers, so the result page must state which alias matched and let the user correct it.
+
+Why: Nobody searches with Twitch's internal set names, they search with what the badge is called in chat.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Ghost median-curve overlay</h3>
+  <details><summary>Details</summary><p>Draw a badge's owner curve against a ghost line: the median curve of comparable badges in the same category at a similar release age, built by aligning every series at age zero and taking the median per age bucket. The chart then reads ahead of the typical TwitchCon badge instead of a bare number, and the gap at 30 and 90 days becomes a comparable score. Effort: M. Risk if built badly: the baseline mixes badges with different window lengths and provider coverage, so a minimum cohort size must be enforced and shown or the ghost line misleads.
+
+Why: An owner count means nothing without a comparison, and the catalog already holds thousands of comparable curves.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Cross-script search matching</h3>
+  <details><summary>Details</summary><p>Index a transliterated form of every catalog name so a query typed in Japanese, Arabic or Cyrillic script, or in Latin transliteration of a non-Latin name, still finds the badge, and show in the result which form matched. Built as an additional index beside the existing search, never replacing it. Effort: M. Risk if built badly: aggressive transliteration creates false matches on short names, so results must display the matched form so a wrong hit is obvious immediately.
+
+Why: Gateway and ゲートウェイ are the same badge and the catalog currently answers only one of them.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Verified claim attestation</h3>
+  <details><summary>Details</summary><p>For badges the automated ownership sync cannot see (regional, in-game, event-only), a member submits an attestation with a screenshot and a note; an admin or a quorum of high-trust members verifies it, and it then counts in that member's inventory under a distinct 'attested' mark that is shown separately from sync-verified ownership wherever counts are used. Effort: L. Risk if built badly: a gameable verification path inflates rarity statistics, so attested ownership must never silently mix into the verified counts that drive TBRI.
+
+Why: There is no official per-user badge API, so a real slice of ownership is invisible to every sync.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Rare badge combination detector</h3>
+  <details><summary>Details</summary><p>Mine synced inventories for pairs and triples of badges that almost never co-occur because their windows were years apart or their audiences differ, and publish the hardest combinations with the few members who hold them (opt-in only). It is the inverse of recommendations: not what to chase next, but which combinations are nearly impossible. Effort: L. Risk if built badly: with few synced memberships, absent co-occurrence is just missing data, so a combination needs a minimum observation base before it can be called impossible.
+
+Why: The rare badge is common knowledge, the rare combination is the actual flex.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Status contradiction watch</h3>
+  <details><summary>Details</summary><p>A nightly check flags badges whose stored status contradicts the evidence: marked active but unlisted by every provider for N days, or window open but zero new owners across M consecutive syncs, or end date long past with status still active. Each flag shows a small 'status uncertain' mark on the badge with the evidence sentence attached and lands in an admin queue. Effort: M. Risk if built badly: a genuinely quiet badge in a quiet week is not broken, so the check must require both provider silence and owner stalling before it raises a flag.
+
+Why: A wrong status is worse than an unknown one, because a countdown reads as a promise.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Measured vs estimated owner series</h3>
+  <details><summary>Details</summary><p>Mark every point in a badge's owner curve as measured or estimated: gaps between observations render as dashed interpolated spans showing the gap length, and any badge with more estimated than measured span carries a 'sparse history' note on the chart and its rarity chip. Uses the sync timestamp recorded on each badge_stats row. Effort: S. Risk if built badly: interpolation that looks like data is how a chart lies, so estimated spans must be visually distinct and excluded from any slope-based statistic.
+
+Why: Half of a young owner curve is interpolation and nothing in the interface currently says so.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Catalog scope and exclusions page</h3>
+  <details><summary>Details</summary><p>A public page documenting what this database deliberately leaves out: the status and role badge classes (moderator, VIP, partner, prime, turbo, staff and their siblings) with live counts pulled from Helix, the reason each is not a collectible catalog entry, and a read-only reference gallery of their current art so the many visitors who come looking for mod or VIP badge art find it and understand the boundary. The exclusion rule is derived from the same check the sync uses, so the page can never disagree with what is stored. Effort: S. Risk if built badly: mixing the reference gallery into normal catalog surfaces, search or the grid re-admits exactly the rows the catalog is built to exclude, so the page must be isolated from every catalog query and clearly labelled as reference.
+
+Why: Status badges are the single most searched class this catalog refuses to hold and the refusal is currently invisible.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Unknown-deadline honesty state</h3>
+  <details><summary>Details</summary><p>Badges with no listed end date get an explicit 'no known deadline' state instead of an implied permanent one: no countdown, no urgency styling, a note that the deadline is unknown with the date we last looked, and a slot in an admin research queue of badges whose deadline is missing. Each badge records whether its deadline is listed, inferred from past windows, or unknown. Effort: S. Risk if built badly: silently treating unknown as permanent gives false safety on a badge that may close tomorrow, so the state must be visibly different from an evergreen badge.
+
+Why: An unknown deadline rendered as no deadline is the catalog's most expensive small lie.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Touch target and hit-area policy</h3>
+  <details><summary>Details</summary><p>The small controls here, the tier chip, a table row action, rail arrows, the countdown copy affordance, are visually 20 to 28 px, below a comfortable thumb target, so touches land on the row instead of the control. Define a hit-area policy: every interactive control guarantees a 44 px minimum target through an invisible padding or pseudo-element that does not change its visual size, controls in a tight row keep an 8 px minimum gutter so their expanded areas cannot overlap, and the policy is expressed once in the component classes. Effort: S. Risk if built badly: expanded areas overlapping until the neighbour is untappable, or a padding trick that breaks the alignment of a tight chip row.
+
+Why: The smallest controls on the site are also the most-used ones on the device where they are hardest to hit.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="game" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Spiele</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Rarity Plinko Drop</h3>
+  <details><summary>Details</summary><p>A ball drops through a peg pyramid whose bin payouts mirror the six rarity tiers, and the server precomputes reachable paths from a per-round seed so the distribution can be published and independently checked. The player chooses the bin width and risk band before the drop, and settlement uses the seeded path with the seed stored for later re-derivation. Effort: M. Risk if built badly: a physics implementation the server does not own lets a client pick its own landing bin, so the drop must be a seeded lookup rather than a client simulation.
+
+Why: It is a household-name arcade game whose payout bins are the site's own rarity ladder.
+
+Source: new-ideas-04-game.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="game" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Spiele</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Badge Derby Betting</h3>
+  <details><summary>Details</summary><p>Eight catalog badges enter a simulated race whose lane speeds are drawn from the round seed but weighted by each badge's current TBRI, so rare badges start as favourites and the odds are printed before betting closes. Stakes go into a pari-mutuel pool, winners divide it after a published house cut, and the field, seed and pool are all stored for audit. Effort: M. Risk if built badly: one large late bet can drain a pool, so a last-thirty-second wager cap is needed, and a race whose result is not seeded is unverifiable.
+
+Why: It is a betting game whose form guide is the rarity index the site already publishes.
+
+Source: new-ideas-04-game.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="game" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Spiele</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Badge Mahjong Exhibit</h3>
+  <details><summary>Details</summary><p>Badge tiles are stacked in layers and a tile is playable only when both long edges are free, which makes the puzzle about uncovering artwork rather than memory. Matching pairs are same-set badges, and each pair both matched and revealed shows a one-line catalog fact. Boards are seeded per day and the server validates the submitted removal order before paying. Effort: M. Risk if built badly: a generated layout can be unsolvable, so boards must be produced by reverse-dealing from a finished state and tested before they are published.
+
+Why: It is a familiar, calm tile game that pays out in catalog knowledge as well as coins.
+
+Source: new-ideas-04-game.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="game" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Spiele</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Daily Badge Crossword</h3>
+  <details><summary>Details</summary><p>A daily grid is built from catalog terms: answers are set names, category names and the release years of notable badges, with clues generated from catalog fields and curated templates. The server owns the grid and the clue set, scores the submission, and publishes the solution the next day. Effort: M. Risk if built badly: generated clues that are ambiguous or duplicated, so the generator must reject grids with repeated answers and the clue pool must be curated.
+
+Why: It is a crossword that only works because the site has a catalog to write clues from.
+
+Source: new-ideas-04-game.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="game" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Spiele</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Catalog Category Sudoku</h3>
+  <details><summary>Details</summary><p>Nine cell glyphs are badge icons drawn from a single category, and the board is a daily server-generated sudoku whose uniqueness is verified at generation time. Completion is checked server-side against the stored solution, with the solve time as a second, separate reward axis. Effort: M. Risk if built badly: publishing the solution alongside the board leaks the answer, so it must live only server-side and be published after the day ends.
+
+Why: It is a standard logic puzzle that gives each catalog category its own puzzle face.
+
+Source: new-ideas-04-game.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="game" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Spiele</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Daily Shared Seed Ladder</h3>
+  <details><summary>Details</summary><p>Every day each game gets one committed seed, and any round played under that seed is grouped into a daily ladder for that game, so members compare runs on an identical sequence rather than on luck. The ladder is a view over game_rounds filtered by the day's seed, and the seed is revealed with a hash at 00:00 UTC so the sequence could not have been chosen after seeing the plays. Effort: M. Risk if built badly: a published seed lets a script pre-solve the sequence, so ladder rounds must be capped per member and the seed must be committed before it becomes usable.
+
+Why: It creates a fair daily competition where luck cannot explain away the winner.
+
+Source: new-ideas-04-game.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Prestige track past level 100</h3>
+  <details><summary>Details</summary><p>Past level 100 the XP bar does not stop: total XP beyond the 254,900 cap converts into prestige stars (one per 50,000 XP), shown as a small laurel count beside the level badge and in place of an unbounded level number on the leaderboards. Prestige is display-only, cannot be bought, and the level badge keeps its Mythic theme at zero stars. It reads the XP already stored in user_progress, so no new data source is needed. Effort: S. Risk if built badly: if the star threshold is too low the top of the ladder flattens within a week, so the spacing should be set from the observed XP distribution of the current top 100 before launch.
+
+Why: The level ladder ends at 100, and the site's longest-running players need somewhere for the number to keep meaning something.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Coin-priced in-round hints</h3>
+  <details><summary>Details</summary><p>During a skill round a member can buy one hint through the normal server path: reveal a memory tile, remove two wrong quiz options, or show the vault's next digit, priced per game in the settings document and scaled to the current bet. The hint is consumed server-side in the same round, the round is flagged as hinted, and the payout is reduced by a fixed fraction so the option assists rather than pays. Effort: M. Risk if built badly: hints that leave the payout untouched make the skill games trivially profitable, so the payout reduction and the one-hint-per-round rule are the whole safety mechanism and must live in the engine, never the client.
+
+Why: The skill games have a hard wall for new players, and a priced hint converts frustration into a small, honest coin sink.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Bankroll coach bet suggestion</h3>
+  <details><summary>Details</summary><p>Before a round a single line suggests a stake for the member's stated goal - 'you hold 12,000 coins and a 30,000 target; a flat 1 to 2 percent stake survives typical variance, an all-in does not' - computed on the server from the balance, that game's payout distribution constants and its configured limits. The suggestion is never auto-applied and can be dismissed permanently from arcade preferences. Effort: S. Risk if built badly: a suggestion that reads as financial advice invites blame when it loses, so it must be framed as a variance note with the arithmetic shown and must reference only the site's own coins.
+
+Why: The arcade has a strong pull toward all-in play and the payout maths needed to counter it is already in the engine.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Seasonal arcade pass</h3>
+  <details><summary>Details</summary><p>Each season carries a pass bought with BadgesCoins, never cash, unlocking a two-track reward path: a free track everyone fills by playing, and a paid track with table themes, a season profile frame and scrip. Progress is season XP earned from rounds, heists and the wheel, tracked per pass and reset with the season, and the pass grants no coins or XP multipliers so it cannot feed the economy. Effort: L. Risk if built badly: a pass is the classic grind machine, so the path must be short and reachable in a few sessions, and the paid track must never accept real money or the addon becomes commerce.
+
+Why: Seasons reset the ladder and take everything with them; a pass is what makes a season leave something behind.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Arcade scrip currency</h3>
+  <details><summary>Details</summary><p>A second, non-purchasable currency is earned only by playing - a little per round, more for win streaks - and is spent on a second chance at a lost round, a bonus spin voucher, or arcade cosmetics. Scrip can never be converted into coins and is never granted for spending coins, so it rewards play without inflating the coin economy, and its balance is shown separately everywhere coins appear. Effort: M. Risk if built badly: scrip that converts to coins, directly or through a purchasable item, becomes a coin faucet, so the no-conversion rule must be enforced in the database, not only in application code.
+
+Why: A pure reward layer with no cash-out lets the arcade pay out generously for play while leaving the coin economy untouched.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Locale Content-Depth Score</h3>
+  <details><summary>Details</summary><p>Per locale, compute the mean number of distinct paths a visitor touches in one session and the share of single-path sessions, then rank locales. A high-depth locale is reading the catalog; a high single-path share suggests people land and leave. Reads the analytics table columns locale, path and visitor hash. Effort: S. Risk if built badly: low-traffic locales yield noisy means, so results must be suppressed below a minimum session count.
+
+Why: Shows which of the eleven translations produce engaged readers instead of translated bounces.
+
+Source: new-ideas-06-stats.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Collector Milestone Spine</h3>
+  <details><summary>Details</summary><p>An automatic permanent chronicle built from rows the site already has: join date, first synced badge, each level bracket crossed in user_progress, each tier gain, first legendary owned, longest streak. Every entry carries the catalog context at that moment — the catalog size then, the badge's owner count then — so it reads as a story rather than a dump, and it lives at a stable profile sub-page. It is an event chronicle, not an inventory diff: there is no scrubber and no reconstruction of past ownership state. Effort: M. Risk if built badly: snapshot history is thin for older accounts, so the early spine is mostly empty and the feature looks broken instead of young.
+
+Why: A collector's history is the thing they retell anyway, and the site is the only place that can date it accurately.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Guest Showcase Slots</h3>
+  <details><summary>Details</summary><p>A member can lend one of their six slots to another member's badge: the tile renders as usual but attributed ('@name's badge, shown by consent'), and the guest can withdraw from their own profile at any time. Both sides opt in — the owner invites, the guest accepts — and the guest's ownership is re-checked against their latest sync before the tile renders. It makes a showcase a place where other people's finds can be exhibited. Effort: M. Risk if built badly: withdrawn consent lingering in a cached profile keeps showing a badge the guest no longer agrees to, so the tile must resolve from a live row with a short cache.
+
+Why: Cross-member display is a genuinely social act on a site whose whole economy is about owning and showing badges.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Tile Admiration Marks</h3>
+  <details><summary>Details</summary><p>A visitor can mark one tile on a profile per day as admired — no text, no score. Marks aggregate per tile into a small count and drive a 'most admired here' line above the shelves; the owner sees the daily curve of marks on their own profile, and a visitor's own profile lists how many collections they have admired. It gives the many visitors who will never write a guestbook note something to do. Effort: M. Risk if built badly: mark farming inflates the counts, so daily caps per salted IP and per account plus owner-visible raw counts are required.
+
+Why: A one-click reaction is the lowest-friction social gesture, and on a badge site the badge itself is the natural object of admiration.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Collection Review Window</h3>
+  <details><summary>Details</summary><p>A member opens a 72-hour window in which others submit a rubric score for the collection on three axes — breadth, rarity, curation — each with a required one-line justification; when it closes, the owner gets a digest with the median per axis, the strongest and weakest line, and reviewers attributed only if they opted in. One review per reviewer per window, and windows are capped to a few per year so the digest stays worth reading. It reviews a collection at a moment, unlike a standing endorsement of a person. Effort: M. Risk if built badly: the justifications are unmoderated free text and repeated windows turn into a popularity contest, so both need caps and a report path.
+
+Why: Collectors want a real second opinion on their haul, and a time-boxed review is a stronger ritual than an endless comment box.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Collection Trajectory Chart</h3>
+  <details><summary>Details</summary><p>Plot the member's own history: owned-badge count and mean TBRI per month from the inventory snapshots the syncs already write, with the two steepest months annotated ('+63 badges in March, mean rarity fell 4 points'). It sits on the profile with a share-card export, and a compare mode overlays a second member's trajectory on the same axes. This is a time series of one collection, not the cross-sectional rarity distribution against the catalog. Effort: M. Risk if built badly: sparse snapshot history produces misleading straight lines, so gaps must render as gaps rather than being interpolated.
+
+Why: Every collector believes their collection has a shape over time, and the snapshots to prove it are already stored.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Category Completion Race</h3>
+  <details><summary>Details</summary><p>Two members opt into a race over one category, each choosing a target from badges both of them lack, and the site tracks who syncs the missing badges first on a shared page with two progress bars and days elapsed. The race ends when one side completes the target, both profiles record the result as a friendly head-to-head, and a member can hold only one active race. Unlike the games, the outcome is decided by real syncs over days rather than a server round. Effort: M. Risk if built badly: a side can win unopposed if the other's target is unreachable, so targets must be validated from both inventories when the race opens.
+
+Why: It turns the catalog's coverage data into a long-running, personal contest instead of another leaderboard row.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Shared Coincidence Moments</h3>
+  <details><summary>Details</summary><p>After each sync the site looks for pairs of members whose new inventory rows contain the same badge inside the same claim window, and offers both a shared 'we both claimed this' card with the badge, the window and the two names. If both accept, the moment is listed permanently on both profiles as a small joint exhibit; if either declines, neither learns who the other was. It is discovered from sync timestamps, never scheduled. Effort: S. Risk if built badly: the pairing reveals a private member's ownership, so a match may only be offered where both inventories are visible to a shared audience.
+
+Why: Shared moments are what turn a database of owners into a community, and the site can detect them for free from data it already syncs.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Collector Relay Chains</h3>
+  <details><summary>Details</summary><p>A member starts a relay by naming a badge and passing it on; the next member adds one related badge — same set, same era, or a deliberate contrast — with a one-line reason, then passes it again. The chain lives at its own URL showing every hop with attribution, and profiles list the chains a member contributed to. Chains end after a set number of hops or on request, with one badge and a capped note per hop. Effort: M. Risk if built badly: chains degrade into incoherent name walls, so hop caps, a fixed relationship vocabulary and starter moderation keep the artifact readable.
+
+Why: A relay is a collaborative artifact the catalog can produce and the games cannot, and it gives members a reason to look at badges they would never chase.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Help Exchange Ledger</h3>
+  <details><summary>Details</summary><p>A member posts a specific small request — 'can someone in Brazil confirm this window is open', 'which of these two should I claim first' — and another fulfils it with a short answer; the fulfilment is logged as a completed exchange attributed to both. The profile shows a help record ('13 answered, 4 asked') and the history is searchable by badge, so the answer outlives its moment. Requests expire after a week and unfulfilled ones leave no trace. Effort: M. Risk if built badly: it becomes a second comment section, so hard limits — one open request per member, no nested replies inside a fulfilment — must be enforced.
+
+Why: The site's real value is other collectors' knowledge, and an exchange ledger makes that help visible and reusable.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Visitor Showcase Vote</h3>
+  <details><summary>Details</summary><p>A member can offer three of their owned badges as candidates and let visitors vote on which becomes the profile's featured hero for the month, with the winner applied automatically when the poll closes and the tally visible to everyone. One vote per account, a fixed closing date, and the owner can always decide the outcome themselves instead. It hands one display decision to the people who visit. Effort: M. Risk if built badly: voting rings decide the slot and polls clog profiles, so one active poll per profile, per-account votes and a monthly cap are needed.
+
+Why: It gives visitors a real stake in a collection and gives the owner a reason to ask people to come back.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Synchronised Claim Pools</h3>
+  <details><summary>Details</summary><p>Members join a pool for a specific badge and hour; the site reminds everyone at the time and, after the next potat sync, publishes the measured owner-count step for that badge during the pool hour plus the pool's contribution ('137 owners in one hour'). The deliverable is evidence — a coordinated claim becomes a recorded catalog event with a chart, not just an RSVP list. Pool pages keep the badge's window, the participant count and the resulting chart as a small public record. Effort: M. Risk if built badly: the pool claims credit for organic claims landing in the same hour, so the measurement must compare against the badge's own rolling hourly baseline rather than against zero.
+
+Why: It is the one social mechanic only this site can offer: a group action that visibly moves a number in the catalog.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Invite Lattice Tree</h3>
+  <details><summary>Details</summary><p>Members invite others and both ends of the invite are recorded, producing a visible generation tree that shows how the community grew; an invitee starts with a small welcome grant and the inviter earns a purely cosmetic mark for each generation that stays active. The lattice is browsable ('see my branch'), every node is a normal profile, and an invite cannot be reattributed after the fact. Effort: M. Risk if built badly: it creates a status hierarchy and invite farming, so grants are one per verified Twitch account and the tree must never display anything a profile keeps private.
+
+Why: Growth has a shape, and letting members see their own branch makes the community feel like something with a history.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Streamer Channel Link</h3>
+  <details><summary>Details</summary><p>A member who streams can link their Twitch channel to their profile, which then shows a cached live-or-offline pill, a pinned note they write for their viewers, and the badges currently claimable so a viewer can act while watching. The pill resolves through a five-minute cache — one Helix stream lookup per channel per window, well inside the existing hourly budget — and linking requires re-authenticating with Twitch so nobody can claim someone else's channel. The link is part of the public profile, not a separate widget page. Effort: M. Risk if built badly: live lookups blow past the rate budget on popular channels, so the cache window and a per-channel lock are the guard.
+
+Why: Streamers and their viewers are already the site's audience, and the profile is where that relationship should resolve.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Vouch Chain Provenance</h3>
+  <details><summary>Details</summary><p>An established member can vouch for a newer one, and the vouch appears on the newcomer's profile as a chain ('vouched by @a, who was vouched by @b'). A vouch unlocks a small set of social surfaces — guestbook stamps, relay hops, race entry — for accounts too new to qualify on their own; vouches are one-way, attributed, revocable with a reason, and an established member may hold only a few live at once. Effort: M. Risk if built badly: vouch farming as a growth hack, so the small per-voucher limit plus revocation and the visible chain keep it costly.
+
+Why: New members cannot use the social layer until someone trusts them, and a visible chain makes that trust a real commitment.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Commitment Reliability Record</h3>
+  <details><summary>Details</summary><p>A profile-facing log of the social commitments a member accepted and completed — races finished, relays continued, review windows honoured, introductions taken up — with abandoned ones listed too. It is a plain dated list with outcomes, deliberately not a single score, and it gates nothing: visibility is the only consequence. The rows come from the commitment features themselves, so it is a read model rather than new tracking. Effort: S. Risk if built badly: it becomes a shame wall punishing one busy week, so it lists a bounded recent window and never reduces to a number.
+
+Why: On a site where members now make each other promises, keeping a record of who follows through is the cheapest fairness available.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Annual Community Awards</h3>
+  <details><summary>Details</summary><p>Once a year members nominate and vote in a small fixed set of categories — most helpful, best curator, best data catch, friendliest newcomer — and winners carry a dated award line on their profile permanently, with the nomination text quoted. The ballot is capped at one nomination per category per member, votes are per account, and results publish only after a reveal date so interim tallies cannot be watched. It is the community rewarding behaviour rather than data ranking collectors. Effort: M. Risk if built badly: coordinated voting and winner cliques, so a minimum account age to vote and unpublished interim counts are the guard.
+
+Why: It is the one annual ritual that recognises the member behaviour the leaderboards are blind to.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Open House Windows</h3>
+  <details><summary>Details</summary><p>A member can schedule a window — announced up to a week ahead, lasting 24 or 48 hours — during which their inventory is public and then closes itself; the profile shows a countdown and a visitor counter that resets each time. Because it is time-based rather than a standing preference, a member can show off for a weekend without going permanently public, and visitors see a normal collection during the window and the usual notice after it. Effort: M. Risk if built badly: a forgotten window leaves an inventory public indefinitely, so closure must be enforced at query time from the timestamp, never by a cron that can fail.
+
+Why: It gives private collectors a safe, bounded way to be seen, which the current binary setting cannot.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Per-Panel Audience Scopes</h3>
+  <details><summary>Details</summary><p>Each profile panel — inventory, trajectory chart, followers, guestbook, review digest — gets its own audience instead of one global flag: everyone, signed-in members, my crew, or private. The audience vocabulary is small and fixed, one shared resolver serves every read path, and a hidden panel renders a boundary notice rather than collapsing the page. Effort: M. Risk if built badly: a panel scoped to crew is read by a query that never joins crew membership and leaks, so the resolver has to be on every read path, not most of them.
+
+Why: Members want to show their inventory to their crew and their trajectory to everyone, and a single switch cannot express that.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Ephemeral Social Traces</h3>
+  <details><summary>Details</summary><p>A member sets a retention for their own social output — guestbook stamps they leave, admiration marks, relay notes, review justifications — choosing 7, 30 or 90 days, after which the row is deleted and the trace disappears from everyone's view. A page lists exactly what is scheduled to vanish and when. Effort: M. Risk if built badly: deleting a trace breaks another member's chain or reply, so removals must degrade gracefully (a hop becomes 'a retired member') instead of breaking the artifact.
+
+Why: It gives members control over their own trail without forcing the site into a full moderation-and-deletion project.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>

@@ -1,0 +1,857 @@
+<article class="card " data-category="game" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Spiele</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Add a global daily cap to stealing</h3>
+  <details><summary>Details</summary><p>The flood check is per victim, so a coordinated group can still drain the top collectors. A global daily cap closes that without touching the per-victim rule.
+
+Source: IMPROVEMENTS.md Part 1.9.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:100%;background:#22c55e"></span></div><span class="val">5/5 · sehr hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (4/5) und Nutzen (5/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Silhouette Showdown</h3>
+  <details><summary>Details</summary><p>A daily quiz game built from the real catalog art: the page renders a badge PNG as a pure-black silhouette (or a 12-pixel downsample) and asks the user to name the badge from four catalog options. Correct answers award XP and a streak multiplier; the pool is drawn from badges the user has *seen* in the catalog so the difficulty is personalized.
+
+Why it fits: The catalog already ships every badge image plus its title, category and rarity, so the entire game content is derived, not authored. It turns the catalog itself into the game board rather than adding a disconnected mini-game, and the streak hook feeds the existing daily-login loop.
+
+Effort: S.
+
+Risk if built badly: Badge art is 14–28 px native, so a bad silhouette is either unrecognizable or trivially recognisable — the difficulty curve must be tuned per badge size or the game feels random.
+
+Source: bugreports/agent-idea-01.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Badge Futures Market</h3>
+  <details><summary>Details</summary><p>A prediction market where users stake BadgesCoins on claims about the catalog: &quot;badge X will cross 50,000 owners within 30 days&quot;, &quot;badge Y will drop out of the legendary tier this month&quot;. Positions are priced by the crowd, settled automatically from the `badge_stats` time series, and the market history for each badge is shown on its detail page.
+
+Why it fits: The 15-minute potat sync already writes owner-count time series per badge and recomputes rarity (TBRI) each run, so every market is objectively resolvable without a human oracle — the exact precondition a prediction market needs.
+
+Effort: L.
+
+Risk if built badly: If settlement windows are generous and oracle rules ambiguous, a handful of users with scripted potat reads can farm near-certain markets and drain the coin supply.
+
+Source: bugreports/agent-idea-01.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Badge Time Machine</h3>
+  <details><summary>Details</summary><p>A global, scrubable timeline of the entire catalog: drag a slider to any past date and the badge grid, owner counts, rarity tiers and &quot;claimable now&quot; state re-render as they were on that day. A &quot;then vs now&quot; mode overlays two dates so you can see exactly which badges were added, expired or demoted in between.
+
+Why it fits: Snapshot history from the 15-minute potat run plus every catalog diff already recorded in the changelog is a full event log; the time machine is a read-only projection over data that currently only powers the trend chart on one page.
+
+Effort: L.
+
+Risk if built badly: Point-in-time reconstruction from a sparse series will interpolate silently and present invented numbers as fact — every cell needs an explicit &quot;as of&quot; timestamp and a staleness marker.
+
+Source: bugreports/agent-idea-01.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Leak Radar</h3>
+  <details><summary>Details</summary><p>A dedicated page that lists badges detected in the catalog feed *before* Twitch announces them — inserted via the badgebase sync's upcoming path — with a per-badge &quot;spotted N hours before official release&quot; counter and a confidence note on the source. A push topic lets people subscribe only to leaks, separate from the normal new-badge push.
+
+Why it fits: The badgebase sync deliberately inserts upcoming badges ahead of their live window by matching image UUIDs; that early-warning side effect is currently invisible. Surfacing it turns an implementation detail of the sync into a genuinely distinctive feature no badge site offers.
+
+Effort: M.
+
+Risk if built badly: If &quot;leak&quot; is used loosely, it becomes rumor-mongering — one false positive published as a leak destroys the credibility of the whole page, so the detection threshold must be conservative and sourced.
+
+Source: bugreports/agent-idea-01.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Fading Badges</h3>
+  <details><summary>Details</summary><p>A leaderboard and per-badge status built on the gap between *owned* and *still displayed*: a badge whose owner count is flat while its wear share craters is flagged &quot;fading&quot;, a badge with both rising is &quot;rising&quot;. Each badge gets a small owned-vs-worn divergence chart with a &quot;worn by X% of owners today&quot; line.
+
+Why it fits: TBRI already computes wear as 15% of the score, but the site only ever shows the resulting number, never the divergence itself. Making the two inputs visible turns an internal rarity component into a browsable signal — &quot;badges people regret claiming&quot; is a story the data already holds.
+
+Effort: S.
+
+Risk if built badly: Wear share is a single-source measurement (potat), so an outage looks like a mass abandonment event; the page needs to mark low-confidence windows rather than declaring every badge &quot;fading&quot;.
+
+Source: bugreports/agent-idea-01.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Drop Survival Lab</h3>
+  <details><summary>Details</summary><p>A statistics page that treats every claim window as a survival observation and renders Kaplan-Meier curves of &quot;how long badges stay claimable&quot;, split by category, free-vs-paid and year. A live table shows the median remaining claim time for badges currently open, so collectors can see which windows historically close fast.
+
+Why it fits: The badgebase sync stores start and end for every drop window (`data-reset` dates); that is a complete survival dataset nobody has ever analyzed. It gives the catalog a genuine quantitative-research artifact instead of another grid.
+
+Effort: M.
+
+Risk if built badly: Windows that are still open are right-censored data; treating them as completed (or dropping them) biases every curve, so the estimator must handle censoring correctly or the numbers are quietly wrong.
+
+Source: bugreports/agent-idea-01.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Achievement Composer</h3>
+  <details><summary>Details</summary><p>A page where users write their own achievement as a predicate over catalog fields — &quot;own every badge from category X released in 2024&quot;, &quot;own 3 badges in the legendary tier&quot; — and the self-evaluating achievement engine awards it when satisfied. Composed achievements appear on the profile next to the 125 built-in ones and are shareable by URL.
+
+Why it fits: Achievements are already self-evaluating rather than hard-coded checks, so a user-authored predicate is an extension of the existing evaluator, and the catalog fields (category, tier, release date, owned) are exactly the vocabulary users want to write against.
+
+Effort: M.
+
+Risk if built badly: User-expressed predicates are a query language, and a naive evaluator is both a DoS vector and a way to write impossible goals — the vocabulary must be a fixed allow-listed schema, never translated SQL.
+
+Source: bugreports/agent-idea-01.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>TBRI-100 — a market index for the rarest badges</h3>
+  <details><summary>Details</summary><p>A single charted index: the mean TBRI of the 100 rarest badges, rebased to 100 at launch, updated with each potat sync. A badge page states whether that badge is &quot;outperforming the index&quot; and a `/index` page shows the line with the biggest movers of the day.
+
+Why it fits: rarity inputs and their history already land in `badge_stats`; the index is one aggregate query and one Recharts chart. Collectors get the language of a market (&quot;my collection beat the index this month&quot;) without any real-money implication.
+
+Effort: M.
+
+Risk if built badly: a moving index invites day-trading impulses; it must read as a curiosity, not as a score to defend, and never gate any reward.
+
+Source: bugreports/agent-idea-02.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Collector Percentile Card</h3>
+  <details><summary>Details</summary><p>From the leaderboard and owner data, a profile header line: &quot;412 of 1,203 badges — top 6% of tracked collectors,&quot; plus a nudge (&quot;4 badges from the next percentile, cheapest gap: these three&quot;). Shareable as an OG card.
+
+Why it fits: worldwide leaderboards and per-badge owner counts already exist; a percentile is a rank-and-count query, and the &quot;cheapest gap&quot; is a join between the catalog and the user's missing set. It gives the same data a second, more personal reading.
+
+Effort: S.
+
+Risk if built badly: percentiles computed over a small or skewed set of tracked profiles mislead users; the copy must state the population, or the card becomes a false claim.
+
+Source: bugreports/agent-idea-02.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Deadline Density Calendar</h3>
+  <details><summary>Details</summary><p>A month grid where each day is shaded by how many claim windows close that day and how rare those badges are, with a click to expand the list. A header blurb: &quot;this week closes 7 windows, 2 of them Legendary.&quot;
+
+Why it fits: claim-window end dates from badgebase plus TBRI give a per-day urgency score with no new collection. It is a planning surface the site lacks — the catalog answers &quot;what is live,&quot; not &quot;what is about to end.&quot;
+
+Effort: S.
+
+Risk if built badly: if it sells urgency without accuracy, one wrong end date destroys trust in every countdown; it must degrade to &quot;date unknown&quot; rather than guess.
+
+Source: bugreports/agent-idea-02.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Co-Ownership Recommendations</h3>
+  <details><summary>Details</summary><p>&quot;Collectors who own this badge also own…&quot; — a similarity graph built from the owner lists potat returns, rendered on badge pages and on a user's profile as three suggested next targets with a reason line.
+
+Why it fits: `?owners=true` responses are already the raw material for a co-occurrence matrix; the project currently uses them for counts only. It converts an existing sync payload into the site's first recommendation engine with no new data source.
+
+Effort: M.
+
+Risk if built badly: co-occurrence driven by a small, overlapping set of power users collapses every recommendation to the same five badges; popularity must be discounted or the feature looks broken.
+
+Source: bugreports/agent-idea-02.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Badge Bingo</h3>
+  <details><summary>Details</summary><p>A monthly 5×5 card of achievable catalog objectives — &quot;claim a badge from a category you own none of,&quot; &quot;find a badge under 500 owners,&quot; &quot;be online when a window closes&quot; — verified server-side from the inventory diff, with XP for each line and a full-card reward.
+
+Why it fits: categories, owner counts and the inventory snapshot diff already exist, and it reuses the achievement evaluation pattern instead of a new rules engine. It pushes collectors toward neglected corners of the catalog rather than toward the same popular badges.
+
+Effort: M.
+
+Risk if built badly: if objectives are not verified against real events, the card becomes either trivially farmable or impossible; every square needs a server-checkable predicate and a stated deadline.
+
+Source: bugreports/agent-idea-02.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Collector Net Worth</h3>
+  <details><summary>Details</summary><p>A single number on the profile derived from rarity and drop type — each owned badge contributes a TBRI-weighted value into a &quot;collection worth,&quot; with a public net-worth board alongside the existing XP leaderboard and a breakdown showing which badges drive it.
+
+Why it fits: TBRI, owner counts and the owned set are all in place; this is a weighted sum, not a new mechanic. It gives rarity a consequence beyond a tier label and creates an intrinsic reason to chase scarce badges.
+
+Effort: M.
+
+Risk if built badly: it must never convert to BadgesCoins or any spendable asset, or rarity becomes an economy exploit; it stays a read-only stat with a published formula.
+
+Source: bugreports/agent-idea-02.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Collector Crews</h3>
+  <details><summary>Details</summary><p>Teams of up to 12 collectors form a crew with a shared name, emblem and combined XP/coin pool. A crew leaderboard ranks crews weekly, and a crew unlocks its own collective achievement when members together own a full category or a set number of legendary-tier badges. Crew chat is replaced by a crew activity strip on the profile.
+
+Why it fits: builds directly on the existing XP/level system and the `achievements` evaluation loop, and gives the public `/feed` a second, team- sized narrative line. Rarity tiers give crews a concrete shared goal.
+
+Effort: M.
+
+Risk if built badly: elitism and closed recruiting cliques; invite spam in profile pushes if there is no rate limit on crew invitations.
+
+Source: bugreports/agent-idea-04.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Palette Pull</h3>
+  <details><summary>Details</summary><p>Generates a site accent theme from the dominant colours of your rarest owned badge, applied to your profile and (optionally) the whole site for your session. A &quot;surprise me&quot; mode pulls from a random legendary in the catalog.
+
+Why it fits: badge art is already served from the synced image assets, so the palette is derivable with no new data, and it plugs straight into the existing `--accent` token system in `globals.css`.
+
+Effort: S.
+
+Risk if built badly: unreadable dark/light contrast from arbitrary badge palettes — clamp luminance and contrast server- or client-side before apply.
+
+Source: bugreports/agent-idea-04.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Weekly Themed Leaderboard Rotations</h3>
+  <details><summary>Details</summary><p>Feature one rotating ranking per week alongside the global boards — &quot;rarest single badge owned&quot;, &quot;biggest rank climb&quot;, &quot;fastest to claim this week's drop&quot; — each computed from data already collected, with the current theme pinned to the homepage.
+
+Effort: M.
+
+Source: bugreports/agent-idea-08.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Feed Cheers</h3>
+  <details><summary>Details</summary><p>Let the existing live XP feed (`/feed`) carry lightweight reactions — a cheer or congrats on another collector's unlock or level-up — reusing the blog's existing reaction storage pattern on a new surface, rate-limited per profile.
+
+Effort: S.
+
+Source: bugreports/agent-idea-08.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Serve badge images at the size they are displayed</h3>
+  <details><summary>Details</summary><p>Badge art is 14-28 px but ships at 1x/2x/4x. width/height are present; add decoding=&quot;async&quot; and a sizes attribute so a 56 px mobile tile does not fetch the 4x asset.
+
+Source: IMPROVEMENTS.md Part 1.1.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Sitemap freshness from the newest badge event</h3>
+  <details><summary>Details</summary><p>Use lastModified from the newest badge_events row per badge instead of a build timestamp, so crawlers see real change dates.
+
+Source: IMPROVEMENTS.md Part 1.8.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Open Graph cards for badges</h3>
+  <details><summary>Details</summary><p>The profile OG route exists; a badge card with image, rarity and owner count would make shares legible.
+
+Source: IMPROVEMENTS.md Part 1.8.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Badge archaeology: a provenance page per badge</h3>
+  <details><summary>Details</summary><p>For every badge: first global sighting, when the claim window opened, how the owner count moved week by week. Nobody publishes a badge's life story.
+
+Source: IMPROVEMENTS.md Part 2 #1.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Collection diffing against any past date</h3>
+  <details><summary>Details</summary><p>&quot;What did I own on 1 January?&quot; answered from the inventory snapshot history — a personal time machine for collectors.
+
+Source: IMPROVEMENTS.md Part 2 #2.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Badge genealogy by artwork family</h3>
+  <details><summary>Details</summary><p>Cluster badges by artwork family (same set or artist) and show the family tree, so collectors can chase a whole lineage.
+
+Source: IMPROVEMENTS.md Part 2 #3.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Predictive drop calendar</h3>
+  <details><summary>Details</summary><p>A model over past windows estimating the next drop date per category, with an explicit confidence band rather than a single confident date.
+
+Source: IMPROVEMENTS.md Part 2 #4.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Time-capsule profiles</h3>
+  <details><summary>Details</summary><p>A private message attached to a profile that unlocks automatically in a year, with a badge as the key.
+
+Source: IMPROVEMENTS.md Part 2 #9.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Session recap card</h3>
+  <details><summary>Details</summary><p>After each visit: XP earned, badges found, rank change — as a shareable card.
+
+Source: IMPROVEMENTS.md Part 2 #17.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Badge weather map</h3>
+  <details><summary>Details</summary><p>A map view showing which regions are unlocking which badges right now, from anonymised owner deltas.
+
+Source: IMPROVEMENTS.md Part 2 #21.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Badge horoscope</h3>
+  <details><summary>Details</summary><p>A playful daily &quot;what your collection says about you&quot;, derived from the categories a member owns most.
+
+Source: IMPROVEMENTS.md Part 2 #25.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Mystery profiles</h3>
+  <details><summary>Details</summary><p>Every Monday one random profile is highlighted with their rarest badge and a riddle about who they are.
+
+Source: IMPROVEMENTS.md Part 2 #26.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Rarity insurance</h3>
+  <details><summary>Details</summary><p>Pay BadgesCoins to freeze a badge's rarity tier for a week, so a sudden claim wave cannot demote a showcase entry.
+
+Source: IMPROVEMENTS.md Part 2 #27.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Wishlist with push alerts</h3>
+  <details><summary>Details</summary><p>Watch a badge and get notified the moment it becomes claimable. The smallest high-value item on this list.
+
+Source: IMPROVEMENTS.md Part 2 #31.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Compare more than two members</h3>
+  <details><summary>Details</summary><p>A table view across up to five usernames instead of the current pairwise compare.
+
+Source: IMPROVEMENTS.md Part 2 #33.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Search by badge image</h3>
+  <details><summary>Details</summary><p>Upload a badge screenshot and find the matching catalog entry by image similarity.
+
+Source: IMPROVEMENTS.md Part 2 #35.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>A real account settings page with deletion and export</h3>
+  <details><summary>Details</summary><p>Account deletion (GDPR) and a data export, as a proper settings page rather than the current customizer alone.
+
+Source: IMPROVEMENTS.md Part 2 #37.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Bulk badge imports via QR codes</h3>
+  <details><summary>Details</summary><p>Scanning a TwitchCon booth poster adds the badge to a &quot;seen in the wild&quot; collection.
+
+Source: IMPROVEMENTS.md Part 2 #45.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>An assistant that recommends the next badge to claim</h3>
+  <details><summary>Details</summary><p>Answers &quot;which currently claimable badge fits my collection best?&quot; from the catalog, citing the rows it used.
+
+Source: IMPROVEMENTS.md Part 2 #50.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Window deadline change log</h3>
+  <details><summary>Details</summary><p>Record every observed start and end date per window at each sync, so any change becomes a dated event on the badge page ('end moved from 12 Sep to 19 Sep') with the previous value shown, and a catalog filter for badges whose deadline has moved this month. The same history scores providers on how often their first listed end date matched the observed expiry, per category. Effort: M. Risk if built badly: scoring on any reported date rather than the first observed one makes a provider that posts honest corrections look inaccurate, which is the opposite of the truth.
+
+Why: A deadline that moves is the most common way a collector misses a badge, and nothing records the movement today.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Archived owner-series backfill</h3>
+  <details><summary>Details</summary><p>A recovery pass pulls dated public snapshots of badge owner pages (Wayback captures of badgebase and potat, plus any other public archives) and inserts the recovered date and owner count into badge_stats marked as source 'archive', with the marker visible on the owner chart. This extends owner curves years earlier than this site has been collecting, so age, rarity and momentum rest on more than a few weeks of observations. Effort: L. Risk if built badly: archive captures are inconsistent and sometimes wrong, so an 'archived' point must never be allowed to overwrite a measured one and the chart must separate the two.
+
+Why: A badge's earliest weeks decide its rarity, and that is exactly the data a young database does not have.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Badge head-to-head comparison</h3>
+  <details><summary>Details</summary><p>Pick any two badges and see them head to head: owner curves on one axis, windows drawn as bars, each rarity signal as a diverging bar, and a written diff ('opens three days earlier, four times fewer owners, one tier higher'), shareable by URL with both ids. Uses the catalog, badge_stats and window history. Effort: M. Risk if built badly: overlaying two curves with different observation spans makes the younger badge look flat, so each side must state its measured coverage and estimated spans must be drawn distinctly.
+
+Why: Collectors argue about which badge is harder or better and there is nowhere to settle it with data.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Versioned rarity methodology page</h3>
+  <details><summary>Details</summary><p>Publish the TBRI formula exactly as implemented, with one real badge's numbers worked through it step by step, the formula version, and the change history of that version so a score from six months ago can still be explained. The numbers are computed live from a stable badge through the same module the syncs use, never hard-coded into the page. Effort: S. Risk if built badly: a worked example with hard-coded values breaks silently as the catalog changes, so it must be generated live and covered by a test that fails when the page and the formula disagree.
+
+Why: Rarity is the site's central claim and a versioned public formula is the difference between a metric and a mystery.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Set completion board</h3>
+  <details><summary>Details</summary><p>For every set_id, compute what share of tracked members hold every version, show the set's completion share on its page and on each badge page, and publish an exhibit of sets nobody has completed with the single version that blocks them most often. Uses synced inventories against the set's version list. Effort: M. Risk if built badly: with a small member base most sets read as 0 percent, so the share must always show its denominator and the exhibit must require a minimum member count before naming a set.
+
+Why: Sets are the natural unit of badge collecting and the catalog has no notion of how close anyone is to one.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (3/5) und Nutzen (4/5) sind ausgeglichen.</p>
+</article>

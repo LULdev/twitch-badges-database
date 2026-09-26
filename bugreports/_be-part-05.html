@@ -1,0 +1,797 @@
+<article class="card " data-category="addon" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Teilen-Karte für Runden</h3>
+  <details><summary>Details</summary><p>Eine eigene OG-Route rendert eine einzelne Runde als Teilen-Karte: das Spiel, sein Badge-Motiv, Einsatz, Auszahlung, Netto und eine Fußzeile mit Link zum überprüfbaren Rundeneintrag. Sie erscheint als 'Runde teilen'-Aktion im Ergebnispanel und im Runden-Verlauf, und das Bild wird wie bei den anderen OG-Routen pro Runden-ID gecacht. Die vorhandenen Karten decken Badges und Profile ab - nicht das eine Artefakt, mit dem ein Spieler wirklich angeben will. Aufwand: S. Risiko bei schlechter Umsetzung: satori rendert bei jedem Crawler-Abruf neu, daher muss die Route anhand der Runden-ID unveränderlich gecacht werden und darf einem ausgeloggten Besucher die Runden-ID eines anderen Mitglieds nicht zeigen, sofern diese Runde nicht ausdrücklich veröffentlicht wurde.
+
+Warum: Große Gewinne sind das am leichtesten teilbare Ergebnis der Arcade und verlassen die Seite derzeit nur als Screenshot oder gar nicht.
+
+Quelle: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Persönlicher RTP- und Varianzbericht</h3>
+  <details><summary>Details</summary><p>Für jedes gespielte Spiel berechnet der Bericht die tatsächliche Rendite (Summe der Auszahlungen geteilt durch Summe der Einsätze), die erwartete Rendite laut veröffentlichter Auszahlungsverteilung, den Unterschied in Standardabweichungen und ein Heiß-oder-Kalt-Flag, das immer die Stichprobengröße nennt. Er ist eine berechnete Schicht über game_rounds und den Engine-Konstanten, kein weiterer Zähler, und sagt klar, wenn die Stichprobe zu klein ist, um etwas zu bedeuten. Aufwand: M. Risiko bei schlechter Umsetzung: ein Bericht, der eine normale Schwankung zur Pechsträhne erklärt, trainiert Aberglauben, daher muss der z-Score mit seinem Konfidenzintervall ausgeliefert werden und die Formulierung darf nie andeuten, dass die Spiele einem Mitglied eine Korrektur schulden.
+
+Warum: Die Seite veröffentlicht die Quoten, und die natürliche Ergänzung ist, jedem Mitglied zu zeigen, was diese Quoten mit den eigenen Coins tatsächlich angestellt haben.
+
+Quelle: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Geplante Arcade-Abende</h3>
+  <details><summary>Details</summary><p>Das Panel legt thematische Stunden ('Slots Hour', 'Heist Hour') in einem veröffentlichten Kalender fest; während eines Abends erhält das beworbene Spiel einen erhöhten Höchsteinsatz und ein eigenes Stundenboard, und ein Abschluss auf diesem Board bringt eine an den Katalog geknüpfte kosmetische Belohnung ein. Der Stundenplan ist eine Zeile in den Einstellungen, die Boards werden aus den game_rounds im Zeitfenster berechnet, und die Seite zeigt die nächsten drei Abende in der lokalen Zeit des Mitglieds. Aufwand: M. Risiko bei schlechter Umsetzung: Stundenboards laden zum Boten die ganze Nacht ein, daher bleibt das Limit von einer Runde pro Sekunde in Kraft und das Board sollte die Platzierung statt der bloßen Rundenzahl belohnen - sonst gewinnt schlicht, wer am längsten durchgehalten hat.
+
+Warum: Die Arcade läuft pausenlos und ist nie terminiert, also gibt es nichts, das den Mitgliedern einen Grund gibt, zur gleichen Zeit da zu sein.
+
+Quelle: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Tastatur-Hotkeys pro Spiel</h3>
+  <details><summary>Details</summary><p>Jedes Spiel bekommt eine dokumentierte Tastenbelegung - Zahlentasten für eine Quiz-Antwort, Pfeiltasten für den Tresor, Leertaste zum Auszahlen, Enter für den gemerkten Einsatz - eingeblendet in einer einklappbaren Legende im Panel und pro Mitglied gemerkt. Die Tasten steuern dieselben Aktionen wie die Maus, es ist also keine neue Spiellogik nötig, und die Legende kommt über die lokalisierten Messages. Aufwand: M. Risiko bei schlechter Umsetzung: Tasten dürfen nicht feuern, während ein Textfeld oder Modal den Fokus hat, sonst spielt man Runden, während man in ein Eingabefeld tippt - der Handler gehört daher hinter die bestehende Modal-Fokusfalle.
+
+Warum: Mehrere der 13 Spiele sind auf die Tastatur ausgelegt (Quiz, Memory, Tresor) und verschenken das derzeit, weil sie eine Maus verlangen.
+
+Quelle: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Duplikat-Artwork-Erkennung</h3>
+  <details><summary>Details</summary><p>Katalogzeilen werden über einen perzeptuellen Hash des Badge-PNG plus einem normalisierten Set-und-Name-Schlüssel geclustert; wahrscheinliche Duplikate oder Neuauflagen erscheinen mit Ähnlichkeitswert und nebeneinanderliegenden Vorschaubildern in einer Admin-Warteschlange. Liest die Tabelle badges (set_id, version, image_url). Aufwand: L. Risiko bei schlechter Umsetzung: echte Varianten von Badges teilen sich über Versionen hinweg dasselbe Artwork, daher müssen Cluster eine Admin-Bestätigung verlangen und dürfen nie automatisch zusammengeführt werden.
+
+Warum: Hält den Katalog vertrauenswürdig - und genau das ist das gesamte Produkt einer Badge-Datenbank.
+
+Quelle: new-ideas-06-stats.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Sammlungs-Cover und Widmung</h3>
+  <details><summary>Details</summary><p>Eine Sammlung bekommt ein Cover: einen Titel ('The Long Winter'), eine optionale einzeilige Widmung und einen eigenen Badge, der als Cover-Marke gewählt wird, gerendert als Kopfbereich über den Regalen und im Profil-OG-Bild. Alle drei Felder liegen in der Anpassung mit harten Größenlimits, und der Cover-Badge muss gegen das zuletzt synchronisierte Inventar des Mitglieds aufgelöst werden, damit kein veralteter Claim auf einen Badge zeigen kann, den das Mitglied nicht besitzt. Die Katalogseiten behalten die Fakten; das hier ist die eigene Rahmung des Mitglieds. Aufwand: S. Risiko bei schlechter Umsetzung: ein unmoderierter Titel und eine Widmung werden zur Angriffsfläche für Schmierereien, und ein übersprungener Besitz-Check lässt ein Mitglied einen Badge prominent zeigen, den es nie verdient hat.
+
+Warum: Eine Sammlung zu benennen ist der einfachste Weg, damit ein Profil eigenhändig gestaltet statt generiert wirkt.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>30-Tage-Verpflichtungs-Pin</h3>
+  <details><summary>Details</summary><p>Ein Mitglied pinnt einen Badge für eine feste 30-Tage-Frist über die Vitrine, und der Pin kann nicht getauscht oder entfernt werden, bis die Frist abläuft; das Profil zeigt daneben 'seit 12/30 Tagen gepinnt'. Die Umsetzung ist eine Zeile pro Profil mit einem locked_until-Zeitstempel, ein Tausch-Endpunkt, der vorzeitige Änderungen ablehnt, und ein protokollierter Admin-Unlock für echte Versehen. Der Wert liegt im Preis: Der Pin sagt 'dieser Badge', nicht 'der Favorit dieser Woche'. Aufwand: S. Risiko bei schlechter Umsetzung: die Sperre wird zur Falle, wenn ein Mitglied den Badge loswerden will, daher muss ein geprüfter Admin-Freigabeweg vom ersten Tag an existieren.
+
+Warum: Ein Signal, das niemand billig ändern kann, ist mehr wert als ein weiteres Freitextfeld auf einem Profil.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Geprüfte Sammler-Eide</h3>
+  <details><summary>Details</summary><p>Ein Mitglied schwört eine feste Sammelregel aus einem begrenzten Vokabular — 'Ich beanspruche keine Bezahl-Badges', 'Ich breche nie ein Set', 'Ich hole immer TwitchCon-Badges' — plus eine optionale freie Klausel, und die Seite prüft sie bei jedem Lauf gegen das synchronisierte Inventar neu, wobei der Eid als gehalten oder gebrochen mit dem Datum des Bruchs erscheint. Ein gebrochener Eid bleibt sichtbar, bis ein neuer geschworen wird. Die Prüfung braucht nur Badges, die das Mitglied bereits hat, also ist sie ein Durchlauf innerhalb des bestehenden potat-Syncs. Aufwand: M. Risiko bei schlechter Umsetzung: ein Grenzfall der Prüfung brandmarkt ehrliche Mitglieder als Eidbrecher, daher muss jedes Urteil mit der Liste der Zeilen kommen, die es erzeugt haben.
+
+Warum: Ein selbst erklärtes Sammelprinzip, das der Server wirklich prüft, ist ein Vertrauenssignal, das kein Profilfeld fälschen kann.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Regal der Aussortierten</h3>
+  <details><summary>Details</summary><p>Ein bewusst ungeschöntes zweites Regal: Badges, die das Mitglied besitzt, aber nicht zeigen will, jeweils versehen mit einem Ein-Wort-Grund aus einer festen Liste ('common', 'grindy', 'ugly', 'region-locked'). Es erscheint eingeklappt unter der Vitrine und macht aus einer Sammlung eine redigierte Meinung statt einen Haufen. Weil die Gründe Chips statt Freitext sind, muss nichts Neues moderiert werden. Aufwand: S. Risiko bei schlechter Umsetzung: der Stapel liest sich als öffentliche Beleidigung der Designer, daher bleibt das Vokabular neutral und es wird nie ein Badge-bezogenes Aggregat der Ablehnungen veröffentlicht.
+
+Warum: Was ein Sammler nicht zeigen will, sagt mehr über den Geschmack als das Gezeigte - und keine Badge-Seite erfasst das derzeit.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Opt-in-Besitzerliste</h3>
+  <details><summary>Details</summary><p>Auf einer Badge-Seite können Mitglieder mit öffentlichem Inventar in einer schlanken Liste auftauchen — Avatar, Level, 'im Besitz seit' — neben einem 'kürzlich beansprucht'-Streifen, sortiert nach Claim-Aktualität statt nach Besitzerzahl. Die Liste wird pro Mitglied einmal über einen einzigen Schalter aktiviert, ist seitenweise unterteilt und liest das Sichtbarkeits-Flag zur Renderzeit. Sie ist der Katalog, auf die Menschen zurückgelenkt - das Spiegelbild einer öffentlichen Sammlungsseite. Aufwand: M. Risiko bei schlechter Umsetzung: sie legt den Besitz von Mitgliedern offen, die privat bleiben wollten, daher darf die Fläche nur für ausdrückliche Opt-ins existieren und muss das Flag bei jedem Rendern erneut prüfen.
+
+Warum: Sie schließt den Kreis zwischen einem Badge und den Sammlern, die ihn haben - die Entdeckung, die der Katalog allein nicht bieten kann.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Gast-Kurator-Woche</h3>
+  <details><summary>Details</summary><p>Ein Mitglied kann der Freundin oder dem Freund die hervorgehobene Vitrine für eine Woche überlassen: Der Gast wählt, welche Badges des Besitzers gezeigt werden, schreibt eine kurze kuratorische Zeile und steht für die Dauer als Urheber auf dem Profil. Die Auswahl muss Badges sein, die der Besitzer wirklich hat, der Besitzer kann einzelne mit Veto blockieren, und die Vereinbarung läuft automatisch aus und hinterlässt eine datierte Notiz. Es ist ein kreativer Akt zu zweit, keine Terminänderung. Aufwand: M. Risiko bei schlechter Umsetzung: die kuratorische Zeile ist Freitext unter fremdem Namen, daher braucht sie ein Längenlimit, das Veto und nur einen aktiven Kurator gleichzeitig.
+
+Warum: Eine Freundin oder einen Freund die eigene Vitrine kuratieren zu lassen ist ein soziales Ritual, das Inhalte hervorbringt, die kein Mitglied allein schaffen könnte.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Einem Sammler folgen</h3>
+  <details><summary>Details</summary><p>Mitglieder können einander folgen, um eine schmale, selbst gewählte Menge an Signalen zu erhalten — eine Freischaltung über eine Stufengrenze hinweg, eine neue Levelstufe, ein abgeschlossenes Set, ein öffentlicher Meilenstein — niemals jeden Claim. Follower und Folgende werden auf dem Profil getrennt gezählt, die Beziehung ist standardmäßig privat mit einem öffentlichen Schalter, und ein Follower bekommt pro Mitglied und Tag höchstens eine Sammel-Benachrichtigung. Der Aktivitäts-Feed bleibt seitenweit; das hier ist der mitgliedsbezogene Ausschnitt davon. Aufwand: M. Risiko bei schlechter Umsetzung: es wird eine Benachrichtigungs-Engagement-Schleife und ein Popularitätswert; das Sammel-Limit und die Ereignis-Auswahl sind es, die es nützlich statt laut halten.
+
+Warum: Folgen ist das fehlende Grundbauteil einer Community-Seite - man kann derzeit nicht sagen 'Ich will wissen, was dieser Sammler macht'.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Badge-Brieffreunde</h3>
+  <details><summary>Details</summary><p>Eine Opt-in-Zusammenführung, bei der die Seite zwei Mitglieder mit komplementären Sammlungen zusammenbringt — jedes besitzt einen großen Anteil dessen, was dem anderen fehlt — ohne zu verraten, wer sie sind, und das Paar tauscht kuratierte Lückenlisten mit je fünf Badges über ein strukturiertes Formular aus. Nach zwei Austauschen kann jede Seite sich zu erkennen geben, und wenn beide zustimmen, werden die Profile als Brieffreunde verknüpft; sonst endet die Zusammenführung einfach. Das Matching nutzt dieselbe Überlappungsrechnung, die die Vergleichsansicht ohnehin braucht. Aufwand: M. Risiko bei schlechter Umsetzung: in einer kleinen Mitgliederbasis identifizieren Treffer Menschen durch Ausschluss, daher braucht das Pairing einen Mindestkandidatenpool und darf nie einen Teiltreffer zeigen.
+
+Warum: Komplementäre Sammlungen sind die spannendste Beziehung, die die Daten finden kann, und Anonymität macht sie zugänglich.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Kontinuität durch benannte Verwalter</h3>
+  <details><summary>Details</summary><p>Ein Mitglied kann eine Vertrauensperson als Verwaltung benennen, die nach 180 Tagen ohne Sync oder Anmeldung die öffentliche Seite des ruhenden Profils übernehmen darf: die hervorgehobene Vitrine aktuell halten, das Cover pflegen und das Gästebuch beantworten, klar als Verwaltung gekennzeichnet. Eigentum, Inventar und private Daten werden nie übertragen, die Verwaltung sieht genau das, was ein Besucher sieht, und das ursprüngliche Mitglied beendet durch das Zurückholen des Kontos die Vereinbarung sofort. Aufwand: M. Risiko bei schlechter Umsetzung: eine Verwaltung stellt jemanden falsch dar oder ändert still die Historie, daher muss die Kennzeichnung auffällig sein, jede Verwaltungsaktion öffentlich und das Zurückholen sofort.
+
+Warum: Aktive Sammlungen, die verstummen, sind ein echter Verlust, wenn die Vitrinen der Inhalt der Seite sind - und kontinuierliche Weiterführung mit Einverständnis bewahrt sie, ohne etwas wegzunehmen.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Sichtbarkeitssteuerung pro Badge</h3>
+  <details><summary>Details</summary><p>Über den einzelnen öffentlich-privat-Schalter fürs Inventar hinaus kann ein Mitglied einzelne Badges als Spotlight markieren — sichtbar und verifiziert im Besitz, während der Rest des Inventars privat bleibt — oder als versteckt, aus der öffentlichen Sammlung ausgeschlossen. Die Steuerung gilt pro Badge, ist begrenzt (etwa 20 Spotlights) und wird von einer geteilten Funktion aufgelöst, die jede Inventar darstellende Fläche aufruft, sodass derselbe Badge auf Profilen, der Besitzerliste und Gastplätzen konsistent wirkt. So kann ein privater Sammler an sozialen Funktionen teilnehmen, ohne alles zu öffnen. Aufwand: M. Risiko bei schlechter Umsetzung: eine Fläche vergisst den Resolver und ein versteckter Badge leckt durch eine gecachte Seite, daher muss der geteilte Resolver verpflichtend sein statt optional.
+
+Warum: Der jetzige Privat-oder-öffentlich-Schalter erzwingt eine Alles-oder-Nichts-Entscheidung, die private Sammler komplett aus der sozialen Schicht heraushält.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Pseudonymes Beteiligungsprofil</h3>
+  <details><summary>Details</summary><p>Ein Mitglied kann ein Pseudonym anlegen, das auf den sozialen Flächen benutzt wird — Gästebuch-Stempel, Relay-Sprünge, Rennen-Teilnahmen, Rezensionsfenster, Claim-Pools —, während der Twitch-Handle an den eigenen Seiten bleibt; beide sind intern verknüpft und über keine öffentliche Route. Das Pseudonym trägt einen eigenen Anzeigenamen und Level-Chip, kann jederzeit zurückgezogen werden, und die damit gemachten Interaktionen behalten das Pseudonym, statt rückwirkend die Identität preiszugeben. Aufwand: M. Risiko bei schlechter Umsetzung: Pseudonyme werden zum Schild für schlechtes Benehmen, daher muss die interne Verknüpfung für die Moderation existieren, ist nur ein Pseudonym pro Konto erlaubt, und Missbrauch hebt es öffentlich auf.
+
+Warum: Schüchterne oder zurückhaltende Mitglieder können so an der sozialen Schicht teilhaben, ohne alles, was sie tun, an ihre Twitch-Identität zu hängen.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Vorschau-Modus für Zielgruppen</h3>
+  <details><summary>Details</summary><p>Aus der Anpassung heraus kann ein Mitglied das eigene Profil für vier Zielgruppen vorab ansehen — eine fremde Person, ein angemeldetes Mitglied, ein Follower, ein stummgeschalteter Besucher —, und jede Vorschau rendert exakt die Felder, die diese Zielgruppe sähe, wobei versteckte durch eine Grenzmarkierung ersetzt statt stillschweigend weggelassen werden. Derselbe Zielgruppen-Resolver treibt das echte Rendern an, also können Vorschau und Wirklichkeit nicht auseinanderdriften. Aufwand: M. Risiko bei schlechter Umsetzung: ein zweiter Codepfad macht die Vorschau beruhigend, während die Live-Seite leckt, daher muss der Resolver geteilt und nicht neu implementiert sein.
+
+Warum: Datenschutzeinstellungen sind nur vertrauenswürdig, wenn Mitglieder sehen können, was sie wirklich bewirken - und das ist der billigste Weg, sie vertrauenswürdig zu machen.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Identitäts-Kontinuität und Namenshistorie</h3>
+  <details><summary>Details</summary><p>Das Profil führt eine Namenshistorie: Sieht ein Sync eine andere Anmeldung für dasselbe Konto, wird der bisherige Handle gespeichert und als 'zuvor bekannt als' angezeigt, alte Profil-URLs lösen weiter über eine Alias-Tabelle auf, und der numerische Permalink bleibt dauerhaft. Das Mitglied kann die Historie vor Besuchern verbergen, während die Links weiter funktionieren, und eine Umbenennung wird nur akzeptiert, wenn sie vom selben authentifizierten Konto kommt. Aufwand: M. Risiko bei schlechter Umsetzung: die Alias-Auflösung verschmilzt zwei Konten zu einer Identität oder legt eine Umbenennung öffentlich offen, die das Mitglied vergessen wollte, daher muss der Abgleich authentifiziert sein und das Verbergen eine Mitgliedsentscheidung bleiben.
+
+Warum: Twitch-Handles ändern sich zwischen Drops, und ohne Identitätsnachweis stirbt mit dem Namen jeder alte Link und jeder alte Ruf.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Inventar-Gesundheitscheck</h3>
+  <details><summary>Details</summary><p>Eine Diagnose für Mitglieder über das eigene synchronisierte Inventar: Badges, die nicht mehr im Katalog sind, doppelte Bild-UUIDs über zwei Set-IDs hinweg, Badges, deren Set aufgelöst wurde, Zeilen, deren letzter Sync viel älter ist als der Rest, und jede Lücke zwischen Inventarzahlen und der öffentlichen Sammlung. Jeder Befund verlinkt zum Badge oder zur passenden 'So verdienst du ihn'-Zeile, und das Panel trennt 'wir glauben, das ist ein Datenproblem' von 'wir glauben, das liegt an deinem Konto'. Aufwand: M. Risiko bei schlechter Umsetzung: es beunruhigt Mitglieder über den normalen Katalogwandel, daher müssen Befunde als Möglichkeiten formuliert sein, mit den zugrunde liegenden Zeilen gezeigt.
+
+Warum: Mitglieder bemerken als Erste, wenn ein Sync falsch aussieht, und eine eingebaute Diagnose schlägt jeden Bug-Report, der derzeit mit einem Screenshot beginnt.
+
+Quelle: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Geschätzte Zählwerte für die Textsuche-Paginierung</h3>
+  <details><summary>Details</summary><p>Wenn ?q= gesetzt ist, führt listBadges drei ilike-Bedingungen plus ein exaktes COUNT über badges aus, bevor eine einzige Seite zurückkommt - die schwerste Abfrage der Seite beantwortet also nur, wie viele Seiten es gibt. Bei vorhandenem q eine geschätzte Anzahl von PostgREST anfordern und Pagination 'etwa N Badges' statt einer exakten Summe rendern lassen. Aufwand: S. Risiko bei schlechter Umsetzung: eine Schätzung, die nicht zur Rechnung des Paginators passt, erzeugt eine tote letzte Seite, daher die angeforderte Seite an das Fenster klemmen, das tatsächlich Zeilen geliefert hat, nicht an die Schätzung.
+
+Warum: Die Suche ist der Hauptweg, um einen bestimmten Badge zu finden, und ihre Paginierungszählung kostet derzeit mehr als die Suche selbst.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Ein Lesezugriff pro Badge-Seite für Metadaten</h3>
+  <details><summary>Details</summary><p>generateMetadata() und der Seitenkörper auf /badges/[slug] (und /blog/[slug]) rufen jeweils denselben Lookup auf, getBadgeBySlug / getPostBySlug, sodass jedes ISR-Rendering und jeder Cache-Miss zwei identische PostgREST-Roundtrips für eine Zeile macht. Diese Lookups in Reacts cache() verpacken, damit ein Request nur einen Lesezugriff macht. Aufwand: S. Risiko bei schlechter Umsetzung: cache() darf einen fehlgeschlagenen Lookup nicht memoisieren, sonst wird aus einem vorübergehenden Pooler-Fehler ein 404 für den ganzen Request; nur die aufgelöste Zeile cachen.
+
+Warum: Jede Badge-Detailseite verdoppelt ihre erste Datenbanklesung ohne jeden Nutzen - reine Kosten auf der zweitbelebtesten Route der Seite.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Abfrage des Besitzer-Verlaufsdiagramms verdichten</h3>
+  <details><summary>Details</summary><p>getBadgeStatsHistory() holt bis zu 250 badge_stats-Zeilen für jede Badge-Seite und mappt jede in einen Diagrammpunkt, aber OwnersChart rendert bei seiner Breite etwa 60 lesbare Positionen. Eine gebuckette Serie anfordern (ein Durchschnitt pro Zeitbucket) oder die Serie serverseitig stufen, mit Rohpunkten für das aktuelle Zeitfenster, sodass Lesezugriff und RSC-Payload um etwa das Vierfache schrumpfen. Aufwand: S. Risiko bei schlechter Umsetzung: ein grober Bucket versteckt die Claim-Spitze, die das Diagramm zeigen soll, daher die letzten 24 Stunden in voller Auflösung halten und nur den älteren Bereich bucken.
+
+Warum: Das Besitzer-Trenddiagramm liegt auf jeder Badge-Seite und überträgt derzeit viermal mehr Zeitreihendaten, als irgendein Bildschirm zeichnen kann.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Die Funktionen in der Datenbank-Region betreiben</h3>
+  <details><summary>Details</summary><p>next.config.ts setzt keine Funktionsregion, daher landen Deployments in einer Vercel-Region, während der für dieses Projekt konfigurierte Supabase-Pooler aws-1-eu-west-1 ist - jede PostgREST-Lesung kann also einen Ozean überqueren. /api/health meldet bereits dbLatencyMs und VERCEL_REGION, daher die Funktionen neben den Pooler legen (oder den Pooler verlegen) und beide Zahlen vorher und nachher vergleichen. Aufwand: S. Risiko bei schlechter Umsetzung: Funktionen von der Zielgruppe wegzuverlagern verbessert die Datenbanklatenz und verschlechtert die Time-to-First-Byte für Besucher, daher beides messen und den CDN vor den gecachten Routen behalten.
+
+Warum: Eine Konfigurationszeile entscheidet, ob jede Abfrage auf dieser leselastigen Seite einen transatlantischen Roundtrip macht.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Einstellungs-Lesungen im Layout cachen</h3>
+  <details><summary>Details</summary><p>src/app/[locale]/layout.tsx erwartet getFeatures() und getMaintenance() bei jedem Rendern jeder Route in allen 11 Sprachen, und jede davon ist eine site_settings-Lesung, die sich nur ändert, wenn ein Admin das Panel speichert. Beide in unstable_cache mit einem Tag verpacken, den die Settings-PATCH-Route invalidiert, und die Wartungsentscheidung auf dem ungecachten Pfad behalten. Aufwand: S. Risiko bei schlechter Umsetzung: ein gecachtes Wartungs-Flag ließe die Seite gesperrt, nachdem ein Admin es ausgeschaltet hat, daher muss der Schreibvorgang invalidieren und das Flag an der Stelle neu gelesen werden, wo es durchgesetzt wird.
+
+Warum: Zwei Datenbanklesungen zahlt jeder Besucher auf jeder Seite für Werte, die sich einige Male im Monat ändern.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Ein Typeahead statt aller Badge-Schlüssel</h3>
+  <details><summary>Details</summary><p>/compare ruft getCatalogKeys() auf, das sich seitenweise in 1000-Zeilen-Häppchen durch alle badges arbeitet, um eine Auswahl zu bauen, die eine Handvoll Treffer zeigt - die Vergleichsseite überträgt also den ganzen Katalog, bevor sie irgendetwas rendern kann. Die Auswahl durch eine entprellte ilike-Präfixabfrage ersetzen, begrenzt auf 20 Zeilen (mit dem bestehenden sanitizeQuery-Escaping), und den seitenweisen Durchlauf nur behalten, wo wirklich eine vollständige Liste exportiert wird. Aufwand: M. Risiko bei schlechter Umsetzung: ein ilike über Nutzereingaben ohne das bestehende Wildcard-Escaping matcht alles und macht aus dem Typeahead einen Vollscan, daher sanitizeQuery wiederverwenden und das Limit serverseitig deckeln.
+
+Warum: Die Zwei-Mitglieder-Vergleichsansicht ist ein kleines Feature, das derzeit bei jedem Besuch die Kosten des gesamten Katalogs zahlt.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Die meistbesuchten Badge-Seiten vorrendern</h3>
+  <details><summary>Details</summary><p>/badges/[slug] deklariert revalidate=120, aber kein generateStaticParams, daher werden alle rund 476 Badges mal 11 Sprachen beim ersten Aufruf gebaut, und die beliebten zahlen diese Regenerierung immer wieder. Die Badges mit den meisten Besitzern plus jeden derzeit aktiven Badge zur Build-Zeit über den Sprachsatz erzeugen und den langen Schwanz auf Nachfrage belassen. Aufwand: M. Risiko bei schlechter Umsetzung: Tausende Seiten beim Build vorzurendern ist genau das, was next build mit Exit-Code 134 auf einer kleinen Maschine sterben lässt, daher die erzeugte Menge deckeln und aus dem Wachstumspfad heraushalten.
+
+Warum: Eine kleine heiße Teilmenge der Badge-Seiten nimmt den Großteil des Traffics auf und ist das Billigste auf der Seite, um es aus einem vorgebauten Cache auszuliefern.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Die langsamen Abschnitte der Badge-Seite streamen</h3>
+  <details><summary>Details</summary><p>/badges/[slug] wartet auf die Badge-Zeile, ihre Besitzerhistorie, die verwandte Kategorie-Liste und einen Live-Zähler eines Drittanbieters, bevor das erste Byte kommt - ein langsamer Anbieter verzögert also schon den Titel und den 'So verdienst du ihn'-Text. OwnersChart, das verwandte Raster und den Live-Zähler hinter Suspense mit Skeletons fester Höhe setzen, damit der Kopfbereich allein mit der Badge-Zeile malt. Aufwand: M. Risiko bei schlechter Umsetzung: ein Skeleton mit falscher Höhe lässt die Seite springen, wenn das Diagramm ankommt - schlimmer als Warten - daher das exakte Diagramm-Feld in CSS reservieren, bevor dahinter gestreamt wird.
+
+Warum: Die Badge-Detailseite ist der Ort, an dem ein Countdown zählt, und ihr statischer Text sollte nie auf ein Diagramm oder einen Drittanbieter-Zähler warten.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Ein kürzerer Anbieter-Timeout innerhalb eines Requests</h3>
+  <details><summary>Details</summary><p>perfil.ts, potat.ts, badgebase.ts, ivr.ts und helix.ts teilen sich ein einziges 15-Sekunden-FETCH_TIMEOUT_MS, daher kann ein Anbieter-Aufruf, während ein Besucher wartet, den Request fünfzehn Sekunden festhalten - weit darüber hinaus, ab wann der Ausfall wie eine kaputte Seite wirkt. Die Konstante in ein Sync-Budget (15 s) und ein Request-Budget (etwa 1500 ms) aufteilen, und der Request-Pfad fällt bei Timeout auf den gespeicherten Wert zurück. Aufwand: S. Risiko bei schlechter Umsetzung: ein zu knappes Request-Budget lässt einen langsamen Anbieter dauerhaft tot wirken, und der Fallback liefert still alte Daten, daher jeden Timeout mit dem Anbieternamen loggen, damit die Fallback-Quote sichtbar ist.
+
+Warum: Ein Einheits-Timeout bedeutet, dass Sync und Besucher dieselbe Geduld teilen - und nur der Sync kann es sich leisten zu warten.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Unveränderliches Caching für die statischen Assets</h3>
+  <details><summary>Details</summary><p>/flags/*, icon-192.png, icon-512.png und sw.js werden ohne explizite Cache-Richtlinie aus public/ ausgeliefert, und sw.js wird bei jeder Navigation neu geholt - genau daran kann auch ein Push-Subscription-Update scheitern. Eine lange unveränderliche Richtlinie für die wirklich statischen Assets in next.config.ts setzen und dem Service Worker eine Versionsabfrage oder eine kurze Revalidierung geben, damit Updates die Geräte erreichen. Aufwand: S. Risiko bei schlechter Umsetzung: sw.js unveränderlich zu cachen strandet Geräte auf einem alten Worker ohne Weg zum Fix, daher muss die eigene Richtlinie des Workers kurz bleiben, während Flags und Icons lang gehen.
+
+Warum: Jeder Besucher lädt Flaggen-SVGs und PWA-Icons herunter, die sich nie ändern, und der Service Worker besonders darf nicht wie sie gecacht werden.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Die geänderten Seiten nach einem Sync aufwärmen</h3>
+  <details><summary>Details</summary><p>Nach dem Commit von runGlobalSync oder runPotatSync sind die geänderten Slugs längst bekannt (sie sind das, was die Engines gerade geschrieben haben), doch der erste Besucher jeder frisch invalidierten Seite zahlt die Regenerierung - und er kommt genau in dem Moment, in dem ein Drop angekündigt wird. Den Sync eine kleine Anzahl interner Abrufe für die geänderten Badge-URLs ausführen lassen, damit der Cache vor dem Traffic-Peak warm ist. Aufwand: M. Risiko bei schlechter Umsetzung: eine Schleife, die jede geänderte Seite aus dem 60-Sekunden-Serverless-Sync heraus holt, sprengt das Invocation-Budget, daher die Warm-Liste auf neue und frisch abgelaufene Badges begrenzen und nach dem Commit der Schreibvorgänge laufen lassen.
+
+Warum: Neue Badges sind der Traffic-Peak der Seite, und der jetzige Cache lässt die erste Besucherwelle die Regenerierungsarbeit machen.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Ein Fortsetzungs-Cursor für einen abgebrochenen Sync</h3>
+  <details><summary>Details</summary><p>Die Syncs schreiben in 200-Zeilen-Häppchen und können mitten im Lauf vom 60-Sekunden-Limit der Serverless-Umgebung abgeschnitten werden, sodass ein halb angewandter Diff bleibt, den der nächste Tick von Grund auf neu berechnet - also zwei Sätze von Anbieter-Aufrufen für ein Ergebnis. Eine sync_runs-Zeile mit der Phase und dem erreichten Häppchen festhalten, und der nächste Lauf setzt von dort fort. Aufwand: M. Risiko bei schlechter Umsetzung: das Fortsetzen auf einem veralteten Plan wendet den Diff von gestern auf den Katalog von heute an, daher muss der Cursor invalidiert werden, wenn sich der Anbieter-Snapshot geändert hat, aus dem er geplant war.
+
+Warum: Ein abgelaufener Sync zahlt derzeit den vollen Preis zweimal, und der pro-Badge-Durchlauf ist die Arbeitslast, die am ehesten an die Wand stößt.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Die Ereignistabellen monatsweise partitionieren</h3>
+  <details><summary>Details</summary><p>analytics_events und activity_events sind die Tabellen, die die Größe dieser Datenbank entscheiden werden, und jede Lesung von ihnen betrifft nur das aktuelle Zeitfenster, während die Aufbewahrungs-Löschung die ganze Tabelle durchsuchen muss. Ihnen native Monatspartitionen geben, oder mindestens einen BRIN-Index auf ts und created_at, damit Feed, Statistik-Views und Aufräumen billig bleiben, während sie Millionen Zeilen passieren. Aufwand: L. Risiko bei schlechter Umsetzung: eine Live-Tabelle zu partitionieren erfordert das Umschreiben der Daten und das Neuanlegen jeder Policy und jedes Grants, daher an der lokalen Seed-Datenbank proben und die unpartitionierte Tabelle wiederherstellbar halten, bis der Tausch verifiziert ist.
+
+Warum: Partitionierung ist die eine Datenbankänderung, die jeden Tag schwerer wird, solange dieser Katalog live ist - und die Ereignistabellen sind der Ort, wo sie gebraucht werden wird.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Das Statistikbündel der Erfolge memoisieren</h3>
+  <details><summary>Details</summary><p>evaluateAchievements ruft buildStats auf, das rund fünfzehn PostgREST-Lesungen macht (user_inventory, game_rounds, activity_events, profile_visits über pageAll, blog_reactions und drei globale Zählungen) bei jeder /achievements-, /inventory- und Nach-Spiel-Auswertung. Das Bündel einmal pro Mitglied berechnen und wiederverwenden, solange sich user_progress.updated_at nicht bewegt hat, und die unbegrenzte activity_events-Art-Auswahl sowie den pageAll-Besuchsdurchlauf durch die Zählungen ersetzen, die die Checks wirklich brauchen. Aufwand: M. Risiko bei schlechter Umsetzung: ein wiederverwendetes Bündel stoppt nach einem Spielergebnis still das Freischalten von Erfolgen, daher den Cache am Zeitstempel der Progress-Zeile aufhängen und bei jedem XP-Schreiben verwerfen.
+
+Warum: Die 125 selbst auswertenden Erfolge sind das spannendste System der Seite und ihr schwerster Lesepfad, immer wieder bezahlt für dasselbe Mitglied.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Eine Kapazitätsanzeige im Status-Tab</h3>
+  <details><summary>Details</summary><p>Die Funktions-Invocations des Hobby-Plans, der schnelle Datentransfer und die Bildoptimierungen sowie die Datenbankgröße von Supabase sind die Grenzen, die die Seite ohne jede Codeänderung stoppen würden - und nichts beobachtet sie derzeit. Ableiten, was sich aus system_heartbeats und analytics_events ableiten lässt, die Datenbankgröße aus einem kleinen View lesen, und alles als Prozentsatz seines Kontingents zeigen, zusammen mit der Einfügequote pro Tabelle, hochgerechnet auf das Datum, an dem sie eine Schwelle überschreitet. Aufwand: M. Risiko bei schlechter Umsetzung: eine Projektion aus einer atypischen Woche liest sich als harte Frist, daher als Projektion kennzeichnen, das Stichprobenfenster zeigen und niemals darauf alarmieren.
+
+Warum: Die Seite läuft auf kostenlosen Tarifen, daher sind die Plan-Limits die wahrscheinlichste Ursache eines plötzlichen Ausfalls und am wenigsten beobachtet.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Den Fan-out-Push-Versand bündeln</h3>
+  <details><summary>Details</summary><p>runGlobalSync ruft sendPushToAll nach einem neuen Drop auf, und diese Schleife über push_subscriptions läuft innerhalb des 60-Sekunden-Serverless-Budgets des Syncs und wächst mit der Mitgliederzahl. In Häppchen mit begrenzter Parallelität senden, einen schlechten Endpunkt den Lauf nicht abbrechen lassen, oder den ganzen Fan-out in eine separate Invocation verlagern, die der Sync auslöst. Aufwand: M. Risiko bei schlechter Umsetzung: ein gebündelter Versand, der eine Benachrichtigung verdoppelt oder einen Endpunkt verliert, ist schlimmer als ein langsamer Versand, daher den Versand pro Subscription und Badge idempotent halten und Endpunkte ausmustern, die der Push-Dienst zurückweist.
+
+Warum: Die Neue-Drop-Benachrichtigung ist das beste Bindungs-Feature der Seite und teilt derzeit ein Budget mit dem Katalogschreiben.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>ETag für den Changelog-RSS-Feed</h3>
+  <details><summary>Details</summary><p>/api/changelog/rss ist force-dynamic und baut den Feed bei jedem Abonnenten-Poll aus der changelog-Tabelle neu, und RSS-Reader pollen nach Zeitplan, ganz gleich, ob etwas passiert ist oder nicht. Ein Revalidate-Fenster plus ETag und Last-Modified ergänzen, abgeleitet vom neuesten changelog.created_at, sodass ein unveränderter Feed mit 304 antwortet, ohne eine Datenbanklesung. Aufwand: S. Risiko bei schlechter Umsetzung: ein veralteter Validator hält Reader auf einem alten Feed, nachdem ein neuer Eintrag gelandet ist, daher aus der neuesten Zeilen-ID oder dem Zeitstempel ableiten und nie von einer Build-Zeit.
+
+Warum: Der Changelog-Feed wird von Maschinen gepollt, die meistens nichts finden, und der automatische Changelog ist eines der Aushängeschilder der Seite.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Den Feed mit dem Cursor pollen, den er liefert</h3>
+  <details><summary>Details</summary><p>FeedList holt /api/feed?limit=30 alle fünf Sekunden und sendet dieselben dreißig Ereignisse erneut, mit clientseitiger Deduplizierung nach ID, obwohl der Endpunkt bereits nextCursor zurückgibt und einen cursor-Parameter annimmt. Die neueste ID senden, die der Client hält, und nur das voranstellen, was zurückkam, sodass eine ruhige Phase ein leeres Array überträgt statt dreißig Aktivitätszeilen. Aufwand: S. Risiko bei schlechter Umsetzung: ein Cursor, der nach einem verborgenen Tab oder langem Schlaf verloren geht, zeigt eine Lücke, die der Leser nicht erkennen kann, daher bei verborgenem Tab auf einen vollen Abruf zurückfallen und die bestehende ID-Deduplizierung behalten.
+
+Warum: Der Live-Feed liegt auf dem Aufmerksamkeitspfad jeder Seite und überträgt derzeit für immer alle fünf Sekunden sein gesamtes Ergebnis.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Den Beacon unter Spitzenlast samplen</h3>
+  <details><summary>Details</summary><p>Wenn ein neuer globaler Badge droppt, schreibt jeder Besucher in analytics_events und postet zweimal, sodass die Tabelle und die /stats-Aggregate ihre schwerste Last genau in dem Moment aufnehmen, der am meisten zählt. Eine Sample-Rate in site_settings ablegen, die der Beacon liest, eine von N Ansichten senden, wobei die Zeile ihr Gewicht trägt, und das Gewicht in den Aggregaten zurückmultiplizieren. Aufwand: M. Risiko bei schlechter Umsetzung: ein Gewicht, das auf manche Zeilen angewandt wird und auf andere nicht, macht das Dashboard stillschweigend falsch, daher das Gewicht beim Schreiben anwenden und das Rohzahlen-Diagramm sichtbar getrennt vom gesampelten halten.
+
+Warum: Ein Drop ist gleichzeitig die belebteste Stunde der Seite und ihr meistbeobachtetes Dashboard - die schlechteste denkbare Zeit, damit der Schreibpfad der Analytik zum Flaschenhals wird.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Die pro-Badge-Nebenwirkungen des Syncs bündeln</h3>
+  <details><summary>Details</summary><p>runGlobalSync schreibt badge_events Zeile für Zeile und erzeugt für jeden neuen Badge einen Blogpost, eine Reihe Benachrichtigungen und einen Push in derselben Schleife - ein großer Drop wird so zu einer seriellen Kette von Roundtrips innerhalb einer 60-Sekunden-Invocation. Die Ereignisse in einem Insert sammeln, für einen Multi-Badge-Drop einen einzigen Sammelpost statt einen pro Badge veröffentlichen und die Benachrichtigungen in einem Durchgang verteilen. Aufwand: M. Risiko bei schlechter Umsetzung: einen Post pro Badge durch einen Sammelpost zu ersetzen ändert, was der Blog-Feed und die Push-Historie zeigen, daher die pro-Badge-badge_events-Zeilen intakt halten, damit die Provenienzseite jedes Badges unberührt bleibt.
+
+Warum: Ein neuer Drop ist der eine Sync-Lauf, der auch Inhalte, Pushes und Benachrichtigungen schreibt - und der Lauf, der am ehesten abgeschnitten wird.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Health-Probe ohne Katalogzählung</h3>
+  <details><summary>Details</summary><p>/api/health führt bei jedem Aufruf eine exakte Zählung über badges aus, bevor es die Seite als erreichbar erklärt - die Uptime-Probe wird damit selbst zu einer der schwereren Lesungen der Seite und koppelt ihre Latenz an die Tabellengröße. Die Summe aus demselben Aggregat lesen, das die Katalog-Views pflegen, oder aus einem Wert, den der Sync auffrischt, und eine einzige billige, begrenzte Lesung als Erreichbarkeitssignal behalten. Aufwand: S. Risiko bei schlechter Umsetzung: eine Summe, die aufhört, sich zu aktualisieren, lässt die Probe einen gesunden Katalog melden, der seit Tagen nicht mehr synchronisiert hat, daher die last_seen_at-Lesung live halten - Veraltung ist ja genau das, was die Probe finden soll.
+
+Warum: Der eine Endpunkt, der schnell und billig antworten muss, ist heute auch einer der wenigen, die den ganzen Katalog zählen.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Nur die Message-Namespaces laden, die eine Route braucht</h3>
+  <details><summary>Details</summary><p>next-intl löst messages/&lt;locale&gt;.json pro Request auf, sodass jede Seite in jeder Sprache den ganzen Namensraumkatalog parst, um eine Handvoll Strings zu rendern, und die Datei trägt zudem 227 Schlüssel, auf die nichts verweist. Die Messages pro Namespace aufteilen und nur die anfordern, die eine Route deklariert, oder zumindest die größten Namespaces gruppieren, damit das Parsen zur Seite proportional bleibt. Aufwand: M. Risiko bei schlechter Umsetzung: ein Namespace, den eine Seite braucht, aber nicht deklariert, wirft MISSING_MESSAGE - der Build bleibt grün und es scheitert still pro Sprache, daher den Namespace-Check ins Release-Audit aufnehmen, bevor das landet.
+
+Warum: Elf Sprachen mal jede Route bedeutet, dass das i18n-Bündel öfter geparst wird als jedes andere Modul auf dieser Seite.
+
+Quelle: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="usability" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Bedienbarkeit</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>'Diesen Badge besitzt du'-Marker auf Katalogflächen</h3>
+  <details><summary>Details</summary><p>Ein angemeldeter Sammler, der den Katalog durchstöbert, kann ohne das Öffnen jedes Badges oder den Abstecher zur Inventarseite nicht sehen, was er bereits hat. Den Own-Badge-ID-Satz des Mitglieds einmal pro Request auf den Abschnitten Katalog, Aktiv, Anstehend und Start sowie im Badge-Detailkopf holen, dann auf jeder Kachel einen kleinen Besitz-Marker mit Textbeschriftung statt nur Farbe rendern plus auf der Detailseite eine eingearbeitete 'ist in deinem Inventar'-Zeile. Es ist immer nur der eigene Satz des Betrachters, nie ein Nachschlag auf den eines anderen. Aufwand: M. Risiko bei schlechter Umsetzung: eine zusätzliche Inventarlesung auf den belebtesten Routen schadet dem Katalog, und ein unsynchronisiertes Inventar lässt jeden Badge unbesitzt wirken, daher den Marker unterdrücken, bis ein erster Sync existiert.
+
+Warum: Auf einen Blick zu wissen, was du noch brauchst, verwandelt den Katalog von einer Referenz in eine To-do-Liste.
+
+Quelle: new-ideas-09-usability.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>

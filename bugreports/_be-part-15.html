@@ -1,0 +1,771 @@
+<article class="card planned" data-category="other" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    <span class="badge-planned">geplant</span>
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Impersonation with its own audit trail</h3>
+  <details><summary>Details</summary><p>Let an admin act as a member to reproduce a bug. Deliberately postponed rather than skipped: it needs a separate, non-repudiable record of every action taken while impersonating, otherwise the audit log becomes ambiguous about who did what. Effort: high.</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (2/5) übersteigt den unmittelbaren Nutzen (2/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Export and import</h3>
+  <details><summary>Details</summary><p>Export a table (or a member's full record) as JSON/CSV for analysis or a manual backup, and import it back. Effort: medium. Note the CSV would need care around the JSON columns.</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (2/5) übersteigt den unmittelbaren Nutzen (2/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card planned" data-category="other" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    <span class="badge-planned">geplant</span>
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Sync dry run</h3>
+  <details><summary>Details</summary><p>Run the catalog diff in a mode that reports what it would add, update and remove without writing anything. The engines already compute those sets before writing, so this is mostly threading a flag through runGlobalSync. Effort: medium.</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (2/5) übersteigt den unmittelbaren Nutzen (2/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Read-only database browser</h3>
+  <details><summary>Details</summary><p>Browse any table with filters and pagination. The Users, Content and Badges tabs already cover the tables that actually need browsing, which is why this stayed unbuilt. Effort: medium-high for a safe version.</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (2/5) übersteigt den unmittelbaren Nutzen (2/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Redirect management and a 404 monitor</h3>
+  <details><summary>Details</summary><p>Manage redirects in the panel and surface the paths that 404 most often. No redirect surface exists yet; the 404 monitor would be the more useful half and could reuse the analytics table. Effort: medium.</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (2/5) übersteigt den unmittelbaren Nutzen (2/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Provider contract fixtures: record every payload shape and diff it on each sync</h3>
+  <details><summary>Details</summary><p>Commit a small corpus of real recorded responses per provider (`badgebase` RSS + detail page, `potat` `/twitch/badges`, `perfil`, Helix/IVR catalog) and, at the start of every sync, compare the live response's key set and value types against the fixture. A mismatch (renamed field, array became object, null where a number was) is written as a changelog row with `kind = 'provider_drift'` and escalates to a push notification. The province here is not parsing — it is noticing that parsing silently returned `undefined` for a field that used to exist.
+
+Effort: M.
+
+Source: bugreports/agent-idea-09.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (2/5) übersteigt den unmittelbaren Nutzen (2/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="0">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Sync-anomaly review on the changelog page: make a bad sync visible before a user reports it</h3>
+  <details><summary>Details</summary><p>The changelog table already records every mutation, so it can answer questions nobody currently asks it: which sync run deleted the most rows, which run moved the most badges between rarity tiers, which run inserted with unusually empty fields. Add a filterable `/changelog` view for sync `kind`s plus a nightly rollup that flags the day's outliers, and let a maintainer confirm or annotate a run. It converts an append-only audit stream into an operational review surface, at the cost of a query rather than a new pipeline.
+
+Effort: M.
+
+Source: bugreports/agent-idea-09.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Neutral. Der Aufwand (2/5) übersteigt den unmittelbaren Nutzen (2/5) nur leicht — ein Kandidat für später.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Verifiable Badge Credential</h3>
+  <details><summary>Details</summary><p>A user can export a signed, offline-verifiable attestation of their badge inventory (an Ed25519-signed payload with the badge IDs, issuance date and a verification URL) that any third party can check without calling the site. A public `/verify` page accepts pasted credentials and shows pass/fail with the underlying claims.
+
+Why it fits: The project already resolves true per-user badge ownership from badges.blog/GQL, which is the hard part; signing the resolved result adds the one missing primitive — a trust boundary that lets &quot;I own this badge&quot; travel outside the site.
+
+Effort: M.
+
+Risk if built badly: Signing without binding the credential to a login and a short validity window lets a stale credential assert a collection forever — the payload needs issuer, subject and expiry or the signature proves nothing.
+
+Source: bugreports/agent-idea-01.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:100%;background:#dc2626"></span></div><span class="val">5/5 · sehr schwer</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (5/5) übersteigt den Nutzen (4/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Live Owner-Delta Stream</h3>
+  <details><summary>Details</summary><p>Replace the once-a-minute `LiveRefresher` poll on badge pages with a server-sent-events stream that pushes owner-count deltas as they land from the sync, driving an animated counter and a rolling momentum sparkline. A &quot;surge&quot; badge appears live on the catalog grid for any badge whose delta crosses a threshold between polls.
+
+Why it fits: The `badge_momentum` view already computes the rate of change, and the 15-minute cadence means there is a continuous supply of deltas — the site currently throws that liveness away by polling the same number.
+
+Effort: M.
+
+Risk if built badly: A stream that is really a 60-second poll wearing an SSE costume is worse than the poll, and a hypothesis-free sparkline on a 15-minute data source implies a precision the data does not have.
+
+Source: bugreports/agent-idea-01.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:100%;background:#dc2626"></span></div><span class="val">5/5 · sehr schwer</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (5/5) übersteigt den Nutzen (4/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="game" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Spiele</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Live tournament bracket</h3>
+  <details><summary>Details</summary><p>A weekly knockout where the winner takes a share of every entry fee and wears a temporary crown on the leaderboard.
+
+Source: IMPROVEMENTS.md Part 2 #19.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:100%;background:#dc2626"></span></div><span class="val">5/5 · sehr schwer</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (5/5) übersteigt den Nutzen (4/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="game" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Spiele</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Real-time multiplayer rounds over SSE</h3>
+  <details><summary>Details</summary><p>A shared slots or roulette table where each player sees the others' bets land live.
+
+Source: IMPROVEMENTS.md Part 2 #42.
+
+Source: IMPROVEMENTS.md Part 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:100%;background:#dc2626"></span></div><span class="val">5/5 · sehr schwer</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (5/5) übersteigt den Nutzen (4/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="game" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Spiele</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Drop Window Rhythm</h3>
+  <details><summary>Details</summary><p>Each round renders a track built from real badgebase start and end dates, and the player taps as a moving marker crosses each window's open and close edges. Accuracy is scored in server-measured milliseconds from the round timestamp rather than the tap's claimed time, with a perfect-chain multiplier that resets on an early or late hit. Effort: S. Risk if built badly: network latency decides perfect taps for distant players, so score against a server-issued clock offset and allow a fair tolerance band.
+
+Why: It makes the catalog's actual countdown data the rhythm track of a game.
+
+Source: new-ideas-04-game.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:100%;background:#dc2626"></span></div><span class="val">5/5 · sehr schwer</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (5/5) übersteigt den Nutzen (4/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="game" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Spiele</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Badge Jigsaw Puzzle</h3>
+  <details><summary>Details</summary><p>One badge image per puzzle is cut into a server-generated set of pieces, and the cut record lets the server verify the final arrangement before paying. Pieces are dragged into place, the timer runs server-side, and the finished art is shown at full resolution as the reward. Effort: M. Risk if built badly: shipping the catalog CDN image directly makes the puzzle solvable by opening the source in a second tab, so a server-resized, re-encoded crop must be served instead.
+
+Why: It makes the site's strongest asset, the badge artwork, the object of the game.
+
+Source: new-ideas-04-game.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:100%;background:#dc2626"></span></div><span class="val">5/5 · sehr schwer</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (5/5) übersteigt den Nutzen (4/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Collector Mentorship</h3>
+  <details><summary>Details</summary><p>A newcomer opts in as a &quot;mentee&quot; and is paired with a higher-level collector; the pair gets a shared progress card (XP gained together, badges unlocked while paired) and small mutual bonuses when the mentee crosses a level. Pairs are listed as a short chain on both profiles.
+
+Why it fits: directly reuses the XP/level curve and profile pages, and gives the 125 achievements a social payoff. Solves the &quot;level 40 user has nothing to do&quot; retention gap.
+
+Effort: M.
+
+Risk if built badly: grooming-style DMs if a private channel is added; keep all contact public/on-site and pairings easy to break.
+
+Source: bugreports/agent-idea-04.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Rarity Wall</h3>
+  <details><summary>Details</summary><p>A full-screen ambient mode showing the entire catalog as a slowly drifting wall of badge tiles; tiles pulse when a badge's owner count changes and dim when a claim window closes. Intended as something a collector leaves running on a second monitor.
+
+Why it fits: the 15-minute potat sync is already a stream of owner deltas, so the wall has genuinely live content; it turns the sync cadence the project is proud of into something visible.
+
+Effort: M.
+
+Risk if built badly: constant polling from an idle tab would hammer the site and the upstream data source — needs a single shared stream and a cap.
+
+Source: bugreports/agent-idea-04.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Collection Scarcity Curve vs Catalog Baseline</h3>
+  <details><summary>Details</summary><p>Plot a logged-in user's inventory as a percentile curve of owner counts (rarest → most common) and overlay the same curve for the whole catalog. The gap between the two lines shows instantly whether a collection is rarity-heavy or mainstream without reading a single badge page.
+
+Effort: M.
+
+Risk if built badly: a reshuffled curve invites over-reading; needs the catalog baseline drawn alongside so the comparison is honest.
+
+Source: bugreports/agent-idea-06.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>&quot;This Month in Badges&quot; Catalog Digest</h3>
+  <details><summary>Details</summary><p>A monthly post assembled from the `changelog` table itself: badges added, badges expired, tier promotions and demotions, and the biggest rarity movers. Because every sync already writes a changelog row, the digest is generated, not hand-written.
+
+Effort: S.
+
+Source: bugreports/agent-idea-08.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>`verify:deploy` — an automated post-deploy smoke check against production</h3>
+  <details><summary>Details</summary><p>A script that, given the production URL, asserts response status and a content marker for a fixed short list: `/api/health`, the sitemap, one badge detail page in each of the 11 locales (to catch `MISSING_MESSAGE`, which the build does not fail on), and the RSS/changelog feed. It runs optionally from a GitHub Actions step after the Vercel deployment finishes, and prints a compact pass/fail table. This is not the CI `verify` script from IMPROVEMENTS.md §10 — it checks the *deployed artifact*, which is the only place a locale or RLS breakage becomes visible.
+
+Effort: S/M.
+
+Source: bugreports/agent-idea-09.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>TBRI methodology and caveats page</h3>
+  <details><summary>Details</summary><p>A public explanation of how the rarity index and its tiers are computed: the six signals, their weights, the tier cut-offs, what is genuinely unknowable (third-party owner estimates), and one fully worked example badge showing every intermediate number. It imports the same constants module the rarity code uses and computes the worked example live from a real badge row, so the published formula cannot silently diverge from the engine. It also states the refresh cadence and the known edge cases (badges with no owner data, paid versus free windows). Data: the rarity constants, one live badge row, that badge's badge_stats series. Effort: S. Risk if built badly: the page describes an older formula after a scoring change and the site's own transparency artifact becomes misinformation; derive displayed numbers from the live function instead of restating them.
+
+Why: The rarity index is the site's core claim to authority, and a methodology page is what separates a computed number from a made-up one.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Press and media kit page</h3>
+  <details><summary>Details</summary><p>A /press page for journalists and fansite editors: an approved one-paragraph description of the site, a fact sheet (catalog size, tracked badges, locales, data sources), downloadable logo assets, a live snapshot of a few headline numbers read from the stats views, and a contact route for quotes or data requests. It pairs with the existing Open Graph route so a story can illustrate itself, and every number carries its own as-of timestamp. Data: stats views for headline numbers, static assets for the logo pack, authored boilerplate. Effort: S. Risk if built badly: a reporter copies a number that was accurate a month ago or a designer reuses a retired logo; keep numbers live and version asset filenames with the date.
+
+Why: Badge coverage in a fan blog or gaming outlet is free distribution, and giving writers a ready kit is how that coverage happens accurately.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Mistake drill from your misses</h3>
+  <details><summary>Details</summary><p>Quiz, memory and vault already know which question or tile a member got wrong, so a drill mode serves a short no-wager round built only from that member's recent misses, running the same engine and the same one-round-per-second limit. An item clears once answered correctly twice, and drill results pay only a small daily-capped XP trickle instead of coins. Effort: M. Risk if built badly: a drill that pays like a real round is free money, so the XP must be capped per day and per drill and the drill set must be rebuilt from the misses rather than hoarded.
+
+Why: The skill games currently punish the same knowledge gap forever, and the misses are already recorded.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Round review marketplace</h3>
+  <details><summary>Details</summary><p>A member requests a paid review of their last N rounds in one game, optionally naming a higher-mastery reviewer; the requester escrows coins, the reviewer writes a short structured critique of bet sizing, cash-out timing and mistake pattern from the round tape, and payment releases on submission with a dispute window. Reviewer reputation comes from reviews written and ratings received, and the work is a one-off audit rather than the ongoing pairing the mentorship idea describes. Effort: L. Risk if built badly: this is a marketplace for advice, so escrow, dispute handling and a volume cap are required, and a reviewer must never see rounds the requester did not explicitly share.
+
+Why: Mastery tracks will create exactly the kind of experts whose knowledge is worth paying for, and the round tape gives them something to read.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Press-your-luck daily claim</h3>
+  <details><summary>Details</summary><p>The daily login bonus becomes a choice: take today's amount, or defer it and double it tomorrow - but deferring loses the day if tomorrow's claim is missed, and only the most recent day can ever be deferred. The decision is stored with the claim date and the doubling is shown before the choice is made, so the gamble is explicit. Effort: S. Risk if built badly: a doubling that can be stacked becomes an exponential faucet, so only one deferred day may exist at a time and a late claim must decay rather than pay.
+
+Why: The login bonus is a button that everyone presses without thinking, and a single decision makes the daily ritual a choice.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Dwell versus Depth Correlation</h3>
+  <details><summary>Details</summary><p>Across path classes (catalog grid, badge detail, stats, blog), correlate median session dwell with paths-per-session to find which page types hold attention and which are quick exits, rendered as a scatter with one point per path class. Reads the analytics table (duration, path, visitor hash). Effort: M. Risk if built badly: idle-tab duration outliers distort the mean, so the top percentile must be trimmed and medians used throughout.
+
+Why: Turns raw dwell and depth numbers into an actionable read on which page types actually work.
+
+Source: new-ideas-06-stats.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Heartbeat Cadence Regularity Score</h3>
+  <details><summary>Details</summary><p>From system_heartbeats, measure each source's inter-beat interval against its expected cadence and compute a regularity score (jitter and missed schedule slots), flagging sources that drift even when they never fully stop. Reads system_heartbeats. Effort: M. Risk if built badly: normal retry jitter looks like irregularity, so a per-source tolerance band is needed and the raw intervals must remain visible.
+
+Why: Catches degrading sync schedules before they become outright outages that freshness monitoring only notices late.
+
+Source: new-ideas-06-stats.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="xp" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">XP</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Seasonal XP Reward Track</h3>
+  <details><summary>Details</summary><p>A free time-limited reward track where members claim cosmetic unlocks at XP thresholds during a season, with season XP counted from activity_events inside the window while the lifetime level stays untouched. Unlocks are claimed manually at each threshold so the track is a visible checklist rather than a silent grant. Effort: L. Risk if built badly: it becomes a grind treadmill that punishes casual members and duplicates the per-level badges, so thresholds must be tuned to ordinary play and its rewards must be visibly distinct from level badges.
+
+Why: It gives the XP economy a recurring shape, a reason to return this month rather than only today.
+
+Source: new-ideas-10-xp-coin-admin.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="coin" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Coins</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Self-Escrow Commitment Contracts</h3>
+  <details><summary>Details</summary><p>A member escrows coins against a self-set goal for the day or week, such as winning five arcade rounds or claiming the next global drop, held by the server and released back with a bonus if the goal verifies, or burned if it fails. Verification reads the existing game_rounds and inventory sync data, and escrow is one-way and capped so it cannot be used to shield coins from stealing. Effort: M. Risk if built badly: a goal that cannot be verified honestly becomes a coin-laundering path, so only server-checkable goals may be offered.
+
+Why: It turns the coin economy into a personal-motivation tool, which is the one thing coins can do that XP cannot.
+
+Source: new-ideas-10-xp-coin-admin.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="coin" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Coins</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Badge Yield</h3>
+  <details><summary>Details</summary><p>Coins accumulate slowly for the rare badges a member actually displays, with a per-tick yield derived from the TBRI tier of the showcase badges and credited through the normal award path under a daily ceiling. It reads the showcase selection and the existing TBRI values, giving rare-badge ownership a passive economic role. Effort: M. Risk if built badly: it becomes an inflation pump for the handful of legendary holders, so the yield must be small, daily-capped and paid only for badges currently displayed.
+
+Why: It connects the coin economy to the catalog, so owning a rare badge pays in a way specific to this site.
+
+Source: new-ideas-10-xp-coin-admin.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="coin" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Coins</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Savings Vault with Interest</h3>
+  <details><summary>Details</summary><p>A member can lock a chosen number of coins for a fixed term such as 7 or 30 days; the deposit earns interest funded from the arcade's house edge and is released at term end, and cannot be withdrawn or stolen while locked. It is the deliberate opposite of the anti-hoard tax, rewarding saving only when coins are genuinely committed. Effort: M. Risk if built badly: it becomes a free inflation machine, so the rate must sit below the house edge and the terms must be long enough that deposits cannot be cycled.
+
+Why: It gives coin holders a reason to plan instead of gambling everything at once, and gives the economy its first long-term sink.
+
+Source: new-ideas-10-xp-coin-admin.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="coin" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Coins</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Bankruptcy Safety Net</h3>
+  <details><summary>Details</summary><p>A member who hits near-zero coins receives a small one-time recovery grant, once per cooldown period, so one bad session does not lock them out of the arcade entirely. It is granted server-side and recorded in both the changelog and the economy ledger. Effort: S. Risk if built badly: members deliberately bust to farm the grant, so it needs a cooldown, an amount far below a normal session's win, and a look at recent coin movements.
+
+Why: A cosmetics-and-games economy should never permanently brick a member's ability to play.
+
+Source: new-ideas-10-xp-coin-admin.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="coin" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Coins</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Steal Bounty Board</h3>
+  <details><summary>Details</summary><p>After a successful heist the victim can post a public bounty in coins on the thief, and any other member who successfully steals from that thief and claims it splits the bounty. The server verifies the claim from steal_attempts, and the bounty is forfeited if unclaimed within a fixed window. Effort: M. Risk if built badly: coordinated groups use bounties to move coins between themselves, so the payout must require a verified fresh steal and be capped per pair.
+
+Why: It turns stealing from a one-way drain into a community-enforced game with consequences.
+
+Source: new-ideas-10-xp-coin-admin.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="coin" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Coins</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Revenge Counter-Steal Window</h3>
+  <details><summary>Details</summary><p>A member robbed within the last hour gets a discounted counter-steal against that specific thief, with reduced price and better odds flagged visibly in the heist UI and derived from the recent steal_attempts row. The window is short and one-shot so it cannot become a farm loop. Effort: S. Risk if built badly: reciprocal robbing inflates both balances, so the odds bonus must be small and the window must not stack with other steal perks.
+
+Why: It gives a robbed member an immediate, personal answer instead of an anonymous loss.
+
+Source: new-ideas-10-xp-coin-admin.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="coin" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Coins</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Parlay Betting Slip</h3>
+  <details><summary>Details</summary><p>A member builds a slip of two to five picks across different arcade games and stakes once; every pick must win for a multiplied payout and any loss voids the slip. The server resolves the slip from the same per-game outcomes the individual rounds already produce, so no new randomness is introduced. Effort: M. Risk if built badly: a lucky parlay creates a coin windfall that wrecks the economy, so the multiplier must be capped and the slip stake limited well below the normal maximum bet.
+
+Why: It adds a genuinely new wagering shape to an arcade whose games are all single-round today.
+
+Source: new-ideas-10-xp-coin-admin.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="coin" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Coins</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Daily Coin Emission Budget</h3>
+  <details><summary>Details</summary><p>The panel sets a maximum number of coins the site may emit across all sources per day; once the budget is spent, further coin awards are reduced rather than refused, and the remaining budget appears as a meter on the admin statistics tab. It is enforced inside the award path against the settings table. Effort: M. Risk if built badly: a hard cutoff silently punishes members who played legitimately, so the budget must degrade gracefully and must never block XP.
+
+Why: An economy with no monetary ceiling inflates, and this is the dial that keeps BadgesCoins meaningful.
+
+Source: new-ideas-10-xp-coin-admin.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="coin" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Coins</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Steal Cooldown Shortcut</h3>
+  <details><summary>Details</summary><p>A member blocked by the steal flood control can pay coins to clear the cooldown and attempt again immediately, with the price rising per use inside the window. It reads the same per-member flood settings, stealFloodMinutes and stealPerHour, that gate heists today and still respects any global cap. Effort: S. Risk if built badly: paying to bypass the anti-abuse limit hands a rich attacker the very drain the limit exists to stop, so the shortcut must be heavily capped and priced.
+
+Why: It converts an anti-abuse rule into a bounded, priced choice without removing the rule.
+
+Source: new-ideas-10-xp-coin-admin.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="coin" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Coins</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Self-Set Loss Limits</h3>
+  <details><summary>Details</summary><p>A member can set a personal coin-loss limit per day or per session; once it is hit the arcade locks their betting until the period resets, with removal possible only after a cooling-off delay rather than a fee. It is opt-in, stored with their other settings, and displayed like a budget. Effort: S. Risk if built badly: it becomes nagware members resent, so it must never be applied silently and must be easy to start, hard to switch off on impulse.
+
+Why: A real coin economy on a gambling-flavoured arcade owes its players a way to stop.
+
+Source: new-ideas-10-xp-coin-admin.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (4/5) übersteigt den Nutzen (3/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Achievement re-evaluation for every member</h3>
+  <details><summary>Details</summary><p>Re-check all 125 achievements for all members, for when a definition changes and previously-earned achievements would now qualify. Needs a queue rather than a loop — one pass over a large member base would not fit in a serverless invocation. Effort: medium.</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (3/5) übersteigt den Nutzen (2/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Cache reset</h3>
+  <details><summary>Details</summary><p>Bust the site's cached pages in one action. Next's revalidation is per route and this deployment exposes no site-wide hook, so a real version needs an infrastructure change rather than a panel button. Effort: medium-high.</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (3/5) übersteigt den Nutzen (2/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Login attempt log for members</h3>
+  <details><summary>Details</summary><p>Record member sign-in attempts for the panel. Supabase owns that flow and does not expose the events to the app, so this needs a call in the auth callback plus its own retention rule. Effort: low-medium.</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (3/5) übersteigt den Nutzen (2/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Per-action permissions instead of three roles</h3>
+  <details><summary>Details</summary><p>A capability matrix (can edit content, can ban, can change settings) rather than moderator/admin/owner. Three roles cover the team this site has; a matrix is worth it the day moderation is delegated widely. Effort: medium.</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (3/5) übersteigt den Nutzen (2/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Two-factor for the panel</h3>
+  <details><summary>Details</summary><p>A TOTP step on top of the Twitch login for staff accounts. The Twitch login is already a second factor for a Twitch account, but not for this site. Effort: medium.</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (3/5) übersteigt den Nutzen (2/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>
+
+<article class="card " data-category="other" data-quickwin="-1">
+  <div class="card-header">
+    <span class="badge-cat">Sonstiges</span>
+    
+    <span class="badge-qw" style="background:#f87171">Aufwändig</span>
+  </div>
+  <h3>Bulk user actions</h3>
+  <details><summary>Details</summary><p>Select several members and ban, role-change or grant an achievement in one go. Needs a selection model in the users table and a batch endpoint. Effort: low-medium.</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:40%;background:#94a3b8"></span></div><span class="val">2/5 · niedrig</span></div>
+  </div>
+  <p class="opinion">Teuer für den Effekt. Aufwand (3/5) übersteigt den Nutzen (2/5) — nur umsetzen, wenn ein konkreter Nutzerbedarf da ist.</p>
+</article>

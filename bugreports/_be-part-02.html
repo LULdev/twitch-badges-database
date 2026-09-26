@@ -1,0 +1,819 @@
+<article class="card " data-category="performance" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Retention windows for the append-only tables</h3>
+  <details><summary>Details</summary><p>analytics_events (a row per beacon), activity_events (a row per XP event), profile_visits and blog_views grow forever, while /stats and /feed only ever read recent windows. Add a retention step to the existing 06:00 cron that folds the older range into the daily stats_* views and then deletes it, with the window kept in site_settings. Effort: M. Risk if built badly: deleting rows that the achievement checks still page through changes members' unlocked achievements, so confirm nothing reads the range being pruned and roll up before the delete in the same run.
+
+Why: Four free tables grow at traffic speed while every feature that touches them only looks at the last few weeks.
+
+Source: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:100%;background:#22c55e"></span></div><span class="val">5/5 · sehr hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (2/5), spürbarer Effekt (5/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="performance" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Performance</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Parallelise the potat page fetches</h3>
+  <details><summary>Details</summary><p>fetchAllDistribution and fetchAllOwners walk their cursors one page at a time, so the sync's wall clock is the sum of every page's latency and sits close to the serverless limit for no reason other than sequencing. Fetch with a small bounded window (three or four in flight) while still honouring the Retry-After: 60 the provider returns. Effort: S. Risk if built badly: parallel pages against a provider that rate-limits by request count turn one sync into a 429 storm, so keep the pool small, back the whole pool off on the first Retry-After and expose the window as a setting.
+
+Why: The owner sweep is the sync most likely to time out, and its time is currently the sum of hundreds of sequential round trips.
+
+Source: new-ideas-08-performance.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:100%;background:#22c55e"></span></div><span class="val">5/5 · sehr hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (2/5), spürbarer Effekt (5/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="usability" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Bedienbarkeit</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Route-change focus and page announcement</h3>
+  <details><summary>Details</summary><p>Client-side navigation in the App Router swaps the tree without moving focus or announcing anything, so a screen-reader user stays anchored in the old header and the new page heading is never read. Add one small client component keyed on the pathname that moves focus to the main heading, sets the document title early and announces the new page once, while ignoring router.refresh so the live refresher does not steal focus every minute. Guard it so it fires only on a real path change. Effort: S. Risk if built badly: if a background refresh is misclassified as navigation it will yank focus out of a form the user is typing in.
+
+Why: Every soft navigation on the site is currently invisible to assistive technology, which makes the whole catalogue feel frozen.
+
+Source: new-ideas-09-usability.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:100%;background:#22c55e"></span></div><span class="val">5/5 · sehr hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (2/5), spürbarer Effekt (5/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="usability" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Bedienbarkeit</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Offline last-known-good catalog</h3>
+  <details><summary>Details</summary><p>There is a service worker for push but no offline behaviour, so a dropped connection gives a browser error page. Cache the last successfully viewed catalog page, badge detail and FAQ entry, detect offline from the connection state and a failed fetch, and render the cached content behind a dated bar that says which moment it came from. Suppress countdowns and any claimable-now state while offline, because a stale deadline is worse than an absent one. Effort: L. Risk if built badly: a cached claim window presented as live misleads someone out of a badge, and a cache that outlives a deploy can serve a broken old bundle, so it must be version keyed.
+
+Why: Twitch badge windows are claimed on phones in poor signal, exactly where a cached catalog beats an error page.
+
+Source: new-ideas-09-usability.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:100%;background:#22c55e"></span></div><span class="val">5/5 · sehr hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (2/5), spürbarer Effekt (5/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="usability" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Bedienbarkeit</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Per-script font stacks with metric overrides</h3>
+  <details><summary>Details</summary><p>One Latin-tuned font stack serves all eleven locales, so Arabic and CJK headings fall back to whatever the operating system picks, with different metrics that clip ascenders and shift line breaks. Define a per-script stack in the theme, selected by the document language, and pair each fallback with a metric-adjusted face definition so a fallback does not jump the layout when the real font loads. Keep the subsets small. Effort: M. Risk if built badly: more font requests slow first paint, and a metric override tuned for one script makes another script's headings collide.
+
+Why: Text rendering quality is the whole interface for a site whose every locale reads differently.
+
+Source: new-ideas-09-usability.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:100%;background:#22c55e"></span></div><span class="val">5/5 · sehr hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (2/5), spürbarer Effekt (5/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="usability" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Bedienbarkeit</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Public accessibility conformance page</h3>
+  <details><summary>Details</summary><p>There is no public statement of what the site supports. Add an accessibility route in all eleven locales stating the target level, which surfaces were tested and when, the known exceptions with a reason and a target date (the canvas games and the admin panel are the likely ones), how to report a barrier, and the last audit date. Generate it partly from a checked-in audit list so the page cannot claim more than was actually tested. Effort: S. Risk if built badly: a conformance page that goes stale over-claims and is worse than none, so it must carry a date and a checked source rather than a hand-typed promise.
+
+Why: A public commitment with named exceptions is what turns an accessibility effort into something users can hold the site to.
+
+Source: new-ideas-09-usability.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:100%;background:#22c55e"></span></div><span class="val">5/5 · sehr hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (2/5), spürbarer Effekt (5/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Light-mode contrast pass on `--line` and muted text</h3>
+  <details><summary>Details</summary><p>`.light` currently inverts surfaces but keeps the dark-mode hairline and secondary-text lightness, so `.data-table` row separators and muted labels sit near the 3:1 boundary. Re-derive `--line` and the muted text token for the light theme from a contrast target rather than from the dark value.
+
+Effort: M.
+
+Source: bugreports/agent-idea-10.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Locale-aware type scale with logical insets</h3>
+  <details><summary>Details</summary><p>Line-height, letter-spacing and inline padding are tuned for Latin copy, so Arabic and Japanese headings either clip or breathe unevenly, and a few components still use physical `padding-left`/`margin-right`. Introduce per-script leading variables and replace physical insets with `padding-inline`/`margin-inline` throughout the layout primitives.
+
+Effort: M.
+
+Source: bugreports/agent-idea-10.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Roving-tabindex keyboard navigation in the badge grid</h3>
+  <details><summary>Details</summary><p>The grid is hundreds of focusable tiles in document order. Make the grid a single tab stop with arrow-key movement between tiles, Enter to open, and Escape to leave, wrapping at rows in the correct visual direction under RTL.
+
+Effort: M.
+
+Source: bugreports/agent-idea-10.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>`.data-table` responsive card fallback</h3>
+  <details><summary>Details</summary><p>Give `.data-table` an agreed `data-label` contract so it collapses to stacked key–value cards below the tablet breakpoint instead of horizontal scrolling.
+
+Effort: M.
+
+Source: bugreports/agent-idea-10.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Badge detail in-page anchor rail</h3>
+  <details><summary>Details</summary><p>Badge detail pages stack description, drop window, rarity breakdown, owner trend and ownership in one column. Add a sticky anchor rail (logical-inline start, so it mirrors under RTL) that jumps between sections and highlights the current one, collapsing to a horizontal scroller on mobile.
+
+Effort: M.
+
+Source: bugreports/agent-idea-10.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Collection Completion Solver</h3>
+  <details><summary>Details</summary><p>Given a user's inventory, the currently claimable badges and the XP curve, the solver computes the cheapest concrete path to the next milestone: which badges to claim, which games to play and in what order to reach a chosen target (next level, next achievement, tier completion), with the coin/XP cost of each route and a &quot;no feasible path&quot; verdict when there isn't one.
+
+Why it fits: Inventory, XP curve, achievement predicates and game rewards all live server-side already; nobody has joined them into a single planner. It converts the site's many separate progress bars into one actionable list.
+
+Effort: M.
+
+Risk if built badly: Optimization over a live, changing catalog produces a plan that is stale before it is read — it must recompute against fresh data and label its assumptions, not cache a route for a day.
+
+Source: bugreports/agent-idea-01.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Collection Fingerprint</h3>
+  <details><summary>Details</summary><p>Hash a user's owned-badge set (sorted UUIDs + tier mix) into a deterministic identicon-style pattern rendered in the profile accent colour, with a &quot;clone distance&quot; readout: &quot;you share 78% of your collection with @someone.&quot;
+
+Why it fits: the owned set is already fetched and cached for the profile; rendering a fingerprint is pure client work with no new storage. It makes collections comparable at a glance and gives profiles a visual identity.
+
+Effort: S.
+
+Risk if built badly: &quot;clone&quot; framing can read as an accusation; the overlap feature should be phrased as affinity, and the fingerprint must not expose a badge-by-badge diff of a private profile.
+
+Source: bugreports/agent-idea-02.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Claimable-now filter with time-remaining sort</h3>
+  <details><summary>Details</summary><p>A top-level filter chip on `/badges` that shows only badges whose claim window is currently open, sorted by &quot;closes soonest&quot; by default, with the remaining time rendered as the existing `.countdown` component on each tile. It is a saved preset combination of `start_date &lt;= now &lt;= end_date` plus an ascending `end_date` sort, and it is also exposed as a visible `/badges?status=claimable` link so the state is shareable.
+
+Why it fits: The catalog already stores `start_date`/`end_date` per badge (badgebase sync, `data-reset` parsing) and the countdown component already computes remaining time. Visitors currently have to scan a mixed grid to answer &quot;what can I get right now&quot;, which is the single most common badge question.
+
+Effort: S.
+
+Risk if built badly: A timezone-naive `now` comparison shows badges as claimable hours after they closed, eroding trust in the whole catalog.
+
+Source: bugreports/agent-idea-03.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Drop-calendar subscription feed (iCal / Google Calendar)</h3>
+  <details><summary>Details</summary><p>A read-only `.ics` endpoint (and a &quot;Subscribe&quot; button on the drops page) that emits one all-day or timed VEVENT per badge claim window, grouped by category, plus per-locale titles. Users add the URL to Google/Apple Calendar once and never miss a window again; the feed is regenerated from the same window columns the site renders.
+
+Why it fits: Drop/claim windows with precise start/end are the catalog's core structured datum, and a calendar feed is the standard, unglamorous way to consume recurring dated data. It also removes the need to visit the site to catch a window.
+
+Effort: M.
+
+Risk if built badly: An `.ics` with an unescaped `,`/`;` in a badge title corrupts the whole feed for every subscriber at once; also needs cache headers so calendar clients polling hourly do not hammer the DB.
+
+Source: bugreports/agent-idea-03.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Notification preferences center</h3>
+  <details><summary>Details</summary><p>A settings section listing every push category separately — new global badges, badges I own/wishlisted, tournament and game results, weekly digest, changelog — with per-category toggles and a quiet-hours window. The existing `push_subscriptions` rows get a preference JSON column the send helper filters on.
+
+Why it fits: Web push is already implemented and already broadcasts to everyone; the moment more than one notification kind exists, all-or-nothing is the #1 reason people unsubscribe. The data driving each category is the catalog change feed and the gamification events.
+
+Effort: M.
+
+Risk if built badly: Filtering done client-side after send (or a payload shape change without a migration) means users still receive the pushes they switched off, which is worse than having no toggle.
+
+Source: bugreports/agent-idea-03.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="stats" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Statistiken</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Rarity Stability Index</h3>
+  <details><summary>Details</summary><p>Derive a volatility score per badge from the variance of its TBRI over the synced time series, and sort the catalog into &quot;stable&quot;, &quot;drifting&quot; and &quot;turbulent&quot; rarity bands. Collectors use it to tell a permanently rare badge from one whose score is still collapsing as newcomers claim it.
+
+Effort: M.
+
+Risk if built badly: short histories make young badges look turbulent by default; the index needs a minimum-history guard.
+
+Source: bugreports/agent-idea-06.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Announce countdowns and the activity feed to screen readers</h3>
+  <details><summary>Details</summary><p>the Countdown timers tick every second and `/feed` prepends XP events with no user action, so a screen-reader user perceives a frozen page. Wrap the countdown's minute-boundary output (not each second) and the feed's new rows in `aria-live=&quot;polite&quot;` regions with `aria-atomic` and a throttled update (e.g. max one announcement per 30 s), and mark the decorative ticking digits `aria-hidden`.
+
+Effort: S.
+
+Source: bugreports/agent-idea-07.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Landmarks, skip link and one H1 per locale page</h3>
+  <details><summary>Details</summary><p>screen-reader navigation relies on a single `&lt;main&gt;` landmark, a skip-to-content link and a consistent heading outline, but locale layouts wrap content in nested divs without landmark roles and some pages open with an `h2`. Introduce a skip link targeting `#main`, mark header/nav/main/footer landmarks once in `[locale]/layout.tsx`, and enforce one `h1` per page.
+
+Effort: S.
+
+Source: bugreports/agent-idea-07.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Collapse the `/badges` count + page + stats reads into one round trip</h3>
+  <details><summary>Details</summary><p>the catalog list runs several sequential PostgREST calls (exact count, page rows, aggregate stats), each a separate network hop inside `queries.ts`. Fold them into a single `select` with `{ count: &quot;exact&quot; }` and embedded/aggregated columns, or one SQL view; keep the existing `.catch(() =&gt; …)` empty-state fallback.
+
+Effort: M.
+
+Source: bugreports/agent-idea-07.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Announce live regions for the feed and countdowns</h3>
+  <details><summary>Details</summary><p>The activity feed and the countdown timers change without user action and are silent to screen readers. Wrap them in aria-live=&quot;polite&quot; with a throttle so updates are announced without flooding.
+
+Source: IMPROVEMENTS.md Part 1.2.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Audit the header tab order</h3>
+  <details><summary>Details</summary><p>The language switcher, theme toggle and account menu are visually grouped but interleave with the nav links in tab order.
+
+Source: IMPROVEMENTS.md Part 1.2.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Badge name collision pages</h3>
+  <details><summary>Details</summary><p>Detect catalog rows that share a display title or a near-identical name, and publish a disambiguation page listing them with the distinguishing facts (set_id, category, window, owner count) plus cross-links from each badge page. The search result for an ambiguous query routes to that page instead of picking one arbitrarily. Effort: S. Risk if built badly: an over-eager similarity threshold creates disambiguation pages for badges that are already distinct, so collisions need an exact-title trigger first and fuzzy matching only as a suggestion.
+
+Why: Twitch reuses names like TwitchCon and Prime repeatedly, and the catalog resolves them to whichever row sorted first.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Localized badge metadata layer</h3>
+  <details><summary>Details</summary><p>Add a translation table keyed on badge id and on provider category terms, holding name, short description and category label per locale, with fallback to the provider's English string when a translation is missing. The badge page, catalog facets, OG card and feeds all read through it, and the admin view shows per-locale fill so an untranslated row is visibly untranslated rather than silently English. Effort: L. Risk if built badly: machine-translating badge names produces plausible nonsense that then outranks the correct English in search, so every term must carry a human or machine marker and machine output must not be indexed as canonical.
+
+Why: Eleven locales of interface chrome around English badge names is only half a localized catalog.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Badge rename tracker</h3>
+  <details><summary>Details</summary><p>Detect when a provider renames a badge or set across syncs, keep the old name, and show a 'formerly known as' line on the detail page with the rename date while the retired name stays in the search index so old links and old habits still resolve. Writes a changelog row per rename. Effort: S. Risk if built badly: matching names across syncs by list position rather than by id invents a rename every time a provider reorders its output, so matching must be id-first.
+
+Why: Names change, bookmarks and memory do not, and nothing in the catalog records the change.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Timezone fairness index per window</h3>
+  <details><summary>Details</summary><p>Score every claim window by how much of the world was awake at its open and close: weight the window's hours against a population-by-timezone curve and produce an index plus a plain label such as closes at 03:00 for Europe. Window pages and the drop list can sort by it, and the catalog can call out windows that only ever opened during one hemisphere's daytime. Effort: S. Risk if built badly: the population curve is an approximation and the score can read as a fairness verdict on Twitch, so present it as a planning aid and always show the underlying hour table so anyone can check it.
+
+Why: A large part of the audience loses drops to the clock and a window-level score is the only way to see that pattern in the data.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Community ownership share</h3>
+  <details><summary>Details</summary><p>For every badge, compute the share of this site's synced members who own it, show it on the detail page beside the global owner count, and use it as a catalog sort. It is a second, independent rarity signal that still works where potat returns nothing, and it can be labelled honestly as a lower bound ('at least N of our members hold this'). Effort: M. Risk if built badly: the member base is small and self-selected, so the share must be presented as site-relative with its denominator visible and never as a claim about global ownership.
+
+Why: A second ownership signal is what makes the site's rarity numbers defensible when one provider goes quiet.
+
+Source: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Per-badge generated FAQ</h3>
+  <details><summary>Details</summary><p>Each badge detail page gains a small FAQ block built from its own row: when the claim window closes, whether it is still obtainable, how many owners it has, which category it belongs to, and whether it is free or paid — each answer short and linking to the tool that owns the fact. It renders as FAQPage structured data so search engines can lift exact answers, and it is generated at render time from live columns rather than stored prose, so answers expire with the data. Data: badge row (window, category, paid flag), latest owner count, TBRI tier. Effort: S. Risk if built badly: a generated answer restates a null or stale column and produces confidently wrong schema; suppress any question whose underlying field is missing instead of writing a hedge.
+
+Why: It makes each of the 476 badge pages answer the exact long-tail question a searcher typed, with no editorial effort per badge.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Curated themed badge lists</h3>
+  <details><summary>Details</summary><p>Hand-curated, editorially framed lists that cut across categories — first badges to chase as a newcomer, badges worth a TwitchCon trip, the finest pixel-art badges in the catalog — stored as an ordered list of badge IDs with a rationale per entry and an intro paragraph. Unlike a generated landing page the value is the selection and the sentence explaining why each badge made it, and each entry links to the badge while showing its live tier and owner count. Lists are versioned so a curator can replace an expired entry with a note. Data: an ordered badge-ID list, the badge rows for live state, authored copy. Effort: S. Risk if built badly: a list goes stale as its badges expire and becomes a page of dead ends; drive a re-check from badge expiry and hide an expired entry rather than leaving it in place.
+
+Why: Curation is the one thing a database cannot generate, and it is what gives a list page a reason to exist beside the filter UI.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Explain-this-number tooltips</h3>
+  <details><summary>Details</summary><p>Wherever the site shows jargon or a computed number — TBRI, tier name, owner count, momentum, half-life, wear share — the label carries a focusable tooltip with a one-sentence plain-language definition and a link to the full methodology page. Definitions come from one shared registry keyed by term so the same word means the same thing on a badge tile, a leaderboard and a chart legend, and keyboard focus opens it without a mouse. Data: a definitions map in code, linked to the glossary and methodology content. Effort: S. Risk if built badly: tooltips multiply until every label has a popover and reading the page becomes an exercise in hovering; restrict it to the defined vocabulary list and never wrap ordinary words.
+
+Why: The site's best features are its numbers, and every undefined number is a reader leaving to look up what TBRI means.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Quick-look split pane on wide screens</h3>
+  <details><summary>Details</summary><p>On viewports wide enough for two columns the catalog becomes master-detail: the BadgeGrid on one side and a pane on the other showing the focused badge's art at 4x, its rarity, owner count, window and a link to the full page, filled as focus or hover moves through the grid without any navigation. The pane reads the same BadgeRow the tile already has, so it costs no extra query, and below the breakpoint the layout falls back to the current single column. It composes with the roving-tabindex grid work already on the board rather than replacing it. Effort: M. Risk if built badly: hover-driven preview on touch devices where there is no hover, or a pane that swallows the click and makes opening a badge ambiguous.
+
+Why: Browsing 476 badges is a scanning task, and inspecting without losing your place in the list is the whole game of a catalog.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Per-breakpoint information budget on badge tiles</h3>
+  <details><summary>Details</summary><p>A badge tile carries name, set, owner count, tier chip and countdown, and at two columns the text wraps to four lines while at six it truncates to nothing useful. Define an explicit budget per breakpoint, two facts at 2 columns (name and tier), three at 4, five at 6, using named slots inside .badge-tile so a tile never renders a field its width cannot hold and the omitted fields are absent from the DOM rather than clipped by overflow. The rule lives once in the tile component, not per page. Effort: S. Risk if built badly: tiles that clip mid-word, or a mobile tile that hides the only fact that matters, whether the badge is still claimable.
+
+Why: The grid is the site's primary surface and it should read cleanly at every width instead of degrading into truncation.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Scroll-adaptive compact header</h3>
+  <details><summary>Details</summary><p>The header is a fixed-height sticky bar carrying brand, nav, locale switcher, theme toggle and the personal HUD, and on a phone that vertical cost is paid on every screenful. Give it two defined states: expanded at scroll top, compact after the first screen where it keeps the brand, the coin and level HUD and the account control and folds the nav into the existing sheet, transitioning over a token duration rather than a bounce. The switch is driven by scroll position with a hysteresis threshold so it cannot flicker at the boundary, and the desktop nav is exempt. Effort: S. Risk if built badly: a header that jitters across the threshold, or one that hides navigation on a desktop where it should stay put.
+
+Why: Persistent chrome should cost the reader less the deeper they read, not the same amount on every screen.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Interaction-state tokens and a state matrix</h3>
+  <details><summary>Details</summary><p>Hover, active, focus-visible, disabled, loading and selected are hand-tuned per component today, so .btn, .chip and .card-interactive each invent their own mix and a chip and a button feel subtly different in the same state. Introduce one token per role (--state-hover-bg, --state-active-scale, --state-focus-ring, --state-disabled-opacity, --state-selected-bg) and one focus-visible rule drawing a 2 px accent ring with an offset that reads on both the page background and inside a card, then document the matrix in the styleguide. This is a different axis from the elevation and radius token idea already on the board, which scales shadows and corners, not states. Effort: S. Risk if built badly: a focus ring invisible against the accent-filled primary button, or a hover token leaking onto display-only chips until they look clickable.
+
+Why: A visitor touches these states hundreds of times a session, and inconsistency between a chip and a button is the difference between a system and a pile of parts.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Ambient theme bound to a live event window</h3>
+  <details><summary>Details</summary><p>The catalog knows when a global event is live, a badge set with a shared short window, a TwitchCon drop, a Prime batch, from badge_events and the set metadata. For the duration of such a window, switch the site's ambient accent and --ambient wash to a palette derived from the dominant colours of that event's badge art, time-boxed to the window and reverting automatically, with a small live marker explaining why the site changed. It is a token override scoped to the html element while the window is open, not a saved preference like the existing profile palettes. Effort: M. Risk if built badly: event art yielding an unreadable accent, a theme that sticks after the window closes because the sweep is stale, or contrast regressions in charts that read the accent token.
+
+Why: The site's whole subject is timed drops, so letting the interface change during one is the design equivalent of live coverage.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Async action state machine for buttons</h3>
+  <details><summary>Details</summary><p>Buttons that trigger server work, sync inventory, claim the daily bonus, copy the badge embed, submit a report, sometimes show a spinner and sometimes show nothing, and a failed action often only reaches the console. Standardise the client lifecycle as one hook plus one button presentation: idle, pending with an inline progress that replaces the label without changing the button width, success with a brief tick then back, and error where the label becomes the retry and the reason goes to a title and a toast. Preserving width through the state change is the point. Effort: S. Risk if built badly: a success tick that fires before the server confirms, or a disabled button that never re-enables after a thrown error.
+
+Why: Nearly every meaningful action here is a network round trip, and the interface should say so in one consistent voice.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Designed system pages as one family</h3>
+  <details><summary>Details</summary><p>404, 500, offline and maintenance are currently whatever Next renders plus the feature-flag gate. Design them as one family sharing a centred measure and a badge-flavoured conceit, a placeholder tile carrying the site's own mark reading this badge is not in the catalog, with the locale-aware message, a primary way back, a secondary retry, and a maintenance variant that shows the last sync heartbeat time so the page admits it is temporary and states how current the data is. The offline variant is served by the existing service worker for cached routes with a clear showing-what-we-have framing. Effort: M. Risk if built badly: an error page that leaks a stack trace or a table name, or an offline page that presents cached catalog data as current.
+
+Why: The pages a visitor sees when something is wrong are the ones they remember, and right now they are unbranded.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Living styleguide route for the design system</h3>
+  <details><summary>Details</summary><p>globals.css carries hundreds of component classes and tokens whose only documentation is the CSS itself. Add an internal styleguide route that renders every component class in every state (default, hover, focus-visible, disabled, selected, error, empty, loading), in both themes, at a wide and a narrow viewport and in both directions, each block labelled with its class name and the tokens it consumes, generated from a manifest that is checked against the stylesheet so a class with no entry fails. It becomes the review surface for the rest of these design ideas and the source for visual snapshots. Effort: M. Risk if built badly: a styleguide that re-implements components instead of rendering the real classes and therefore drifts, or one shipped publicly and indexed without a noindex.
+
+Why: A design system with no place to look at itself is a set of files nobody trusts, and this site's CSS is already past that size.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Bottom action bar on badge pages for phones</h3>
+  <details><summary>Details</summary><p>On a phone a badge page's primary action, the claim link, or the wishlist toggle for an upcoming badge, scrolls away immediately and the visitor has to hunt back up. Add a bottom action bar that appears once the in-flow action leaves the viewport, carrying the primary action plus one context action, wishlist or share, respecting the bottom safe-area inset and sitting above the toast layer, with the in-flow control remaining the source in the accessibility tree and the bar a shortcut to it. Effort: S. Risk if built badly: two competing primary buttons on screen at once, a bar covering the last row of content, or a bar lingering on a finished badge whose only action is gone.
+
+Why: During a live drop the visitor is holding a phone in one hand, and the one thing they came to tap should never be behind a scroll.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Icon grid and stroke contract</h3>
+  <details><summary>Details</summary><p>Icons are inline SVG written per component, so the same concept is drawn at three sizes with different stroke weights and optical alignment, and nav glyphs sit on different baselines. Establish one icon contract: a 24-unit grid with a defined live area, three sizes (16, 20, 24) scaled from a single drawing, a stroke token using currentColor with one weight per size, rounded caps, and an alignment rule so glyphs in a row share a baseline, then audit the existing set into it and add a check that a new icon matches the contract. No icon font and no change of technique required. Effort: M. Risk if built badly: redrawing everything for uniformity and losing the specific glyphs that worked, or a 16 px variant that turns a detailed icon into a smudge.
+
+Why: Icons are the only ornament a dark data-dense UI can afford, and three weights of the same symbol is three visual languages.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="addon" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Add-ons</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Level-gated game unlocks</h3>
+  <details><summary>Details</summary><p>The high-variance games (blackjack, roulette, coin-flip ladder) stay locked until a member reaches a configured level, and each locked tile shows the level required and a one-line reason to learn the slower games first. Gates come from the admin settings document, so the panel can move or drop a gate without a deploy, and a locked tile still links to the rules page while tracking stays open. Crossing a threshold writes a small 'new game unlocked' notification. Effort: S. Risk if built badly: gating a game players already spent coins on reads as punishment, so gates must apply only to accounts created after the feature ships or be announced ahead with a grace period.
+
+Why: New members meet 13 games at once with no ordering, and a staged unlock gives the arcade a shape without removing any game.
+
+Source: new-ideas-05-addon.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="3">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Showcase Provenance Captions</h3>
+  <details><summary>Details</summary><p>Each of the six showcase slots gets an optional caption (about 90 characters) where the member records how the badge was earned — 'TwitchCon 2019 booth', 'gifted by @name', 'subbed in the final hour'. Captions live as a bounded array inside the existing customization document, render under the tile on the profile and inside the profile OG card, and are saved through the same customizer route. Visitors stop seeing six unexplained icons; the server length-checks and stores the text so no markup travels with it. Effort: S. Risk if built badly: captions become unmoderated free text carrying links or slurs, and the customization blob grows past its 4 KB cap.
+
+Why: It turns a showcase of images into a set of small personal histories, which is exactly the storytelling the catalog alone cannot provide.
+
+Source: new-ideas-07-profile.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Schneller Gewinn. Geringer Aufwand (1/5), spürbarer Effekt (4/5) — direkt umsetzen.</p>
+</article>

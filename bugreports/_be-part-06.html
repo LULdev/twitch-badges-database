@@ -1,0 +1,805 @@
+<article class="card " data-category="usability" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Bedienbarkeit</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Hide badges I own catalog toggle</h3>
+  <details><summary>Details</summary><p>Once a collector owns a few hundred badges the catalog is mostly noise. Add a hide-what-I-own toggle on the catalog, active and upcoming pages that subtracts the viewer's inventory id set from the query server-side, with the count line reading N shown of M, hiding your 412. When no sync has ever run, show the toggle disabled with a sync prompt instead of an empty grid. Effort: M. Risk if built badly: applying the exclusion without saying so makes the catalog look broken, and a large exclusion list must be passed as a set rather than a giant NOT IN string.
+
+Why: For a returning collector, filtering out the known is the single biggest reduction in catalog friction.
+
+Source: new-ideas-09-usability.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="usability" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Bedienbarkeit</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Inline autosave with a visible undo</h3>
+  <details><summary>Details</summary><p>Turn save-on-submit into debounced autosave for the customization document: write 800 ms after the last change, show a saved-at timestamp in place of the button state, and offer a ten-second undo that restores the previously stored document, while keeping the explicit save button for people who prefer it. Keep exactly one previous document per save so undo is a single well-defined restore. Effort: M. Risk if built badly: autosaving a half-typed banner URL or a partially typed hex colour writes junk that renders as a broken profile, and an undo landing after a later edit restores the wrong document.
+
+Why: Autosave removes the fear that closes the customizer, as long as the undo makes the change feel reversible.
+
+Source: new-ideas-09-usability.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="usability" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Bedienbarkeit</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Confirmation and undo for high-stakes actions</h3>
+  <details><summary>Details</summary><p>Heists, large wheel spins, showcase removal and reset-to-default all fire on one click with no statement of the stake. Add a confirmation that names the exact consequence and amount, such as the maximum steal from this member and the fact that a failed attempt is spent, and where the action is genuinely reversible offer a short undo window. Read the amounts from the same settings the engine uses so the dialog cannot promise a limit the server would refuse. Effort: M. Risk if built badly: confirmations on every small action become noise, so they need a threshold, and an undo for a coin action reopens the double-spend hole the atomic counters closed.
+
+Why: Provable fairness is the site's promise for its games, and a dialog that states the exact stake is part of keeping it.
+
+Source: new-ideas-09-usability.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="usability" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Bedienbarkeit</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Catalog-searching 404 page</h3>
+  <details><summary>Details</summary><p>The not-found page is sixteen lines of text, and a mistyped badge slug is the most likely 404 on the site. Turn it into a recovery page: take the last path segment, run one cheap similarity query against badge slugs and titles plus blog slugs, and offer the five closest badges, a prefilled search box and the three most likely destinations, keeping the query bounded and the page cacheable. Effort: M. Risk if built badly: a similarity query on every bot 404 is free database load for crawlers, and a recovery page that looks like a search result can be mistaken for the real page.
+
+Why: Most 404s on a slug-driven catalog are one typo away from a real page, and today the site offers no way to find it.
+
+Source: new-ideas-09-usability.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card planned" data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    <span class="badge-planned">geplant</span>
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Scheduled publishing</h3>
+  <details><summary>Details</summary><p>Give blog posts a future published_at and have them appear on their own. The column already exists and the public query already filters on status; what is missing is a scheduled flip. Effort: low.</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Rarity tier ramps as first-class tokens</h3>
+  <details><summary>Details</summary><p>The six TBRI tiers drive colour today, but the values are repeated as literals across tile borders, chips, distribution bars and the heatmap. Define one token per tier — `--tier-&lt;tier&gt;-bg`, `--tier-&lt;tier&gt;-line`, `--tier-&lt;tier&gt;-text` — and make every rarity surface read from them.
+
+Effort: M.
+
+Source: bugreports/agent-idea-10.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>BadgeTile progressive reveal with a token-shaped skeleton</h3>
+  <details><summary>Details</summary><p>14–28 px badge images on a grid of hundreds flash in as each one loads, and the grid reflows while it happens. Give `.badge-tile` a fixed intrinsic box plus a low-contrast skeleton driven by `--line`, and fade the real image over it once decoded.
+
+Effort: S.
+
+Source: bugreports/agent-idea-10.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Countdown urgency states inside `.countdown`</h3>
+  <details><summary>Details</summary><p>`.countdown` renders every timer identically whether a drop closes in six days or forty minutes. Add three modifier states (`is-calm`, `is-soon`, `is-critical`) that shift the token-derived colour and weight, and pair the change with a static label so it never depends on colour alone.
+
+Effort: S.
+
+Source: bugreports/agent-idea-10.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Persistent filter chip rail with URL-backed state</h3>
+  <details><summary>Details</summary><p>The catalog's active filters are scattered between the search input, a status control and the URL. Consolidate them into one sticky chip rail that shows every active filter, each removable in place, with the URL as the single source of truth.
+
+Effort: M.
+
+Source: bugreports/agent-idea-10.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Collection Binder</h3>
+  <details><summary>Details</summary><p>A trading-card-binder view of a profile: badge icons snapped into pocketed sheets, with empty sockets for the badges in a chosen category the collector has not unlocked yet. Flipping a page animates the badges in.
+
+Why it fits: the owned/missing split is already computed at login via the perfil path, and the &quot;empty sockets&quot; make missing badges as visible and motivating as owning them.
+
+Effort: M.
+
+Risk if built badly: a purely cosmetic feature that inflates profile page weight; keep it lazy and off the default path.
+
+Source: bugreports/agent-idea-04.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Arabic/RTL mirroring via CSS logical properties</h3>
+  <details><summary>Details</summary><p>`ar` is RTL but the layout ships Tailwind physical utilities (`left-*`/`right-*`, `ml-*`/`mr-*`, `text-left`), so mirrored content drifts: the header cluster, countdown badges and grid gutters sit on the wrong side while text is right-aligned. Convert the shell and the shared component classes in `src/app/globals.css` (`.card`, `.chip`, `.badge-tile`, `.data-table`) to logical properties (`ms-`/`me-`, `inset-inline-start`, `text-start`) so one rule set serves all 11 locales.
+
+Effort: M.
+
+Source: bugreports/agent-idea-07.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Respect `prefers-reduced-motion` in decorative animation</h3>
+  <details><summary>Details</summary><p>sparkle-animated level badges, the stats `Reveal`/`CountUp` set and the chart intro animations all run unconditionally, which can trigger motion sickness and add main-thread work. Gate every animation behind a `prefers-reduced-motion: reduce` media query (CSS) and a JS matchMedia check so reduced-motion users get static finals.
+
+Effort: S.
+
+Source: bugreports/agent-idea-07.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Index the hot read paths the feed, progress and momentum queries use</h3>
+  <details><summary>Details</summary><p>the feed filters, leaderboards and momentum read `activity_events` by `(kind, created_at)`, `user_progress` by `updated_at`, and the per-badge owner series grows unbounded. Add the missing composite/partial indexes and a nightly rollup of `badge_stats` into daily rows, then verify with `EXPLAIN` that the planned index is actually used.
+
+Effort: M.
+
+Source: bugreports/agent-idea-07.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Make rarity readable without colour</h3>
+  <details><summary>Details</summary><p>Rarity is colour plus text today, but the distribution bars and heatmap cells rely on colour alone. Add patterns or labels, and a labelled heatmap legend.
+
+Source: IMPROVEMENTS.md Part 1.2.
+
+Source: IMPROVEMENTS.md Part 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Badge glossary of Twitch terminology</h3>
+  <details><summary>Details</summary><p>A /glossary page defining the vocabulary the catalog silently assumes: Prime Gaming, Turbo, Hype Train, sub, bit and cheer badges, affiliate versus partner, TwitchCon drops, charity badges, OG sub, plus the site's own terms (TBRI, claim window, drop, set_id, version). Each entry is a two-part definition (one line plus a longer explanation) with a link into the matching catalog filter or the badge that exemplifies the term, so a definition doubles as a discovery path. Entries are stored rows (term, slug, short, long, related badge IDs) rather than a hardcoded list, so each gets a stable anchor and DefinedTerm structured data. Data: hand-authored rows plus catalog rows for the example badges. Effort: M. Risk if built badly: entries drift from the catalog as categories are renamed and example badges expire, and a DefinedTerm block pointing at a deleted badge is worse than no markup; keep the example references validated against the catalog on render.
+
+Why: Every visitor who does not know what a Hype Train badge is bounces, and a glossary is the cheapest way to turn that confusion into an internal link.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Catalog Eras editorial hubs</h3>
+  <details><summary>Details</summary><p>Named historical periods of badge releases — the closed-beta years, the Prime Gaming era, the Hype Train era, the affiliate-era explosion — each with an editorial page explaining what changed about how badges were earned and a grid of the badges released inside it. Eras are explicit date ranges in a small table (name, slug, start, end, intro copy) and the grid is an ordinary catalog query filtered to that range, so the page stays correct as new badges arrive. Each era links to its predecessor and successor to form a readable history. Data: first-sighting and release dates from badge_events and the catalog, plus authored copy. Effort: M. Risk if built badly: the era boundaries are arguable and a wrong one becomes a factual claim the site publishes with authority; keep the ranges in data with a note explaining how they were chosen.
+
+Why: It turns a flat catalog of 476 items into a story a newcomer can read in order, which is exactly the narrative the badge world has never had written down.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Learn hub for claiming basics</h3>
+  <details><summary>Details</summary><p>A /learn section of long-form tutorials answering what a new viewer actually types: what a global badge is, how to claim a Prime badge, why a badge does not appear in the picker, how channel sub badges differ from global ones, and how to check which global badges an account owns. Each tutorial is a real article with numbered steps, catalog examples and HowTo structured data where the steps are procedural, ending by pointing at the catalog surface that performs the action. Articles are content rows with locale, so they translate like the rest of the site. Data: authored copy plus cited catalog rows and badge images. Effort: M. Risk if built badly: the tutorials duplicate the per-badge how-to text and rot whenever Twitch changes its UI; keep platform mechanics in one place, date-stamp every article, and link rather than restate.
+
+Why: It captures the highest-volume search intent in this niche and converts it into a visit to the claimable view instead of a bounce.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Internal-link suggestion engine</h3>
+  <details><summary>Details</summary><p>While an editor writes a draft, a side panel scans the body for badge names, set names, categories, tier vocabulary and glossary terms and suggests the internal target for each match — a badge detail page, a filtered catalog view, a glossary anchor — with the anchor text taken from the draft itself. It also flags mentions with no target yet (an un-glossed term, a badge absent from the catalog) as content gaps, and reports the draft's internal link count against its length. Data: a term index built from badge names, set ids, categories, FAQ keys and glossary terms, matched against the draft's plain text. Effort: M. Risk if built badly: it over-links common words and turns prose into a link farm; require a confidence threshold and let the editor accept suggestions individually rather than auto-inserting them.
+
+Why: Internal links are what let 476 badge pages and a growing blog hold each other up in search, and doing it by hand is what nobody does.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Keyword-to-page map</h3>
+  <details><summary>Details</summary><p>An internal map assigning each target query cluster to exactly one canonical page — a badge detail page, a category landing page, a tutorial, a glossary term — with its current owner page and a cannibalization flag when two pages compete for the same intent. It is generated by matching queries against page titles, headings and copy already in the repo and shows clusters with no page at all as the editorial backlog. Data: per-route text extracted from the content rows plus, where available, the zero-result search log and referrer hosts. Effort: M. Risk if built badly: it hardens into a stale spreadsheet claiming ownership of pages that were renamed; regenerate it from routable content rather than maintaining it by hand.
+
+Why: With this much overlapping content, the fastest ranking win is stopping two of the site's own pages from fighting over one query.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Newsletter archive as web pages</h3>
+  <details><summary>Details</summary><p>Every issue the site sends becomes a public indexable page at its own URL with a title, description and Article markup, plus an archive index ordered by date and an RSS feed of issues. Each archive page also links the badges and posts it featured, so old issues keep working as internal-link sources, and the send action writes the archive row from the same payload that went out. Data: the newsletter payloads the admin tab already stores plus the badges and posts they reference. Effort: M. Risk if built badly: an issue containing a personal greeting or a subscriber-only offer publishes verbatim; require an explicit archive step and strip every personalization field before the row is written.
+
+Why: Newsletters are written once and read once, while an archive page keeps earning search traffic forever.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Guest contributor program</h3>
+  <details><summary>Details</summary><p>Outside writers — collector bloggers, fansite editors, well-known community members — can pitch and publish under the site's editor, each with an author profile page listing their posts, a short bio and a link to their collector profile, plus an author entity in the Article markup. Pitches and drafts move through the content tab with a status per stage, and authorship is a real relation on the post row so a writer's body of work gathers in one place. Data: post rows with an author relation, member profiles for the linked collector identity, editorial status fields. Effort: M. Risk if built badly: it becomes an unvetted link channel writers farm for backlinks; require editor approval, nofollow outbound links, and a visible disclosure on any paid or sponsored contribution.
+
+Why: Domain expertise about badges lives in the community, and this is how it becomes original on-site content instead of a Reddit thread.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Last call deadline column</h3>
+  <details><summary>Details</summary><p>A short forward-looking post on a fixed cadence naming the badges whose claim windows close in the next few days, with one line of commentary each and a live countdown beside every entry. It is the inverse of a retrospective digest: it exists to be read in the next 72 hours, so it is dated, cheap to write (a template pulls the closing list and the writer adds a sentence and a priority order), and links straight into the claimable view. Data: windows closing soon, badge rows, owner counts. Effort: S. Risk if built badly: it becomes auto-generated filler that is identical every week; require a human editorial choice of what to lead with and skip weeks when nothing closes.
+
+Why: It is the one piece of writing that has an immediate reason to be read, and it converts a reader into a claim the same day.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Five-email collector course</h3>
+  <details><summary>Details</summary><p>A short automated email course over a week that takes a curious visitor from what a global badge is to claiming their first: message one explains the catalog, two walks through claiming, three explains rarity and why some badges are hard, four introduces the games and XP, five invites them to link Twitch and see their own inventory. Each message carries one live catalog example resolved at send time and exactly one call to action, and replies route into the mailbag column. Data: subscriber record and step progress, one example badge per message chosen by tier, the existing send path. Effort: M. Risk if built badly: it becomes a nagging sequence that burns the list; cap it at five messages, stop the sequence on engagement, and keep the send path unsubscribe-compliant.
+
+Why: It converts a visitor who read one tutorial into a member with a synced inventory, using the same writing the learn hub already produces.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Reader mailbag column</h3>
+  <details><summary>Details</summary><p>A recurring column answering questions real readers ask, sourced from newsletter replies, unanswered FAQ submissions and community channels, each answered properly and linked to the catalog surface or tutorial that resolves it. Questions that recur graduate into a glossary entry or a tutorial, so the mailbag doubles as the content-discovery loop, and each instalment credits the asker by first name only. Data: submitted questions, the catalog and FAQ for answers, the glossary and tutorials as graduation targets. Effort: S. Risk if built badly: it publishes an asker's identifying details or an unverified guess as fact; anonymize by default and label anything the team could not verify as an open question rather than a settled answer.
+
+Why: Reader questions are free keyword research with intent attached, and answering them in public is content nobody else has.
+
+Source: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Lifecycle-adaptive badge detail header</h3>
+  <details><summary>Details</summary><p>The badge detail page renders one header composition (image, name, rarity chip, status pill) whatever the badge's stage, so an upcoming badge, an open one and an extinct one all lead with the same weight. Define four header compositions selected server-side from the existing status/is_confirmed_active fields and end_date: upcoming leads with the countdown and a remind action, claimable-now leads with the claim link and time remaining, closed leads with final owner count and tier, extinct leads with the archive framing and its provenance context. No client state, just a prop choosing the composition. Effort: M. Risk if built badly: four near-identical headers that differ only in colour, which is worse than one, or a header that keeps claiming 'open' after the sweep has moved on.
+
+Why: It makes the page answer the visitor's real question, can I still get this, in the first screen instead of the fifth.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Scroll-spy category header in the grid</h3>
+  <details><summary>Details</summary><p>When the catalog is sorted or grouped by category, insert a sticky sub-header per group that pins under the site header while its group is in view, carrying the category name, its count and a jump list of the other groups. The header is derived from the ordered rows the grid already receives (no new query), the pin uses position: sticky with the header height as its top offset, and the active group is resolved by one IntersectionObserver over the group headings. Effort: M. Risk if built badly: a sticky bar stacking under the sticky site header and eating a third of a phone screen, or jump counts that lie while the sync changes group sizes.
+
+Why: A long catalog needs an index that travels with you, and category is the axis collectors actually scan by.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Disclosure accordion for badge detail on phones</h3>
+  <details><summary>Details</summary><p>Badge detail stacks six to eight sections in one narrow column, so on a phone the drop window, rarity breakdown, owner trend and ownership sit below the fold in an undifferentiated wall. Below the tablet breakpoint render the sections as a disclosure accordion with the answer-critical section (window and claimability) open and the rest collapsed behind a one-line summary each, keeping the URL hash contract so a shared anchor still lands open. Wider viewports render the same markup expanded, so there is one section list and two presentations. Effort: M. Risk if built badly: hiding the very data the visitor came for behind a tap, or collapsed summaries that drift out of date with the section they summarise.
+
+Why: Badge pages are dense by nature, and a phone visitor should reach the answer before the bibliography.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Home page answer zones</h3>
+  <details><summary>Details</summary><p>The home page currently presents the same catalog grid /badges does. Restructure it into three stacked answer zones with fixed vertical budgets: claimable now with the live count and the two soonest-closing badges, just added from the newest badge_events rows, and rarest movers from the momentum view, each zone one row tall with a link into the full surface. Every zone is server-rendered from queries that already exist, and each has a defined quiet-day state rather than collapsing. Effort: M. Risk if built badly: a home page that duplicates /badges with extra chrome, or zones that are empty and unexplained on a day when nothing dropped.
+
+Why: A live catalog's front door should answer what is happening right now before it shows a wall of tiles.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Shared-element transition from tile to detail</h3>
+  <details><summary>Details</summary><p>Clicking a tile hard-cuts to the detail page even though the same image is at both ends. Use the View Transitions API, which the Next 16 App Router supports, to give the badge image a view-transition-name keyed to the badge id so it morphs from the 28 px tile into the detail hero while the rest of the page cross-fades, falling back to the current navigation where the API is absent and to a plain cut under the motion preference. Only the image and the title carry names, so the transition count stays small. Effort: M. Risk if built badly: duplicate view-transition-name warnings across a long list, a morph that runs on a reduced-motion device, or a transition that delays first paint of the destination on a slow phone.
+
+Why: The badge art is the site's one uninterrupted visual thread, and continuing it across the navigation makes the catalog feel like one object instead of pages.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Server-honest suspense reveal for game rounds</h3>
+  <details><summary>Details</summary><p>The 13 games and the wheel are server-authoritative, so the client does not know the outcome until the response lands and any spin or flip is theatre of unknown length. Design the reveal to be honest about that: the wheel's easing is computed to land on the server's slot within the time the request actually takes, with a minimum spin so a fast response still reads as deliberate, and the games use a fixed-length reveal that continues while the response is in flight and resolves when it arrives, never announcing a result the client invented. The pending phase is designed suspense, not a spinner covering the board. Effort: M. Risk if built badly: an animation that resolves client-side and then contradicts the server payload, or a reveal that overruns on a slow response and looks frozen exactly when the player is most invested.
+
+Why: For games whose whole promise is server-decided fairness, the reveal should look like it is waiting for the truth rather than inventing it.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Print stylesheet for badges and sets</h3>
+  <details><summary>Details</summary><p>A collector wants a badge on paper: a club handout, a classroom sheet, a wall of the set they are chasing. Add a print stylesheet for badge detail and for a filtered catalog list where the ambient gradient and all shadows drop, the layout becomes a single column at a printable measure, each badge prints with its name, set, window dates and a QR to the canonical URL reusing the existing URL shapes, page breaks land between badges, and art is kept with print-color-adjust where the browser allows. It is a media print block over the same markup, so nothing is duplicated. Effort: S. Risk if built badly: a print view that carries the sticky header and nav onto every page, or art that prints as an empty box because it is a CSS background.
+
+Why: The catalog is reference material, and reference material that cannot be printed is only half a reference.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Numeric and date presentation layer</h3>
+  <details><summary>Details</summary><p>Numbers are formatted ad hoc across the site: owner counts, TBRI scores, coin balances, XP, percentages, dates and durations each have their own rounding and their alignment differs between a table, a tile and a chart label. Define one presentation layer with tabular figures wherever a number can change or align, locale-correct grouping and compact notation like 1.2M with the exact value in a title, a decimal policy per metric, right-alignment for measures inside .data-table, a consistent delta treatment with a direction glyph so meaning survives colour blindness, and dates in the visitor's locale with an explicit timezone label. Effort: M. Risk if built badly: compact notation collapsing two different values to the same 1.2M in a comparison, or locale formatting that breaks the truncation a tile layout depends on.
+
+Why: This is a database site, so numbers and dates are the product, and it currently speaks them in a dozen dialects.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Wrapping, hyphenation and measure policy</h3>
+  <details><summary>Details</summary><p>Headings break mid-phrase, a long badge name orphans one word onto a third line, and prose runs the full width of a wide card. Add a typographic policy: text-wrap balance on headings and section titles, text-wrap pretty with widow control on lead paragraphs, hyphens auto with the correct lang per locale so long German and Russian badge names break sensibly, and a per-locale measure ceiling applied to .prose-content and the FAQ rather than inherited from the container width. This is about wrapping and measure specifically, not the type-scale and logical-inset work already on the board. Effort: S. Risk if built badly: hyphenation that splits a badge name into an unrecognisable fragment, or balanced headings that wrap into a taller and emptier block than the ragged one they replaced.
+
+Why: This site is mostly text about small images, and clean wrapping is most of what separates a reference page from a wall.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Deterministic placeholder for missing badge art</h3>
+  <details><summary>Details</summary><p>When a badge image 404s because a provider URL moved or an asset was never mirrored, the grid shows a broken-image icon and the OG render throws. Render a deterministic placeholder instead: a two-tone tile in the badge's tier colour carrying the set initial, hashed from the badge id alone so the same badge always yields the same glyph, sized to the same box so the grid does not shift, labelled art unavailable for assistive tech, with a discreet report link, and used by both the grid and the OG route so a share stays legible. Effort: S. Risk if built badly: a placeholder that looks close enough to real art to hide a broken provider for weeks, or a glyph with enough contrast to be mistaken for a badge in a screenshot.
+
+Why: Missing art is a certainty in a catalog built from third-party feeds, and the broken-image icon is the one image this site never designed.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Drop-window annotation bands on the owner chart</h3>
+  <details><summary>Details</summary><p>The owner-trend chart on a badge page plots a bare line, but the events that explain it, the window opening, a mid-window re-drop, the closing date, are not on it. Read the badge_events rows and the start and end dates and render them as annotated bands and markers on the existing OwnersChart: a shaded band across the open window, a vertical rule at close with a dated label, and a legend line instead of the bands on narrow widths. It reuses the chart's own domain computation, so no new data source and no new query. Effort: M. Risk if built badly: a band covering the curve it is meant to explain, or annotations implying a precision the recorded event timestamps do not have.
+
+Why: An owner curve without its drop window is a shape with no story, and the events are already sitting in the database.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Linked crosshair across the stats dashboard</h3>
+  <details><summary>Details</summary><p>The /stats page stacks a dozen independent charts, so reading what happened the week of the 14th means hovering the same date twelve times and holding twelve numbers in your head. Add a linked crosshair: hovering or focusing any chart publishes the resolved bucket, day or week, to a shared context, every other chart draws a thin rule at that bucket and shows its value in the chart head, and moving to another chart moves the whole column. The bucket is the shared key, so it works across different series with no new queries. Effort: L. Risk if built badly: a handler publishing on every pixel of movement and re-rendering twelve charts per frame, or a linked rule landing on a bucket another chart does not have and silently reading nothing.
+
+Why: The dashboard is a set of series over one time axis, and the only question worth asking of it is what several did at the same moment.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Rarity tier thresholds as chart reference rules</h3>
+  <details><summary>Details</summary><p>TBRI tiers derive from owner count and window characteristics, so each tier implies an approximate owner threshold for a given badge profile, and the chart never shows where those boundaries sit. Add optional horizontal reference rules to the owner chart, one per tier boundary for the badge's own window profile, drawn in the tier token colour with a label and toggled from the chart head, so a visitor can see how close a badge is to the legendary line and whether the forecast crosses it. Derived from the same rarity inputs the badge page already loads. Effort: M. Risk if built badly: threshold lines implying a hard boundary where the score is continuous, or a chart so full of rules that the trend they annotate disappears.
+
+Why: The tiers are the site's central abstraction and the chart that drives them should show where they actually fall.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Inline micro-visualisation contract for data tables</h3>
+  <details><summary>Details</summary><p>The leaderboards, the category tables and the compare view are numbers in cells, with the shape behind each number invisible. Define one inline micro-viz column contract for .data-table: a 60 by 16 sparkline of the row's own history, a tick marking the column median, and a small delta chip for the period change, all inline SVG drawn from the row's data with no interaction of their own, degrading to the plain number below the tablet breakpoint, and applied only where a series actually exists (owner trends, XP over time, momentum) rather than as decoration on a single value. Effort: M. Risk if built badly: a sparkline on every row turning the table into visual noise, or a median tick computed over the visible page rather than the population.
+
+Why: Tables are where this site keeps its facts, and a fact with its shape beside it is read in a fraction of the time.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Compare view as a three-lane diff</h3>
+  <details><summary>Details</summary><p>The two-member compare view puts two inventories side by side, which turns the actual question, what do we share and what do I have that you do not, into a manual scan of two columns. Restructure it as a diff: a shared lane in the middle for badges both own, a lane left for only-A and a lane right for only-B, each badge a tile with its tier, all three lanes aligned by set so related badges line up, with a count per lane and a plain-text export of the delta. It reads the two inventories the compare view already resolves. Effort: M. Risk if built badly: a three-column tile layout unusable below the tablet breakpoint, or alignment by set scattering the lanes because most badges have no set.
+
+Why: The compare view exists to answer a question about difference, and the current layout makes the visitor do the diffing by eye.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Category pictogram set</h3>
+  <details><summary>Details</summary><p>Categories, subscription tiers, Bits, Prime, follower milestones, event drops, game-specific sets, are labelled with text-only chips. Draw a small consistent pictogram per top-level category, one grid size and one stroke weight following the icon contract, and place it in the filter chips, the category table rows, a corner mark on the tile and the RSS and OG output, so a category is recognisable before its label is read. The set is deliberately small and closed, and a new category without a pictogram fails the review check rather than shipping a generic dot. Effort: M. Risk if built badly: pictograms literal enough to read as emoji, or a set that keeps growing with mixed metaphors until it signifies nothing.
+
+Why: Category is one of this catalog's two axes and the one that currently has no visual language at all.
+
+Source: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:20%;background:#4ade80"></span></div><span class="val">1/5 · sehr leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:60%;background:#fbbf24"></span></div><span class="val">3/5 · mittel</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (1/5) steht in einem gesunden Verhältnis zum Nutzen (3/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>Manual inventory re-sync with visible status</h3>
+  <details><summary>Details</summary><p>On the profile/inventory page, a &quot;Sync my badges&quot; button with the last-synced timestamp, which provider answered (badges.blog vs Twitch GQL fallback), and the count found/last run, plus a disabled/cooldown state while a sync is in flight. A failed sync states the reason instead of failing quietly.
+
+Why it fits: Ownership resolves through a third-party `/api/perfil` with a GQL fallback and varies per user; a new badge can be claimed on Twitch before the site knows. Giving the user the trigger plus a cooldown is the politeness boundary the AGENTS.md ToS note asks for.
+
+Effort: S.
+
+Risk if built badly: No cooldown turns the button into a click-loop hammering a third-party API and gets the project rate-limited or blocked.
+
+Source: bugreports/agent-idea-03.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:100%;background:#22c55e"></span></div><span class="val">5/5 · sehr hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (4/5) und Nutzen (5/5) sind ausgeglichen.</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="1">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#fbbf24">Neutral</span>
+  </div>
+  <h3>OBS / browser-source overlay of live drops</h3>
+  <details><summary>Details</summary><p>A minimal, chrome-free route (`?widget=1` on the claimable view) designed as an OBS browser source: current claimable badges with countdowns, transparent background, auto-refresh on the existing server refresh cadence, and query params for scale, theme and max rows.
+
+Why it fits: Twitch badges and streamers are the same audience, and the site already renders live countdown tiles and refreshes server data once a minute. A creator keeps this up for their whole stream, which is passive, continuous distribution.
+
+Effort: L.
+
+Risk if built badly: A widget that polls too aggressively (or defeats the cache) multiplies the site's own traffic by every concurrent stream and can take the catalog down during a big drop.
+
+Source: bugreports/agent-idea-03.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:80%;background:#f87171"></span></div><span class="val">4/5 · schwierig</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:100%;background:#22c55e"></span></div><span class="val">5/5 · sehr hoch</span></div>
+  </div>
+  <p class="opinion">Solide Idee, aber nicht dringend. Aufwand (4/5) und Nutzen (5/5) sind ausgeglichen.</p>
+</article>

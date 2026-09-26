@@ -1,0 +1,841 @@
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Kunststil-Atlas</h3>
+  <details><summary>Details</summary><p>Ein ML-Durchlauf über die Badge-Bilder klassifiziert jedes Bild in einen Kunststil-Tag (Pixel-Art, flache Vektorgrafik, Gradient/Mesh, fotobasiert, Veröffentlichungs-Ära), und ein neuer Stöber-Modus lässt Nutzer den Katalog nach Stil durchsehen und verfolgen, wie sich das Badge-Design von Twitch Jahr für Jahr verändert hat. Jede Badge-Karte zeigt ihre Tags, und die Filter-URLs lassen sich teilen.
+
+Warum es passt: Der Katalog enthält jedes globale Badge-Bild, und die Bilder sind das einzige Artefakt der Website, das nie wirklich analysiert wurde — das ist ein abgeleiteter Datensatz, den kein Wettbewerber hat, und er dient zugleich als Feature zur visuellen Historie.
+
+Aufwand: M.
+
+Risiko bei schlechter Umsetzung: Ein verrauschter Klassifikator, der deutlich unterschiedliche Stile falsch zuordnet, zerstört das Vertrauen in jede andere abgeleitete Kennzahl der Website; Tags mit geringer Konfidenz müssen daher verborgen bleiben, statt als Fakt dargestellt zu werden.
+
+Quelle: bugreports/agent-idea-01.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Badge-DNA-Barcode</h3>
+  <details><summary>Details</summary><p>Jedes Badge erhält einen deterministischen visuellen Barcode (ein kleines gestreiftes Symbol), der einen kanonischen Hash seines Seltenheitsvektors, seiner Kategorie und seines Veröffentlichungsdatums kodiert. Der Barcode erscheint auf der Badge-OG-Karte und lässt sich mit einer Handykamera scannen oder in ein Suchfeld einfügen, um dieses Badge zu öffnen — und der visuelle Vergleich zweier Barcodes zeigt, wie nah zwei Badges im Seltenheitsraum beieinander liegen.
+
+Warum es passt: Seltenheit ist eine feste Formel aus 4 Komponenten über Daten, die die Website bereits besitzt, sodass sich ein stabiler Fingerabdruck günstig definieren lässt; er verleiht jedem Badge eine physische, teilbare Identität und macht die OG-Pipeline zu einem interaktiven Einstiegspunkt.
+
+Aufwand: S.
+
+Risiko bei schlechter Umsetzung: Das Kodieren eines Hashs eines *veränderlichen* Seltenheitswerts bedeutet, dass sich der Barcode still ändert, wenn sich die Besitzerzahl eines Badges bewegt — der Fingerabdruck muss über unveränderliche Identitätsfelder laufen, sonst entwertet er jede geteilte Karte.
+
+Quelle: bugreports/agent-idea-01.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Badge-Halbwertszeit</h3>
+  <details><summary>Details</summary><p>Für jedes Badge wird die Besitzerkurve ab der ersten Sichtung aufgetragen und gemessen, wie lange es brauchte, um die Hälfte seiner gesamten Besitzer zu erreichen — eine Zerfallskonstante. Badge-Seiten zeigen sie als &quot;Halbwertszeit: 4 Tage&quot; mit einer kleinen Sparkline, und der Katalog erhält eine sortierbare Liste &quot;schnellste Abklingzeit / langsamste Abklingzeit&quot;.
+
+Warum es passt: `badge_stats` speichert bereits alle 15 Minuten eine Besitzer-Zeitreihe pro Badge, sodass die Halbwertszeit nur Arithmetik über vorhandene Daten ist. Sie verwandelt eine statische Besitzerzahl in eine Aussage darüber, wie ein Badge tatsächlich gefarmt wurde — eine wirklich neue Achse, die niemand sonst veröffentlicht.
+
+Aufwand: M.
+
+Risiko bei schlechter Umsetzung: Badges mit kurzen Historien oder verrauschten Potat-Stichproben liefern unsinnige Halbwertszeiten, daher braucht die Anpassung eine Mindeststichproben- und Anpassungsgüte-Schwelle, bevor irgendetwas angezeigt wird.
+
+Quelle: bugreports/agent-idea-02.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Seltenheits-Auf- und Abstiegs-Ticker</h3>
+  <details><summary>Details</summary><p>Ein Live-Feed der Stufenwechsel — &quot;Badge X ist gerade von Legendär auf Episch gefallen, weil 12.000 Spieler es abgeholt haben.&quot; Jeder Eintrag verlinkt zum Badge mit einer Vorher/Nachher-Aufschlüsselung des TBRI, die erklärt, welcher Eingabewert sich bewegt hat.
+
+Warum es passt: `computeRarity` läuft bei jedem Sync, und die Changelog-Infrastruktur existiert bereits; ein Stufenwechsel ist ein Diff über einen Wert, der alle 15 Minuten neu berechnet wird. Er macht einen unsichtbaren Hintergrundprozess sichtbar und dramatisch.
+
+Aufwand: S.
+
+Risiko bei schlechter Umsetzung: Schwankungen an der Schwelle können dazu führen, dass dasselbe Badge mehrmals täglich zwischen zwei Stufen pendelt; es braucht Hysterese oder eine Abklingzeit pro Badge, bevor eine Ticker-Zeile geschrieben wird.
+
+Quelle: bugreports/agent-idea-02.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Verwaiste Badges im Blick</h3>
+  <details><summary>Details</summary><p>Eine kleine rotierende Ausstellung von Badges am unteren Ende der Besitzerverteilung — null, ein oder zwei erfasste Besitzer — jeweils mit ihrer Geschichte und einem &quot;Teile, was du weißt&quot;-Anstoß. Im Grunde eine Adoptionsseite für die einsamsten Einträge des Katalogs.
+
+Warum es passt: Die Potat-Besitzerzahlen und der TBRI-Eingabewert zur Besitzerknappheit identifizieren das Ende der Verteilung bereits; die Seite ist eine gefilterte Liste plus redaktioneller Text. Sie hebt die interessantesten Zeilen der Datenbank hervor, die heute am Ende einer Sortierung vergraben liegen.
+
+Aufwand: S.
+
+Risiko bei schlechter Umsetzung: Badges ohne Besitzer sind oft Badges, deren Zählung fehlt, nicht wirklich besitzerlose; die Seite muss &quot;nicht beansprucht&quot; von &quot;nicht gezählt&quot; unterscheiden, sonst veröffentlicht sie eine Lüge.
+
+Quelle: bugreports/agent-idea-02.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Wirtschafts-Hauptbuch (XP- und BadgesCoins-Transaktionsverlauf)</h3>
+  <details><summary>Details</summary><p>Eine Profil-Unterseite, die jede XP- und Münzbewegung mit Zeitstempel, Quelle (tägliche Anmeldung, Badge freigeschaltet, Rad, Spiel, Heist, Münzregen), Differenz und resultierendem Guthaben auflistet, filterbar nach Quelle und Zeitraum, mit einem kleinen Diagramm des laufenden Guthabens. Dazu eine Zusammenfassung pro Quelle (&quot;diesen Monat durch Spiele verdient: N&quot;).
+
+Warum es passt: XP und Münzen werden von mindestens fünf Subsystemen vergeben, und jede Vergabe schreibt bereits ein Ereignis (der `/feed` zeigt sie für alle Nutzer). Nutzer mit einem unerklärbaren Guthaben haben heute keine Möglichkeit, es zu prüfen; ein Hauptbuch ist die erwartete Antwort auf &quot;wo sind meine Münzen geblieben&quot;.
+
+Aufwand: M.
+
+Risiko bei schlechter Umsetzung: Das Offenlegen fremder Nutzerzeilen (oder unaggregierter Heist-Opferdaten) über eine Hauptbuch-Ansicht ignoriert RLS und leakt den Wirtschaftsgraphen; die Seite muss strikt auf den eigenen Bereich begrenzt sein.
+
+Quelle: bugreports/agent-idea-03.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Datenaktualitäts-Badges und Banner für veralteten Katalog</h3>
+  <details><summary>Details</summary><p>Jede Katalogfläche (Raster, Badge-Detail, Bestenliste, Statistiken) zeigt eine unauffällige Zeile &quot;Katalog aktualisiert vor X · Besitzer vor X&quot;, gespeist aus dem neuesten Heartbeat-/Sync-Zeitstempel, und wenn der neueste erfolgreiche Sync älter ist als der erwartete Takt, zeigt der Header ein ausblendbares Banner zu veralteten Daten mit einem Link zu `/status` oder dem Changelog.
+
+Warum es passt: Das Projekt zeichnet `system_heartbeats` bereits auf und löscht sie nach 90 Tagen, und der 15-Minuten-Takt von Potat bedeutet, dass das Datenalter eine echte, für Nutzer sichtbare Größe ist, wenn ein Cron fehlschlägt. Stille Veraltetheit ist genau der Ausfall, dessen Aufdeckung die Heartbeat-Tabelle dienen soll.
+
+Aufwand: S.
+
+Risiko bei schlechter Umsetzung: Auf das Dev-Sync-Intervall fest kodierte Schwellenwerte lassen das Banner in der Produktion dauerhaft (oder nie) auslösen und gewöhnen Nutzer daran, es zu ignorieren.
+
+Quelle: bugreports/agent-idea-03.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Zuletzt angesehen und gemerkte Filter</h3>
+  <details><summary>Details</summary><p>Ein kleiner &quot;zuletzt angesehen&quot;-Streifen auf der Start-/Badges-Seite (die letzten ~8 Badge-Detailseiten, lokal gespeichert), und der Filter-/Sortier-/Ansichtszustand auf `/badges` wird zwischen Besuchen gemerkt, sodass zurückkehrende Nutzer auf derselben Liste landen, die sie verlassen haben. Löschen ist ein Klick.
+
+Warum es passt: Der Katalog ist paginiert und nach Seltenheit, Kategorie und Status gefiltert; dieselbe Ansicht bei jedem Besuch neu zusammenzusetzen ist pure Reibung. Die zuletzt angesehenen Badges liefern zudem die Grundlage für &quot;zurück zum Badge, dessen Zeitfenster sich schließt&quot;.
+
+Aufwand: S.
+
+Risiko bei schlechter Umsetzung: Gespeicherter Filterzustand, der nach einer Kategorie-Umbenennung stillschweigend neue Badges ausschließt, zeigt eine leere Seite, die wie ein Ausfall wirkt.
+
+Quelle: bugreports/agent-idea-03.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Onboarding-Checkliste für neue Sammler</h3>
+  <details><summary>Details</summary><p>Eine ausblendbare Checklisten-Karte im Dashboard für Konten ohne Fortschritt: Twitch verknüpfen (falls noch nicht geschehen), deine Badges synchronisieren, die tägliche Anmeldung einsammeln, einmal am Rad drehen, einen Anzeigenamen fürs Profil festlegen, den ersten Wunschlisten-Eintrag hinzufügen. Jeder Schritt verlinkt direkt auf die Fläche, die ihn abschließt, und wird anhand des echten Zustands abgehakt, nicht anhand eines Klicks.
+
+Warum es passt: XP, Münzen, 125 Erfolge, 13 Spiele, das Rad und das Inventar existieren bereits, aber nichts führt einen Erstbesucher hindurch; der Abschlusszustand lässt sich aus `user_progress`, Inventarzeilen und der Wunschliste ableiten, also braucht es keine neuen Mechaniken.
+
+Aufwand: M.
+
+Risiko bei schlechter Umsetzung: Ein optimistisches clientseitiges Abhaken zeigt eine vollständige Checkliste für Arbeit, die fehlgeschlagen ist (z. B. lief der Inventar-Sync nie), sodass der Nutzer glaubt, seine Sammlung werde erfasst, obwohl das nicht stimmt.
+
+Quelle: bugreports/agent-idea-03.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Community-Feldnotizen</h3>
+  <details><summary>Details</summary><p>Eine Crowdsourcing-Wiki-Schicht über Badges, deren Drop-Fenster, Kategorie oder Verdien-Anleitung im badgebase-Feed fehlt oder vage ist: Sammler reichen Feldnotizen ein (&quot;erscheint nur in der Twitch-Mobile-App&quot;), andere bestätigen oder bestreiten sie. Bestätigte Notizen erscheinen auf der Badge-Seite mit Namen des Beitragenden und einem Reputationszähler.
+
+Warum es passt: Der Katalog hat von vornherein Lücken (badgebase ist die maßgebliche Quelle, aber nicht erschöpfend); ein eigenes Reputationssystem erweitert das bestehende XP-Modell auf Datenarbeit, nicht nur auf Spiele.
+
+Aufwand: M.
+
+Risiko bei schlechter Umsetzung: Böswillige oder manipulative Bearbeitungen, um XP zu verdienen — es braucht Moderations-Warteschlangen, verpflichtende Quellen und kein XP für unbestätigte Notizen.
+
+Quelle: bugreports/agent-idea-04.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Münz-Geschenkwand</h3>
+  <details><summary>Details</summary><p>Ein Sammler kann einem anderen BadgesCoins mit einer öffentlichen Dankesnachricht schicken, und jedes angenommene Geschenk erscheint auf einer websiteweiten &quot;Geschenke&quot;-Wand mit beiden Namen und dem Betrag. Ein wöchentlicher Top-Schenker-Streifen gibt der Wand ihre eigene kleine Bestenliste.
+
+Warum es passt: BadgesCoins fließen bereits durch Steals und Münzregen; das fügt einer Wirtschaft, die derzeit komplett räuberisch ist, einen positiven, nicht-konfrontativen Fluss hinzu und verwendet das atomare Zählermuster wieder, auf dem die Steals beruhen.
+
+Aufwand: S.
+
+Risiko bei schlechter Umsetzung: Das Farmen von Zweitkonten, um Münzen zu waschen oder Großzügigkeit vorzutäuschen — es braucht harte Transfergrenzen und kein öffentliches Ranking allein nach Betrag.
+
+Quelle: bugreports/agent-idea-04.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Fokusverwaltung und Fokusfallen in Spiel-Modals und dem Rad</h3>
+  <details><summary>Details</summary><p>Die 13 serverautoritativen Spiele und das tägliche Rad öffnen Ergebnis-Panels, die Tastaturnutzer ohne erneutes Durchtabben der ganzen Seite nicht erreichen. Eine Fokusfalle pro Modal hinzufügen, den Fokus beim Ende einer Runde auf die Ergebnis-Überschrift bewegen, den Fokus beim Schließen zum Auslöser zurückholen und `Esc` unterstützen.
+
+Aufwand: M.
+
+Quelle: bugreports/agent-idea-07.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>recharts und die Spiel-Runtime per Code-Splitting aus Nicht-Stats-Routen entfernen</h3>
+  <details><summary>Details</summary><p>recharts und die Gamification-Runtime der 13 Spiele sind schwer und gehören nie in das initiale Bundle des Katalogs. Das Stats-Chart-Set und die Spielmodule über `next/dynamic` (nur clientseitig, `ssr: false`) auf den Routen laden, die sie verwenden, und prüfen, dass keine Katalog-/Blog-Seite sie transitiv importiert.
+
+Aufwand: M.
+
+Quelle: bugreports/agent-idea-07.md</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Fokus in den Spiel-Modals auf das Rundenergebnis bewegen</h3>
+  <details><summary>Details</summary><p>Nach dem Ende einer Runde müssen Tastaturnutzer das Ergebnis erst suchen. Der Fokus darauf macht die Spiele ohne Maus spielbar.
+
+Quelle: IMPROVEMENTS.md Teil 1.2.
+
+Quelle: IMPROVEMENTS.md Teil 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Nachrichten-Schlüssel aus den definierenden Enums ableiten</h3>
+  <details><summary>Details</summary><p>FeedKind und AchievementCategory zur alleinigen Quelle ihrer Nachrichten-Schlüssel machen, sodass das Hinzufügen einer Variante ohne Übersetzung den Build fehlschlagen lässt, statt einen rohen Schlüssel zu rendern.
+
+Quelle: IMPROVEMENTS.md Teil 1.3.
+
+Quelle: IMPROVEMENTS.md Teil 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Das gespeicherte Anpassungsdokument begrenzen und auf eine Allowlist setzen</h3>
+  <details><summary>Details</summary><p>`customization` auf etwa 4 KB begrenzen und seine Schlüssel serverseitig auf eine Allowlist setzen, damit ein gespeicherter Blob nicht unbegrenzt wachsen oder einen CSS-Wert ins Rendering einschleusen kann.
+
+Quelle: IMPROVEMENTS.md Teil 1.5.
+
+Quelle: IMPROVEMENTS.md Teil 1</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Katalogübergreifende Identität mit einem einheitlichen Sammler-Score</h3>
+  <details><summary>Details</summary><p>Ein Profil, das Twitch und optional weitere Plattformen verknüpft und über alle hinweg einen einzigen Sammler-Score zeigt.
+
+Quelle: IMPROVEMENTS.md Teil 2 #10.
+
+Quelle: IMPROVEMENTS.md Teil 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Community-Museum ausgestorbener Badges</h3>
+  <details><summary>Details</summary><p>Eine kuratierte, rotierende Ausstellung ausgestorbener Badges mit redaktionellem Text; die Rotation wird per Abstimmung entschieden.
+
+Quelle: IMPROVEMENTS.md Teil 2 #28.
+
+Quelle: IMPROVEMENTS.md Teil 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="profile" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Profil</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Öffentliche Sammlungsseiten mit Filtern</h3>
+  <details><summary>Details</summary><p>Die Badges eines Profils nach Seltenheit, Datum oder Kategorie sortieren, mit teilbaren gefilterten URLs.
+
+Quelle: IMPROVEMENTS.md Teil 2 #32.
+
+Quelle: IMPROVEMENTS.md Teil 2</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Startverzögerung beim Claimen</h3>
+  <details><summary>Details</summary><p>Für jedes Zeitfenster wird die Lücke zwischen der gelisteten Startzeit und dem ersten in badge_stats beobachteten Besitzeranstieg gemessen und auf der Badge-Seite angezeigt, etwa als 'erste Claims 47 Minuten nach dem gelisteten Start erfasst', mit einem Median pro Kategorie und einem Filter für Fenster, die nie einen erfassten Claim geliefert haben. Das legt Verzögerungen beim Claimen und still kaputte Drops offen, ohne Twitch-Interna zu erraten. Verwendet die Fensterstartdaten plus die Besitzerserie und die Sync-Zeitstempel. Aufwand: M. Risiko bei schlechter Umsetzung: Ein Sync, der einfach zu spät lief, lässt ein Fenster verzögert erscheinen; jede Lücke muss daher festhalten, wie lange nach dem Fenster die Beobachtung tatsächlich genommen wurde.
+
+Warum: Ein Fenster, das sich zu spät oder nie öffnet, ist der Unterschied zwischen einem Sammler, der ein Badge bekommt, und einem, der es verpasst.
+
+Quelle: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Snapshot-Archiv der Anbieterseiten</h3>
+  <details><summary>Details</summary><p>Bei der ersten Sichtung eines Badges und erneut beim Schließen seines Fensters wird die Anbieterseite, von der es gelesen wurde (HTML plus gerenderter Screenshot), zum Badge gespeichert, und die Detailseite verlinkt auf diese eingefrorene Kopie mit ihrem Abruf-Zeitstempel. Wenn badgebase oder Potat später eine Seite ändert oder löscht, existieren die Belege, auf die sich diese Website bei einem Fensterdatum stützte, weiterhin und lassen sich mit der aktuellen Seite abgleichen. Der Speicherbedarf ist kleiner Text und ein Bild pro Badge und Ereignis. Aufwand: M. Risiko bei schlechter Umsetzung: Archivierte Drittanbieterseiten können personenbezogene Daten oder Tracking-Skripte enthalten, daher muss der Snapshot vor dem Ausliefern bereinigt werden und wird nie mit aktivierten Skripten gerendert.
+
+Warum: Eine Badge-Datenbank ist nur so glaubwürdig wie die Belege hinter ihren Daten, und Anbieterseiten verschwinden.
+
+Quelle: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Community-Tags an Badges</h3>
+  <details><summary>Details</summary><p>Jedes angemeldete Mitglied kann einem Badge aus einer Vorschlagsliste kurze freie Tags hinzufügen ('Nostalgie', 'hässlich', 'abonnieren-und-vergessen'), und jeder Tag erhält eine Seite, die alle Badges mit diesem Tag nach Seltenheit auflistet, plus eine Tag-Wolke im Katalog. Die Moderation nutzt die bestehenden Admin-Inhaltswerkzeuge wieder; keine andere Liste der Website ist ein geteilter Wortschatz über den Katalog. Aufwand: M. Risiko bei schlechter Umsetzung: Eine ungeformte Folksonomie füllt sich mit Synonymen und Beleidigungen; Tags brauchen daher Normalisierung, einen Meldeknopf und ein Werkzeug zum Zusammenführen von Dubletten.
+
+Warum: Sammler beschreiben Badges in ihren eigenen Worten, während der Katalog nur die Anbieterkategorien von Twitch anbietet.
+
+Quelle: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Audit der Badge-Grafik-Assets</h3>
+  <details><summary>Details</summary><p>Ein Durchlauf erfasst, welche Auflösungen für jedes Badge existieren (1x, 2x, 4x), die Bytegröße und ob die kanonische URL noch ein Bild liefert, und veröffentlicht dann einen Filter 'unscharf' und einen 'kaputte Grafik' mit einer Admin-Liste von Badges, deren Grafik fehlt oder tot ist. Tote URLs erhalten einen einzelnen erneuten Auflösungsversuch gegen den Katalog, bevor sie als kaputt erfasst werden, und fehlende höhere Auflösungen bekommen eine eigene Platzhalter-Behandlung statt einer hochskalierten Unschärfe. Aufwand: S. Risiko bei schlechter Umsetzung: Ein kurzzeitiger CDN-Ausfall markiert hunderte Badges als kaputt; Fehler brauchen daher einen Retry und eine Abklingzeit, bevor sie gespeichert werden.
+
+Warum: Ein Katalog, der an seinen Grafiken gemessen wird, sollte wissen, welche seiner Bilder fehlen, tot sind oder eine niedrige Auflösung haben.
+
+Quelle: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Claim-Plan für offene Fenster</h3>
+  <details><summary>Details</summary><p>Ein Mitglied erhält einen persistenten Claim-Plan: die offenen Fenster, die es interessieren, sortiert nach einer serverseitig berechneten Kombination aus Deadline und Seltenheit, jedes mit einem Zustand 'will', 'geclaimt' oder 'übersprungen', der Besuche und Geräte überdauert, plus einem Fortschrittsring und einer exportierbaren Checkliste. Er ist zustandsbehaftet pro Mitglied, anders als der zustandslose 'claimbar'-Filter, und er ist stumm, anders als die Wunschlisten-Alarme. Verwendet offene Fenster, Wunschlistendaten des Mitglieds und synchronisierte Eigentümerschaft, um gelandete Claims automatisch abzuhaken. Aufwand: M. Risiko bei schlechter Umsetzung: Hängt der 'geclaimt'-Haken vom nächsten Inventar-Sync statt vom Mitglied ab, zeigt der Plan falschen Fortschritt; manueller und synchronisierter Zustand müssen daher getrennt gespeichert und angezeigt werden.
+
+Warum: Sammler, die mehrere gleichzeitige offene Fenster im Blick behalten, brauchen einen Plan, dem sie über Tage vertrauen können, nicht einen frischen Filter bei jedem Besuch.
+
+Quelle: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Vorläufige Seltenheitskennzeichnung</h3>
+  <details><summary>Details</summary><p>Badges, die jünger sind als ein konfigurierbares Beobachtungsfenster oder durch weniger als N Besitzerstichproben gestützt sind, zeigen ihren TBRI als 'vorläufig' mit einem eigenen Chip, sind von Stufenwechsel-Alarmen und stufenbasierten Bestenlisten ausgeschlossen, bis sie reifen, und die Detailseite nennt, wann sich die Schätzung stabilisieren sollte. Verwendet das Alter der badge_stats-Serie des Badges. Aufwand: M. Risiko bei schlechter Umsetzung: Vorläufige Badges zu verstecken statt sie zu kennzeichnen nimmt neue Drops genau in dem Moment aus dem Katalog, in dem Menschen danach suchen.
+
+Warum: Seltenheit, berechnet aus drei Tagen Daten, ist eine Vermutung; sie als Stufe darzustellen, täuscht alle, die sie lesen.
+
+Quelle: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Audit der Kalibrierung der Stufen-Grenzwerte</h3>
+  <details><summary>Details</summary><p>Die Live-Verteilung der TBRI-Werte neu berechnen und prüfen, ob die Stufengrenzen weiterhin die Pyramide erzeugen, die die Stufen behaupten: wie viele Badges der Stufe Legendär tatsächlich existieren, ob ein Band leer ist oder überläuft und welcher Anteil des Katalogs in jeder Stufe liegt. Veröffentlicht die Grenzwerttabelle, die aktuellen Anteile und einen vorgeschlagenen Neuschnitt, wenn die Verteilung abgedriftet ist, pro Lauf gespeichert, damit die Drift über die Zeit sichtbar wird. Aufwand: S. Risiko bei schlechter Umsetzung: Automatische Neuschnitte würden über Nacht jeden Screenshot und jedes Ranking entwerten; das Audit darf daher nur vorschlagen; Grenzwerte ändern sich bewusst und sind versioniert.
+
+Warum: Seltenheitsstufen sind der gemeinsame Wortschatz des Katalogs, und derzeit prüft nichts, ob die Bezeichnungen noch zu den Schwellenwerten passen, die sie definieren.
+
+Quelle: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>set_id-Rückwärtssuche</h3>
+  <details><summary>Details</summary><p>Eine kleine Seite plus ein JSON-Endpunkt, auf dem jeder eine Twitch-set_id, eine vollständige Badge-UUID oder eine Bild-URL einfügt und den Katalogeintrag mit seiner Set-Seite, seinem aktuellen Status und seiner Besitzerzahl erhält, mit Weiterleitungen, sodass eine rohe ID-URL sich wie eine Badge-Seite verhält. Gebaut für Discord-Bot-Autoren, Wiki-Bearbeiter und Moderatoren, die eine ID haben und sonst nichts. Aufwand: S. Risiko bei schlechter Umsetzung: Ein ID-Auflöser, der auf den nächsten Treffer ausweicht, liefert das falsche Badge mit voller Überzeugung; unbekannte IDs müssen daher sauber 'nicht gefunden' zurückgeben statt einer Vermutung.
+
+Warum: Entwickler und Moderatoren arbeiten mit set_ids, während der Katalog nur Badge-Namen spricht.
+
+Quelle: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Evergreen- gegen Limited-Lebenszyklus</h3>
+  <details><summary>Details</summary><p>Einen Lebenszyklus-Zustand pro Badge ableiten — noch nie geschlossen (evergreen, wie Subscriber-Badges), mindestens einmal geschlossen (limited) oder zurückgekehrt (neu aufgelegt) —, ihn als Chip auf der Kachel und der Detailseite zeigen und ihn in die Katalog-Facetten aufnehmen, damit dauerhaft und limitiert durchstöberbare Klassen sind. Unterschieden vom 'jetzt claimbar'-Filter, der nur den heutigen Zustand sieht. Aufwand: M. Risiko bei schlechter Umsetzung: Ein limitiertes Badge, das schlicht noch nicht geschlossen wurde, wird fälschlich als evergreen bezeichnet; der Chip muss daher 'kein erfasstes Ende' sagen, wann immer das alles ist, was die Daten hergeben.
+
+Warum: Ob ein Badge dauerhaft oder ein Einmal-Drop ist, ist die erste Frage, die ein Sammler dazu stellt.
+
+Quelle: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Katalog-Rekordtafel</h3>
+  <details><summary>Details</summary><p>Eine Rekordseite, berechnet über den ganzen Katalog: am schnellsten zu 100k Besitzern, am längsten ununterbrochen offenes Fenster, größtes Set nach Versionszahl, seltenstes noch claimbares Badge, ältestes noch erhältliches Badge, größter Besitzersprung bei einem einzelnen Sync, meiste durch eine Anbieterrevision verlorene Besitzer. Jeder Rekord verlinkt zum Badge und nennt das Beobachtungsfenster, über das er berechnet wurde, samt dem Datum seiner Aufstellung. Aufwand: M. Risiko bei schlechter Umsetzung: Rekorde über eine kurze Historie sind Artefakte davon, wann diese Website mit dem Synchronisieren begann; jeder Rekord muss daher sein Fenster offenlegen, sonst bedeutet er stillschweigend 'seit unserem Start'.
+
+Warum: Der Katalog enthält Superlative, die noch nie jemand berechnet hat, und Rekorde sind auf einen Blick lesbar.
+
+Quelle: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="badge" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Badges</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Claim-Trichter pro Badge</h3>
+  <details><summary>Details</summary><p>Die Badge-Seite als kleinen Trichter instrumentieren: Seitenaufrufe, Aufklappen der Claim-Anleitung, Klicks auf den Claim-Link und bestätigtes 'danach im Besitz' aus dem nächsten Inventar-Sync, alles aus anonymer Analytik plus Link-Klick-Protokollierung, mit einer Admin-Ansicht der Badges mit dem größten Interesse und den wenigsten Konversionen. Sie beantwortet, welche Badges die Leute wollen und nicht bekommen. Aufwand: M. Risiko bei schlechter Umsetzung: Winzige Stichproben pro Badge lesen sich wie Trends; der Trichter muss daher Zählungen zeigen, unterhalb einer Schwelle unterdrücken und über Wochen statt Tage aggregieren.
+
+Warum: Ob eine Badge-Seite Interesse in ein geclaimtes Badge verwandelt, ist die eigene Konversionsfrage des Katalogs.
+
+Quelle: new-ideas-01-badge.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Flavor-Texte pro Badge</h3>
+  <details><summary>Details</summary><p>Jedes Badge erhält eine kurze, von Menschen geschriebene Zeile — ein bis zwei Sätze Kontext oder Charakter, bewusst getrennt von den nüchternen Verdien-Anleitungen —, gerendert im Kachel-Tooltip, auf der Detailseite und auf der OG-Karte. Die Texte sind eine Spalte der Badge-Zeile, verfasst im Content-Tab, und jedes Badge ohne eigenen Text fällt auf eine generierte Zeile zurück, zusammengesetzt aus Kategorie, Stufe und Release-Jahr, damit die Abdeckung nie null ist. Sammler können die Genauigkeit eines Texts mit einem einzigen Tipp bewerten und so eine Warteschlange speisen, in der Admins die schwächsten überarbeiten. Daten: verfasster Text plus Katalogfelder für den Fallback. Aufwand: M. Risiko bei schlechter Umsetzung: 476 handgeschriebene Zeilen werden zur Wartungsschuld, und ein falscher Text darüber, wie ein Badge verdient wurde, liest sich als maßgeblich; Text und Verdien-Anleitung strikt getrennt halten und generierte Fallbacks als generiert kennzeichnen.
+
+Warum: Eigener Text auf jeder Badge-Seite ist sowohl der Unterschied zwischen einem Index und einem Ratgeber als auch der einzige originäre Text, den Suchmaschinen ranken können.
+
+Quelle: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Von Null-Treffer-Suchen zu Lücken-Briefings</h3>
+  <details><summary>Details</summary><p>Jede Katalogsuche ohne Ergebnis wird mit ihrer Abfrage, ihrem Locale und ihrem Zeitstempel protokolliert, und ein wöchentlicher Job clustert die Abfragen zu Themen (prime gaming, twitchcon, mod badge) und macht aus jedem Cluster ein kurzes Briefing: wonach gesucht wurde, ob es im Katalog einen nahen Treffer gibt und welche Seite die Antwort liefern sollte. Themen ohne antwortende Seite werden Kandidaten für Tutorials oder ein Glossar; Themen, bei denen ein Badge existiert, aber unauffindbar ist, werden zu Alias- oder Synonym-Arbeit am Suchindex. Daten: die protokollierten Abfragen plus die Felder Name, set_id und Kategorie des Katalogs zur Erkennung naher Treffer. Aufwand: S. Risiko bei schlechter Umsetzung: Das Protokoll wird zu einem unmoderierten Ablageort für alles, was Besucher in ein Feld tippen; nur einen gekürzten Abfragestring speichern und alles, das nach Name oder E-Mail-Adresse aussieht, verwerfen.
+
+Warum: Eine erfolglose Suche ist die ehrlichste Aussage darüber, welche Inhalte der Website fehlen, und die Website sammelt sie bereits, ohne etwas zu tun.
+
+Quelle: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Alt-Texte für Badge-Grafiken</h3>
+  <details><summary>Details</summary><p>Ein generierter zugänglicher Name und Alt-Text für jedes Badge-Bild auf der ganzen Website: der Name des Badges, sein Set und seine Kategorie sowie seine Seltenheitsstufe, zusammengesetzt aus der Zeile statt leer zu bleiben oder als Dateiname zu dienen. Hat ein Badge einen kuratierten Flavor-Text, reichert dieser die Beschreibung an, und die Open-Graph-Route nutzt denselben String in ihren Metadaten. Daten: Badge-Name, Set, Kategorie, Stufe und der optionale Flavor-Text. Aufwand: S. Risiko bei schlechter Umsetzung: Hunderte fast identische Strings wiederholen nur den sichtbaren Namen und verschlechtern das Screenreader-Erlebnis; nur die informativen Felder behalten, die dekorative Verdopplung des Stufen-Chips weglassen und rein dekorative Instanzen als leer markieren.
+
+Warum: Badge-Grafik ist der gesamte Inhalt des Katalogs; ihre Zugänglichkeit ist daher kein Bonus, sondern der Unterschied zwischen einer nutzbaren und einer unbrauchbaren Seite für einen Screenreader-Besucher.
+
+Quelle: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Inhaltsindex für Menschen</h3>
+  <details><summary>Details</summary><p>Ein HTML-Index, der jeden geschriebenen Text der Website auflistet — Beiträge nach Monat gruppiert, Tutorials, Glossarbegriffe, Methodik- und Quellenseiten, kuratierte Listen — als durchstöberbares, crawlerbares Verzeichnis, bewusst getrennt vom maschinellen Zweck der XML-Sitemap. Er gibt Lesern das ganze Archiv auf einen Blick, gibt Crawlern und der Prüfung interner Links einen einzigen Hub und kann die Abdeckungszahl jedes Inhaltstyps zeigen, damit eine Lücke sichtbar wird. Daten: Inhaltszeilen gruppiert nach Typ und Datum plus die Routenliste. Aufwand: S. Risiko bei schlechter Umsetzung: Er wächst zu einer Tausend-Links-Seite, die als Navigation nutzlos und im Rendering langsam ist; nach Typ paginieren und ihn als Hub statt als Ablage halten.
+
+Warum: Ein Archiv, das niemand durchstöbern kann, ist ein Archiv, auf das niemand verlinkt; interne Links sind es, die das Ranking der Website zwischen ihren eigenen Seiten tragen.
+
+Quelle: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="content" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Content</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Inline-Redaktions-Threads</h3>
+  <details><summary>Details</summary><p>Entwürfe im Content-Tab unterstützen inline verankerte Kommentare: Ein Redakteur markiert einen Satz und hinterlässt eine Notiz, der Autor antwortet im selben Thread, und der Thread muss gelöst sein, bevor sich der Veröffentlichen-Knopf freischaltet. Das ersetzt die Prüfung außerhalb des Dokuments und hält die Diskussion am exakten Text fest, um den es geht; jeder Thread ist typisiert als Fakt, Struktur, SEO oder Recht, sodass ein Autor weiß, welche Art von Änderung gefragt ist. Daten: Kommentarzeilen, verankert an einen Zeichenbereich einer Inhaltsrevision, plus die bestehenden Inhaltsstatusfelder. Aufwand: M. Risiko bei schlechter Umsetzung: Es wird ein zweiter Chat und die Veröffentlichungssperre wird verübelt; Threads kurzlebig halten, sie beim Veröffentlichen automatisch auflösen und eine Tippfehler-Korrektur niemals an einem offenen Struktur-Thread blockieren.
+
+Warum: Redaktionelle Qualität auf einer Website, an der mehr als eine Person schreibt, hängt davon ab, dass die Prüfung im Dokument statt in einem Chatfenster geschieht.
+
+Quelle: new-ideas-02-content.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Motion-Token-Skala mit einer Bewegungsstufen-Einstellung</h3>
+  <details><summary>Details</summary><p>Jede Animation wählt eigene Dauer und Easing, und die einzige Kontrolle über Bewegung ist die prefers-reduced-motion-Media-Query. Eine Motion-Token-Skala definieren (--dur-1/2/3, --ease-standard/enter/exit), die von den Komponentenklassen konsumiert wird, plus eine explizite Stufe in der Oberfläche — voll, dezent oder aus —, gespeichert wie das Theme und auf ein data-motion-Attribut am html-Element gemappt. Das ist eine andere Achse als die bereits auf dem Brett liegende Reduced-Motion-Idee, die die OS-Query beachtet: Sie gibt Besuchern, die Ruhe wollen, aber nicht null Bewegung, eine mittlere Stufe, und macht das dekorative Set (Funkeln, Münzregen, Partikel) entbehrlich, während Übergänge, die Bedeutung tragen, bleiben. Aufwand: M. Risiko bei schlechter Umsetzung: Tokens, die jede Komponente zugunsten fest kodierter Zahlen ignoriert, oder eine Aus-Stufe, die auch den Übergang tötet, der einen Zustandswechsel vermittelt.
+
+Warum: Bewegung ist Teil der Identität dieser Website — alles Funkeln und fliegende Münzen —, also verdient sie dieselbe Token-Disziplin wie Farbe und Radius.
+
+Quelle: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Ein Overlay-Baustein für Dialoge und Sheets</h3>
+  <details><summary>Details</summary><p>Dialoge, Spiel-Ergebnispanels, das Sprachpanel, das mobile Navigations-Sheet und das Kontomenü sind getrennte Implementierungen mit unterschiedlichen Scrims, Größen und Schließregeln. Einen Overlay-Baustein definieren mit drei Präsentationen, gewählt nach Viewport und Inhaltsgröße — verankerter Popover, zentrierter Dialog und Bottom-Sheet auf Handys —, mit gemeinsamem Scrim-Token, Scroll-Sperre, Escape- und Außenklick-Schließung, einem Titel-und-Schließen-Header-Muster und Safe-Area-Insets für das Sheet. Das ist der Layout- und Verhaltensvertrag; die bereits auf dem Brett liegende Fokusfallen-Arbeit fügt sich dort ein, statt pro Fläche neu gebaut zu werden. Aufwand: L. Risiko bei schlechter Umsetzung: Ein Sheet, das den Seitenscroll auf iOS einsperrt, ein Overlay, das in einem Stacking-Kontext unter einer Karte gerendert wird, oder eine halbfertige Migration, die zwei Scrim-Farben auf derselben Seite hinterlässt.
+
+Warum: Overlays sind der Ort, an dem Spiele, Konto und Sprache zusammenleben, und fünf verschiedene Scrims sind fünf verschiedene Produkte.
+
+Quelle: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Optische Normalisierung der Badge-Grafiken</h3>
+  <details><summary>Details</summary><p>Badge-PNGs haben wild unterschiedliche innere Polster und Inhaltsmaße — ein Bits-Badge füllt seine Leinwand, während ein Partner-Badge darin schwebt —, sodass ein Raster einheitlich großer Bilder trotzdem wie ein Raster unterschiedlich großer Badges wirkt. Eine Messung der Inhalts-Bounding-Box jedes Bilds zur Sync-Zeit hinzufügen, das Inset neben der Badge-Zeile speichern und die Kacheln so rendern, dass die Grafik skaliert wird und der Inhalt eine konsistente optische Box einnimmt, statt dass die Datei eine feste füllt. Die Quellgrafik bleibt unangetastet, und die Messung ist ein Durchlauf pro Bild beim Sync. Aufwand: M. Risiko bei schlechter Umsetzung: Grafik, die über ihre native Auflösung hinaus skaliert wird, bis sie verschwimmt, oder ein Beschneiden, das einen Schein oder Schatten abschneidet, der wirklich zum Badge gehört.
+
+Warum: Die ganze Seite ist eine Wand aus einem Objekt; das Auge liest jede Größenunstimmigkeit als Nachlässigkeit, bevor es irgendetwas anderes liest.
+
+Quelle: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Kontrastplatte für Badge-Grafiken im hellen Theme</h3>
+  <details><summary>Details</summary><p>Viele Badge-Assets sind mit weißen oder sehr hellen Strichen auf Transparenz gezeichnet; das liest sich auf der dunklen Fläche wunderbar und verschwindet auf der hellen fast. Eine günstige Luminanz- und Ausdehnungsmessung pro Bild beim Sync speichern und im hellen Theme eine dezente Platte rendern — eine surface-2-Füllung oder eine haarfeine Outline mit geringer Deckkraft —, hinter genau der Grafik, die sie braucht, damit Badges mit hellen Strichen lesbar bleiben, während alles andere seinen bisherigen plattenlosen Look behält. Die Entscheidung gilt pro Bild, nicht pro Theme. Aufwand: M. Risiko bei schlechter Umsetzung: Eine Platte unter Grafik, die keine brauchte, wirkt wie ein Rendering-Fehler, oder eine Platte, die stark genug ist, dass das helle Theme zu einem Raster grauer Quadrate wird.
+
+Warum: Die Hälfte des Katalogs ist hell auf Transparent, und das helle Theme verliert derzeit genau diese Hälfte der Wand.
+
+Quelle: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Explizite Daten-Suffizienz-Zustände für Charts</h3>
+  <details><summary>Details</summary><p>Charts rendern mit einem Punkt, vier Punkten oder einem Jahr Historie auf dieselbe Weise, und eine Lücke im Sync-Takt wird mit einer geraden Linie durchzogen, als fehlte nichts. Die Suffizienz-Zustände explizit definieren: ein Punkt zeigt einen großen Wert mit 'noch keine Historie' statt einer flachen Linie; weniger als eine Woche Punkte zeigt Punkte ohne Trendlinie und ohne Momentum-Behauptung; eine Lücke, die länger als der Sync-Takt ist, rendert als gestricheltes Segment mit einem Keine-Daten-Marker; und eine leere Serie zeigt einen gestalteten Platzhalter statt nackter Achsen. Die Schwellenwerte leben beim Chart-Vertrag, getrennt von Leeren-Zuständen auf Seitenebene, denn hier sagt das Chart die Wahrheit über seine eigenen Eingaben. Aufwand: M. Risiko bei schlechter Umsetzung: Ein echter Trend hinter einer konservativen Schwelle versteckt, oder eine gestrichelte Lücke, die übertreibt, wie viel fehlt, obwohl es nur ein übersprungener Heartbeat war.
+
+Warum: Jedes dieser Charts entsteht aus einem Polling-Sync, und so eine Serie als vollständig auszugeben ist der leichteste Weg, einen Sammler in die Irre zu führen.
+
+Quelle: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="design" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Design</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Datensparmodus für langsame und getaktete Verbindungen</h3>
+  <details><summary>Details</summary><p>Ein Besucher mit getakteter Verbindung bekommt das volle Erlebnis und zahlt dafür: dekorative Bewegung, Partikeleffekte, das Chart-Bundle und 4x-Grafik. Einen gestalteten Datensparmodus hinzufügen, automatisch aktiviert aus dem Save-Data-Header und dem effektiven Verbindungstyp und in den Einstellungen überschreibbar, der dekorative Bewegung und Ambient-Effekte auf die dezente Stufe senkt, 1x-Grafik anfordert, das Stats-Bundle aufschiebt, bis ein Chart in die Nähe des Viewports kommt, und Münzregen-artige Effekte durch statische Äquivalente ersetzt — angezeigt als kleiner Chip, damit der Besucher versteht, warum die Website anders aussieht, statt sie für kaputt zu halten. Aufwand: M. Risiko bei schlechter Umsetzung: Der Modus nimmt etwas Funktionales zusammen mit der Dekoration mit, oder die automatische Erkennung liest eine Verbindung falsch und lässt die Website für alle verkleinert wirken.
+
+Warum: Das ist ein datenschwerer Katalog, der täglich von Menschen am Handy besucht wird, und eine Möglichkeit, dafür weniger zu zahlen, ist ein Feature statt eine Verschlechterung.
+
+Quelle: new-ideas-03-design.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
+
+<article class="card " data-category="game" data-quickwin="2">
+  <div class="card-header">
+    <span class="badge-cat">Spiele</span>
+    
+    <span class="badge-qw" style="background:#22c55e">Quick Win</span>
+  </div>
+  <h3>Katalog-Match-Three</h3>
+  <details><summary>Details</summary><p>Badge-Kacheln fallen in einem Raster mit sechs Spalten, und ein Tausch ist nur legal, wenn beide Kacheln eine Kategorie teilen, sodass jeder Zug ein kleiner Akt der Katalogsortierung ist. Aufräumen wertet nach der Stufe der übereinstimmenden Badges, und der Server spielt das eingereichte Zugprotokoll gegen den Rundenseed erneut durch, um den Score vor der Auszahlung neu zu berechnen. Aufwand: L. Risiko bei schlechter Umsetzung: Der Score ist die am leichtesten fälschbare Zahl der Website; dem Zugprotokoll muss allein vertraut werden, und jeder clientseitig angezeigte Score muss klar als Richtwert gekennzeichnet sein.
+
+Warum: Eine Match-Three-Schleife und der Badge-Katalog verstärken sich gegenseitig, statt dass eines nur ein Skin über dem anderen ist.
+
+Quelle: new-ideas-04-game.json</p></details>
+  <div class="metrics">
+    <div class="metric"><span class="label">Aufwand</span><div class="bar"><span style="width:40%;background:#86efac"></span></div><span class="val">2/5 · leicht</span></div>
+    <div class="metric"><span class="label">Nutzen</span><div class="bar"><span style="width:80%;background:#4ade80"></span></div><span class="val">4/5 · hoch</span></div>
+  </div>
+  <p class="opinion">Gute Balance. Der Aufwand (2/5) steht in einem gesunden Verhältnis zum Nutzen (4/5).</p>
+</article>
