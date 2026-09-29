@@ -420,7 +420,10 @@ export default async function BadgeDetailPage({ params }: PageProps) {
     />
   );
 
-  /** Market map: this badge against its category peers (owners × TBRI). */
+  /** Market map: this badge against its category peers (owners × TBRI).
+   *  Temporarily hidden per owner decision (2026-09-29) — flip the flag to
+   *  bring it back at the bottom of the page; data wiring + keys stay live. */
+  const SHOW_MARKET_MAP = false;
   const marketMapSection = related !== null && mapPeers.length > 0 && (
     <MarketMap
       self={{
@@ -751,14 +754,14 @@ export default async function BadgeDetailPage({ params }: PageProps) {
           {ownershipSection}
         </div>
         <div className="space-y-6">
-          {radarCard}
           {rarityPanel}
+          {radarCard}
           {provenanceSection}
         </div>
       </div>
-      {marketMapSection}
       {faqSection}
       {relatedSection}
+      {SHOW_MARKET_MAP && marketMapSection}
     </div>
   );
 }
