@@ -17,7 +17,11 @@ export default function TowerGame() {
 
   async function climb() {
     const res = await play({ cashoutAt });
-    if (!res) return;
+    // A rejected round clears the previous floor marker and verdict.
+    if (!res) {
+      setLast(null);
+      return;
+    }
     // The server result is untyped coming over the wire: read only the fields
     // that are actually present instead of casting the whole object.
     const raw = res.result as Record<string, unknown>;

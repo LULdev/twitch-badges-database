@@ -324,8 +324,128 @@ const META_ACHIEVEMENTS: Array<{ id: string; at: number }> = [
   { id: "c_ach_100", at: 100 },
 ];
 
+type AdminClient = ReturnType<typeof createAdminClient>;
+
+/**
+ * How long a skip stays valid.
+ *
+ * The skip is allowed for at most this long after the last COMPLETE pass. It
+ * exists only for the checks that no row can announce: `k_weekend_warrior`
+ * reads `new Date().getUTCDay()`, `s_birthday` compares today's month/day with
+ * the Twitch account's creation date, and `s_ghost_town` reads `accountAgeDays`,
+ * which grows with no row changing. `s_top_percent` and `s_pioneer` are a
+ * second outside case: they read data that changes when a DIFFERENT user acts,
+ * so no row this user's watermark watches can announce them. Every
+ * data-driven unlock is covered by the watermark itself and does not depend on
+ * this constant; this is the bound on how long such an unlock can be deferred,
+ * and it is a deferral, never a loss — the next call after the window expires
+ * runs the full pass.
+ */
+const ACH_EVAL_SKIP_WINDOW_MS = 60_000;
+
+interface AchEvalState {
+  /** Newest source row visible right now, recomputed fresh by the RPC. */
+  inputsAt: string | null;
+  /**
+   * Newest source row the last COMPLETED pass had already seen when it started.
+   * This — not `evaluatedAt` — is what the skip test compares against.
+   */
+  storedInputsAt: string | null;
+  /** When that pass finished. Drives the skip window only. */
+  evaluatedAt: string | null;
+}
+
+/**
+ * Read the watermark AND recompute the newest achievement-relevant input in one
+ * request (`achievement_eval_state`). Returns null when the RPC is unavailable
+ * (migration not applied yet, transient error) — the caller then evaluates in
+ * full, which is the fail-safe direction.
+ */
+async function readEvalState(
+  supabase: AdminClient,
+  userId: string,
+): Promise<AchEvalState | null> {
+  const { data, error } = await supabase.rpc("achievement_eval_state", {
+    p_user_id: userId,
+  });
+  if (error) {
+    console.warn("[achievements] eval state read failed:", error);
+    return null;
+  }
+  const row = (Array.isArray(data) ? data[0] : data) as
+    | {
+        inputs_at?: string | null;
+        stored_inputs_at?: string | null;
+        evaluated_at?: string | null;
+      }
+    | null;
+  if (!row) return null;
+  return {
+    inputsAt: row.inputs_at ?? null,
+    storedInputsAt: row.stored_inputs_at ?? null,
+    evaluatedAt: row.evaluated_at ?? null,
+  };
+}
+
+/**
+ * Arm the fast path after a pass that ran in full.
+ *
+ * `inputsAt` is the value read BEFORE the pass started, not a fresh reading and
+ * not `Date.now()`. Anything committed while the pass was working carries a
+ * later timestamp, so the next call sees a newer input and runs in full again.
+ * Skipping this write (RPC error, or a pass whose input read failed) simply
+ * leaves the fast path disarmed; it never leaves it armed with a wrong value.
+ */
+async function writeEvalWatermark(
+  supabase: AdminClient,
+  userId: string,
+  inputsAt: string | null,
+): Promise<void> {
+  if (!inputsAt) return;
+  const { error } = await supabase.rpc("bump_achievement_eval_watermark", {
+    p_user_id: userId,
+    p_inputs_at: inputsAt,
+  });
+  if (error) console.warn("[achievements] watermark bump failed:", error);
+}
+
+/**
+ * True when nothing that any check reads has changed since the last complete
+ * pass.
+ *
+ * The comparison is `fresh inputsAt <= storedInputsAt`, NOT `<= evaluatedAt`.
+ * `evaluatedAt` is when the last pass FINISHED, so a row committed while that
+ * pass was still working (for example a concurrent request from the same user)
+ * carries a timestamp between the two — comparing against the finish time would
+ * skip it and hide a genuine unlock. Comparing against the stored start-time
+ * watermark is the sound test: anything newer than what the pass actually saw
+ * forces a re-run.
+ *
+ * `evaluatedAt` only bounds the skip in time, for the checks no row can
+ * announce (weekend rollover, the Twitch anniversary, account age).
+ */
+function canSkip(state: AchEvalState, now: number): boolean {
+  if (!state.inputsAt || !state.storedInputsAt || !state.evaluatedAt) return false;
+  const input = Date.parse(state.inputsAt);
+  const seen = Date.parse(state.storedInputsAt);
+  const evaluated = Date.parse(state.evaluatedAt);
+  if (!Number.isFinite(input) || !Number.isFinite(seen) || !Number.isFinite(evaluated)) {
+    return false;
+  }
+  if (input > seen) return false;
+  if (now - evaluated > ACH_EVAL_SKIP_WINDOW_MS) return false;
+  return true;
+}
+
 export async function evaluateAchievements(userId: string): Promise<string[]> {
   const supabase = createAdminClient();
+
+  // ---- FAST PATH -------------------------------------------------------
+  // One request answers "could anything have unlocked since the last complete
+  // pass?". Only a NULL/unavailable state or a stale window falls through.
+  const state = await readEvalState(supabase, userId);
+  if (state && canSkip(state, Date.now())) return [];
+
   const stats = await buildStats(userId);
 
   const { data: unlockedRows } = await supabase
@@ -404,6 +524,18 @@ export async function evaluateAchievements(userId: string): Promise<string[]> {
       },
     ).catch(() => undefined);
   }
+
+  // ---- WHERE THE WATERMARK IS BUMPED -----------------------------------
+  // Last statement of a pass that ran in full, and the ONLY place it is
+  // written. It is armed even when `newly` is empty — an evaluation that finds
+  // nothing is exactly the one a re-run may skip. It records the `inputs_at`
+  // read at the TOP of this call, so every write this pass itself performed
+  // (user_achievements inserts, bump_counters, logActivity, the inner award)
+  // carries a LATER timestamp than the watermark and forces the next call to
+  // evaluate in full. That is what makes c_ach_1 / c_ach_10 resolve on the
+  // call after the unlock that earned them, instead of relying on the
+  // in-loop `totalUnlocked` arithmetic to catch every case.
+  await writeEvalWatermark(supabase, userId, state?.inputsAt ?? null);
 
   return newly;
 }

@@ -107,7 +107,7 @@ export default function QuizGame({ badges }: { badges: QuizBadge[] }) {
             </div>
           </>
         ) : (
-          <button type="button" onClick={startRound} className="btn btn-primary w-full">
+          <button type="button" onClick={startRound} disabled={busy} className="btn btn-primary w-full">
             {t("start")}
           </button>
         )}

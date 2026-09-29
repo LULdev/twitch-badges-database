@@ -81,7 +81,13 @@ export default function ShootGame() {
         cancelAnimationFrame(raf.current);
         const { hits: h, shots: sh } = stateRef.current;
         void play({ hits: h, shots: sh }).then((res) => {
-          if (!res) return;
+          if (!res) {
+            // A rejected round (rate limit, gate, network) must not leave the
+            // previous round's verdict on the field next to the round-failed
+            // error — `summary` is local state here, separate from `last`.
+            setSummary(null);
+            return;
+          }
           // The server decides the outcome; the client summary must not imply
           // a win from its own accuracy figure.
           setSummary(

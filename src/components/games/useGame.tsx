@@ -59,6 +59,11 @@ export function useGame(gameId: string) {
         const data = (await res.json()) as PlayResponse;
         if (!data.ok) {
           setError(t("roundFailed"));
+          // A rejected round must not leave the PREVIOUS round's verdict on
+          // screen: `RoundOutcome` renders from `last`, and only success ever
+          // overwrote it, so games using it (Shoot, Vault, Memory, Quiz,
+          // Catcher) kept showing an old "You Win +N" beside the new error.
+          setLast(null);
           return null;
         }
         setLast(data);
@@ -66,6 +71,7 @@ export function useGame(gameId: string) {
         return data;
       } catch {
         setError(t("networkError"));
+        setLast(null);
         return null;
       } finally {
         inFlight.current = false;

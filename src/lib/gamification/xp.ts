@@ -39,6 +39,109 @@ export type FeedKind =
   | "profile"
   | "first_login";
 
+/* ------------------------------------------------------------------------- *
+ * Short-TTL caches for the two reads that every wheel spin and every game
+ * round repeats and that nothing on those paths needs to be byte-exact.
+ *
+ * These are round-trip savers, not a correctness mechanism: the economy already
+ * treats the RPC return value as the authority for the balance, so a cache hit
+ * costs nothing and a miss behaves exactly as it did before.
+ * ------------------------------------------------------------------------- */
+
+interface CacheEntry<T> {
+  value: T;
+  at: number;
+}
+
+const progressCache = new Map<string, CacheEntry<ProgressRow>>();
+const feedIdentityCache = new Map<string, CacheEntry<FeedIdentity>>();
+
+/**
+ * How long a `user_progress` snapshot may back award()'s pre-read.
+ *
+ * The redundancy this removes is within ONE request: a game round reads the row
+ * for the bet authorisation, `bumpCoins` moves the balance, and award() read
+ * the row a second time. That whole chain is sub-second, so 2 s is generous
+ * headroom while still bounding the one real exposure — a concurrent award on a
+ * second request for the same user — to roughly the duration of the request it
+ * is racing.
+ *
+ * It is deliberately NOT applied to `getProgress` itself: `/api/progress` and
+ * the "not enough coins" authorisation in games.ts must keep reading fresh, and
+ * a cache inside `getProgress` would silently make the debit check stale.
+ */
+const AWARD_PROGRESS_TTL_MS = 2_000;
+
+/**
+ * How long a profile's denormalized feed identity may be reused.
+ *
+ * `username` / `avatar_url` are copied onto `activity_events` as a point-in-time
+ * record of who the player was when the event fired, so a rename surfacing up
+ * to 30 s late changes nothing a reader can observe. One spin is otherwise
+ * wasteful here: award() calls logActivity up to twice and every unlocked
+ * achievement calls it again, each repeating the identical `profiles` SELECT.
+ */
+const FEED_IDENTITY_TTL_MS = 30_000;
+
+/** Keeps a warm lambda from growing either map without bound. */
+const CACHE_MAX_ENTRIES = 5_000;
+
+function cacheGet<T>(
+  cache: Map<string, CacheEntry<T>>,
+  key: string,
+  ttl: number,
+): T | undefined {
+  const hit = cache.get(key);
+  if (!hit) return undefined;
+  if (Date.now() - hit.at > ttl) {
+    cache.delete(key);
+    return undefined;
+  }
+  return hit.value;
+}
+
+function cacheSet<T>(cache: Map<string, CacheEntry<T>>, key: string, value: T): void {
+  // Map iterates in insertion order, so the first key is the oldest write.
+  if (cache.size >= CACHE_MAX_ENTRIES) {
+    const oldest = cache.keys().next();
+    if (!oldest.done) cache.delete(oldest.value);
+  }
+  cache.set(key, { value, at: Date.now() });
+}
+
+interface FeedIdentity {
+  username: string | null;
+  avatar: string | null;
+}
+
+/**
+ * The username/avatar that `logActivity` denormalizes onto every feed row.
+ *
+ * The error is swallowed exactly as before: a failed SELECT has always written
+ * nulls onto the event, and turning that into a throw would drop feed rows that
+ * are written today.
+ */
+async function getFeedIdentity(userId: string): Promise<FeedIdentity> {
+  const cached = cacheGet(feedIdentityCache, userId, FEED_IDENTITY_TTL_MS);
+  if (cached !== undefined) return cached;
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("username, avatar_url")
+    .eq("id", userId)
+    .maybeSingle();
+  const identity: FeedIdentity = {
+    username: data?.username ?? null,
+    avatar: data?.avatar_url ?? null,
+  };
+  // A failed read must not be cached. Pre-cache, a transient pooler blip
+  // nulled the identity of only the events written during the blip; caching
+  // the nulls would pin them onto every feed row for the next 30 s. Leaving
+  // the cache cold makes the next event retry, exactly as before.
+  if (!error) cacheSet(feedIdentityCache, userId, identity);
+  return identity;
+}
+
 /** Public live-feed entry — every XP gain, game, achievement, steal … */
 export async function logActivity(entry: {
   userId: string | null;
@@ -54,13 +157,9 @@ export async function logActivity(entry: {
     let username: string | null = null;
     let avatar: string | null = null;
     if (entry.userId) {
-      const { data } = await supabase
-        .from("profiles")
-        .select("username, avatar_url")
-        .eq("id", entry.userId)
-        .maybeSingle();
-      username = data?.username ?? null;
-      avatar = data?.avatar_url ?? null;
+      const identity = await getFeedIdentity(entry.userId);
+      username = identity.username;
+      avatar = identity.avatar;
     }
     const { error } = await supabase.from("activity_events").insert({
       user_id: entry.userId,
@@ -139,6 +238,41 @@ export async function getProgress(userId: string): Promise<ProgressRow> {
 }
 
 /**
+ * award()'s pre-read: the same row and the same upsert-on-miss guarantee as
+ * `getProgress`, but a warm cache answers it.
+ *
+ * The cached object is frozen because it is shared: award() is the only caller
+ * and only reads it, but a future writer would otherwise poison every later
+ * reader within the TTL. Errors are deliberately not cached and concurrent
+ * misses are not de-duplicated — a miss behaves exactly as it does today, so a
+ * transient read failure still throws rather than becoming a cached zeroed row.
+ */
+async function getProgressForAward(userId: string): Promise<ProgressRow> {
+  const cached = cacheGet(progressCache, userId, AWARD_PROGRESS_TTL_MS);
+  if (cached !== undefined) return cached;
+  const row = await getProgress(userId);
+  cacheSet(progressCache, userId, Object.freeze(row));
+  return row;
+}
+
+/**
+ * Write-through: republish what the atomic RPC actually committed so the next
+ * read in the same burst sees the new balance rather than the snapshot taken
+ * before this award.
+ *
+ * Merged, never replaced. Only xp and coins are republished because they are
+ * the only columns this function knows post-RPC; the counters the migrations
+ * moved into SQL are deliberately absent from the destructure in award() and
+ * must not be fabricated here. A cold cache is left cold — a partial row would
+ * be worse than a miss.
+ */
+function noteAwardedProgress(userId: string, xp: number, coins: number): void {
+  const entry = progressCache.get(userId);
+  if (!entry) return;
+  cacheSet(progressCache, userId, Object.freeze({ ...entry.value, xp, coins }));
+}
+
+/**
  * Guarantees the `user_progress` row exists before a daily gate RPC runs.
  *
  * `claim_daily_gate` / `claim_wheel_gate` only UPDATE: with no row the update
@@ -186,7 +320,12 @@ export async function award(
   options: AwardOptions,
 ): Promise<AwardResult> {
   const supabase = createAdminClient();
-  const current = await getProgress(userId);
+  // Same row, same upsert-on-miss guarantee, usually a cache hit. A game round
+  // already read this row for the bet check and then bumped the coins, so this
+  // was the third read of one request. Of the whole row only `xp` (for
+  // `before`) and the never-reached `coins` fallback are consumed — everything
+  // else is destructured away below.
+  const current = await getProgressForAward(userId);
 
   let xpAwarded = Math.max(0, Math.floor(options.xp ?? 0));
   const coinsAwarded = Math.floor(options.coins ?? 0);
@@ -239,6 +378,7 @@ export async function award(
         Math.max(0, current.coins + coinsAwarded),
     );
   }
+  noteAwardedProgress(userId, newXp, newCoins);
   const after = levelFromXp(newXp).level;
 
   // The remaining row patch must not carry ANY column that an atomic RPC owns.

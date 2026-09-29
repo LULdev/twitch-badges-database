@@ -18,7 +18,12 @@ export default function HiloGame() {
 
   async function guess(choice: "higher" | "lower") {
     const result = await play({ choice });
-    if (!result) return;
+    // Keep the server-owned score but drop the previous verdict: on a rejected
+    // round `won`/`actual` describe a round that never happened.
+    if (!result) {
+      setState((prev) => ({ currentScore: prev.currentScore }));
+      return;
+    }
     const r = result.result as {
       currentScore: number;
       nextScore: number;

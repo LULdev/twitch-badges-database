@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { award, bumpCoins, getProgress } from "./xp";
 import { evaluateAchievements } from "./achievements";
 import { getEconomy, getFeatures, getGames } from "@/lib/settings";
+import { after } from "next/server";
 
 /**
  * The arcade: 13 badge-themed games, all server-authoritative.
@@ -80,57 +81,109 @@ export async function playGame(
 ): Promise<PlayResult> {
   const meta = GAMES.find((g) => g.id === gameId);
   if (!meta) return fail("Unknown game.");
+
+  const supabase = createAdminClient();
+  // `resolveGame` must not see a fractional or non-finite stake: the bet-bounds
+  // gate below no longer runs before it, so the resolver is handed a sanitised
+  // value up front rather than `Math.floor(bet)` after the fact.
+  const wager = Number.isFinite(bet) ? Math.floor(bet) : 0;
+
+  // ── WAVE A — every read the round needs, in flight together ────────────────
   // All three arcade switches are enforced HERE, not only in the pages. The master
   // switch and the `features.games` flag were honoured by the hub and the API route
   // while this engine settled rounds regardless, so an arcade "switched off" stayed
   // fully playable from the game URL. The panel can also switch a single game off or
   // move its bet bounds; the catalog metadata is only the fallback, so a settings
   // document written before a game existed can never make that game unplayable.
-  const [settings, features] = await Promise.all([getGames(GAMES), getFeatures()]);
+  //
+  // Nothing in this wave writes. The three settings reads are 5 s-cached
+  // (settings.ts), the two selects are plain reads, `getProgress` only
+  // materialises a missing row, and `resolveGame` is side-effect free (its DB
+  // access is one read for hilo's running score plus, for slots, a 10-minute
+  // cached symbol pool). Firing them together removes five head-to-head
+  // round trips; the gates below still run before the first write.
+  //
+  // `resolveGame` is wrapped rather than awaited raw so a failure inside it
+  // surfaces where it always used to — after the gates — instead of turning an
+  // arcade-disabled or rate-limited request into a 500. Every other member of
+  // the batch is rejection-free by construction (`readSetting` catches, the
+  // selects resolve `{ error }`), so the only promise here that can reject is
+  // `getProgress`, which is precisely the one that already threw here.
+  const outcomeAttempt = resolveGame(userId, gameId, wager, input, supabase).then(
+    (value) => ({ ok: true as const, value }),
+    (error: unknown) => ({ ok: false as const, error }),
+  );
+  // `getProgress` can reject (a transient pooler failure must not read as "no
+  // row"), and a rejection from `Promise.all` would abort the whole wave before
+  // the arcade/bet/rate gates run — turning a "switched off" or rate-limited
+  // request into a 500. It is therefore carried the same way as the resolver
+  // and unwrapped only after the gates have had their say.
+  const progressAttempt = getProgress(userId).then(
+    (value) => ({ ok: true as const, value }),
+    (error: unknown) => ({ ok: false as const, error }),
+  );
+
+  const [settings, features, lastRound, streak, progress, economy, outcome] = await Promise.all([
+    getGames(GAMES),
+    getFeatures(),
+    // Flood check: max one round per second.
+    supabase
+      .from("game_rounds")
+      .select("created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    // Streak window for this game. It is read HERE, in the same wave as the
+    // flood check, because it is an independent `game_rounds` select and
+    // nothing writes to `game_rounds` before the insert below (resolveGame only
+    // reads), so it observes exactly the rows it observed when it ran after the
+    // resolver.
+    supabase
+      .from("game_rounds")
+      .select("won")
+      .eq("user_id", userId)
+      .eq("game", gameId)
+      .order("created_at", { ascending: false })
+      .limit(10),
+    progressAttempt,
+    getEconomy(),
+    outcomeAttempt,
+  ]);
+
   if (!settings.enabled || !features.games) {
     return fail("The arcade is currently switched off.");
   }
   const rules =
     settings.games[meta.id] ?? { enabled: true, minBet: meta.minBet, maxBet: meta.maxBet };
   if (!rules.enabled) return fail("This game is currently switched off.");
-  bet = Math.floor(bet);
+  bet = wager;
   if (!Number.isFinite(bet) || bet < rules.minBet || bet > rules.maxBet) {
     return fail(`Bet must be between ${rules.minBet} and ${rules.maxBet} coins.`);
   }
-
-  const supabase = createAdminClient();
-
-  // Flood check: max one round per second.
-  const { data: lastRound } = await supabase
-    .from("game_rounds")
-    .select("created_at")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
   if (
-    lastRound &&
-    Date.now() - new Date(String(lastRound.created_at)).getTime() < RATE_LIMIT_MS
+    lastRound.data &&
+    Date.now() - new Date(String(lastRound.data.created_at)).getTime() < RATE_LIMIT_MS
   ) {
     return fail("Slow down — one round per second.");
   }
-
-  const progress = await getProgress(userId);
-  if (progress.coins < bet) return fail("Not enough coins.");
-
-  const outcome = await resolveGame(userId, gameId, bet, input, supabase);
-
-  const net = outcome.payout - bet;
+  if (!progress.ok) throw progress.error;
+  if (progress.value.coins < bet) return fail("Not enough coins.");
+  if (!outcome.ok) throw outcome.error;
+  const payout = outcome.value.payout;
+  const net = payout - bet;
   // ONE grading decision, used everywhere below. A resolver that reports its own
   // `won` knows better than the payout does: hilo pays by the odds, so a correct
   // call at the edges returns slightly less than the stake (0.981x worst) while still
   // being a win. Previously only the streak flag honoured that — the persisted
   // row, the `games_won` counter, the win XP, the feed line and the response all
   // graded on `payout > bet`, so such a round was still recorded as a loss.
-  const won = typeof outcome.result.won === "boolean" ? outcome.result.won : outcome.payout > bet;
-  const streakFlags = await currentStreakFlags(supabase, userId, gameId, won);
-
-  const result = { ...outcome.result, ...streakFlags };
+  const won =
+    typeof outcome.value.result.won === "boolean" ? outcome.value.result.won : payout > bet;
+  const result = {
+    ...outcome.value.result,
+    ...currentStreakFlags(gameId, won, (streak.data ?? []) as Array<{ won: boolean }>),
+  };
 
   const { data: round, error: roundError } = await supabase
     .from("game_rounds")
@@ -138,7 +191,7 @@ export async function playGame(
       user_id: userId,
       game: gameId,
       bet,
-      payout: outcome.payout,
+      payout,
       won,
       result,
     })
@@ -227,7 +280,8 @@ export async function playGame(
     throw coinError;
   }
 
-  const economy = await getEconomy();
+  // `economy` was resolved in wave A and is still the value the operator last
+  // published (same 5 s cache bound as before — it is simply read earlier).
   const awardResult = await award(userId, {
     xp: won ? economy.gameWinXp : economy.gameLoseXp,
     source: `game:${gameId}`,
@@ -242,15 +296,19 @@ export async function playGame(
         ? `won ${net.toLocaleString("en")} coins in ${meta.title ?? gameId}`
         : `called it right in ${meta.title ?? gameId} (${net.toLocaleString("en")} coins)`
       : `played ${gameId} (${net >= 0 ? "+" : ""}${net.toLocaleString("en")} coins)`,
-    payload: { game: gameId, bet, payout: outcome.payout },
+    payload: { game: gameId, bet, payout },
   });
 
-  await evaluateAchievements(userId).catch(() => undefined);
+  // The achievement pass re-reads the whole player (17 aggregate queries, 8 of
+  // them paged) and wrote nothing this round needs. It is handed to `after` so
+  // the platform finishes it once the response is flushed, instead of holding
+  // the spinner for a fifth of a second on every round.
+  afterResponse(() => evaluateAchievements(userId).catch(() => undefined));
 
   return {
     ok: true,
     bet,
-    payout: outcome.payout,
+    payout,
     won,
     balance: awardResult.coins,
     result,
@@ -262,30 +320,45 @@ function fail(message: string): PlayResult {
 }
 
 /**
- * Streak achievements. This runs BEFORE the current round is inserted, so the
- * round being played is passed in explicitly — otherwise a loss could still
- * complete the streak, and the win that actually completed it was not counted.
+ * Hand a task to the platform's post-response queue.
+ *
+ * `after()` is the only mechanism that keeps work ALIVE once the response has
+ * been flushed — on Vercel the invocation is not frozen until every registered
+ * callback settles, whereas a bare `void promise` is killed mid-flight. Outside
+ * a request scope (a script, a unit test) `after()` throws synchronously, so
+ * the task degrades to fire-and-forget rather than taking the round down with
+ * it. The task itself is responsible for swallowing its own errors; this only
+ * guarantees it does not block or throw.
  */
-async function currentStreakFlags(
-  supabase: ReturnType<typeof createAdminClient>,
-  userId: string,
+function afterResponse(task: () => Promise<unknown>): void {
+  try {
+    after(task);
+  } catch {
+    void task().catch(() => undefined);
+  }
+}
+
+/**
+ * Streak achievements. The caller snapshots the previous rounds BEFORE the
+ * current one is inserted and passes the round being played in explicitly —
+ * otherwise a loss could still complete the streak, and the win that actually
+ * completed it was not counted.
+ *
+ * Pure now: the window arrives from the same read wave as the flood check, so
+ * this function no longer owns a query of its own and can be graded the instant
+ * `won` is known.
+ */
+function currentStreakFlags(
   gameId: string,
   currentWon: boolean,
-): Promise<Record<string, unknown>> {
-  const { data } = await supabase
-    .from("game_rounds")
-    .select("won")
-    .eq("user_id", userId)
-    .eq("game", gameId)
-    .order("created_at", { ascending: false })
-    .limit(10);
-  const rounds = (data ?? []) as Array<{ won: boolean }>;
+  rounds: Array<{ won: boolean }>,
+): Record<string, unknown> {
+  if (!currentWon) return {};
   let streak = 0;
   for (const row of rounds) {
     if (row.won) streak += 1;
     else break;
   }
-  if (!currentWon) return {};
   const total = streak + 1;
 
   if ((gameId === "rps" || gameId === "blackjack") && total >= 5) {

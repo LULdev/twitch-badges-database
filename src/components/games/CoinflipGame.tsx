@@ -17,7 +17,12 @@ export default function CoinflipGame() {
 
   async function go() {
     const result = await play({ choice: side, target });
-    if (!result) return;
+    // A rejected round must clear the previous flip trail, the only win/loss
+    // signal this game renders. `playedSide` stays: it is the player own pick.
+    if (!result) {
+      setFlips(null);
+      return;
+    }
     const reported = result.result.side;
     setPlayedSide(reported === "tails" ? "tails" : "heads");
     setFlips((result.result.flips as string[]) ?? []);

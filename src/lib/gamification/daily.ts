@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { award, bumpCoins, ensureProgress, getProgress, logActivity, readProgress } from "./xp";
 import { evaluateAchievements } from "./achievements";
-import { getEconomy } from "@/lib/settings";
+import { getEconomy, type EconomySettings } from "@/lib/settings";
 
 /**
  * Daily login bonus. Base amounts and per-streak increments come from the admin
@@ -9,11 +9,20 @@ import { getEconomy } from "@/lib/settings";
  * coins per streak day, capped at +50 and +250) reproduce exactly what this
  * used to hardcode. One claim per UTC day.
  */
-export async function claimDaily(userId: string): Promise<
+export async function claimDaily(
+  userId: string,
+  /**
+   * Pre-read economy settings. The route overlaps this read with `playerGate`
+   * (the gate must precede any write, this read performs none), so it arrives
+   * already resolved. Omitted, it behaves exactly as before by awaiting
+   * `getEconomy()` here — same 5 s cache, same defaults either way.
+   */
+  economy?: EconomySettings,
+): Promise<
   { ok: false; reason: "already" } | { ok: true; xp: number; coins: number; streak: number }
 > {
   const supabase = createAdminClient();
-  const economy = await getEconomy();
+  const settings = economy ?? (await getEconomy());
   const todayStr = new Date().toISOString().slice(0, 10);
 
   // The gate only UPDATEs, so a user with no `user_progress` row would match 0
@@ -33,13 +42,13 @@ export async function claimDaily(userId: string): Promise<
   if (streak < 0) return { ok: false, reason: "already" };
 
   const bonus = Math.min(
-    economy.streakXpCap,
-    (streak - 1) * economy.streakXpPerDay,
+    settings.streakXpCap,
+    (streak - 1) * settings.streakXpPerDay,
   );
-  const xp = economy.dailyXp + bonus;
+  const xp = settings.dailyXp + bonus;
   const coins =
-    economy.dailyCoins +
-    Math.min(economy.streakCoinsCap, (streak - 1) * economy.streakCoinsPerDay);
+    settings.dailyCoins +
+    Math.min(settings.streakCoinsCap, (streak - 1) * settings.streakCoinsPerDay);
 
   try {
     await award(userId, {

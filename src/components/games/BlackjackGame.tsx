@@ -16,7 +16,10 @@ export default function BlackjackGame() {
 
   async function deal() {
     const result = await play({ stopAt });
+    // A rejected round must not leave the previous hand on the table beside the
+    // round-failed error — `last` is local state that only success overwrote.
     if (result) setLast(result.result as typeof last);
+    else setLast(null);
   }
 
   return (

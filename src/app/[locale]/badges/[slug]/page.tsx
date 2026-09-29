@@ -12,6 +12,7 @@ import RarityChip from "@/components/badges/RarityChip";
 import Countdown from "@/components/badges/Countdown";
 import { StatusChip } from "@/components/badges/BadgeCard";
 import { jsonLdScript } from "@/lib/jsonld";
+import { buildBadgeFaq } from "@/lib/badges/faq";
 import BadgeGrid from "@/components/badges/BadgeGrid";
 import OwnersChart from "@/components/charts/OwnersChart";
 import ShareButtons from "@/components/ShareButtons";
@@ -73,6 +74,7 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("badges");
+  const tFaq = await getTranslations("badgeFaq");
   const tcd = await getTranslations("countdown");
   const tc = await getTranslations("common");
   // Percentages with a locale-correct decimal separator; `toFixed` always
@@ -109,6 +111,90 @@ export default async function BadgeDetailPage({ params }: PageProps) {
 
   const relatedBadges = (related?.items ?? []).filter((b) => b.id !== badge.id).slice(0, 6);
 
+  /**
+   * Ownership figures, one source per metric.
+   *
+   * `badge.owner_count` is the only source for the headline: it is potat's
+   * LIFETIME owner total. The live lookup returns potat's CURRENT-wearer count
+   * — the same metric as `active_count`, not the same as the owner total — so
+   * falling back to it for the headline would publish a figure that is smaller
+   * by orders of magnitude and label it "people own this badge". When the
+   * stored poll has not run yet, the honest answer is "no data", and the FAQ's
+   * owners answer already words the live-only case correctly on its own.
+   */
+  const totalOwners = badge.owner_count;
+  const share =
+    badge.percentage !== null
+      ? Number(badge.percentage)
+      : live?.percentage !== null && live?.percentage !== undefined
+        ? Number(live.percentage)
+        : null;
+  // The live wearer count is the fresher reading of the holding metric, so it
+  // wins over the stored poll; both mean the same thing.
+  const holding = live?.userCount ?? badge.active_count ?? null;
+
+  const faq = buildBadgeFaq(badge, {
+    locale,
+    t: tFaq,
+    liveUserCount: live?.userCount ?? null,
+    livePercentage: live?.percentage ?? null,
+  });
+
+  /**
+   * The owner's trajectory, in words. The chart below already draws the curve,
+   * but a reader who only wants the conclusion should not have to interpret it:
+   * this compares the oldest and newest owner counts that are actually
+   * recorded. Both ends must be real numbers — a trend built on a null endpoint
+   * would invent a direction the data does not support, so it returns null and
+   * the section is omitted rather than guessed.
+   */
+  const trend = (() => {
+    const points = history.filter(
+      (p) => p.owner_count !== null && Number.isFinite(p.owner_count),
+    );
+    if (points.length < 2) return null;
+    const first = points[0].owner_count as number;
+    const last = points[points.length - 1].owner_count as number;
+    if (first === 0) return null;
+    const changePct = ((last - first) / first) * 100;
+    return {
+      changePct,
+      // A band, not a threshold: a 0.4% drift between two polls is noise from
+      // a badge that is simply not being claimed, and calling that "growing"
+      // would be a claim the data cannot support.
+      direction:
+        Math.abs(changePct) < 0.5
+          ? ("flat" as const)
+          : changePct > 0
+            ? ("growing" as const)
+            : ("shrinking" as const),
+      samples: points.length,
+      windowDays: Math.max(
+        1,
+        Math.round(
+          (new Date(points[points.length - 1].polled_at).getTime() -
+            new Date(points[0].polled_at).getTime()) /
+            86_400_000,
+        ),
+      ),
+    };
+  })();
+
+  /**
+   * Where this record came from. `source` is the sync engine that last wrote the
+   * row (helix = Twitch's own catalog API, badgebase = the curated badge index,
+   * custom = hand-added in the panel), so it is the honest answer to "why
+   * should I trust these numbers" — a badge whose numbers come from a different
+   * pipeline behave differently from one scraped from Twitch directly.
+   */
+  const SOURCE_KEYS: Record<string, string> = {
+    helix: "sourceHelix",
+    badgebase: "sourceBadgebase",
+    custom: "sourceCustom",
+    sync: "sourceSync",
+  };
+  const sourceLabel = t(SOURCE_KEYS[badge.source] ?? "sourceOther");
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -135,6 +221,14 @@ export default async function BadgeDetailPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
+      />
+      {/* The FAQPage is rendered from the SAME `faq.items` array as the visible
+          accordion below. Google invalidates a rich result when the structured
+          data and the on-page text disagree, so the two must never be built
+          separately. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(faq.jsonLd) }}
       />
 
       <nav className="text-xs text-muted" aria-label={tc("breadcrumb")}>
@@ -243,56 +337,57 @@ export default async function BadgeDetailPage({ params }: PageProps) {
           <h2 className="pt-2 text-sm font-bold uppercase tracking-[0.08em] text-muted">
             {tc("owners")}
           </h2>
-          <dl className="space-y-3 text-sm">
-            {/* A row is only rendered when the count is known. `?? 0` existed to
-                satisfy the ICU plural, so a badge nobody has polled rendered the
-                contradiction "0 owners" beside the value "—" (live:
-                /en/badges/bits-v100). The listing card already omits the line
-                entirely when the count is null (BadgeCard.tsx), and a real 0 now
-                reads "0 owners / 0" — label and value always agree. */}
-            {badge.owner_count !== null && (
+          {/*
+            One source per metric.
+
+            The block used to stack up to four numbers: `owner_count`,
+            `active_count`, the live `userCount` and `percentage` — plus the
+            live `percentage` folded into the live row. `active_count` and the
+            live `userCount` are the SAME metric (potat's current holder count)
+            arriving from two sources, as are `percentage` and
+            `live.percentage`. Because the two sources are polled at different
+            times they routinely disagreed, so the page stated two different
+            answers to "how many people have this badge" and a visitor had no
+            way to tell which was current.
+
+            Now each figure is picked once, from the freshest source available,
+            and the poll timestamp is shown so a stale number is self-evident.
+          */}
+          {totalOwners === null ? (
+            <p className="text-sm text-muted">{t("ownersNoData")}</p>
+          ) : (
+            <div className="rounded-[var(--radius-input)] border border-line bg-surface-2 p-4">
+              <p className="text-3xl font-black tabular-nums">
+                {new Intl.NumberFormat(locale).format(totalOwners)}
+              </p>
+              <p className="mt-1 text-xs text-muted">
+                {t("ownersHeadline", { count: totalOwners })}
+              </p>
+              {share !== null && (
+                <p className="mt-1 text-xs text-muted">
+                  {t("ownersShare", { value: percent.format(share) })}
+                </p>
+              )}
+            </div>
+          )}
+          {holding !== null && holding !== totalOwners && (
+            <dl className="space-y-3 pt-3 text-sm">
               <div className="flex justify-between gap-4">
-                <dt className="text-muted">
-                  {t("ownerCount", { count: badge.owner_count })}
-                </dt>
+                <dt className="text-muted">{t("currentlyHolding")}</dt>
                 <dd className="font-semibold tabular-nums">
-                  {new Intl.NumberFormat(locale).format(badge.owner_count)}
+                  {new Intl.NumberFormat(locale).format(holding)}
                 </dd>
               </div>
-            )}
-            {badge.active_count !== null && (
-              <div className="flex justify-between gap-4">
-                <dt className="text-muted">
-                  {t("activeCount", { count: badge.active_count })}
-                </dt>
-                <dd className="font-semibold tabular-nums">
-                  {new Intl.NumberFormat(locale).format(badge.active_count)}
-                </dd>
-              </div>
-            )}
-            {live?.userCount !== null && live?.userCount !== undefined && (
-              <div className="flex justify-between gap-4">
-                <dt className="text-muted">
-                  <span className="me-1.5 inline-block size-1.5 animate-pulse rounded-full bg-success" aria-hidden />
-                  {t("liveCount")}
-                </dt>
-                <dd className="font-semibold tabular-nums text-success">
-                  {new Intl.NumberFormat(locale).format(live.userCount)}
-                  {live.percentage !== null
-                    ? ` (${percent.format(Number(live.percentage))}%)`
-                    : ""}
-                </dd>
-              </div>
-            )}
-            {badge.percentage !== null && (
-              <div className="flex justify-between gap-4">
-                <dt className="text-muted">%</dt>
-                <dd className="font-semibold tabular-nums">
-                  {t("percentageOfUsers", { value: percent.format(Number(badge.percentage)) })}
-                </dd>
-              </div>
-            )}
-          </dl>
+              {badge.last_polled_at && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted">{t("ownersUpdated")}</dt>
+                  <dd className="text-end font-medium">
+                    {formatDate(badge.last_polled_at, locale)}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          )}
 
           <div className="rounded-[var(--radius-input)] border border-line bg-surface-2 p-4">
             <p className="text-xs font-bold uppercase tracking-[0.08em] text-muted">
@@ -318,14 +413,115 @@ export default async function BadgeDetailPage({ params }: PageProps) {
               <h2>{t("ownerTrend")}</h2>
             </div>
             <p className="-mt-4 mb-3 text-xs text-muted">{t("ownerTrendSubtitle")}</p>
+            {trend && (
+              <p className="mb-3 rounded-[var(--radius-input)] border border-line bg-surface-2 px-4 py-2.5 text-sm">
+                {t(`trend${trend.direction[0].toUpperCase()}${trend.direction.slice(1)}`, {
+                  value: percent.format(Math.abs(trend.changePct)),
+                  count: trend.samples,
+                  days: trend.windowDays,
+                })}
+              </p>
+            )}
             {chartData.length >= 2 ? (
               <OwnersChart data={chartData} />
             ) : (
               <p className="py-8 text-center text-sm text-muted">{t("noStats")}</p>
             )}
           </section>
+
+          {/* Where this record comes from, and the full history of the badge in
+              one block. Both are answers a collector actually asks and neither
+              is anywhere else on the page. Every row is conditional: a badge
+              with no claim window has no window row, and a badge still running
+              has no removal row. */}
+          <section className="card p-6">
+            <div className="section-title">
+              <h2>{t("recordDetails")}</h2>
+            </div>
+            <p className="-mt-4 mb-4 text-xs text-muted">
+              {t("sourceLabel")}: {sourceLabel}
+            </p>
+            <dl className="space-y-3 text-sm">
+              {badge.first_seen_at && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted">{t("firstDetected")}</dt>
+                  <dd className="text-end font-medium">
+                    {formatDate(badge.first_seen_at, locale)}
+                  </dd>
+                </div>
+              )}
+              {badge.release_date && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted">{t("releaseDate")}</dt>
+                  <dd className="text-end font-medium">
+                    {formatDate(badge.release_date, locale)}
+                  </dd>
+                </div>
+              )}
+              {badge.start_date && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted">{t("claimOpens")}</dt>
+                  <dd className="text-end font-medium">
+                    {formatDate(badge.start_date, locale)}
+                  </dd>
+                </div>
+              )}
+              {badge.end_date && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted">{t("claimCloses")}</dt>
+                  <dd className="text-end font-medium">
+                    {formatDate(badge.end_date, locale)}
+                  </dd>
+                </div>
+              )}
+              {badge.last_seen_at && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted">{t("lastSeen")}</dt>
+                  <dd className="text-end font-medium">
+                    {formatDate(badge.last_seen_at, locale)}
+                  </dd>
+                </div>
+              )}
+              {badge.removed_at && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted">{t("withdrawn")}</dt>
+                  <dd className="text-end font-medium text-danger">
+                    {formatDate(badge.removed_at, locale)}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </section>
         </div>
       </div>
+
+      {faq.items.length > 0 && (
+        <section className="card p-6" aria-labelledby="badge-faq">
+          <div className="section-title">
+            <h2 id="badge-faq">{tFaq("title", { title: badge.title })}</h2>
+          </div>
+          <p className="-mt-4 mb-4 text-xs text-muted">{tFaq("subtitle")}</p>
+          {/* A native disclosure list: keyboard accessible and screen-reader
+              correct with no client JS, which matters because these pages are
+              the most-crawled surface on the site. */}
+          <div className="divide-y divide-line">
+            {faq.items.map((item, index) => (
+              <details key={index} className="group py-3">
+                <summary className="flex cursor-pointer items-start justify-between gap-4 text-sm font-semibold marker:content-none">
+                  <span>{item.q}</span>
+                  <span
+                    aria-hidden
+                    className="mt-0.5 shrink-0 text-muted transition-transform group-open:rotate-45"
+                  >
+                    +
+                  </span>
+                </summary>
+                <p className="mt-2 text-sm leading-relaxed text-muted">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
 
       {relatedBadges.length > 0 && (
         <section aria-labelledby="related">

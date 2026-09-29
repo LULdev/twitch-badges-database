@@ -15,7 +15,10 @@ export default function RpsGame() {
 
   async function choose(choice: string) {
     const result = await play({ choice });
+    // Same rule as Blackjack: a rejected round clears the previous throw
+    // instead of leaving it beside the round-failed error.
     if (result) setLast(result.result as typeof last);
+    else setLast(null);
   }
 
   return (
