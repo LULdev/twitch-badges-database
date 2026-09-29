@@ -1,7 +1,7 @@
 {
   "meta": {
     "siteTitle": "Twitch 徽章数据库",
-    "siteDescription": "实时追踪所有 Twitch 全球徽章：带有倒计时的进行中掉落、即将推出的徽章、稀有度指数、持有者统计以及全球收藏家排行榜。",
+    "siteDescription": "实时追踪每个 Twitch 全局徽章：掉落倒计时、稀有度指数、持有者统计和排行榜——还有游戏、等级与每日转盘。",
     "badgeTitle": "{title} — Twitch 徽章",
     "badgeDescription": "{title}（{setId}）：获取方式、稀有度、持有者数量和可用时间窗口。",
     "profileTitle": "{username} 的徽章收藏",
@@ -87,8 +87,8 @@
     "breadcrumb": "面包屑导航"
   },
   "home": {
-    "heroTitle": "所有 Twitch 徽章，尽在一个数据库。",
-    "heroSubtitle": "带倒计时的实时掉落、即将推出的徽章、专有稀有度指数和全球收藏家排行榜——直接从 Twitch API 同步。",
+    "heroTitle": "Twitch 徽章数据库 — 实时追踪每一个全局徽章",
+    "heroSubtitle": "实时掉落倒计时、独家稀有度指数和收藏者排行榜——还有游戏、等级和每日幸运转盘。使用 Twitch 账号免费体验。",
     "ctaExplore": "浏览徽章",
     "ctaLogin": "通过 Twitch 登录",
     "statActive": "当前进行中",
@@ -105,7 +105,16 @@
     "rarestSubtitle": "当前稀有度指数最高",
     "fromChangelog": "最新变更",
     "fromBlog": "博客精选",
-    "readMore": "阅读更多"
+    "readMore": "阅读更多",
+    "heroEyebrow": "实时：{count} 个徽章可领取",
+    "heroF1Title": "实时徽章追踪",
+    "heroF1Desc": "每个全局掉落都会通过 Twitch API 检测并同步，倒计时精确到徽章过期的那一秒。",
+    "heroF2Title": "TBRI 稀有度指数",
+    "heroF2Desc": "基于稀缺度、持有量和涨势的 0–100 评分——在领取之前就知道哪些徽章真正稀有。",
+    "heroF3Title": "边收集边玩",
+    "heroF3Desc": "13 款街机游戏、XP、等级、硬币和 125 个成就——还有每日幸运转盘，Twitch Turbo 大奖真实概率为亿分之一。",
+    "heroF4Title": "你的收藏主页",
+    "heroF4Desc": "使用 Twitch 登录，同步你已有的徽章、搭建展示柜并在全球排行榜上攀升——支持 11 种语言。"
   },
   "badges": {
     "aboutRarity": "关于稀有度指数",
@@ -643,7 +652,8 @@
     "networkError": "网络错误，请重试。",
     "wheelDisabled": "幸运转盘目前已停用。",
     "notAuthed": "请使用 Twitch 登录以旋转转盘。",
-    "banned": "你的账号已被封禁。"
+    "banned": "你的账号已被封禁。",
+    "youWon": "你赢得了"
   },
   "feed": {
     "title": "实时活动动态",

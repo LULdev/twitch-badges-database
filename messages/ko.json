@@ -1,7 +1,7 @@
 {
   "meta": {
     "siteTitle": "Twitch 배지 데이터베이스",
-    "siteDescription": "모든 Twitch 전역 배지를 실시간으로 추적: 카운트다운이 있는 진행 중 드롭, 예정된 출시, 희귀도 지수, 소유자 통계, 전 세계 수집가 랭킹.",
+    "siteDescription": "모든 글로벌 Twitch 배지를 실시간으로 추적하세요: 드롭 카운트다운, 희귀도 지수, 통계와 랭킹 — 게임, 레벨, 매일 룰렛까지.",
     "badgeTitle": "{title} — Twitch 배지",
     "badgeDescription": "{title}({setId}): 획득 방법, 희귀도, 소유자 수, 획득 가능 기간.",
     "profileTitle": "{username}님의 배지 컬렉션",
@@ -87,8 +87,8 @@
     "breadcrumb": "이동 경로"
   },
   "home": {
-    "heroTitle": "모든 Twitch 배지를 하나의 데이터베이스에서.",
-    "heroSubtitle": "카운트다운이 있는 실시간 드롭, 예정 출시, 독자적인 희귀도 지수, 전 세계 수집가 랭킹 — Twitch API에서 직접 동기화됩니다.",
+    "heroTitle": "Twitch 배지 데이터베이스 — 모든 글로벌 배지를 실시간으로 추적",
+    "heroSubtitle": "실시간 드롭 카운트다운, 독자 희귀도 지수, 컬렉터 랭킹 — 게임, 레벨, 매일 돌리는 룰렛까지. Twitch 계정으로 무료로 이용하세요.",
     "ctaExplore": "배지 둘러보기",
     "ctaLogin": "Twitch로 로그인",
     "statActive": "현재 진행 중",
@@ -105,7 +105,16 @@
     "rarestSubtitle": "현재 최고 희귀도 지수",
     "fromChangelog": "최근 변경 사항",
     "fromBlog": "블로그에서",
-    "readMore": "더 읽기"
+    "readMore": "더 읽기",
+    "heroEyebrow": "실시간: 지금 받을 수 있는 배지 {count}개",
+    "heroF1Title": "실시간 배지 추적",
+    "heroF1Desc": "모든 글로벌 드롭을 Twitch API로 감지·동기화하며, 배지 만료 초까지 카운트다운합니다.",
+    "heroF2Title": "TBRI 희귀도 지수",
+    "heroF2Desc": "희소성, 보유량, 추세로 계산한 0~100 점수 — 받기 전에 어떤 배지가 진짜 희귀한지 알 수 있습니다.",
+    "heroF3Title": "수집하며 플레이",
+    "heroF3Desc": "13개의 아케이드 게임, XP, 레벨, 코인, 125개 업적 — 매일 돌리는 룰렛에는 1억 분의 1의 실제 확률로 Twitch Turbo 잭팟이.",
+    "heroF4Title": "나의 컬렉션 프로필",
+    "heroF4Desc": "Twitch로 로그인하면 보유 배지가 동기화되고, 쇼케이스를 꾸미고, 세계 랭킹을 오를 수 있습니다 — 11개 언어 지원."
   },
   "badges": {
     "aboutRarity": "희귀도 지수란",
@@ -643,7 +652,8 @@
     "networkError": "네트워크 오류입니다. 다시 시도해 주세요.",
     "wheelDisabled": "현재 룰렛 기능이 비활성화되어 있습니다.",
     "notAuthed": "Twitch로 로그인하여 룰렛을 돌려 주세요.",
-    "banned": "계정이 차단되었습니다."
+    "banned": "계정이 차단되었습니다.",
+    "youWon": "축하합니다"
   },
   "feed": {
     "title": "실시간 활동 피드",

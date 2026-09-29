@@ -15,6 +15,12 @@ import RarityChip from "@/components/badges/RarityChip";
 import { formatCompact } from "@/components/badges/BadgeCard";
 import { localeAlternates } from "@/lib/seo";
 
+// Live data (potat leaderboards, rankings) — never prerender. With a loading
+// boundary in the segment the build actually executes this page's fetches
+// during static generation; eleven parallel locale workers then trip potat's
+// rate limit (Retry-After: 60) and the export times out.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {

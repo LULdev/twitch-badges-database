@@ -1,7 +1,7 @@
 {
   "meta": {
     "siteTitle": "Twitch Badges Database",
-    "siteDescription": "Sigue todas las insignias globales de Twitch en tiempo real: drops activos con cuenta regresiva, próximos lanzamientos, índice de rareza, estadísticas de propietarios y clasificaciones mundiales de coleccionistas.",
+    "siteDescription": "Sigue cada insignia global de Twitch en tiempo real: cuentas atrás de drops, índice de rareza, estadísticas y clasificaciones — más juegos, niveles y ruleta.",
     "badgeTitle": "{title} — Insignia de Twitch",
     "badgeDescription": "{title} ({setId}): cómo conseguirla, rareza, número de propietarios y periodo de disponibilidad.",
     "profileTitle": "Colección de insignias de {username}",
@@ -87,8 +87,8 @@
     "breadcrumb": "Ruta de navegación"
   },
   "home": {
-    "heroTitle": "Todas las insignias de Twitch. Una sola base de datos.",
-    "heroSubtitle": "Drops en vivo con cuenta regresiva, próximos lanzamientos, un índice de rareza exclusivo y clasificaciones mundiales de coleccionistas — sincronizados directamente desde la API de Twitch.",
+    "heroTitle": "Twitch Badges Database — sigue cada insignia global en tiempo real",
+    "heroSubtitle": "Cuentas atrás de drops en directo, índice de rareza propio y clasificaciones de coleccionistas — además de juegos, niveles y una ruleta diaria. Gratis con tu cuenta de Twitch.",
     "ctaExplore": "Explorar insignias",
     "ctaLogin": "Iniciar sesión con Twitch",
     "statActive": "Activas ahora",
@@ -105,7 +105,16 @@
     "rarestSubtitle": "Mayor índice de rareza ahora",
     "fromChangelog": "Últimos cambios",
     "fromBlog": "Del blog",
-    "readMore": "Leer más"
+    "readMore": "Leer más",
+    "heroEyebrow": "En directo: {count} insignias disponibles",
+    "heroF1Title": "Seguimiento de insignias en tiempo real",
+    "heroF1Desc": "Cada drop global se detecta y sincroniza desde la API de Twitch, con cuentas atrás al segundo de cuándo expira una insignia.",
+    "heroF2Title": "Índice de rareza TBRI",
+    "heroF2Desc": "Una puntuación de 0 a 100 basada en escasez, difusión y momentum — sabe qué insignias son realmente raras antes de conseguirlas.",
+    "heroF3Title": "Juega mientras coleccionas",
+    "heroF3Desc": "13 juegos arcade, XP, niveles, monedas y 125 logros — más una ruleta diaria con un jackpot de Twitch Turbo con probabilidades reales de 1 entre 100.000.000.",
+    "heroF4Title": "Tu perfil de colección",
+    "heroF4Desc": "Inicia sesión con Twitch para sincronizar las insignias que ya tienes, montar una vitrina y escalar en las clasificaciones mundiales — en 11 idiomas."
   },
   "badges": {
     "aboutRarity": "Sobre el índice de rareza",
@@ -643,7 +652,8 @@
     "networkError": "Error de red: inténtalo de nuevo.",
     "wheelDisabled": "La ruleta está desactivada ahora mismo.",
     "notAuthed": "Inicia sesión con Twitch para girar la ruleta.",
-    "banned": "Tu cuenta está baneada."
+    "banned": "Tu cuenta está baneada.",
+    "youWon": "Has ganado"
   },
   "feed": {
     "title": "Feed de actividad en vivo",

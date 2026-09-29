@@ -131,7 +131,9 @@ export async function fetchOwnedLeaderboard(
       first: "100",
     });
     if (cursor) params.set("after", cursor);
-    const res = await potatFetch(`/twitch/badges?${params}`);
+    // 15 min data cache: ownership leaderboards barely move, and revalidate 0
+    // refetched potat on EVERY leaderboards page view (2–5 s of latency each).
+    const res = await potatFetch(`/twitch/badges?${params}`, 900);
     const page = (await res.json()) as PotatOwnedPage;
     all.push(...page.data);
     cursor = page.pagination?.hasNextPage

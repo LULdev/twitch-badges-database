@@ -12,6 +12,7 @@ export function BadgeImage({
   size = 56,
   className = "",
   alt,
+  loading = "lazy",
 }: {
   badge: BadgeImageSource | BadgeRow;
   size?: number;
@@ -21,6 +22,8 @@ export function BadgeImage({
    * title as text in the same link, so screen readers do not announce it twice.
    */
   alt?: string;
+  /** "eager" for above-the-fold decorative figures (hero orbit). */
+  loading?: "lazy" | "eager";
 }) {
   const src =
     badge.image_url_4x ?? badge.image_url_2x ?? badge.image_url_1x ?? null;
@@ -45,7 +48,7 @@ export function BadgeImage({
       alt={alt ?? badge.title}
       width={size}
       height={size}
-      loading="lazy"
+      loading={loading}
       className={className}
       style={{ imageRendering: "auto" }}
     />

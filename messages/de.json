@@ -1,7 +1,7 @@
 {
   "meta": {
     "siteTitle": "Twitch Badges Database",
-    "siteDescription": "Verfolge alle globalen Twitch-Badges in Echtzeit: aktive Drops mit Countdown-Timern, bevorstehende Releases, Raritätsindex, Besitzer-Statistiken und weltweite Sammler-Bestenlisten.",
+    "siteDescription": "Verfolge jedes globale Twitch-Badge in Echtzeit: Drop-Countdowns, Seltenheitsindex, Besitzer-Statistiken und Ranglisten — plus Spiele, Level und Glücksrad.",
     "badgeTitle": "{title} — Twitch-Badge",
     "badgeDescription": "{title} ({setId}): So erhältst du es, Rarität, Besitzeranzahl und Verfügbarkeitszeitraum.",
     "profileTitle": "Badge-Sammlung von {username}",
@@ -87,8 +87,8 @@
     "breadcrumb": "Pfadnavigation"
   },
   "home": {
-    "heroTitle": "Alle Twitch-Badges. Eine Datenbank.",
-    "heroSubtitle": "Live-Drops mit Countdown-Timern, bevorstehende Releases, ein eigener Raritätsindex und weltweite Sammler-Bestenlisten — direkt aus der Twitch-API synchronisiert.",
+    "heroTitle": "Twitch Badges Database — jedes globale Badge in Echtzeit verfolgen",
+    "heroSubtitle": "Live-Countdowns für Drops, ein eigener Seltenheitsindex und Sammler-Ranglisten — dazu Spiele, Level und ein tägliches Glücksrad. Kostenlos mit deinem Twitch-Konto.",
     "ctaExplore": "Badges entdecken",
     "ctaLogin": "Mit Twitch anmelden",
     "statActive": "Jetzt aktiv",
@@ -105,7 +105,16 @@
     "rarestSubtitle": "Aktueller Höchstwert im Raritätsindex",
     "fromChangelog": "Letzte Änderungen",
     "fromBlog": "Aus dem Blog",
-    "readMore": "Mehr lesen"
+    "readMore": "Mehr lesen",
+    "heroEyebrow": "Jetzt live: {count} Badges erhältlich",
+    "heroF1Title": "Badge-Tracking in Echtzeit",
+    "heroF1Desc": "Jeder globale Drop wird über die Twitch-API erkannt und synchronisiert — mit Countdowns auf die Sekunde, bis ein Badge abläuft.",
+    "heroF2Title": "TBRI-Seltenheitsindex",
+    "heroF2Desc": "Ein 0–100-Score aus Knappheit, Verbreitung und Dynamik — erkenne vor dem Einsammeln, welche Badges wirklich selten sind.",
+    "heroF3Title": "Spielen beim Sammeln",
+    "heroF3Desc": "13 Arcade-Spiele, XP, Level, Coins und 125 Erfolge — plus ein tägliches Glücksrad mit einem Twitch-Turbo-Jackpot mit echten 1-zu-100.000.000-Chancen.",
+    "heroF4Title": "Dein Sammlerprofil",
+    "heroF4Desc": "Melde dich mit Twitch an, um deine Badges zu synchronisieren, eine Vitrine aufzubauen und in weltweiten Ranglisten aufzusteigen — in 11 Sprachen."
   },
   "badges": {
     "aboutRarity": "Über den Raritätsindex",
@@ -643,7 +652,8 @@
     "networkError": "Netzwerkfehler – versuche es erneut.",
     "wheelDisabled": "Das Glücksrad ist derzeit deaktiviert.",
     "notAuthed": "Melde dich mit Twitch an, um zu drehen.",
-    "banned": "Dein Konto ist gesperrt."
+    "banned": "Dein Konto ist gesperrt.",
+    "youWon": "Du hast gewonnen"
   },
   "feed": {
     "title": "Live-Aktivitätsfeed",

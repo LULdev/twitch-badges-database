@@ -1,4 +1,24 @@
 import { createClient } from "./supabase/server";
+import { createClient as createJsClient } from "@supabase/supabase-js";
+import { unstable_cache } from "next/cache";
+import { envOr } from "@/lib/env";
+
+/**
+ * Cookie-less anon client for user-agnostic catalog reads. The per-request
+ * server client (`createClient`) awaits `cookies()`, which pins every caller to
+ * the request — the hot read models below (home, stats, categories) serve the
+ * same rows to every visitor, so they run through this client inside
+ * `unstable_cache` instead of re-querying per navigation. RLS is unchanged
+ * (anon key, public-read tables).
+ */
+let cachedCatalogClient: ReturnType<typeof createJsClient> | null = null;
+function catalogClient() {
+  cachedCatalogClient ??= createJsClient(
+    envOr("NEXT_PUBLIC_SUPABASE_URL"),
+    envOr("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"),
+  );
+  return cachedCatalogClient;
+}
 
 export interface BadgeRow {
   id: string;
@@ -369,114 +389,139 @@ export interface HomeData {
   upcoming: BadgeRow[];
   newest: BadgeRow[];
   rarest: BadgeRow[];
+  heroBadges: Array<Pick<BadgeRow, "slug" | "title" | "image_url_2x" | "rarity_tier">>;
   counts: { active: number; upcoming: number; expired: number; total: number };
   latestChangelog: ChangelogRow[];
   latestPosts: BlogPostRow[];
 }
 
+/** Cached home read: 10 queries per render was 10 round trips per navigation. */
+const loadHomeData = unstable_cache(
+  async (): Promise<HomeData> => {
+    const supabase = catalogClient();
+
+    const [
+      endingSoonRes,
+      upcomingRes,
+      newestRes,
+      rarestRes,
+      heroBadgesRes,
+      activeCountRes,
+      upcomingCountRes,
+      expiredCountRes,
+      totalCountRes,
+      changelogRes,
+      postsRes,
+    ] = await Promise.all([
+      supabase
+        .from("badges")
+        .select("*")
+        .eq("status", "active")
+        .not("end_date", "is", null)
+        .order("end_date", { ascending: true })
+        .limit(6),
+      supabase
+        .from("badges")
+        .select("*")
+        .eq("status", "upcoming")
+        .order("start_date", { ascending: true, nullsFirst: false })
+        .limit(6),
+      supabase
+        .from("badges")
+        .select("*")
+        .order("first_seen_at", { ascending: false })
+        .limit(8),
+      supabase
+        .from("badges")
+        .select("*")
+        .order("rarity_score", { ascending: false })
+        .limit(6),
+      // Deterministic pick for the hero orbit: the rarest ACTIVE badges that
+      // actually have artwork (rarity_score desc naturally surfaces legendary/
+      // mythic rows when they exist — a hard tier filter left the orbit nearly
+      // empty on the live catalog). Same order on every render, so caching (and
+      // any future static rendering) stays stable.
+      supabase
+        .from("badges")
+        .select("slug,title,image_url_2x,rarity_tier")
+        .eq("status", "active")
+        .not("image_url_2x", "is", null)
+        .order("rarity_score", { ascending: false })
+        .order("id")
+        .limit(8),
+      supabase
+        .from("badges")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "active"),
+      supabase
+        .from("badges")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "upcoming"),
+      supabase
+        .from("badges")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "expired"),
+      supabase.from("badges").select("id", { count: "exact", head: true }),
+      supabase
+        .from("changelog")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(6),
+      supabase
+        .from("blog_posts")
+        .select("*")
+        .eq("status", "published")
+        .order("published_at", { ascending: false })
+        .limit(3),
+    ]);
+
+    return {
+      endingSoon: (endingSoonRes.data ?? []) as BadgeRow[],
+      upcoming: (upcomingRes.data ?? []) as BadgeRow[],
+      newest: (newestRes.data ?? []) as BadgeRow[],
+      rarest: (rarestRes.data ?? []) as BadgeRow[],
+      heroBadges: (heroBadgesRes.data ?? []) as HomeData["heroBadges"],
+      counts: {
+        active: activeCountRes.count ?? 0,
+        upcoming: upcomingCountRes.count ?? 0,
+        expired: expiredCountRes.count ?? 0,
+        total: totalCountRes.count ?? 0,
+      },
+      latestChangelog: (changelogRes.data ?? []) as ChangelogRow[],
+      latestPosts: (postsRes.data ?? []) as BlogPostRow[],
+    };
+  },
+  ["home-data"],
+  { revalidate: 300, tags: ["catalog", "home"] },
+);
+
 export async function getHomeData(): Promise<HomeData> {
-  const supabase = await createClient();
-
-  const [
-    endingSoonRes,
-    upcomingRes,
-    newestRes,
-    rarestRes,
-    activeCountRes,
-    upcomingCountRes,
-    expiredCountRes,
-    totalCountRes,
-    changelogRes,
-    postsRes,
-  ] = await Promise.all([
-    supabase
-      .from("badges")
-      .select("*")
-      .eq("status", "active")
-      .not("end_date", "is", null)
-      .order("end_date", { ascending: true })
-      .limit(6),
-    supabase
-      .from("badges")
-      .select("*")
-      .eq("status", "upcoming")
-      .order("start_date", { ascending: true, nullsFirst: false })
-      .limit(6),
-    supabase
-      .from("badges")
-      .select("*")
-      .order("first_seen_at", { ascending: false })
-      .limit(8),
-    supabase
-      .from("badges")
-      .select("*")
-      .order("rarity_score", { ascending: false })
-      .limit(6),
-    supabase
-      .from("badges")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "active"),
-    supabase
-      .from("badges")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "upcoming"),
-    supabase
-      .from("badges")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "expired"),
-    supabase.from("badges").select("id", { count: "exact", head: true }),
-    supabase
-      .from("changelog")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(6),
-    supabase
-      .from("blog_posts")
-      .select("*")
-      .eq("status", "published")
-      .order("published_at", { ascending: false })
-      .limit(3),
-  ]);
-
-  return {
-    endingSoon: (endingSoonRes.data ?? []) as BadgeRow[],
-    upcoming: (upcomingRes.data ?? []) as BadgeRow[],
-    newest: (newestRes.data ?? []) as BadgeRow[],
-    rarest: (rarestRes.data ?? []) as BadgeRow[],
-    counts: {
-      active: activeCountRes.count ?? 0,
-      upcoming: upcomingCountRes.count ?? 0,
-      expired: expiredCountRes.count ?? 0,
-      total: totalCountRes.count ?? 0,
-    },
-    latestChangelog: (changelogRes.data ?? []) as ChangelogRow[],
-    latestPosts: (postsRes.data ?? []) as BlogPostRow[],
-  };
+  // The catalog changes on the daily sync; five minutes of staleness on the
+  // home aggregates is invisible and turns repeat navigations into cache hits.
+  return loadHomeData();
 }
 
-export async function getCategories(): Promise<string[]> {
-  const supabase = await createClient();
-  // PostgREST caps a single response at 1000 rows and the old select had no
-  // range, so this returned the categories of only the first 1000 badges in
-  // `category` order — once the catalog passed 1000 rows, every
-  // alphabetically-late category silently disappeared from the dropdown, with
-  // no error anywhere. Page with `.range()` and an `id` tiebreak. A query
-  // failure is thrown, not swallowed: the caller treats the category list as
-  // decoration and renders the grid regardless.
-  const pageSize = 1000;
-  const set = new Set<string>();
-  for (let from = 0; ; from += pageSize) {
+/** Cached category list: one view round trip instead of paging the full table. */
+const loadCategories = unstable_cache(
+  async (): Promise<string[]> => {
+    const supabase = catalogClient();
     const { data, error } = await supabase
-      .from("badges")
-      .select("category")
-      .order("id")
-      .range(from, from + pageSize - 1);
+      .from("stats_catalog_categories")
+      .select("category, count");
     if (error) throw error;
-    const batch = (data ?? []) as Array<{ category: string }>;
-    for (const row of batch) if (row.category) set.add(row.category);
-    if (batch.length < pageSize) break;
-  }
-  return [...set].sort();
+    const rows = (data ?? []) as Array<{ category: string }>;
+    return rows.map((row) => row.category).filter(Boolean).sort();
+  },
+  ["badge-categories"],
+  { revalidate: 300, tags: ["catalog"] },
+);
+
+export async function getCategories(): Promise<string[]> {
+  // The old implementation paged the whole badges table sequentially (1000 rows
+  // per round trip) just to DISTINCT the category column — N sequential
+  // round trips on every explorer render. The stats view aggregates it in
+  // Postgres; failures still throw, as the caller renders the grid regardless.
+  return loadCategories();
 }
 
 export async function getProfileByUsername(
@@ -652,21 +697,22 @@ export interface SiteStats {
   newestBadges: BadgeRow[];
 }
 
-export async function getSiteStats(): Promise<SiteStats> {
-  const supabase = await createClient();
-  const [
-    totalRes,
-    activeRes,
-    upcomingRes,
-    expiredRes,
-    freeRes,
-    paidRes,
-    rarityRes,
-    categoryRes,
-    newestRes,
-  ] = await Promise.all([
-    supabase.from("badges").select("id", { count: "exact", head: true }),
-    supabase
+const loadSiteStats = unstable_cache(
+  async (): Promise<SiteStats> => {
+    const supabase = catalogClient();
+    const [
+      totalRes,
+      activeRes,
+      upcomingRes,
+      expiredRes,
+      freeRes,
+      paidRes,
+      rarityRes,
+      categoryRes,
+      newestRes,
+    ] = await Promise.all([
+      supabase.from("badges").select("id", { count: "exact", head: true }),
+      supabase
       .from("badges")
       .select("id", { count: "exact", head: true })
       .eq("status", "active"),
@@ -728,6 +774,13 @@ export async function getSiteStats(): Promise<SiteStats> {
     totalTrackedUsers: null,
     newestBadges: (newestRes.data ?? []) as BadgeRow[],
   };
+  },
+  ["site-stats"],
+  { revalidate: 300, tags: ["catalog"] },
+);
+
+export async function getSiteStats(): Promise<SiteStats> {
+  return loadSiteStats();
 }
 
 export async function getRarestBadges(limit = 10): Promise<BadgeRow[]> {

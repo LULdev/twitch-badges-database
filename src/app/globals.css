@@ -2109,3 +2109,504 @@ html {
   .role-owner .role-ring { opacity: 0.35; }
   .role-sparkle { display: none; }
 }
+
+/* ============================================================
+   Wheel of Fortune — luxury casino wheel
+   Static gold chassis (rim, bulbs, gloss) + JS-rotated face.
+   The face node NEVER gets a CSS transform/transition — its
+   style.transform is owned by WheelOfFortune.tsx (applyAngle).
+   ============================================================ */
+
+.wheel {
+  /* 45deg per segment — keep in sync with SEGMENT_ANGLE in the component. */
+  --seg-angle: 45deg;
+  --wheel-face-inset: 10px;                 /* rim thickness, mobile */
+  --wheel-spoke: rgba(253, 230, 138, 0.28); /* gold hairline spokes  */
+  --wheel-win: var(--warning);              /* theme-aware gold      */
+}
+@media (min-width: 640px) {
+  .wheel { --wheel-face-inset: 13px; }
+}
+
+/* --- Metallic gold rim (static) --- */
+.wheel-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  z-index: 0;
+  background: conic-gradient(
+    from 40deg,
+    #fde68a 0deg, #b45309 60deg, #fbbf24 120deg, #7c2d12 170deg,
+    #fde68a 220deg, #f59e0b 290deg, #92400e 340deg, #fde68a 360deg
+  );
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.55),
+    0 6px 24px -6px rgba(0, 0, 0, 0.6),
+    var(--shadow-glow);
+}
+/* Accent aura pulse — opacity on a separate layer so the rim's own
+   box-shadow stays static and trivially overridable per theme. */
+.wheel-rim::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle,
+    transparent 58%,
+    color-mix(in srgb, var(--accent) 32%, transparent) 72%,
+    transparent 86%
+  );
+  opacity: 0.4;
+  z-index: -1;
+  animation: wheel-rim-pulse 6s ease-in-out infinite;
+}
+/* Jewel-setting hairline at the face boundary. */
+.wheel-rim::after {
+  content: "";
+  position: absolute;
+  inset: var(--wheel-face-inset);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(253, 230, 138, 0.5), inset 0 0 12px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+/* --- Static gloss: fixed light source over the rotating face --- */
+.wheel-gloss {
+  position: absolute;
+  inset: var(--wheel-face-inset);
+  border-radius: 999px;
+  z-index: 2;
+  background: radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.13), transparent 55%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 -14px 30px rgba(0, 0, 0, 0.32);
+  pointer-events: none;
+}
+
+/* --- Idle breathing wrapper: pure CSS, paused by [data-phase].
+     The face inside is the ONLY rotated-by-JS node. --- */
+.wheel-idle {
+  position: absolute;
+  inset: var(--wheel-face-inset);
+  display: block;
+  z-index: 1;
+  transition: transform 600ms ease-out; /* graceful exit when breathing stops */
+}
+.wheel[data-phase="idle"]:not([data-spent]) .wheel-idle {
+  animation: wheel-breathe 11s ease-in-out infinite;
+}
+
+/* --- The face: conic segments come from the component's inline style --- */
+.wheel-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 2px rgba(253, 230, 138, 0.5), inset 0 0 28px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Radial gold spokes at segment boundaries, masked away at hub+rim --- */
+.wheel-spokes {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: repeating-conic-gradient(
+    transparent 0deg 43.7deg,
+    var(--wheel-spoke) 43.7deg 45deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 20%, #000 26% 88%, transparent 94%);
+  mask: radial-gradient(circle, transparent 20%, #000 26% 88%, transparent 94%);
+  pointer-events: none;
+}
+
+/* --- Segments: rotation + label placement identical to the old code --- */
+.wheel-seg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.wheel-seg-label {
+  margin-top: 1.25rem;                 /* was mt-5 */
+  white-space: nowrap;
+  font-size: 0.625rem;                 /* was text-[0.625rem] */
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: #fff;
+  writing-mode: vertical-rl;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+@media (min-width: 640px) {
+  .wheel-seg-label { font-size: 0.75rem; }  /* was sm:text-xs */
+}
+.wheel-seg-label--turbo {
+  background: rgba(12, 8, 24, 0.72);
+  border: 1px solid rgba(253, 230, 138, 0.7);
+  border-radius: 999px;
+  padding: 0.55em 0.4em;
+  text-shadow: none;
+}
+
+/* Winning wedge wash: a conic wedge aligned with the segment's own
+   rotation; drop-shadow gives it a wedge-shaped glow (paint-only). */
+.wheel-seg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: conic-gradient(
+    from calc(var(--seg-angle) / -2),
+    transparent 0deg,
+    rgba(255, 255, 255, 0.3) 3.5deg,
+    rgba(255, 255, 255, 0.3) 41.5deg,
+    transparent 45deg
+  );
+  filter: drop-shadow(0 0 10px var(--wheel-win));
+  opacity: 0;
+  pointer-events: none;
+}
+.wheel-seg--won::before {
+  animation: wheel-seg-win 1.5s ease-in-out 5 both;
+}
+
+/* --- LED bulbs: opacity-only chase, evenly spaced via negative delays --- */
+.wheel-bulbs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+}
+.wheel-bulb {
+  fill: #fde68a;
+  opacity: 0.26;
+  animation: wheel-bulb-chase 1.8s linear infinite;
+  animation-delay: calc(var(--i) * -0.1125s); /* 1.8s / 16 bulbs */
+}
+.wheel[data-phase="waiting"] .wheel-bulbs,
+.wheel[data-phase="settling"] .wheel-bulbs {
+  filter: brightness(1.4);
+}
+
+/* --- Jewel pointer --- */
+.wheel-pointer {
+  position: absolute;
+  top: -1.15rem;
+  left: 50%;
+  width: 1.625rem;
+  margin-left: -0.8125rem;   /* centered without transform — RTL-safe */
+  z-index: 6;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.55));
+  pointer-events: none;
+}
+.wheel-pointer svg { display: block; width: 100%; height: auto; }
+
+/* --- Center hub: gold bezel, dark face, margin-centering (no transform) --- */
+.wheel-hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4rem;
+  height: 4rem;
+  margin: -2rem 0 0 -2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background:
+    radial-gradient(circle at 32% 28%, #241640, #14092b 70%) padding-box,
+    conic-gradient(from 210deg, #fde68a, #b45309, #fbbf24, #7c2d12, #fde68a) border-box;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* --- Win celebration (fires because [data-won] derives from `result`,
+     which the settle timeout sets exactly when the wheel stops) --- */
+.wheel-win-ring {
+  position: absolute;
+  inset: 4%;
+  border-radius: 999px;
+  border: 3px solid var(--wheel-win);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.wheel-flash {
+  position: absolute;
+  inset: var(--wheel-face-inset);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.08) 45%, transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.wheel[data-won] .wheel-win-ring {
+  animation: wheel-win-ring 1.5s cubic-bezier(0, 0, 0.2, 1) 2;
+}
+.wheel[data-won] .wheel-flash {
+  animation: wheel-flash 0.8s ease-out 1;
+}
+.wheel[data-won="turbo"] .wheel-win-ring {
+  border-color: #f87171;
+  animation:
+    wheel-win-ring 1.5s cubic-bezier(0, 0, 0.2, 1) 2,
+    wheel-hue 3s linear infinite;   /* same hue cycle as .rarity-mythic's gem */
+}
+
+/* --- Keyframes --- */
+@keyframes wheel-breathe {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(1.2deg); }
+}
+@keyframes wheel-rim-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 0.8; }
+}
+@keyframes wheel-bulb-chase {
+  0%, 28%, 100% { opacity: 0.26; }
+  10%           { opacity: 1; }
+}
+@keyframes wheel-seg-win {
+  0%   { opacity: 0.2; }
+  50%  { opacity: 0.75; }
+  100% { opacity: 0.3; }
+}
+@keyframes wheel-win-ring {
+  0%   { transform: scale(0.9);  opacity: 0; }
+  12%  { opacity: 0.85; }
+  100% { transform: scale(1.22); opacity: 0; }
+}
+@keyframes wheel-flash {
+  0%   { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+@keyframes wheel-hue {
+  to { filter: hue-rotate(360deg); }
+}
+
+/* --- Light theme: only the chassis sits on the page background; the face,
+   spokes, bulbs and labels are dark-on-dark by design and stay identical. --- */
+.light .wheel-rim {
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.55),
+    inset 0 -3px 6px rgba(120, 53, 15, 0.35),
+    0 6px 24px -8px rgba(124, 58, 237, 0.35),
+    var(--shadow-glow);
+}
+
+/* --- Reduced motion: idle/decorative motion off; the spin itself is already
+   calmed by the REDUCED_* constants in WheelOfFortune.tsx. --- */
+@media (prefers-reduced-motion: reduce) {
+  .wheel-idle,
+  .wheel[data-phase="idle"]:not([data-spent]) .wheel-idle,
+  .wheel-rim::before,
+  .wheel-bulb,
+  .wheel-seg--won::before,
+  .wheel[data-won] .wheel-win-ring,
+  .wheel[data-won] .wheel-flash,
+  .wheel[data-won="turbo"] .wheel-win-ring {
+    animation: none !important;
+  }
+  .wheel[data-phase="waiting"] .wheel-bulbs,
+  .wheel[data-phase="settling"] .wheel-bulbs {
+    filter: none;
+  }
+  /* Static, legible win states instead of motion. */
+  .wheel-seg--won::before { opacity: 0.45; }
+  .wheel[data-won] .wheel-win-ring { opacity: 0.6; }
+  .wheel-idle { transition: none; }
+}
+
+/* ============================================================
+   Home hero — "Collector's Orbit" highlight box
+   ============================================================ */
+
+.hero-box {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  box-shadow: var(--shadow-card);
+  isolation: isolate;
+}
+/* Drifting aurora (same recipe as .stats-hero::before) */
+.hero-box::before {
+  content: "";
+  position: absolute;
+  inset: -40% -10% auto -10%;
+  height: 150%;
+  z-index: -1;
+  background:
+    radial-gradient(closest-side, color-mix(in srgb, var(--accent) 30%, transparent), transparent 70%) 15% 25% / 42% 60% no-repeat,
+    radial-gradient(closest-side, color-mix(in srgb, var(--info) 18%, transparent), transparent 70%) 60% 10% / 38% 55% no-repeat,
+    radial-gradient(closest-side, color-mix(in srgb, var(--rank-gold) 20%, transparent), transparent 70%) 85% 70% / 40% 60% no-repeat;
+  filter: blur(6px);
+  animation: stats-aurora 22s ease-in-out infinite alternate;
+}
+/* Top accent hairline */
+.hero-box::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent,
+    color-mix(in srgb, var(--accent) 55%, transparent), transparent);
+}
+
+/* Slow shimmer sweep across the panel (hero-shimmer keyframes already exist) */
+.hero-box-inner { position: relative; overflow: hidden; }
+.hero-box-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%,
+    rgba(255, 255, 255, 0.06) 50%, transparent 60%);
+  transform: translateX(-130%);
+  animation: hero-shimmer 7s ease-in-out infinite;
+  pointer-events: none;
+}
+[dir="rtl"] .hero-box-inner::before { animation-name: hero-shimmer-rtl; }
+@keyframes hero-shimmer-rtl {
+  0%, 60% { transform: translateX(130%); }
+  90%, 100% { transform: translateX(-130%); }
+}
+
+/* Feature icon chip (same recipe as .kpi-icon) */
+.hero-f-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.9rem; height: 1.9rem; flex-shrink: 0;
+  border-radius: 0.6rem;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ---- The orbit ---- */
+.hero-orbit-wrap {
+  display: grid;
+  place-items: center;
+  width: min(19rem, 100%);
+  margin-inline: auto;
+  aspect-ratio: 1;               /* reserves the square: no CLS */
+}
+.hero-orbit {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  animation: hero-orbit 56s linear infinite;
+}
+.hero-orbit:hover { animation-play-state: paused; }
+@keyframes hero-orbit { to { transform: rotate(360deg); } }
+
+/* Each item is a full-size wrapper rotated to its slot angle (static transform).
+   The rotating parent carries it around the circle. */
+.hero-orbit-item {
+  position: absolute;
+  inset: 0;
+  transform: rotate(var(--a, 0deg));
+}
+/* The badge chip, centered ON the circle (the wrapper's top edge) */
+.hero-orbit-slot {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 3.5rem;
+  height: 3.5rem;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--line-strong);
+  background: color-mix(in srgb, var(--surface-2) 88%, transparent);
+  box-shadow: var(--shadow-card);
+}
+/* Counter-rotation keeps badges upright while the ring turns (transform only) */
+.hero-orbit-counter {
+  animation: hero-orbit-rev 56s linear infinite;
+}
+@keyframes hero-orbit-rev { to { transform: rotate(-360deg); } }
+/* Gentle bob (transform only, staggered via --d set inline) */
+.hero-orbit-badge {
+  animation: hero-bob 5s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.hero-orbit-badge img,
+.hero-orbit-badge > span {
+  display: block;
+}
+@keyframes hero-bob {
+  0%, 100% { transform: translateY(-2px); }
+  50%      { transform: translateY(2px); }
+}
+
+/* ---- Central Twitch emblem: scaled-up mythic conic ring ---- */
+.hero-emblem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 7rem;
+  height: 7rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--foreground);
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    conic-gradient(from var(--rarity-angle),
+      #f87171, #fbbf24, #a970ff, #60a5fa, #f87171) border-box;
+  border: 2px solid transparent;
+  animation:
+    rarity-spin 5s linear infinite,          /* @property --rarity-angle */
+    rarity-float 4s ease-in-out infinite;
+  z-index: 1;
+}
+/* Halo: pre-blurred layer, only OPACITY animates (compositor-friendly) */
+.hero-emblem-halo {
+  position: absolute;
+  inset: -1.5rem;
+  border-radius: 999px;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--accent) 45%, transparent) 0%, transparent 70%);
+  filter: blur(10px);
+  animation: hero-halo 3.2s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+@keyframes hero-halo {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.9; }
+}
+
+/* ---- Decorative dashed rings, counter-rotating (transform only) ---- */
+.hero-ring {
+  position: absolute;
+  border-radius: 999px;
+  border: 1px dashed color-mix(in srgb, var(--accent) 35%, transparent);
+  pointer-events: none;
+}
+.hero-ring-a { inset: 9.5%;  animation: hero-orbit 90s linear infinite reverse; }
+.hero-ring-b { inset: 2%;    border-style: dotted; opacity: 0.35;
+               animation: hero-orbit 140s linear infinite; }
+
+/* ---- Reduced motion: static ring of badges, frozen emblem ---- */
+@media (prefers-reduced-motion: reduce) {
+  .hero-box::before,
+  .hero-box-inner::before,
+  .hero-orbit,
+  .hero-orbit-counter,
+  .hero-orbit-badge,
+  .hero-emblem,
+  .hero-emblem-halo,
+  .hero-ring {
+    animation: none;
+  }
+  .hero-orbit-badge { transform: none; }
+  .hero-emblem-halo { opacity: 0.55; }
+}

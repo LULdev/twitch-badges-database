@@ -1,7 +1,7 @@
 {
   "meta": {
     "siteTitle": "Twitch Badges Database",
-    "siteDescription": "Acompanhe todas as insígnias globais da Twitch em tempo real: drops ativos com contagem regressiva, lançamentos futuros, índice de raridade, estatísticas de proprietários e rankings mundiais de colecionadores.",
+    "siteDescription": "Acompanhe cada emblema global da Twitch em tempo real: contagens de drops, índice de raridade, estatísticas e rankings — mais jogos, níveis e roleta diária.",
     "badgeTitle": "{title} — Insígnia da Twitch",
     "badgeDescription": "{title} ({setId}): como conseguir, raridade, número de proprietários e período de disponibilidade.",
     "profileTitle": "Coleção de insígnias de {username}",
@@ -87,8 +87,8 @@
     "breadcrumb": "Trilha de navegação"
   },
   "home": {
-    "heroTitle": "Todas as insígnias da Twitch. Um só banco de dados.",
-    "heroSubtitle": "Drops ao vivo com contagem regressiva, lançamentos futuros, índice de raridade exclusivo e rankings mundiais de colecionadores — sincronizados diretamente da API da Twitch.",
+    "heroTitle": "Twitch Badges Database — acompanhe cada emblema global em tempo real",
+    "heroSubtitle": "Contagens regressivas de drops ao vivo, índice de raridade exclusivo e rankings de colecionadores — além de jogos, níveis e uma roleta diária. Grátis com sua conta Twitch.",
     "ctaExplore": "Explorar insígnias",
     "ctaLogin": "Entrar com a Twitch",
     "statActive": "Ativas agora",
@@ -105,7 +105,16 @@
     "rarestSubtitle": "Maior índice de raridade agora",
     "fromChangelog": "Últimas mudanças",
     "fromBlog": "Do blog",
-    "readMore": "Ler mais"
+    "readMore": "Ler mais",
+    "heroEyebrow": "Ao vivo agora: {count} emblemas disponíveis",
+    "heroF1Title": "Rastreamento de emblemas em tempo real",
+    "heroF1Desc": "Cada drop global é detectado e sincronizado pela API da Twitch, com contagens regressivas ao segundo em que um emblema expira.",
+    "heroF2Title": "Índice de raridade TBRI",
+    "heroF2Desc": "Uma pontuação de 0 a 100 baseada em escassez, adoção e momento — saiba quais emblemas são realmente raros antes de resgatá-los.",
+    "heroF3Title": "Jogue enquanto coleciona",
+    "heroF3Desc": "13 jogos de fliperama, XP, níveis, moedas e 125 conquistas — mais uma roleta diária com um jackpot de Twitch Turbo com chances reais de 1 em 100.000.000.",
+    "heroF4Title": "Seu perfil de coleção",
+    "heroF4Desc": "Entre com a Twitch para sincronizar os emblemas que já possui, montar uma vitrine e subir nos rankings mundiais — em 11 idiomas."
   },
   "badges": {
     "aboutRarity": "Sobre o índice de raridade",
@@ -643,7 +652,8 @@
     "networkError": "Erro de rede — tente novamente.",
     "wheelDisabled": "A roleta está desativada no momento.",
     "notAuthed": "Entre com a Twitch para girar a roleta.",
-    "banned": "Sua conta está banida."
+    "banned": "Sua conta está banida.",
+    "youWon": "Você ganhou"
   },
   "feed": {
     "title": "Feed de atividade ao vivo",

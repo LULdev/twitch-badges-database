@@ -4,7 +4,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getFeatures } from "@/lib/settings";
 import FeedList, { type FeedEvent } from "@/components/FeedList";
-import LiveRefresher from "@/components/LiveRefresher";
 import { localeAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -57,7 +56,10 @@ export default async function FeedPage({
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <LiveRefresher intervalMs={15000} />
+      {/* No LiveRefresher here: FeedList already polls /api/feed every 5 s and
+          merges client-side — the additional router.refresh() every 15 s
+          re-ran the whole dynamic render chain (auth + layout + queries) for
+          nothing, competing with real navigations. */}
       <header>
         <h1 className="text-2xl font-extrabold tracking-tight">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted">{t("subtitle")}</p>

@@ -1,7 +1,7 @@
 {
   "meta": {
     "siteTitle": "Twitch Badges Database",
-    "siteDescription": "Suivez tous les badges globaux Twitch en temps réel : drops actifs avec compte à rebours, prochaines sorties, indice de rareté, statistiques de détenteurs et classements mondiaux de collectionneurs.",
+    "siteDescription": "Suivez chaque badge Twitch global en temps réel : comptes à rebours, indice de rareté, stats de détenteurs et classements — plus jeux, niveaux et roue quotidienne.",
     "badgeTitle": "{title} — Badge Twitch",
     "badgeDescription": "{title} ({setId}) : comment l'obtenir, rareté, nombre de détenteurs et période de disponibilité.",
     "profileTitle": "Collection de badges de {username}",
@@ -87,8 +87,8 @@
     "breadcrumb": "Fil d'Ariane"
   },
   "home": {
-    "heroTitle": "Tous les badges Twitch. Une seule base de données.",
-    "heroSubtitle": "Drops en direct avec compte à rebours, prochaines sorties, un indice de rareté exclusif et des classements mondiaux de collectionneurs — synchronisés directement depuis l'API Twitch.",
+    "heroTitle": "Twitch Badges Database — suivez chaque badge global en temps réel",
+    "heroSubtitle": "Comptes à rebours des drops en direct, indice de rareté propriétaire et classements de collectionneurs — plus des jeux, des niveaux et une roue quotidienne. Gratuit avec ton compte Twitch.",
     "ctaExplore": "Explorer les badges",
     "ctaLogin": "Se connecter avec Twitch",
     "statActive": "Actifs maintenant",
@@ -105,7 +105,16 @@
     "rarestSubtitle": "Indice de rareté le plus élevé actuellement",
     "fromChangelog": "Dernières modifications",
     "fromBlog": "Depuis le blog",
-    "readMore": "Lire la suite"
+    "readMore": "Lire la suite",
+    "heroEyebrow": "En direct : {count} badges à récupérer",
+    "heroF1Title": "Suivi des badges en temps réel",
+    "heroF1Desc": "Chaque drop global est détecté et synchronisé via l'API Twitch, avec des comptes à rebours à la seconde d'expiration d'un badge.",
+    "heroF2Title": "Indice de rareté TBRI",
+    "heroF2Desc": "Un score de 0 à 100 fondé sur la rareté, la diffusion et la dynamique — sache quels badges sont vraiment rares avant de les récupérer.",
+    "heroF3Title": "Joue pendant que tu collectionnes",
+    "heroF3Desc": "13 jeux d'arcade, de l'XP, des niveaux, des pièces et 125 succès — plus une roue quotidienne avec un jackpot Twitch Turbo à de vraies chances de 1 sur 100 000 000.",
+    "heroF4Title": "Ton profil de collectionneur",
+    "heroF4Desc": "Connecte-toi avec Twitch pour synchroniser les badges que tu possèdes déjà, créer une vitrine et grimper dans les classements mondiaux — en 11 langues."
   },
   "badges": {
     "aboutRarity": "À propos de l'indice de rareté",
@@ -643,7 +652,8 @@
     "networkError": "Erreur réseau — réessaie.",
     "wheelDisabled": "La roue est désactivée pour le moment.",
     "notAuthed": "Connecte-toi avec Twitch pour faire tourner la roue.",
-    "banned": "Ton compte est banni."
+    "banned": "Ton compte est banni.",
+    "youWon": "Tu as gagné"
   },
   "feed": {
     "title": "Fil d'activité en direct",

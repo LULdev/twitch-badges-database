@@ -1,7 +1,7 @@
 {
   "meta": {
     "siteTitle": "Twitch Badges Database",
-    "siteDescription": "Track every global Twitch badge in real time: active drops with countdown timers, upcoming releases, rarity index, owner statistics and worldwide collector leaderboards.",
+    "siteDescription": "Track every global Twitch badge in real time: drop countdowns, rarity index, owner stats and leaderboards — plus games, levels and a daily prize wheel.",
     "badgeTitle": "{title} — Twitch Badge",
     "badgeDescription": "{title} ({setId}): how to earn it, rarity, owner count and availability window.",
     "profileTitle": "{username}'s badge collection",
@@ -87,8 +87,8 @@
     "breadcrumb": "Breadcrumb"
   },
   "home": {
-    "heroTitle": "Every Twitch badge. One database.",
-    "heroSubtitle": "Live drops with countdown timers, upcoming releases, a proprietary rarity index and worldwide collector leaderboards — synced directly from the Twitch API.",
+    "heroTitle": "Twitch Badges Database — Track Every Global Badge in Real Time",
+    "heroSubtitle": "Live drop countdowns, a proprietary rarity index and collector leaderboards — plus games, levels and a daily prize wheel. Free with your Twitch account.",
     "ctaExplore": "Explore badges",
     "ctaLogin": "Log in with Twitch",
     "statActive": "Active now",
@@ -105,7 +105,16 @@
     "rarestSubtitle": "Highest rarity index right now",
     "fromChangelog": "Latest changes",
     "fromBlog": "From the blog",
-    "readMore": "Read more"
+    "readMore": "Read more",
+    "heroEyebrow": "Live now: {count} badges claimable",
+    "heroF1Title": "Real-time badge tracking",
+    "heroF1Desc": "Every global drop detected and synced from the Twitch API, with live countdowns to the second a badge expires.",
+    "heroF2Title": "TBRI rarity index",
+    "heroF2Desc": "A 0–100 score built from scarcity, wear and momentum — know which badges are genuinely rare before you claim them.",
+    "heroF3Title": "Play while you collect",
+    "heroF3Desc": "13 arcade games, XP, levels, coins and 125 achievements — plus a daily Wheel of Fortune with a Twitch Turbo jackpot at real 1-in-100,000,000 odds.",
+    "heroF4Title": "Your collection profile",
+    "heroF4Desc": "Log in with Twitch to sync the badges you already own, build a showcase and climb worldwide leaderboards — in 11 languages."
   },
   "badges": {
     "aboutRarity": "About the rarity index",
@@ -643,7 +652,8 @@
     "networkError": "Network error — try again.",
     "wheelDisabled": "The wheel is disabled right now.",
     "notAuthed": "Log in with Twitch to spin the wheel.",
-    "banned": "Your account is banned."
+    "banned": "Your account is banned.",
+    "youWon": "You won"
   },
   "feed": {
     "title": "Live Activity Feed",

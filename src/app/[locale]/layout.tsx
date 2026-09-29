@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { routing, isRtl, localeHtmlLang } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
 import { siteUrl, localeAlternates } from "@/lib/seo";
@@ -79,9 +79,14 @@ export default async function LocaleLayout({
   let user: HeaderUser | null = null;
   try {
     const supabase = await createClient();
+    // getSession() decodes the JWT locally — zero network. The proxy already
+    // validated/refreshed the session authoritatively on this very request, so
+    // a second blocking auth round trip here only added latency to every
+    // navigation (getUser() calls the auth server on every invocation).
     const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+    const authUser = session?.user ?? null;
     if (authUser) {
       const { data: profile } = await supabase
         .from("profiles")
@@ -104,6 +109,23 @@ export default async function LocaleLayout({
 
   const features = await getFeatures();
 
+  // Ship ONLY the namespaces client components actually read. Without a
+  // messages prop the provider serializes the entire catalog (58–86 KB per
+  // locale) into every RSC payload — on every navigation and router.refresh().
+  // Server components are unaffected: they read via getTranslations on the
+  // server. Keep this list in sync with the useTranslations("…") namespaces in
+  // client components (grep it when adding one).
+  const allMessages = (await getMessages()) as Record<string, unknown>;
+  const CLIENT_NAMESPACES = [
+    "nav", "common", "footer", "login", "errors", "account", "profile",
+    "customizer", "inventory", "notifications", "feed", "blog", "compare",
+    "countdown", "rarity", "roles", "stats", "wheel", "steal", "games",
+    "admin",
+  ];
+  const clientMessages = Object.fromEntries(
+    CLIENT_NAMESPACES.filter((ns) => ns in allMessages).map((ns) => [ns, allMessages[ns]]),
+  );
+
   return (
     <html
       lang={localeHtmlLang[locale as keyof typeof localeHtmlLang] ?? locale}
@@ -112,7 +134,7 @@ export default async function LocaleLayout({
     >
       <body className="min-h-dvh antialiased">
         <ThemeScript />
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={clientMessages}>
           <div className="flex min-h-dvh flex-col">
             <Header user={user} features={features} />
             <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">

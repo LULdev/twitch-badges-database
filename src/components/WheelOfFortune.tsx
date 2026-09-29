@@ -129,10 +129,16 @@ export default function WheelOfFortune() {
 
   const wheelStyle = useMemo(
     () => ({
-      background: `conic-gradient(${SEGMENTS.map((segment, index) => {
+      background: `conic-gradient(${SEGMENTS.flatMap((segment, index) => {
         const start = index * SEGMENT_ANGLE;
-        const color = segment.turbo ? "#fbbf24" : index % 2 === 0 ? "#a970ff" : "#2c1a4d";
-        return `${color} ${start}deg ${(start + SEGMENT_ANGLE)}deg`;
+        if (segment.turbo) {
+          // Rainbow sweep inside the jackpot wedge — same palette as
+          // .rarity-mythic in globals.css, drawn as sub-stops of this wedge.
+          const rainbow = ["#f87171", "#fbbf24", "#fde68a", "#34d399", "#60a5fa", "#a970ff", "#f472b6", "#f87171"];
+          return rainbow.map((color, step) => `${color} ${start + (step * SEGMENT_ANGLE) / (rainbow.length - 1)}deg`);
+        }
+        const color = index % 2 === 0 ? "#3b2565" : "#1c1133";
+        return [`${color} ${start}deg`, `${color} ${start + SEGMENT_ANGLE}deg`];
       }).join(", ")})`,
     }),
     [],
@@ -269,6 +275,9 @@ export default function WheelOfFortune() {
 
   const busy = phase !== "idle";
   const locked = busy || usedToday;
+  // Index of the awarded segment — drives the winning-wedge highlight, which
+  // starts exactly when the settle timeout fires (the tick the wheel stops).
+  const wonIndex = result ? SEGMENTS.findIndex((s) => s.id === result.id) : -1;
 
   return (
     <div className="space-y-6">
@@ -278,37 +287,76 @@ export default function WheelOfFortune() {
         onClick={spin}
         aria-disabled={locked}
         aria-label={`${tg("spin")} — ${t("title")}`}
-        className={`relative mx-auto block size-72 rounded-full border-0 bg-transparent p-0 text-left sm:size-96 ${locked ? "cursor-not-allowed opacity-80" : "cursor-pointer"}`}
+        data-phase={phase}
+        data-spent={usedToday || undefined}
+        data-won={result ? (result.turbo ? "turbo" : "yes") : undefined}
+        className={`wheel relative mx-auto block size-72 rounded-full border-0 bg-transparent p-0 text-left sm:size-96 ${locked ? "cursor-not-allowed opacity-80" : "cursor-pointer"}`}
       >
-        <span
-          className="absolute -top-1 left-1/2 z-10 -translate-x-1/2 text-2xl"
-          aria-hidden="true"
-        >
-          ▼
-        </span>
-        <div
-          ref={wheelRef}
-          className="size-full rounded-full border-4 border-line-strong shadow-glow"
-          style={wheelStyle}
-        >
-          {SEGMENTS.map((segment, index) => (
-            <div
-              key={segment.id}
-              className="absolute inset-0 flex justify-center"
-              style={{ transform: `rotate(${index * SEGMENT_ANGLE + SEGMENT_ANGLE / 2}deg)` }}
-            >
-              <span
-                className={`mt-5 whitespace-nowrap text-[0.625rem] font-black tracking-wide sm:text-xs ${segment.turbo ? "text-black" : "text-white"}`}
-                style={{ writingMode: "vertical-rl" }}
+        {/* Static chassis — never rotates. */}
+        <span className="wheel-rim" aria-hidden="true" />
+        <span className="wheel-gloss" aria-hidden="true" />
+
+        {/* Idle breathing lives on this wrapper; the face inside stays JS-owned. */}
+        <span className="wheel-idle">
+          <div ref={wheelRef} className="wheel-face" style={wheelStyle}>
+            <span className="wheel-spokes" aria-hidden="true" />
+            {SEGMENTS.map((segment, index) => (
+              <div
+                key={segment.id}
+                className={`wheel-seg${index === wonIndex ? " wheel-seg--won" : ""}`}
+                style={{ transform: `rotate(${index * SEGMENT_ANGLE + SEGMENT_ANGLE / 2}deg)` }}
               >
-                {segment.label}
-              </span>
-            </div>
-          ))}
-        </div>
-        <span className="pointer-events-none absolute left-1/2 top-1/2 grid size-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-4 border-line-strong bg-background text-xs font-black">
-          {tg("spin")}
+                <span
+                  dir="ltr"
+                  className={`wheel-seg-label${segment.turbo ? " wheel-seg-label--turbo" : ""}`}
+                >
+                  {segment.label}
+                </span>
+              </div>
+            ))}
+          </div>
         </span>
+
+        {/* LED ring — one SVG, scales with the button at both breakpoints. */}
+        <svg className="wheel-bulbs" viewBox="-100 -100 200 200" aria-hidden="true" focusable="false">
+          {Array.from({ length: 16 }, (_, i) => (
+            <circle
+              key={i}
+              className="wheel-bulb"
+              style={{ "--i": i } as React.CSSProperties}
+              cx="0"
+              cy="-96.5"
+              r="2.4"
+              transform={`rotate(${i * 22.5})`}
+            />
+          ))}
+        </svg>
+
+        {/* Jewel-tipped pointer. */}
+        <span className="wheel-pointer" aria-hidden="true">
+          <svg viewBox="0 0 32 40" focusable="false">
+            <defs>
+              <linearGradient id="wheel-ptr-gold" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stopColor="#b45309" />
+                <stop offset="0.35" stopColor="#fde68a" />
+                <stop offset="0.55" stopColor="#fbbf24" />
+                <stop offset="1" stopColor="#92400e" />
+              </linearGradient>
+              <linearGradient id="wheel-ptr-gem" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="#e9d5ff" />
+                <stop offset="0.5" stopColor="#a970ff" />
+                <stop offset="1" stopColor="#6d28d9" />
+              </linearGradient>
+            </defs>
+            <path d="M16 40 C10 30 2 24 2 14 a14 14 0 1 1 28 0 c0 10 -8 16 -14 26 z" fill="url(#wheel-ptr-gold)" stroke="#713f12" strokeWidth="1" />
+            <circle cx="16" cy="14" r="6.5" fill="url(#wheel-ptr-gem)" stroke="#fde68a" strokeWidth="1" />
+            <circle cx="14" cy="11.5" r="1.6" fill="#fff" opacity="0.9" />
+          </svg>
+        </span>
+
+        <span className="wheel-hub">{tg("spin")}</span>
+        <span className="wheel-win-ring" aria-hidden="true" />
+        <span className="wheel-flash" aria-hidden="true" />
       </button>
 
       <div className="text-center">
@@ -332,7 +380,8 @@ export default function WheelOfFortune() {
             aria-live="polite"
             className={`card mx-auto mt-4 max-w-sm p-5 ${result.turbo ? "border-warning" : ""}`}
           >
-            <p className="text-2xl font-black">{result.turbo ? t("turboWon") : result.label}</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-muted">{t("youWon")}</p>
+            <p dir="ltr" className="text-2xl font-black">{result.turbo ? t("turboWon") : result.label}</p>
             <p className="mt-1 text-sm text-muted">
               {result.turbo ? t("turboWon") : (<span dir="ltr" className="inline-flex items-center gap-1.5">+{result.coins.toLocaleString(locale)} <Coin size={16} className="bcoin-lg" /></span>)}
             </p>

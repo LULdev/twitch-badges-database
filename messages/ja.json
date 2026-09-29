@@ -1,7 +1,7 @@
 {
   "meta": {
     "siteTitle": "Twitchバッジデータベース",
-    "siteDescription": "Twitchの全グローバルバッジをリアルタイムで追跡：カウントダウン付きの実施中ドロップ、今後のリリース、レアリティ指数、所有者統計、世界中のコレクターランキング。",
+    "siteDescription": "Twitch の全グローバル バッジをリアルタイム追跡：ドロップのカウントダウン、レア度指数、統計とランキング — ゲームやレベル、毎日のルーレットも。",
     "badgeTitle": "{title} — Twitchバッジ",
     "badgeDescription": "{title}（{setId}）：入手方法、レアリティ、所有者数、入手可能期間。",
     "profileTitle": "{username}さんのバッジコレクション",
@@ -87,8 +87,8 @@
     "breadcrumb": "パンくずリスト"
   },
   "home": {
-    "heroTitle": "Twitchの全バッジを、一つのデータベースに。",
-    "heroSubtitle": "カウントダウン付きのリアルタイムドロップ、今後のリリース、独自のレアリティ指数、世界中のコレクターランキング — Twitch APIから直接同期。",
+    "heroTitle": "Twitch Badges Database — すべてのグローバルバッジをリアルタイム追跡",
+    "heroSubtitle": "ドロップのライブ カウントダウン、独自のレア度指数、コレクター ランキング — さらにゲーム、レベル、毎日のルーレットも。Twitch アカウントで無料。",
     "ctaExplore": "バッジを見る",
     "ctaLogin": "Twitchでログイン",
     "statActive": "現在実施中",
@@ -105,7 +105,16 @@
     "rarestSubtitle": "現在最高のレアリティ指数",
     "fromChangelog": "最新の変更",
     "fromBlog": "ブログから",
-    "readMore": "続きを読む"
+    "readMore": "続きを読む",
+    "heroEyebrow": "今すぐ：獲得できるバッジ {count} 個",
+    "heroF1Title": "バッジのリアルタイム追跡",
+    "heroF1Desc": "Twitch API からすべてのグローバル ドロップを検出・同期し、バッジの失効秒までカウントダウンします。",
+    "heroF2Title": "TBRI レア度指数",
+    "heroF2Desc": "希少性・保有度・勢いから算出する 0～100 のスコア — 獲得前にどのバッジが本当にレアか分かります。",
+    "heroF3Title": "集めながら遊ぶ",
+    "heroF3Desc": "13 のアーケード ゲーム、XP、レベル、コイン、125 個の実績 — 毎日のルーレットには本物の確率 1 億分の 1 で Twitch Turbo ジャックポット。",
+    "heroF4Title": "あなたのコレクション プロフィール",
+    "heroF4Desc": "Twitch でログインして保有バッジを同期し、ショーケースを作り、世界ランキングを登りましょう — 11 言語対応。"
   },
   "badges": {
     "aboutRarity": "レアリティ指数について",
@@ -643,7 +652,8 @@
     "networkError": "ネットワークエラーです。もう一度お試しください。",
     "wheelDisabled": "現在、ルーレットは無効です。",
     "notAuthed": "Twitch でログインしてルーレットを回してください。",
-    "banned": "あなたのアカウントは停止されています。"
+    "banned": "あなたのアカウントは停止されています。",
+    "youWon": "獲得しました"
   },
   "feed": {
     "title": "ライブアクティビティフィード",
