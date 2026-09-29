@@ -199,12 +199,7 @@
     "confirmedActive": "Confirmed active",
     "ownersHeadlineShort": "Lifetime owners",
     "wearingNow": "Wearing it now",
-    "shareOfViewers": "Share of viewers",
-    "chapterEarn": "How to earn it",
-    "chapterRarity": "How rare is it",
-    "chapterOwners": "Who owns it",
-    "chapterHistory": "The full history",
-    "chapterWorld": "In its world"
+    "shareOfViewers": "Share of viewers"
   },
   "countdown": {
     "expiresIn": "Expires in",

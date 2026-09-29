@@ -2681,42 +2681,6 @@ html {
 }
 
 /* ============================================================
-   Badge detail — Variant C "Document" (doc-*)
-   ============================================================ */
-.doc-ring {
-  position: relative;
-  display: grid;
-  place-items: center;
-  border-radius: 1.25rem;
-  border: 2px solid transparent;
-  background:
-    linear-gradient(var(--surface), var(--surface)) padding-box,
-    conic-gradient(from var(--rarity-angle),
-      color-mix(in srgb, var(--tier-color, var(--accent)) 30%, #fff),
-      var(--tier-color, var(--accent)),
-      color-mix(in srgb, var(--tier-color, var(--accent)) 55%, #000),
-      var(--tier-color, var(--accent))) border-box;
-  animation: rarity-spin 8s linear infinite;
-}
-.doc-chapter { max-width: none; }
-.doc-chapter-head {
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-  border-block-start: 1px solid var(--line);
-  padding-block-start: 1.75rem;
-}
-.doc-chapter-num {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: var(--accent-soft);
-  -webkit-text-stroke: 1px color-mix(in srgb, var(--accent) 45%, transparent);
-}
-.doc-companion { position: static; }
-.doc-companion > div { position: sticky; top: 6.5rem; }
-
-/* ============================================================
    Badge detail — reduced motion kill switch
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
@@ -2724,10 +2688,99 @@ html {
   .claim-elapsed::after,
   .claim-now,
   .claim-now .live-dot::after,
-  .doc-ring,
+  .gal-stage::before,
+  .gal-ring,
+  .gal-halo,
+  .gal-plinth,
+  .gal-plinth-shadow,
   .radar-in,
   .map-self-ping {
     animation: none;
   }
   .radar-in, .map-self-ping { opacity: 1; transform: none; }
 }
+
+/* ============================================================
+   Badge detail — "Gallery" layout (gal-*)
+   ============================================================ */
+.gal-stage {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.gal-stage::before {
+  content: "";
+  position: absolute;
+  inset: -40% -10% auto -10%;
+  height: 150%;
+  z-index: -1;
+  background:
+    radial-gradient(closest-side, color-mix(in srgb, var(--tier-color, var(--accent)) 22%, transparent), transparent 70%) 20% 20% / 45% 55% no-repeat,
+    radial-gradient(closest-side, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%) 75% 60% / 40% 50% no-repeat;
+  filter: blur(6px);
+  animation: stats-aurora 24s ease-in-out infinite alternate;
+}
+.gal-pedestal {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 11.5rem;
+  height: 11.5rem;
+}
+.gal-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    conic-gradient(from var(--rarity-angle),
+      color-mix(in srgb, var(--tier-color, var(--accent)) 30%, #fff),
+      var(--tier-color, var(--accent)),
+      color-mix(in srgb, var(--tier-color, var(--accent)) 55%, #000),
+      var(--tier-color, var(--accent)),
+      color-mix(in srgb, var(--tier-color, var(--accent)) 30%, #fff)) border-box;
+  animation: rarity-spin 6s linear infinite;
+  box-shadow: var(--shadow-glow);
+}
+.gal-halo {
+  position: absolute;
+  inset: -1.25rem;
+  border-radius: 999px;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--tier-color, var(--accent)) 40%, transparent) 0%, transparent 70%);
+  filter: blur(10px);
+  animation: hero-halo 3.4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+.gal-plinth {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 1rem;
+  animation: rarity-float 5.5s ease-in-out infinite;
+}
+.gal-plinth-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: -0.9rem;
+  width: 8.5rem;
+  height: 1.25rem;
+  translate: -50% 0;
+  border-radius: 999px;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.45), transparent 75%);
+  filter: blur(3px);
+  animation: gal-plinth 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes gal-plinth {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(0.94); opacity: 0.34; }
+}
+.gal-accession {
+  text-align: center;
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+}
+.gal-placard { outline: 1px solid var(--line); outline-offset: 5px; }

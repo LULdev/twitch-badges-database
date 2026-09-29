@@ -17,6 +17,7 @@ import RarityChip from "@/components/badges/RarityChip";
 import Countdown from "@/components/badges/Countdown";
 import ClaimBar from "@/components/badges/ClaimBar";
 import MomentumReadout from "@/components/badges/MomentumReadout";
+import TiltPedestal from "@/components/badges/TiltPedestal";
 import { StatusChip } from "@/components/badges/BadgeCard";
 import { jsonLdScript } from "@/lib/jsonld";
 import { buildBadgeFaq } from "@/lib/badges/faq";
@@ -91,7 +92,7 @@ function formatDate(value: string | null, locale: string): string {
   });
 }
 
-/** The six TBRI axes in render order (top of the radar → clockwise). */
+/** The six TBRI axes in render order. */
 const COMPONENT_KEYS: RarityComponentKey[] = [
   "scarcity",
   "wear",
@@ -273,7 +274,7 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   };
 
   /* ---------------------------------------------------------------- */
-  /* Shared sections — built once, arranged by the document layout.    */
+  /* Shared sections — built once, arranged by the gallery layout.     */
   /* ---------------------------------------------------------------- */
 
   const claimLabels = {
@@ -344,6 +345,19 @@ export default async function BadgeDetailPage({ params }: PageProps) {
       </div>
     );
 
+  /** Claim-window rail for the gallery hero — the ClaimBar under the placard. */
+  const claimRail = (badge.start_date || badge.end_date || badge.release_date) && (
+    <div className="border-t border-line bg-surface-2 px-6 py-4">
+      <ClaimBar
+        start={badge.start_date}
+        end={badge.end_date}
+        releasedAt={badge.release_date}
+        locale={locale}
+        labels={claimLabels}
+      />
+    </div>
+  );
+
   const acquisitionSection = (
     <section className="card p-6" aria-labelledby="bd-earn">
       <h2 id="bd-earn" className="text-sm font-bold uppercase tracking-[0.08em] text-muted">
@@ -374,8 +388,8 @@ export default async function BadgeDetailPage({ params }: PageProps) {
           {badge.rarity_score}
         </span>
         <RarityChip tier={badge.rarity_tier} score={badge.rarity_score} />
-        {momentumChip}
       </div>
+      <div className="flex flex-wrap gap-2">{momentumChip}</div>
       <div className="space-y-2.5">
         {rarityComponents.map((component, index) => (
           <div key={component.key} className="grow-bar">
@@ -623,85 +637,58 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   );
 
   /* ---------------------------------------------------------------- */
-  /* "Document" layout: story chapters + sticky companion.             */
+  /* "Gallery" layout: pedestal, placard, two-column wing.             */
   /* ---------------------------------------------------------------- */
-  const chapters = [
-    { id: "doc-earn", num: "01", title: t("chapterEarn"), node: acquisitionSection },
-    { id: "doc-rarity", num: "02", title: t("chapterRarity"), node: rarityPanel },
-    { id: "doc-owners", num: "03", title: t("chapterOwners"), node: ownershipSection },
-    { id: "doc-history", num: "04", title: t("chapterHistory"), node: provenanceSection },
-    { id: "doc-world", num: "05", title: t("chapterWorld"), node: relatedSection },
-  ];
-
   return (
     <div className="space-y-8">
       {headerScripts}
       {breadcrumb}
-      <section className="card overflow-hidden" style={{ ["--tier-color" as string]: tierColor }}>
-        <div className="flex flex-col items-center gap-6 p-6 sm:flex-row sm:items-start sm:p-8">
-          <div className="doc-ring shrink-0 p-3">
-            <BadgeImage badge={badge} size={104} alt="" />
-          </div>
-          <div className="min-w-0 flex-1 text-center sm:text-start">
-            <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{badge.title}</h1>
-            <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+      <section className="gal-stage card" style={{ ["--tier-color" as string]: tierColor }}>
+        <div className="flex flex-col items-center gap-8 p-6 sm:flex-row sm:items-start sm:p-8">
+          <TiltPedestal className="shrink-0">
+            <figure className="gal-pedestal">
+              <span className="gal-halo" aria-hidden="true" />
+              <span className="gal-ring" aria-hidden="true" />
+              <div className="gal-plinth">
+                <BadgeImage badge={badge} size={112} alt="" />
+              </div>
+              <span className="gal-plinth-shadow" aria-hidden="true" />
+              <figcaption className="gal-accession font-mono text-muted">
+                {badge.set_id} · {t("version")} {badge.version}
+              </figcaption>
+            </figure>
+          </TiltPedestal>
+          <div className="gal-placard card min-w-0 flex-1 p-5 text-center sm:text-start">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               {chips}
             </div>
+            <h1 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">
+              {badge.title}
+            </h1>
             {badge.description && (
-              <p className="mt-2 text-sm leading-relaxed text-muted">{badge.description}</p>
+              <p className="mt-2 text-sm text-muted">{badge.description}</p>
             )}
-            <p className="mt-2 font-mono text-xs text-muted">
-              {t("setId")}: {badge.set_id} · {t("version")}: {badge.version}
-            </p>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               {actions}
             </div>
           </div>
         </div>
-        <div className="border-t border-line bg-surface-2 px-6 py-4">
-          <ClaimBar
-            start={badge.start_date}
-            end={badge.end_date}
-            releasedAt={badge.release_date}
-            locale={locale}
-            labels={claimLabels}
-          />
-        </div>
+        {claimRail}
         {claimStrip}
       </section>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-        <main className="min-w-0 space-y-8">
-          {chapters.map((chapter) => (
-            <section key={chapter.id} id={chapter.id} className="doc-chapter scroll-mt-24 space-y-4">
-              <div className="doc-chapter-head">
-                <span className="doc-chapter-num" aria-hidden="true">{chapter.num}</span>
-                <h2 className="text-sm font-bold uppercase tracking-[0.08em] text-muted">
-                  {chapter.title}
-                </h2>
-              </div>
-              {chapter.node}
-            </section>
-          ))}
-          {faqSection}
-        </main>
-        <aside className="doc-companion hidden lg:block">
-          <div className="space-y-6">
-            <div className="card p-5 text-center">
-              <p className="text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-muted">
-                {t("momentumTitle")}
-              </p>
-              <div className="mt-2 flex justify-center">{momentumChip}</div>
-              <div className="mt-4 flex justify-center">
-                <ShareButtons
-                  path={`/${locale}/badges/${badge.slug}`}
-                  title={`${badge.title} — Twitch Badges Database`}
-                />
-              </div>
-            </div>
-          </div>
-        </aside>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
+          {acquisitionSection}
+          {ownershipSection}
+        </div>
+        <div className="space-y-6">
+          {rarityPanel}
+          {provenanceSection}
+        </div>
       </div>
+      {faqSection}
+      {relatedSection}
     </div>
   );
 }

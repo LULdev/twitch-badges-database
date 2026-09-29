@@ -199,12 +199,7 @@
     "confirmedActive": "활성 확인됨",
     "ownersHeadlineShort": "누적 소유자",
     "wearingNow": "현재 착용 중",
-    "shareOfViewers": "시청자 비율",
-    "chapterEarn": "획득 방법",
-    "chapterRarity": "얼마나 희귀할까",
-    "chapterOwners": "누가 소유하고 있을까",
-    "chapterHistory": "전체 히스토리",
-    "chapterWorld": "배지의 세계"
+    "shareOfViewers": "시청자 비율"
   },
   "countdown": {
     "expiresIn": "종료까지",

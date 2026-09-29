@@ -199,12 +199,7 @@
     "confirmedActive": "Активность подтверждена",
     "ownersHeadlineShort": "Владельцы за всё время",
     "wearingNow": "Носят его сейчас",
-    "shareOfViewers": "Доля зрителей",
-    "chapterEarn": "Как его получить",
-    "chapterRarity": "Насколько он редкий",
-    "chapterOwners": "Кто им владеет",
-    "chapterHistory": "Полная хронология",
-    "chapterWorld": "В его мире"
+    "shareOfViewers": "Доля зрителей"
   },
   "countdown": {
     "expiresIn": "Истекает через",

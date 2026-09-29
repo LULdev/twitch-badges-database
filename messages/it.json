@@ -199,12 +199,7 @@
     "confirmedActive": "Attività confermata",
     "ownersHeadlineShort": "Possessori in totale",
     "wearingNow": "Lo indossano ora",
-    "shareOfViewers": "Percentuale di spettatori",
-    "chapterEarn": "Come ottenerlo",
-    "chapterRarity": "Quanto è raro",
-    "chapterOwners": "Chi lo possiede",
-    "chapterHistory": "La cronologia completa",
-    "chapterWorld": "Nel suo mondo"
+    "shareOfViewers": "Percentuale di spettatori"
   },
   "countdown": {
     "expiresIn": "Scade tra",

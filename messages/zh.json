@@ -199,12 +199,7 @@
     "confirmedActive": "已确认活跃",
     "ownersHeadlineShort": "累计持有者",
     "wearingNow": "当前佩戴中",
-    "shareOfViewers": "观众占比",
-    "chapterEarn": "获取方式",
-    "chapterRarity": "它有多稀有",
-    "chapterOwners": "谁拥有它",
-    "chapterHistory": "完整历史",
-    "chapterWorld": "徽章的世界"
+    "shareOfViewers": "观众占比"
   },
   "countdown": {
     "expiresIn": "剩余时间",

@@ -199,12 +199,7 @@
     "confirmedActive": "アクティブ確認済み",
     "ownersHeadlineShort": "累計所有者数",
     "wearingNow": "現在装着中",
-    "shareOfViewers": "視聴者に占める割合",
-    "chapterEarn": "入手方法",
-    "chapterRarity": "どれくらい希少？",
-    "chapterOwners": "誰が持っているか",
-    "chapterHistory": "すべての履歴",
-    "chapterWorld": "バッジの世界"
+    "shareOfViewers": "視聴者に占める割合"
   },
   "countdown": {
     "expiresIn": "終了まで",

@@ -199,12 +199,7 @@
     "confirmedActive": "نشاط مؤكد",
     "ownersHeadlineShort": "إجمالي المالكين",
     "wearingNow": "يرتدونها الآن",
-    "shareOfViewers": "نسبة المشاهدين",
-    "chapterEarn": "كيفية الحصول عليها",
-    "chapterRarity": "ما مدى ندرتها",
-    "chapterOwners": "من يملكها",
-    "chapterHistory": "السجل الكامل",
-    "chapterWorld": "في عالمها"
+    "shareOfViewers": "نسبة المشاهدين"
   },
   "countdown": {
     "expiresIn": "تنتهي خلال",
