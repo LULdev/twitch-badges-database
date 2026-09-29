@@ -96,7 +96,13 @@ export default function MarketMap({
 }: {
   self: MarketMapSelf;
   peers: MarketMapPeer[];
-  pathBuilder: (slug: string) => string;
+  /**
+   * Optional href builder for peer links. The page rendering this component is
+   * a SERVER component, and function props cannot cross the server→client
+   * boundary — so the default builds the path from the component's own locale:
+   * `/${locale}/badges/${slug}` (localePrefix is "always").
+   */
+  pathBuilder?: (slug: string) => string;
   labels: MarketMapLabels;
   selfColor?: string;
 }) {
@@ -104,6 +110,7 @@ export default function MarketMap({
   const locale = useLocale();
   const reducedMotion = useReducedMotion();
   const accent = selfColor ?? theme.accent;
+  const buildPath = pathBuilder ?? ((slug: string) => `/${locale}/badges/${slug}`);
 
   const fmt = (value: number) => new Intl.NumberFormat(locale).format(value);
 
@@ -197,7 +204,7 @@ export default function MarketMap({
         {plottedPeers.map((peer) => {
           const dot = project(peer.owners, peer.score, peer.share, minLog, maxLog);
           return (
-            <a key={peer.slug} href={pathBuilder(peer.slug)} tabIndex={-1} style={{ cursor: "pointer" }}>
+            <a key={peer.slug} href={buildPath(peer.slug)} tabIndex={-1} style={{ cursor: "pointer" }}>
               <circle
                 cx={dot.x}
                 cy={dot.y}
@@ -243,7 +250,7 @@ export default function MarketMap({
           {topPeers.map((peer) => (
             <tr key={peer.slug}>
               <th scope="row">
-                <a href={pathBuilder(peer.slug)}>{peer.title}</a>
+                <a href={buildPath(peer.slug)}>{peer.title}</a>
               </th>
               <td>{fmt(peer.owners)}</td>
               <td>{fmt(peer.score)}</td>

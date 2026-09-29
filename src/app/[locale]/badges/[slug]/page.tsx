@@ -18,6 +18,8 @@ import Countdown from "@/components/badges/Countdown";
 import ClaimBar from "@/components/badges/ClaimBar";
 import MomentumReadout from "@/components/badges/MomentumReadout";
 import TiltPedestal from "@/components/badges/TiltPedestal";
+import RarityRadar from "@/components/badges/RarityRadar";
+import MarketMap from "@/components/badges/MarketMap";
 import { StatusChip } from "@/components/badges/BadgeCard";
 import { jsonLdScript } from "@/lib/jsonld";
 import { buildBadgeFaq } from "@/lib/badges/faq";
@@ -135,7 +137,10 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   const [history, related, live, events, momentum, memberCount, dropPost] = await Promise.all([
     getBadgeStatsHistory(badge.id).catch(() => []),
     badge.category
-      ? listBadges({ category: badge.category, perPage: 7 }).catch(() => null)
+      // 25 rows feeds the Market Map with ~24 category peers; the related grid
+      // still slices 6 from the same deterministic order (id tiebreak), so
+      // nothing changes for it. (perPage clamps at 12–96 anyway — 7 was 12.)
+      ? listBadges({ category: badge.category, perPage: 25 }).catch(() => null)
       : Promise.resolve(null),
     fetchBadgeLiveStats(badge.set_id).catch(() => null),
     getBadgeEvents(badge.id).catch(() => [] as BadgeEventRow[]),
@@ -157,6 +162,18 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   }));
 
   const relatedBadges = (related?.items ?? []).filter((b) => b.id !== badge.id).slice(0, 6);
+
+  // Category peers for the Market Map: same query, wider window than the grid.
+  // share stays on the 0..1 scale the map's dot radii expect.
+  const mapPeers = (related?.items ?? [])
+    .filter((b) => b.id !== badge.id)
+    .map((b) => ({
+      slug: b.slug,
+      title: b.title,
+      owners: b.owner_count,
+      score: b.rarity_score,
+      share: b.percentage === null ? null : Number(b.percentage) / 100,
+    }));
 
   /**
    * Ownership figures, one source per metric.
@@ -378,6 +395,57 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   );
 
   /** Rarity panel: big stored score + the six component bars, live-recomputed. */
+  /** Rarity radar: the six TBRI components as an at-a-glance hexagon shape. */
+  const radarCard = (
+    <RarityRadar
+      components={{
+        scarcity: rarityNow.scarcity,
+        wear: rarityNow.wear,
+        obtainability: rarityNow.obtainability,
+        age: rarityNow.age,
+        momentum: rarityNow.momentum,
+        brevity: rarityNow.brevity,
+      }}
+      score={badge.rarity_score}
+      tierColor={tierColor}
+      labels={{
+        title: t("radarTitle"),
+        scarcity: t("tbriScarcity"),
+        wear: t("tbriWear"),
+        obtainability: t("tbriObtainability"),
+        age: t("tbriAge"),
+        momentum: t("tbriMomentum"),
+        brevity: t("tbriBrevity"),
+      }}
+    />
+  );
+
+  /** Market map: this badge against its category peers (owners × TBRI). */
+  const marketMapSection = related !== null && mapPeers.length > 0 && (
+    <MarketMap
+      self={{
+        owners: badge.owner_count,
+        score: badge.rarity_score,
+        share: share === null ? null : share / 100,
+      }}
+      peers={mapPeers}
+      selfColor={tierColor}
+      labels={{
+        title: t("marketMapTitle"),
+        subtitle: t("marketMapSubtitle", {
+          count: int.format(Math.max(0, (related?.total ?? mapPeers.length + 1) - 1)),
+        }),
+        x: t("marketMapX"),
+        y: t("marketMapY"),
+        you: t("marketMapYou"),
+        quad1: t("marketMapQuad1"),
+        quad2: t("marketMapQuad2"),
+        quad3: t("marketMapQuad3"),
+        quad4: t("marketMapQuad4"),
+      }}
+    />
+  );
+
   const rarityPanel = (
     <section className="card space-y-4 p-6" aria-labelledby="bd-rarity">
       <div className="section-title">
@@ -683,10 +751,12 @@ export default async function BadgeDetailPage({ params }: PageProps) {
           {ownershipSection}
         </div>
         <div className="space-y-6">
+          {radarCard}
           {rarityPanel}
           {provenanceSection}
         </div>
       </div>
+      {marketMapSection}
       {faqSection}
       {relatedSection}
     </div>
