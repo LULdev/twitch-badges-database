@@ -4,6 +4,10 @@
       "Vercel": {
         "type": "http",
         "url": "https://mcp.vercel.com"
+      },
+      "cronjobde": {
+        "type": "http",
+        "url": "https://www.cronjob.de/bridge"
       }
     }
   }

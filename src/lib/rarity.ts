@@ -126,28 +126,85 @@ function brevityOf(input: RarityInput): number {
   return clamp01(1 - Math.log10(Math.max(days, 0.25)) / Math.log10(365));
 }
 
-export function computeRarity(
+export interface RarityComponents {
+  /** The six TBRI sub-scores, each in 0..1 (pre-weight). */
+  scarcity: number;
+  wear: number;
+  obtainability: number;
+  age: number;
+  momentum: number;
+  brevity: number;
+  /** Weighted sum of the components, 0..1 — before the 100× scale and rounding. */
+  raw: number;
+  /** Final TBRI score 0..100 (Math.round'ed) — identical to computeRarity().score. */
+  score: number;
+  /** Identical to computeRarity().tier. */
+  tier: RarityTier;
+  /** True when requiresTicket pinned the badge to legendary (score clamped 76..87). */
+  pinned: boolean;
+}
+
+/**
+ * The six TBRI components computed individually, plus the aggregated score.
+ * Pure refactor of computeRarity: same inputs, same rounding, same clamps,
+ * same tier boundaries — computeRarity() is a thin wrapper over this. The
+ * operand order of the weighted sum is load-bearing so the IEEE-754 result
+ * stays bit-identical to the previous inline expression.
+ */
+export function computeRarityComponents(
   input: RarityInput,
   now: Date = new Date(),
-): RarityResult {
+): RarityComponents {
+  const scarcity = scarcityOf(input.totalOwners);
+  const wear = wearOf(input.totalOwners, input.activeUsers);
+  const obtainability = obtainabilityOf(input, now);
+  const age = ageOf(input.firstSeenAt, now);
+  const momentum = momentumOf(input);
+  const brevity = brevityOf(input);
+
   const raw =
-    WEIGHTS.scarcity * scarcityOf(input.totalOwners) +
-    WEIGHTS.wear * wearOf(input.totalOwners, input.activeUsers) +
-    WEIGHTS.obtainability * obtainabilityOf(input, now) +
-    WEIGHTS.age * ageOf(input.firstSeenAt, now) +
-    WEIGHTS.momentum * momentumOf(input) +
-    WEIGHTS.brevity * brevityOf(input);
+    WEIGHTS.scarcity * scarcity +
+    WEIGHTS.wear * wear +
+    WEIGHTS.obtainability * obtainability +
+    WEIGHTS.age * age +
+    WEIGHTS.momentum * momentum +
+    WEIGHTS.brevity * brevity;
 
   // Ticket-purchase badges (TwitchCon & co.) are pinned to legendary:
   // physical presence plus a paid ticket makes them inherently scarce.
   if (input.requiresTicket) {
     const score = Math.min(87, Math.max(76, Math.round((100 * raw) / WEIGHT_SUM)));
-    return { score, tier: "legendary" };
+    return {
+      scarcity, wear, obtainability, age, momentum, brevity,
+      raw, score, tier: "legendary", pinned: true,
+    };
   }
 
   const score = Math.round((100 * raw) / WEIGHT_SUM);
-  return { score, tier: tierOf(score) };
+  return {
+    scarcity, wear, obtainability, age, momentum, brevity,
+    raw, score, tier: tierOf(score), pinned: false,
+  };
 }
+
+export function computeRarity(
+  input: RarityInput,
+  now: Date = new Date(),
+): RarityResult {
+  const { score, tier } = computeRarityComponents(input, now);
+  return { score, tier };
+}
+
+export type RarityComponentKey =
+  | "scarcity"
+  | "wear"
+  | "obtainability"
+  | "age"
+  | "momentum"
+  | "brevity";
+
+/** Component weights (scarcity 0.4 … brevity 0.1) — for labeled UIs. */
+export const RARITY_WEIGHTS: Readonly<Record<RarityComponentKey, number>> = WEIGHTS;
 
 export function tierOf(score: number): RarityTier {
   if (score >= 88) return "mythic";

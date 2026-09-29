@@ -54,6 +54,8 @@ export interface BadgeRow {
     | "epic"
     | "legendary"
     | "mythic";
+  /** Written by the badgebase sync from the /active listing (status authority). */
+  is_confirmed_active?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -382,6 +384,63 @@ export async function getBadgeStatsHistory(
     .order("polled_at", { ascending: false })
     .limit(limit);
   return ((data ?? []) as StatsPoint[]).reverse();
+}
+
+export interface BadgeEventRow {
+  kind: "added" | "updated" | "removed" | "restocked";
+  detail: Record<string, unknown> | null;
+  created_at: string;
+}
+
+/** Catalog lifecycle events for one badge (added/removed sweeps). */
+export async function getBadgeEvents(badgeId: string, limit = 50): Promise<BadgeEventRow[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("badge_events")
+    .select("kind, detail, created_at")
+    .eq("badge_id", badgeId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []) as BadgeEventRow[];
+}
+
+export interface BadgeMomentum {
+  activeCount: number | null;
+  growth24h: number | null;
+}
+
+/**
+ * 24h active-wearer growth from the badge_momentum view — the same input the
+ * potat sync feeds the rarity engine. SILENT NO-ROW TRAP: the view only
+ * covers badges with an end_date and status <> removed; a windowless badge
+ * returns { data: null, error: null }. That is "no momentum data", not an
+ * error — the caller treats null as neutral momentum.
+ */
+export async function getBadgeMomentum(badgeId: string): Promise<BadgeMomentum | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("badge_momentum")
+    .select("active_count, growth_24h")
+    .eq("badge_id", badgeId)
+    .maybeSingle();
+  if (!data) return null;
+  const row = data as { active_count: number | null; growth_24h: number | null };
+  return { activeCount: row.active_count, growth24h: row.growth_24h };
+}
+
+/**
+ * How many site members track this badge in their inventory. RLS counts only
+ * public-inventory members (plus the viewer's own rows when logged in), so
+ * the number reads "members here" — never a substitute for the potat
+ * owner_count headline (one-source-per-metric contract).
+ */
+export async function getBadgeMemberCount(badgeId: string): Promise<number> {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("user_inventory")
+    .select("badge_id", { count: "exact", head: true })
+    .eq("badge_id", badgeId);
+  return count ?? 0;
 }
 
 export interface HomeData {

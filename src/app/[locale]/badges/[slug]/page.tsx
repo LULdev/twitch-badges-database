@@ -4,12 +4,19 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
   getBadgeBySlug,
+  getBadgeEvents,
+  getBadgeMomentum,
+  getBadgeMemberCount,
   getBadgeStatsHistory,
+  getPostBySlug,
   listBadges,
+  type BadgeEventRow,
 } from "@/lib/queries";
 import { BadgeImage } from "@/components/badges/BadgeImage";
 import RarityChip from "@/components/badges/RarityChip";
 import Countdown from "@/components/badges/Countdown";
+import ClaimBar from "@/components/badges/ClaimBar";
+import MomentumReadout from "@/components/badges/MomentumReadout";
 import { StatusChip } from "@/components/badges/BadgeCard";
 import { jsonLdScript } from "@/lib/jsonld";
 import { buildBadgeFaq } from "@/lib/badges/faq";
@@ -17,8 +24,15 @@ import BadgeGrid from "@/components/badges/BadgeGrid";
 import OwnersChart from "@/components/charts/OwnersChart";
 import ShareButtons from "@/components/ShareButtons";
 import LiveRefresher from "@/components/LiveRefresher";
-import { localeAlternates } from "@/lib/seo";
+import { localeAlternates, siteUrl } from "@/lib/seo";
 import { fetchBadgeLiveStats } from "@/lib/twitch/potat";
+import {
+  computeRarityComponents,
+  RARITY_COLORS,
+  RARITY_WEIGHTS,
+  type RarityComponentKey,
+} from "@/lib/rarity";
+import { isTicketBadge } from "@/lib/twitch/types";
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -58,7 +72,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       images: image ? [{ url: image }] : undefined,
     },
-    twitter: { card: "summary", title, description },
+    // Next's Metadata API does NOT fall back to openGraph.images for Twitter —
+    // the "summary" card without images shared imageless on X.
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: image ? [{ url: image }] : undefined,
+    },
   };
 }
 
@@ -70,33 +91,58 @@ function formatDate(value: string | null, locale: string): string {
   });
 }
 
+/** The six TBRI axes in render order (top of the radar → clockwise). */
+const COMPONENT_KEYS: RarityComponentKey[] = [
+  "scarcity",
+  "wear",
+  "obtainability",
+  "age",
+  "momentum",
+  "brevity",
+];
+
+const COMPONENT_COLOR: Record<RarityComponentKey, string> = {
+  scarcity: "var(--accent)",
+  wear: "var(--success)",
+  obtainability: "var(--warning)",
+  age: "var(--info)",
+  momentum: "var(--danger)",
+  brevity: "var(--rank-gold)",
+};
+
 export default async function BadgeDetailPage({ params }: PageProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("badges");
-  const tFaq = await getTranslations("badgeFaq");
-  const tcd = await getTranslations("countdown");
-  const tc = await getTranslations("common");
-  // Percentages with a locale-correct decimal separator; `toFixed` always
-  // emitted "." regardless of locale.
+  const [t, tFaq, tcd, tc] = await Promise.all([
+    getTranslations("badges"),
+    getTranslations("badgeFaq"),
+    getTranslations("countdown"),
+    getTranslations("common"),
+  ]);
+
   const percent = new Intl.NumberFormat(locale, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+  const int = new Intl.NumberFormat(locale);
 
   // Deliberately no .catch here: getBadgeBySlug returns null only for a missing
   // slug, so a real query error now surfaces instead of becoming a 404.
   const badge = await getBadgeBySlug(slug);
   if (!badge) notFound();
 
-  const [history, related, live] = await Promise.all([
+  const [history, related, live, events, momentum, memberCount, dropPost] = await Promise.all([
     getBadgeStatsHistory(badge.id).catch(() => []),
-    // Without a category the filter would be a no-op and the section would
-    // list the global newest badges under a "same category" heading.
     badge.category
       ? listBadges({ category: badge.category, perPage: 7 }).catch(() => null)
       : Promise.resolve(null),
     fetchBadgeLiveStats(badge.set_id).catch(() => null),
+    getBadgeEvents(badge.id).catch(() => [] as BadgeEventRow[]),
+    // A missing row is "no momentum data" (windowless badges are outside the
+    // view), not an error — the momentum component then takes its neutral 0.5.
+    getBadgeMomentum(badge.id).catch(() => null),
+    getBadgeMemberCount(badge.id).catch(() => 0),
+    getPostBySlug(`drop-${badge.slug}`).catch(() => null),
   ]);
 
   const chartData = history.map((point) => ({
@@ -129,8 +175,6 @@ export default async function BadgeDetailPage({ params }: PageProps) {
       : live?.percentage !== null && live?.percentage !== undefined
         ? Number(live.percentage)
         : null;
-  // The live wearer count is the fresher reading of the holding metric, so it
-  // wins over the stored poll; both mean the same thing.
   const holding = live?.userCount ?? badge.active_count ?? null;
 
   const faq = buildBadgeFaq(badge, {
@@ -140,14 +184,7 @@ export default async function BadgeDetailPage({ params }: PageProps) {
     livePercentage: live?.percentage ?? null,
   });
 
-  /**
-   * The owner's trajectory, in words. The chart below already draws the curve,
-   * but a reader who only wants the conclusion should not have to interpret it:
-   * this compares the oldest and newest owner counts that are actually
-   * recorded. Both ends must be real numbers — a trend built on a null endpoint
-   * would invent a direction the data does not support, so it returns null and
-   * the section is omitted rather than guessed.
-   */
+  /** The owner's trajectory, in words (see OwnersChart for the curve). */
   const trend = (() => {
     const points = history.filter(
       (p) => p.owner_count !== null && Number.isFinite(p.owner_count),
@@ -159,9 +196,6 @@ export default async function BadgeDetailPage({ params }: PageProps) {
     const changePct = ((last - first) / first) * 100;
     return {
       changePct,
-      // A band, not a threshold: a 0.4% drift between two polls is noise from
-      // a badge that is simply not being claimed, and calling that "growing"
-      // would be a claim the data cannot support.
       direction:
         Math.abs(changePct) < 0.5
           ? ("flat" as const)
@@ -182,10 +216,7 @@ export default async function BadgeDetailPage({ params }: PageProps) {
 
   /**
    * Where this record came from. `source` is the sync engine that last wrote the
-   * row (helix = Twitch's own catalog API, badgebase = the curated badge index,
-   * custom = hand-added in the panel), so it is the honest answer to "why
-   * should I trust these numbers" — a badge whose numbers come from a different
-   * pipeline behave differently from one scraped from Twitch directly.
+   * row, so it is the honest answer to "why should I trust these numbers".
    */
   const SOURCE_KEYS: Record<string, string> = {
     helix: "sourceHelix",
@@ -195,12 +226,35 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   };
   const sourceLabel = t(SOURCE_KEYS[badge.source] ?? "sourceOther");
 
+  // The six TBRI components recomputed live from the same inputs the potat
+  // sync feeds the engine (stored counts + the momentum view). The headline
+  // score stays the STORED badge.rarity_score — the bars explain the current
+  // drivers, they never overwrite the shipped number.
+  const rarityNow = computeRarityComponents({
+    totalOwners: badge.owner_count,
+    activeUsers: badge.active_count,
+    status: badge.status,
+    startDate: badge.start_date,
+    endDate: badge.end_date,
+    firstSeenAt: badge.first_seen_at,
+    growth24h: momentum?.growth24h ?? null,
+    requiresTicket: isTicketBadge(badge.set_id, badge.how_to_earn, badge.description),
+  });
+  const tierColor = RARITY_COLORS[badge.rarity_tier];
+  const rarityComponents = COMPONENT_KEYS.map((key) => ({
+    key,
+    label: t(`tbri${key[0].toUpperCase()}${key.slice(1)}`),
+    weight: RARITY_WEIGHTS[key],
+    value: rarityNow[key],
+    color: COMPONENT_COLOR[key],
+  }));
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: badge.title,
     description: badge.description ?? badge.how_to_earn ?? badge.title,
-    image: badge.image_url_4x ?? badge.image_url_2x ?? undefined,
+    image: badge.image_url_4x ?? badge.image_url_2x ?? badge.image_url_1x ?? undefined,
     category: badge.category,
     // A Product without `offers` is rejected by Google's rich-results test
     // ("Missing field offers"), which forfeits eligibility for every badge page.
@@ -211,12 +265,347 @@ export default async function BadgeDetailPage({ params }: PageProps) {
       price: 0,
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
-      url: `/${locale}/badges/${badge.slug}`,
+      url: `${siteUrl()}/${locale}/badges/${badge.slug}`,
     },
+    ...(badge.start_date && badge.end_date
+      ? { temporalCoverage: `${badge.start_date}/${badge.end_date}` }
+      : {}),
   };
 
-  return (
-    <div className="space-y-8">
+  /* ---------------------------------------------------------------- */
+  /* Shared sections — built once, arranged by the document layout.    */
+  /* ---------------------------------------------------------------- */
+
+  const claimLabels = {
+    elapsed: t("claimElapsed"),
+    open: t("claimOpen"),
+    closed: t("claimClosed"),
+    upcoming: t("claimUpcoming"),
+    noEnd: t("claimNoEnd"),
+  };
+
+  const chips = (
+    <>
+      <StatusChip status={badge.status} />
+      <RarityChip tier={badge.rarity_tier} score={badge.rarity_score} />
+      <span className="chip pointer-events-none">
+        {badge.is_paid ? tc("paid") : tc("free")}
+      </span>
+      <span className="chip pointer-events-none">{badge.category}</span>
+      {badge.is_confirmed_active && (
+        <span className="chip chip-live pointer-events-none">{t("confirmedActive")}</span>
+      )}
+    </>
+  );
+
+  const actions = (
+    <>
+      {badge.click_url && (
+        <a
+          href={badge.click_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-secondary text-xs"
+        >
+          {t("openOnTwitch")}
+          <span className="dir-arrow" aria-hidden="true">→</span>
+        </a>
+      )}
+      <ShareButtons
+        path={`/${locale}/badges/${badge.slug}`}
+        title={`${badge.title} — Twitch Badges Database`}
+      />
+    </>
+  );
+
+  /** The preserved countdown strip — contract documented inline. */
+  const claimStrip = (badge.status === "active" || badge.status === "upcoming") &&
+    (badge.end_date || badge.start_date) && (
+      <div className="flex flex-col items-center gap-2 border-t border-line bg-surface-2 px-6 py-4 sm:flex-row sm:justify-between">
+        <span className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+          {badge.status === "upcoming" && badge.start_date
+            ? tcd("startsIn")
+            : badge.end_date
+              ? tcd("expiresIn")
+              : tcd("permanent")}
+        </span>
+        {badge.status === "upcoming" && badge.start_date ? (
+          <Countdown size="lg" target={badge.start_date} mode="starts" />
+        ) : badge.end_date ? (
+          <Countdown size="lg" target={badge.end_date} mode="expires" />
+        ) : (
+          // An ACTIVE badge with a start date and no end date has no window
+          // to count down to. The strip used to render "Expires in" against
+          // `end_date ?? start_date!` — i.e. a countdown to a date in the
+          // PAST, beside the "Live" status chip, and the non-null assertion
+          // hid the missing case from the type checker.
+          <span className="text-xs font-semibold text-success">{tcd("live")}</span>
+        )}
+      </div>
+    );
+
+  const acquisitionSection = (
+    <section className="card p-6" aria-labelledby="bd-earn">
+      <h2 id="bd-earn" className="text-sm font-bold uppercase tracking-[0.08em] text-muted">
+        {t("howToEarn")}
+      </h2>
+      <p className="mt-3 text-sm leading-relaxed">
+        {badge.how_to_earn ?? badge.description ?? t("howToEarnUnknown")}
+      </p>
+    </section>
+  );
+
+  const momentumChip = (
+    <MomentumReadout
+      growth24h={momentum?.growth24h ?? null}
+      locale={locale}
+      labels={{ up: t("momentumUp"), down: t("momentumDown"), flat: t("momentumFlat") }}
+    />
+  );
+
+  /** Rarity panel: big stored score + the six component bars, live-recomputed. */
+  const rarityPanel = (
+    <section className="card space-y-4 p-6" aria-labelledby="bd-rarity">
+      <div className="section-title">
+        <h2 id="bd-rarity">{t("tbriTitle")}</h2>
+      </div>
+      <div className="flex items-baseline gap-3">
+        <span className="text-4xl font-black tabular-nums" style={{ color: tierColor }}>
+          {badge.rarity_score}
+        </span>
+        <RarityChip tier={badge.rarity_tier} score={badge.rarity_score} />
+        {momentumChip}
+      </div>
+      <div className="space-y-2.5">
+        {rarityComponents.map((component, index) => (
+          <div key={component.key} className="grow-bar">
+            <span className="w-28 shrink-0 truncate text-xs text-muted">{component.label}</span>
+            <div className="grow-bar-track">
+              <div
+                className="grow-bar-fill"
+                style={{
+                  width: `${Math.round(component.value * 100)}%`,
+                  "--bar-color": component.color,
+                  "--d": `${index * 90}ms`,
+                } as React.CSSProperties}
+              />
+            </div>
+            <span className="w-14 shrink-0 text-end font-mono text-[0.6875rem] tabular-nums text-muted">
+              {Math.round(component.value * 100)}%
+            </span>
+          </div>
+        ))}
+      </div>
+      <p className="text-[0.6875rem] text-muted">{t("tbriApprox")}</p>
+      <p className="text-xs leading-relaxed text-muted">{t("rarityFormula")}</p>
+    </section>
+  );
+
+  /** Ownership: KPI trio + trend sentence + history chart. */
+  const ownershipSection = (
+    <section className="card p-6" aria-labelledby="bd-owners">
+      <div className="section-title">
+        <h2 id="bd-owners">{t("ownerTrend")}</h2>
+      </div>
+      <p className="-mt-4 mb-3 text-xs text-muted">{t("ownerTrendSubtitle")}</p>
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="rounded-[var(--radius-input)] border border-line bg-surface-2 p-3">
+          <p className="text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-muted">
+            {t("ownersHeadlineShort")}
+          </p>
+          <p className="mt-1 text-2xl font-black tabular-nums">
+            {totalOwners === null ? "—" : int.format(totalOwners)}
+          </p>
+        </div>
+        <div className="rounded-[var(--radius-input)] border border-line bg-surface-2 p-3">
+          <p className="text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-muted">
+            {t("wearingNow")}
+          </p>
+          <p className="mt-1 text-2xl font-black tabular-nums">
+            {holding === null ? "—" : int.format(holding)}
+          </p>
+        </div>
+        <div className="rounded-[var(--radius-input)] border border-line bg-surface-2 p-3">
+          <p className="text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-muted">
+            {t("shareOfViewers")}
+          </p>
+          <p className="mt-1 text-2xl font-black tabular-nums">
+            {share === null ? "—" : `${percent.format(share)}%`}
+          </p>
+        </div>
+      </div>
+      {trend && (
+        <p className="mb-3 rounded-[var(--radius-input)] border border-line bg-surface-2 px-4 py-2.5 text-sm">
+          {t(`trend${trend.direction[0].toUpperCase()}${trend.direction.slice(1)}`, {
+            value: percent.format(Math.abs(trend.changePct)),
+            count: trend.samples,
+            days: trend.windowDays,
+          })}
+        </p>
+      )}
+      {chartData.length >= 2 ? (
+        <OwnersChart data={chartData} />
+      ) : (
+        <p className="py-8 text-center text-sm text-muted">{t("noStats")}</p>
+      )}
+      {badge.last_polled_at && (
+        <p className="mt-3 text-end font-mono text-[0.6875rem] text-muted">
+          {t("ownersUpdated")}: {formatDate(badge.last_polled_at, locale)}
+        </p>
+      )}
+    </section>
+  );
+
+  /** Provenance: record details + lifecycle events + member count + drop post. */
+  const EVENT_KEYS: Partial<Record<BadgeEventRow["kind"], string>> = {
+    added: "eventAdded",
+    removed: "eventRemoved",
+  };
+  const provenanceSection = (
+    <section className="card p-6" aria-labelledby="bd-record">
+      <div className="section-title">
+        <h2 id="bd-record">{t("recordDetails")}</h2>
+      </div>
+      <p className="-mt-4 mb-4 text-xs text-muted">
+        {t("sourceLabel")}: {sourceLabel}
+      </p>
+      <dl className="space-y-3 text-sm">
+        {badge.first_seen_at && (
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">{t("firstDetected")}</dt>
+            <dd className="text-end font-medium">{formatDate(badge.first_seen_at, locale)}</dd>
+          </div>
+        )}
+        {badge.release_date && (
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">{t("releaseDate")}</dt>
+            <dd className="text-end font-medium">{formatDate(badge.release_date, locale)}</dd>
+          </div>
+        )}
+        {badge.start_date && (
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">{t("claimOpens")}</dt>
+            <dd className="text-end font-medium">{formatDate(badge.start_date, locale)}</dd>
+          </div>
+        )}
+        {badge.end_date && (
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">{t("claimCloses")}</dt>
+            <dd className="text-end font-medium">{formatDate(badge.end_date, locale)}</dd>
+          </div>
+        )}
+        {badge.last_seen_at && (
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">{t("lastSeen")}</dt>
+            <dd className="text-end font-medium">{formatDate(badge.last_seen_at, locale)}</dd>
+          </div>
+        )}
+        {badge.removed_at && (
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">{t("withdrawn")}</dt>
+            <dd className="text-end font-medium text-danger">
+              {formatDate(badge.removed_at, locale)}
+            </dd>
+          </div>
+        )}
+      </dl>
+
+      {memberCount > 0 && (
+        <p className="mt-4 rounded-[var(--radius-input)] border border-line bg-surface-2 px-4 py-2.5 text-sm">
+          {t("membersOwn", { count: int.format(memberCount) })}
+        </p>
+      )}
+
+      {dropPost && (
+        <Link
+          href={`/blog/${dropPost.slug}`}
+          className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
+        >
+          {t("readDropPost")}
+          <span className="dir-arrow" aria-hidden="true">→</span>
+        </Link>
+      )}
+
+      {events.length > 0 && (
+        <div className="mt-5">
+          <h3 className="text-xs font-bold uppercase tracking-[0.08em] text-muted">
+            {t("historyTitle")}
+          </h3>
+          <ol className="mt-3 space-y-2.5 border-s border-line ps-4">
+            {events.slice(0, 10).map((event, index) => {
+              const key = EVENT_KEYS[event.kind];
+              if (!key) return null;
+              return (
+                <li key={index} className="relative text-sm">
+                  <span
+                    aria-hidden
+                    className="absolute -start-[1.3125rem] top-1.5 size-2 rounded-full"
+                    style={{
+                      background: event.kind === "removed" ? "var(--danger)" : "var(--success)",
+                    }}
+                  />
+                  <span className="text-foreground">{t(key)}</span>
+                  <span className="ms-2 font-mono text-xs text-muted">
+                    {formatDate(event.created_at, locale)}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      )}
+    </section>
+  );
+
+  const faqSection = faq.items.length > 0 && (
+    <section className="card p-6" aria-labelledby="badge-faq">
+      <div className="section-title">
+        <h2 id="badge-faq">{tFaq("title", { title: badge.title })}</h2>
+      </div>
+      <p className="-mt-4 mb-4 text-xs text-muted">{tFaq("subtitle")}</p>
+      {/* A native disclosure list: keyboard accessible and screen-reader
+          correct with no client JS, which matters because these pages are
+          the most-crawled surface on the site. */}
+      <div className="divide-y divide-line">
+        {faq.items.map((item, index) => (
+          <details key={index} className="group py-3">
+            <summary className="flex cursor-pointer items-start justify-between gap-4 text-sm font-semibold marker:content-none">
+              <span>{item.q}</span>
+              <span
+                aria-hidden
+                className="mt-0.5 shrink-0 text-muted transition-transform group-open:rotate-45"
+              >
+                +
+              </span>
+            </summary>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  );
+
+  const relatedSection = relatedBadges.length > 0 && (
+    <section aria-labelledby="related">
+      <div className="section-title">
+        <h2 id="related">{t("sameCategory", { category: badge.category })}</h2>
+      </div>
+      <BadgeGrid badges={relatedBadges} showCountdown={false} />
+    </section>
+  );
+
+  const breadcrumb = (
+    <nav className="text-xs text-muted" aria-label={tc("breadcrumb")}>
+      <Link href="/badges" className="hover:text-foreground">
+        {tc("viewAll")}
+      </Link>
+      <span className="mx-1.5">/</span>
+      <span className="text-foreground">{badge.title}</span>
+    </nav>
+  );
+
+  const headerScripts = (
+    <>
       <LiveRefresher intervalMs={120_000} />
       <script
         type="application/ld+json"
@@ -230,307 +619,89 @@ export default async function BadgeDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(faq.jsonLd) }}
       />
+    </>
+  );
 
-      <nav className="text-xs text-muted" aria-label={tc("breadcrumb")}>
-        <Link href="/badges" className="hover:text-foreground">
-          {tc("viewAll")}
-        </Link>
-        <span className="mx-1.5">/</span>
-        <span className="text-foreground">{badge.title}</span>
-      </nav>
+  /* ---------------------------------------------------------------- */
+  /* "Document" layout: story chapters + sticky companion.             */
+  /* ---------------------------------------------------------------- */
+  const chapters = [
+    { id: "doc-earn", num: "01", title: t("chapterEarn"), node: acquisitionSection },
+    { id: "doc-rarity", num: "02", title: t("chapterRarity"), node: rarityPanel },
+    { id: "doc-owners", num: "03", title: t("chapterOwners"), node: ownershipSection },
+    { id: "doc-history", num: "04", title: t("chapterHistory"), node: provenanceSection },
+    { id: "doc-world", num: "05", title: t("chapterWorld"), node: relatedSection },
+  ];
 
-      {/* Header card */}
-      <section className="card overflow-hidden">
-        <div className="flex flex-col items-center gap-6 p-6 sm:flex-row sm:items-start">
-          <div className="shrink-0 rounded-2xl border border-line bg-surface-2 p-4">
-            <BadgeImage badge={badge} size={96} alt="" />
+  return (
+    <div className="space-y-8">
+      {headerScripts}
+      {breadcrumb}
+      <section className="card overflow-hidden" style={{ ["--tier-color" as string]: tierColor }}>
+        <div className="flex flex-col items-center gap-6 p-6 sm:flex-row sm:items-start sm:p-8">
+          <div className="doc-ring shrink-0 p-3">
+            <BadgeImage badge={badge} size={104} alt="" />
           </div>
           <div className="min-w-0 flex-1 text-center sm:text-start">
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-              <StatusChip status={badge.status} />
-              <RarityChip tier={badge.rarity_tier} score={badge.rarity_score} />
-              <span className="chip pointer-events-none">
-                {badge.is_paid ? tc("paid") : tc("free")}
-              </span>
-              <span className="chip pointer-events-none">{badge.category}</span>
+            <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{badge.title}</h1>
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+              {chips}
             </div>
-            <h1 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">
-              {badge.title}
-            </h1>
             {badge.description && (
-              <p className="mt-2 text-sm text-muted">{badge.description}</p>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{badge.description}</p>
             )}
             <p className="mt-2 font-mono text-xs text-muted">
               {t("setId")}: {badge.set_id} · {t("version")}: {badge.version}
             </p>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-              {badge.click_url && (
-                <a
-                  href={badge.click_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-secondary text-xs"
-                >
-                  {t("openOnTwitch")} ↗
-                </a>
-              )}
-              <ShareButtons
-                path={`/${locale}/badges/${badge.slug}`}
-                title={`${badge.title} — Twitch Badges Database`}
-              />
+              {actions}
             </div>
           </div>
         </div>
-
-        {/* Countdown strip */}
-        {(badge.status === "active" || badge.status === "upcoming") &&
-          (badge.end_date || badge.start_date) && (
-            <div className="flex flex-col items-center gap-2 border-t border-line bg-surface-2 px-6 py-4 sm:flex-row sm:justify-between">
-              <span className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
-                {badge.status === "upcoming" && badge.start_date
-                  ? tcd("startsIn")
-                  : badge.end_date
-                    ? tcd("expiresIn")
-                    : tcd("permanent")}
-              </span>
-              {badge.status === "upcoming" && badge.start_date ? (
-                <Countdown size="lg" target={badge.start_date} mode="starts" />
-              ) : badge.end_date ? (
-                <Countdown size="lg" target={badge.end_date} mode="expires" />
-              ) : (
-                // An ACTIVE badge with a start date and no end date has no window
-                // to count down to. The strip used to render "Expires in" against
-                // `end_date ?? start_date!` — i.e. a countdown to a date in the
-                // PAST, beside the "Live" status chip, and the non-null assertion
-                // hid the missing case from the type checker.
-                <span className="text-xs font-semibold text-success">{tcd("live")}</span>
-              )}
-            </div>
-          )}
+        <div className="border-t border-line bg-surface-2 px-6 py-4">
+          <ClaimBar
+            start={badge.start_date}
+            end={badge.end_date}
+            releasedAt={badge.release_date}
+            locale={locale}
+            labels={claimLabels}
+          />
+        </div>
+        {claimStrip}
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Facts */}
-        <section className="card space-y-5 p-6 lg:col-span-1">
-          <h2 className="text-sm font-bold uppercase tracking-[0.08em] text-muted">
-            {t("availability")}
-          </h2>
-          <dl className="space-y-3 text-sm">
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted">{badge.start_date ? t("started") : t("released")}</dt>
-              <dd className="text-end font-medium">
-                {formatDate(badge.start_date ?? badge.release_date ?? badge.first_seen_at, locale)}
-              </dd>
-            </div>
-            {badge.end_date && (
-              <div className="flex justify-between gap-4">
-                <dt className="text-muted">{t("ends")}</dt>
-                <dd className="text-end font-medium">{formatDate(badge.end_date, locale)}</dd>
+      <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+        <main className="min-w-0 space-y-8">
+          {chapters.map((chapter) => (
+            <section key={chapter.id} id={chapter.id} className="doc-chapter scroll-mt-24 space-y-4">
+              <div className="doc-chapter-head">
+                <span className="doc-chapter-num" aria-hidden="true">{chapter.num}</span>
+                <h2 className="text-sm font-bold uppercase tracking-[0.08em] text-muted">
+                  {chapter.title}
+                </h2>
               </div>
-            )}
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted">{t("firstSeen")}</dt>
-              <dd className="text-end font-medium">{formatDate(badge.first_seen_at, locale)}</dd>
-            </div>
-          </dl>
-
-          <h2 className="pt-2 text-sm font-bold uppercase tracking-[0.08em] text-muted">
-            {tc("owners")}
-          </h2>
-          {/*
-            One source per metric.
-
-            The block used to stack up to four numbers: `owner_count`,
-            `active_count`, the live `userCount` and `percentage` — plus the
-            live `percentage` folded into the live row. `active_count` and the
-            live `userCount` are the SAME metric (potat's current holder count)
-            arriving from two sources, as are `percentage` and
-            `live.percentage`. Because the two sources are polled at different
-            times they routinely disagreed, so the page stated two different
-            answers to "how many people have this badge" and a visitor had no
-            way to tell which was current.
-
-            Now each figure is picked once, from the freshest source available,
-            and the poll timestamp is shown so a stale number is self-evident.
-          */}
-          {totalOwners === null ? (
-            <p className="text-sm text-muted">{t("ownersNoData")}</p>
-          ) : (
-            <div className="rounded-[var(--radius-input)] border border-line bg-surface-2 p-4">
-              <p className="text-3xl font-black tabular-nums">
-                {new Intl.NumberFormat(locale).format(totalOwners)}
+              {chapter.node}
+            </section>
+          ))}
+          {faqSection}
+        </main>
+        <aside className="doc-companion hidden lg:block">
+          <div className="space-y-6">
+            <div className="card p-5 text-center">
+              <p className="text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-muted">
+                {t("momentumTitle")}
               </p>
-              <p className="mt-1 text-xs text-muted">
-                {t("ownersHeadline", { count: totalOwners })}
-              </p>
-              {share !== null && (
-                <p className="mt-1 text-xs text-muted">
-                  {t("ownersShare", { value: percent.format(share) })}
-                </p>
-              )}
-            </div>
-          )}
-          {holding !== null && holding !== totalOwners && (
-            <dl className="space-y-3 pt-3 text-sm">
-              <div className="flex justify-between gap-4">
-                <dt className="text-muted">{t("currentlyHolding")}</dt>
-                <dd className="font-semibold tabular-nums">
-                  {new Intl.NumberFormat(locale).format(holding)}
-                </dd>
+              <div className="mt-2 flex justify-center">{momentumChip}</div>
+              <div className="mt-4 flex justify-center">
+                <ShareButtons
+                  path={`/${locale}/badges/${badge.slug}`}
+                  title={`${badge.title} — Twitch Badges Database`}
+                />
               </div>
-              {badge.last_polled_at && (
-                <div className="flex justify-between gap-4">
-                  <dt className="text-muted">{t("ownersUpdated")}</dt>
-                  <dd className="text-end font-medium">
-                    {formatDate(badge.last_polled_at, locale)}
-                  </dd>
-                </div>
-              )}
-            </dl>
-          )}
-
-          <div className="rounded-[var(--radius-input)] border border-line bg-surface-2 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-muted">
-              {t("aboutRarity")}
-            </p>
-            <p className="mt-2 text-xs leading-relaxed text-muted">{t("rarityFormula")}</p>
+            </div>
           </div>
-        </section>
-
-        {/* How to earn + chart */}
-        <div className="space-y-6 lg:col-span-2">
-          <section className="card p-6">
-            <h2 className="text-sm font-bold uppercase tracking-[0.08em] text-muted">
-              {t("howToEarn")}
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed">
-              {badge.how_to_earn ?? badge.description ?? t("howToEarnUnknown")}
-            </p>
-          </section>
-
-          <section className="card p-6">
-            <div className="section-title">
-              <h2>{t("ownerTrend")}</h2>
-            </div>
-            <p className="-mt-4 mb-3 text-xs text-muted">{t("ownerTrendSubtitle")}</p>
-            {trend && (
-              <p className="mb-3 rounded-[var(--radius-input)] border border-line bg-surface-2 px-4 py-2.5 text-sm">
-                {t(`trend${trend.direction[0].toUpperCase()}${trend.direction.slice(1)}`, {
-                  value: percent.format(Math.abs(trend.changePct)),
-                  count: trend.samples,
-                  days: trend.windowDays,
-                })}
-              </p>
-            )}
-            {chartData.length >= 2 ? (
-              <OwnersChart data={chartData} />
-            ) : (
-              <p className="py-8 text-center text-sm text-muted">{t("noStats")}</p>
-            )}
-          </section>
-
-          {/* Where this record comes from, and the full history of the badge in
-              one block. Both are answers a collector actually asks and neither
-              is anywhere else on the page. Every row is conditional: a badge
-              with no claim window has no window row, and a badge still running
-              has no removal row. */}
-          <section className="card p-6">
-            <div className="section-title">
-              <h2>{t("recordDetails")}</h2>
-            </div>
-            <p className="-mt-4 mb-4 text-xs text-muted">
-              {t("sourceLabel")}: {sourceLabel}
-            </p>
-            <dl className="space-y-3 text-sm">
-              {badge.first_seen_at && (
-                <div className="flex justify-between gap-4">
-                  <dt className="text-muted">{t("firstDetected")}</dt>
-                  <dd className="text-end font-medium">
-                    {formatDate(badge.first_seen_at, locale)}
-                  </dd>
-                </div>
-              )}
-              {badge.release_date && (
-                <div className="flex justify-between gap-4">
-                  <dt className="text-muted">{t("releaseDate")}</dt>
-                  <dd className="text-end font-medium">
-                    {formatDate(badge.release_date, locale)}
-                  </dd>
-                </div>
-              )}
-              {badge.start_date && (
-                <div className="flex justify-between gap-4">
-                  <dt className="text-muted">{t("claimOpens")}</dt>
-                  <dd className="text-end font-medium">
-                    {formatDate(badge.start_date, locale)}
-                  </dd>
-                </div>
-              )}
-              {badge.end_date && (
-                <div className="flex justify-between gap-4">
-                  <dt className="text-muted">{t("claimCloses")}</dt>
-                  <dd className="text-end font-medium">
-                    {formatDate(badge.end_date, locale)}
-                  </dd>
-                </div>
-              )}
-              {badge.last_seen_at && (
-                <div className="flex justify-between gap-4">
-                  <dt className="text-muted">{t("lastSeen")}</dt>
-                  <dd className="text-end font-medium">
-                    {formatDate(badge.last_seen_at, locale)}
-                  </dd>
-                </div>
-              )}
-              {badge.removed_at && (
-                <div className="flex justify-between gap-4">
-                  <dt className="text-muted">{t("withdrawn")}</dt>
-                  <dd className="text-end font-medium text-danger">
-                    {formatDate(badge.removed_at, locale)}
-                  </dd>
-                </div>
-              )}
-            </dl>
-          </section>
-        </div>
+        </aside>
       </div>
-
-      {faq.items.length > 0 && (
-        <section className="card p-6" aria-labelledby="badge-faq">
-          <div className="section-title">
-            <h2 id="badge-faq">{tFaq("title", { title: badge.title })}</h2>
-          </div>
-          <p className="-mt-4 mb-4 text-xs text-muted">{tFaq("subtitle")}</p>
-          {/* A native disclosure list: keyboard accessible and screen-reader
-              correct with no client JS, which matters because these pages are
-              the most-crawled surface on the site. */}
-          <div className="divide-y divide-line">
-            {faq.items.map((item, index) => (
-              <details key={index} className="group py-3">
-                <summary className="flex cursor-pointer items-start justify-between gap-4 text-sm font-semibold marker:content-none">
-                  <span>{item.q}</span>
-                  <span
-                    aria-hidden
-                    className="mt-0.5 shrink-0 text-muted transition-transform group-open:rotate-45"
-                  >
-                    +
-                  </span>
-                </summary>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{item.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {relatedBadges.length > 0 && (
-        <section aria-labelledby="related">
-          <div className="section-title">
-            <h2 id="related">{t("sameCategory", { category: badge.category })}</h2>
-          </div>
-          <BadgeGrid badges={relatedBadges} showCountdown={false} />
-        </section>
-      )}
     </div>
   );
 }
