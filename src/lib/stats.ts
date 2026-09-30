@@ -237,24 +237,40 @@ export function availability(ok: number, total: number): number | null {
   return Math.max(0, Math.min(100, (ok / total) * 100));
 }
 
+/**
+ * Heartbeat sources that make up the scheduled sync pipeline (`cron/*` and
+ * `sync/*`). The per-minute `web` probe (~1,440 rows/day vs ~100 sync runs)
+ * would dominate any availability sum, so the gauges and the staleness gate
+ * deliberately exclude it — its own last_status still feeds the overall
+ * verdict via `errored`.
+ */
+export function pipelineSources(sources: UptimeSource[]): UptimeSource[] {
+  return sources.filter(
+    (source) =>
+      source.source.startsWith("cron/") || source.source.startsWith("sync/"),
+  );
+}
+
 function serviceStatus(sources: UptimeSource[]): ServiceStatus {
   // Operator-initiated one-offs (`manual/*`) are written only when someone
   // presses "sync now" in the dashboard, and no recurring job ever supersedes
   // their row — so a single failed manual run would pin the public gauge at
-  // "degraded" forever. The gauge describes the *scheduled* pipeline: `sync/*`
-  // and `cron/*` (plus `web`).
+  // "degraded" forever.
   const recurring = sources.filter(
     (source) => !source.source.startsWith("manual/"),
   );
   if (recurring.length === 0) return "degraded";
-  const latest = recurring
+  // Staleness is a pipeline signal: the web probe would keep the age fresh
+  // forever even if every sync silently stopped. Web failures are still
+  // caught below through `errored`.
+  const latest = pipelineSources(sources)
     .map((source) => source.last_at ?? "")
     .sort()
     .at(-1);
   if (!latest) return "degraded";
   const ageMinutes = (Date.now() - new Date(latest).getTime()) / 60_000;
   const errored = recurring.filter((source) => source.last_status === "error");
-  // No heartbeat in 36h means the pipeline is not running at all.
+  // No pipeline heartbeat in 36h means the sync pipeline is not running at all.
   if (ageMinutes > 60 * 36) return "down";
   if (errored.length > 0 || ageMinutes > 120) return "degraded";
   return "operational";
@@ -334,8 +350,12 @@ export async function getPlatformStats(): Promise<PlatformStats> {
     last_ms: row.last_ms === null ? null : num(row.last_ms),
   }));
 
+  // Availability gauges measure the scheduled pipeline only — including the
+  // per-minute web probe would make a failed sync move the gauge by fractions
+  // of a percent.
+  const pipeline = pipelineSources(sources);
   const sum = (key: "checks_total" | "ok_total" | "checks_24h" | "ok_24h" | "checks_7d" | "ok_7d" | "checks_30d" | "ok_30d") =>
-    sources.reduce((total, source) => total + num(source[key]), 0);
+    pipeline.reduce((total, source) => total + num(source[key]), 0);
 
   const lastHeartbeat =
     sources
@@ -506,8 +526,12 @@ export async function getUptimeSnapshot(): Promise<PlatformStats["uptime"]> {
     last_ms: row.last_ms === null ? null : num(row.last_ms),
   }));
 
+  // Availability gauges measure the scheduled pipeline only — including the
+  // per-minute web probe would make a failed sync move the gauge by fractions
+  // of a percent.
+  const pipeline = pipelineSources(sources);
   const sum = (key: "checks_total" | "ok_total" | "checks_24h" | "ok_24h" | "checks_7d" | "ok_7d" | "checks_30d" | "ok_30d") =>
-    sources.reduce((total, source) => total + num(source[key]), 0);
+    pipeline.reduce((total, source) => total + num(source[key]), 0);
 
   const heartbeatTimes = sources
     .map((source) => source.last_at)

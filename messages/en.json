@@ -33,7 +33,8 @@
     "wheel": "Wheel of Fortune",
     "mainNav": "Main navigation",
     "mobileNav": "Mobile navigation",
-    "acp": "Admin panel"
+    "acp": "Admin panel",
+    "status": "Status"
   },
   "common": {
     "search": "Search badges…",
@@ -403,7 +404,7 @@
     "allLeaderboards": "All leaderboards",
     "availability": "Availability",
     "availabilityAll": "All time",
-    "availabilitySub": "Successful sync and health checks",
+    "availabilitySub": "Successful sync-pipeline checks",
     "avg": "avg",
     "avgLevel": "Avg. level",
     "badgeClaims": "Badges unlocked",

@@ -33,7 +33,8 @@
     "wheel": "عجلة الحظ",
     "mainNav": "التنقل الرئيسي",
     "mobileNav": "تنقل الجوال",
-    "acp": "لوحة الإدارة"
+    "acp": "لوحة الإدارة",
+    "status": "الحالة"
   },
   "common": {
     "search": "ابحث عن شارات…",
@@ -403,7 +404,7 @@
     "allLeaderboards": "جميع لوحات الصدارة",
     "availability": "التوفر",
     "availabilityAll": "كل الوقت",
-    "availabilitySub": "الفحوصات الناجحة",
+    "availabilitySub": "فحوصات ناجحة لخط المزامنة",
     "avg": "متوسط",
     "avgLevel": "متوسط المستوى",
     "badgeClaims": "الشارات المفتوحة",

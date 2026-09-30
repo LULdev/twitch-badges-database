@@ -33,7 +33,8 @@
     "wheel": "Ruota della fortuna",
     "mainNav": "Navigazione principale",
     "mobileNav": "Navigazione mobile",
-    "acp": "Pannello admin"
+    "acp": "Pannello admin",
+    "status": "Stato"
   },
   "common": {
     "search": "Cerca badge…",
@@ -403,7 +404,7 @@
     "allLeaderboards": "Tutte le classifiche",
     "availability": "Disponibilità",
     "availabilityAll": "Da sempre",
-    "availabilitySub": "Controlli riusciti",
+    "availabilitySub": "Controlli riusciti della pipeline di sincronizzazione",
     "avg": "media",
     "avgLevel": "Livello medio",
     "badgeClaims": "Badge sbloccati",

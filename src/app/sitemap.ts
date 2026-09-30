@@ -36,6 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/expired",
     "/leaderboards",
     "/stats",
+    "/status",
     "/compare",
     "/blog",
     "/changelog",

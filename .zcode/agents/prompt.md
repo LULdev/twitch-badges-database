@@ -1,7 +1,7 @@
 ---
-name: "prompt-refiner"
-description: "Rewrites vague user requests into precise, structured task prompts for coding agents. Use before delegating to an implementation agent when the request is unclear or underspecified."
-color: yellow
+name: "PROMPT"
+description: "You are a prompt refinement specialist for coding agents."
+color: orange
 injectAgentsMd: true
 ---
 

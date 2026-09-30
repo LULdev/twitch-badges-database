@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { localeHtmlLang } from "@/i18n/routing";
 import { siteUrl } from "@/lib/seo";
 import { jsonLdScript } from "@/lib/jsonld";
+import { KIND_COLORS } from "@/lib/changelog-kinds";
 import { getHomeData } from "@/lib/queries";
 import BadgeGrid from "@/components/badges/BadgeGrid";
 import { BadgeImage } from "@/components/badges/BadgeImage";
@@ -245,14 +246,26 @@ export default async function HomePage({
                 </Link>
               </div>
               <ul className="space-y-3">
-                {data.latestChangelog.slice(0, 5).map((entry) => (
+                {data.latestChangelog.map((entry) => (
                   <li key={entry.id} className="flex gap-3 text-sm">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
-                    <div>
-                      <p className="font-medium leading-snug">{entry.title}</p>
-                      <p className="mt-0.5 text-xs text-muted">
-                        {new Date(entry.created_at).toLocaleString(locale)}
-                      </p>
+                    <span
+                      className="mt-1.5 size-1.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: KIND_COLORS[entry.kind] ?? "var(--muted)" }}
+                      aria-hidden
+                    />
+                    <div className="min-w-0">
+                      <Link
+                        href={`/changelog#changelog-${entry.id}`}
+                        className="font-medium leading-snug hover:text-accent"
+                      >
+                        {entry.title}
+                      </Link>
+                      <time
+                        dateTime={entry.created_at}
+                        className="mt-0.5 block text-xs text-muted"
+                      >
+                        {new Date(entry.created_at).toLocaleDateString(locale, { dateStyle: "medium" })}
+                      </time>
                     </div>
                   </li>
                 ))}

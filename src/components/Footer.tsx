@@ -44,6 +44,7 @@ export default async function Footer() {
             <li><Link className="text-muted hover:text-foreground" href="/blog">{nav("blog")}</Link></li>
             <li><Link className="text-muted hover:text-foreground" href="/changelog">{nav("changelog")}</Link></li>
             <li><Link className="text-muted hover:text-foreground" href="/stats">{nav("stats")}</Link></li>
+            <li><Link className="text-muted hover:text-foreground" href="/status">{nav("status")}</Link></li>
             <li><Link className="text-muted hover:text-foreground" href="/compare">{nav("compare")}</Link></li>
             <li><Link className="text-muted hover:text-foreground" href="/inventory">{nav("inventory")}</Link></li>
           </ul>

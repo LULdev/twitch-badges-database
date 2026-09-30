@@ -33,7 +33,8 @@
     "wheel": "フォーチュンホイール",
     "mainNav": "メインナビゲーション",
     "mobileNav": "モバイルナビゲーション",
-    "acp": "管理パネル"
+    "acp": "管理パネル",
+    "status": "ステータス"
   },
   "common": {
     "search": "バッジを検索…",
@@ -403,7 +404,7 @@
     "allLeaderboards": "すべてのランキング",
     "availability": "可用性",
     "availabilityAll": "全期間",
-    "availabilitySub": "成功した同期とヘルスチェック",
+    "availabilitySub": "同期パイプラインのチェック成功",
     "avg": "平均",
     "avgLevel": "平均レベル",
     "badgeClaims": "解除したバッジ",

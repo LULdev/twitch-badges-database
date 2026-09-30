@@ -33,7 +33,8 @@
     "wheel": "Roleta da fortuna",
     "mainNav": "Navegação principal",
     "mobileNav": "Navegação móvel",
-    "acp": "Painel de admin"
+    "acp": "Painel de admin",
+    "status": "Estado"
   },
   "common": {
     "search": "Buscar insígnias…",
@@ -403,7 +404,7 @@
     "allLeaderboards": "Todos os rankings",
     "availability": "Disponibilidade",
     "availabilityAll": "Total geral",
-    "availabilitySub": "Verificações bem-sucedidas",
+    "availabilitySub": "Verificações bem-sucedidas do pipeline de sincronização",
     "avg": "média",
     "avgLevel": "Nível médio",
     "badgeClaims": "Emblemas desbloqueados",

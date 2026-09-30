@@ -1151,6 +1151,7 @@ html {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 0.9rem;
 }
@@ -2970,6 +2971,11 @@ html {
   font-family: var(--font-mono, ui-monospace, monospace);
   text-transform: uppercase;
   letter-spacing: 0.1em;
+}
+/* letter-spacing breaks the cursive joining of Arabic script — localized
+   relative times and schedule lines rendered in this class lose it. */
+[dir="rtl"] .wire-mono {
+  letter-spacing: 0;
 }
 .wire-row {
   display: grid;

@@ -33,7 +33,8 @@
     "wheel": "Ruleta de la fortuna",
     "mainNav": "Navegación principal",
     "mobileNav": "Navegación móvil",
-    "acp": "Panel de admin"
+    "acp": "Panel de admin",
+    "status": "Estado"
   },
   "common": {
     "search": "Buscar insignias…",
@@ -403,7 +404,7 @@
     "allLeaderboards": "Todas las clasificaciones",
     "availability": "Disponibilidad",
     "availabilityAll": "Total histórico",
-    "availabilitySub": "Comprobaciones correctas",
+    "availabilitySub": "Comprobaciones correctas del pipeline de sincronización",
     "avg": "media",
     "avgLevel": "Nivel medio",
     "badgeClaims": "Insignias desbloqueadas",

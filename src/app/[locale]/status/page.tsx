@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { getUptimeSnapshot, type UptimeSource } from "@/lib/stats";
+import { getUptimeSnapshot, pipelineSources, type UptimeSource } from "@/lib/stats";
 import { listChangelog, type ChangelogRow } from "@/lib/queries";
 import { localeAlternates } from "@/lib/seo";
 import Reveal from "@/components/stats/Reveal";
@@ -36,6 +36,13 @@ export async function generateMetadata({
 const STATUS_LAYOUTS = ["a", "b", "c", "d"] as const;
 type StatusLayout = (typeof STATUS_LAYOUTS)[number];
 
+/**
+ * Variant D "Dashboard" is the live layout (owner decision 2026-09-30). The
+ * Classic/Timeline/Light variants below stay fully wired in this file,
+ * hidden behind this flag — flip to true to re-preview them via ?layout=.
+ */
+const STATUS_LAYOUT_PREVIEW = false;
+
 function resolveLayout(value: unknown): StatusLayout {
   const single = Array.isArray(value) ? value[0] : value;
   return typeof single === "string" &&
@@ -59,20 +66,24 @@ const SCHEDULE: ScheduleEntry[] = [
   { source: "cron/potat", every15: true },
 ];
 
+/** The sync/* heartbeat sources fire when their cron counterpart runs. */
+const SCHEDULE_ALIAS: Record<string, string> = {
+  "sync/global": "cron/global",
+  "sync/badgebase": "cron/badgebase",
+  "sync/potat": "cron/potat",
+};
+
 function nextRunMs(entry: ScheduleEntry, now: Date): number {
   if (entry.every15) {
     // GitHub Actions fires at :07/:22/:37/:52 to dodge the Vercel crons.
-    const offsets = [7, 22, 37, 52];
-    const cur = new Date(now);
-    for (let i = 0; i <= 4; i++) {
-      const candidate = new Date(cur);
-      candidate.setUTCMinutes(offsets[i % 4], 0, 0);
-      if (i === 4) candidate.setUTCHours(candidate.getUTCHours() + 1);
-      if (candidate.getTime() > now.getTime()) {
-        return candidate.getTime() - now.getTime();
-      }
+    const next = [7, 22, 37, 52].find((o) => o > now.getUTCMinutes());
+    const candidate = new Date(now);
+    if (next !== undefined) {
+      candidate.setUTCMinutes(next, 0, 0);
+    } else {
+      candidate.setUTCHours(now.getUTCHours() + 1, 7, 0, 0);
     }
-    return 0;
+    return candidate.getTime() - now.getTime();
   }
   const [h, m] = entry.daily!;
   const candidate = new Date(now);
@@ -83,12 +94,24 @@ function nextRunMs(entry: ScheduleEntry, now: Date): number {
   return candidate.getTime() - now.getTime();
 }
 
-const msLabel = (ms: number) =>
-  ms >= 3_600_000
-    ? `${Math.round(ms / 3_600_000)}h ${Math.round((ms % 3_600_000) / 60_000)}m`
-    : ms >= 60_000
-      ? `${Math.round(ms / 60_000)}m`
-      : `${Math.max(1, Math.round(ms / 1000))}s`;
+/**
+ * Next run for a heartbeat source: the nearest of ALL its schedule entries
+ * (cron/potat is both a 06:30 Vercel cron AND on the 15-minute grid — taking
+ * only the first match showed "in 14h" while the next run was minutes away).
+ */
+function nextRunFor(source: string, now: Date): number | null {
+  const target = SCHEDULE_ALIAS[source] ?? source;
+  const entries = SCHEDULE.filter((s) => s.source === target);
+  if (entries.length === 0) return null;
+  return Math.min(...entries.map((entry) => nextRunMs(entry, now)));
+}
+
+// Minutes-first so rounding can never emit "1h 60m" at the hour boundary.
+const msLabel = (ms: number) => {
+  const minutes = Math.max(1, Math.round(ms / 60_000));
+  if (minutes < 60) return `${minutes}m`;
+  return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+};
 
 /** Engine identity of a data_sync changelog row from its title. */
 function engineOf(title: string): string {
@@ -112,11 +135,21 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
   const tc = await getTranslations("changelog");
   const layout = resolveLayout(sp.layout);
 
-  const [uptime, syncFeed, incidents] = await Promise.all([
+  const [uptime, syncFeedRaw, bugfixes] = await Promise.all([
     getUptimeSnapshot().catch(() => null),
-    listChangelog("data_sync", 12).catch(() => [] as ChangelogRow[]),
+    // 120 rows so the daily global/badgebase runs are still inside the window
+    // next to potat's 96-per-day rows (variant D looks up each engine's
+    // newest run; the timeline itself slices the newest 12).
+    listChangelog("data_sync", 120).catch(() => [] as ChangelogRow[]),
     listChangelog("bugfix", 10).catch(() => [] as ChangelogRow[]),
   ]);
+  const syncFeed = syncFeedRaw.slice(0, 12);
+  // Incidents = bug fixes plus failed/skipped sync runs (risk high) — the
+  // rows the risk column exists to surface. The high-risk syncs are already
+  // in syncFeedRaw, so no extra query.
+  const incidents = [...bugfixes, ...syncFeedRaw.filter((r) => r.risk === "high")]
+    .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
+    .slice(0, 10);
 
   const now = new Date();
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
@@ -364,7 +397,7 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
 
   const sourceCard = (src: UptimeSource) => {
     const rate = src.checks_24h > 0 ? Math.round((src.ok_24h / src.checks_24h) * 100) : null;
-    const sched = SCHEDULE.find((s) => s.source === src.source);
+    const next = nextRunFor(src.source, now);
     return (
       <div className="card p-4" key={src.source}>
         <div className="flex items-center justify-between gap-2">
@@ -382,11 +415,11 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
           <dd className="text-end tabular-nums">
             {rate === null ? "—" : `${rate}%`}
           </dd>
-          {sched && (
+          {next !== null && (
             <>
               <dt className="text-muted">{t("nextRun")}</dt>
               <dd className="text-end tabular-nums">
-                {t("in", { time: msLabel(nextRunMs(sched, now)) })}
+                {t("in", { time: msLabel(next) })}
               </dd>
             </>
           )}
@@ -403,7 +436,7 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
   /* ---------------------------------------------------------------- */
   /* Variant A — "Classic": hero + service grid + gauges               */
   /* ---------------------------------------------------------------- */
-  const variantClassic = (
+  const variantClassic = () => (
     <div className="space-y-8">
       <section className="hero-box">
         <div className="hero-box-inner flex flex-wrap items-center justify-between gap-4 p-6 sm:p-8">
@@ -461,7 +494,7 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
     const src = engine ? bySource.get(engine) : undefined;
     return { entry, engine, src };
   });
-  const variantTimeline = (
+  const variantTimeline = () => (
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
@@ -485,29 +518,36 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
             {timelineItems.length === 0 ? (
               <p className="text-sm text-muted">{t("noSyncs")}</p>
             ) : (
-              timelineItems.map(({ entry, engine, src }, i) => (
+              timelineItems.map(({ entry, engine, src }, i) => {
+                const failed =
+                  entry.payload?.failed === true ||
+                  entry.payload?.allDetailsFailed === true;
+                const duration =
+                  src && src.last_ms && src.last_ms > 0
+                    ? ` · ${(src.last_ms / 1000).toFixed(1)}s`
+                    : "";
+                return (
                 <Reveal key={entry.id} delay={Math.min(i, 8) * 40}>
                   <div className="chron-item">
                     <p className="chron-date">
                       {relTime(entry.created_at)}
-                      {src ? ` · ${(src.last_ms ?? 0) / 1000 > 0 ? `${((src.last_ms ?? 0) / 1000).toFixed(1)}s` : ""}` : ""}
+                      {duration}
                     </p>
                     <div
                       className="chron-entry card scroll-mt-24 p-3.5"
                       style={{
-                        ["--entry-color" as string]:
-                          entry.payload?.failed === true
-                            ? "var(--danger)"
-                            : entry.payload?.skipped
-                              ? "var(--warning)"
-                              : "var(--success)",
+                        ["--entry-color" as string]: failed
+                          ? "var(--danger)"
+                          : entry.payload?.skipped
+                            ? "var(--warning)"
+                            : "var(--success)",
                       }}
                     >
                       <div className="flex flex-wrap items-baseline justify-between gap-2">
                         <p className="cl-sentence">
                           {engine ? sourceLabel(engine) : entry.title}
                         </p>
-                        {entry.payload?.failed === true ? (
+                        {failed ? (
                           <span className="chip chip-danger pointer-events-none text-[0.5625rem]">
                             {ts("statusDown")}
                           </span>
@@ -521,7 +561,8 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
                     </div>
                   </div>
                 </Reveal>
-              ))
+                );
+              })
             )}
           </section>
           {incidentList}
@@ -540,7 +581,7 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
   /* Variant C — "Single light": one giant status light                */
   /* ---------------------------------------------------------------- */
   const lastIncident = incidents[0];
-  const variantLight = (
+  const variantLight = () => (
     <div className="space-y-8">
       <section className="card relative overflow-hidden p-10 text-center" aria-label={t("title")}>
         <div
@@ -580,20 +621,21 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
       <section className="card overflow-hidden p-0" aria-label={t("sources")}>
         <ol>
           {recurring.map((src) => {
-            const sched = SCHEDULE.find((s) => s.source === src.source);
+            const next = nextRunFor(src.source, now);
             return (
               <li key={src.source} className="wire-row">
+                {/* .wire-row expects [idx][time][label][meta] — a placeholder
+                    keeps the label out of the narrow index column. */}
+                <span className="wire-idx" aria-hidden="true" />
+                <span className="wire-time">{relTime(src.last_at)}</span>
                 <span className="min-w-0 truncate text-sm font-semibold">
                   {sourceLabel(src.source)}
                 </span>
-                <span className="wire-time">{relTime(src.last_at)}</span>
-                <span className="wire-mono hidden text-[0.5625rem] text-muted sm:inline">
-                  {src.checks_24h > 0
-                    ? `${Math.round((src.ok_24h / src.checks_24h) * 100)}%`
-                    : "—"}
-                </span>
                 <span className="wire-mono text-[0.5625rem] text-accent">
-                  {sched ? t("in", { time: msLabel(nextRunMs(sched, now)) }) : "—"}
+                  {src.checks_24h > 0
+                    ? `${Math.round((src.ok_24h / src.checks_24h) * 100)}% · `
+                    : ""}
+                  {next !== null ? t("in", { time: msLabel(next) }) : "—"}
                 </span>
               </li>
             );
@@ -615,15 +657,21 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">{t("title")}</h1>
           <p className="mt-1 text-sm text-muted">{t("subtitle")}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            {statusDot(statusTone)}
+            <span className="text-sm font-semibold">{headline}</span>
+            <span className="text-xs text-muted">
+              {t("heartbeat")} {relTime(uptime?.lastHeartbeat ?? null)}
+            </span>
+          </div>
         </div>
-        {statusDot(statusTone)}
       </header>
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6" aria-label={t("availability")}>
         <div className="bl-kpi"><b>{uptime?.availability24h == null ? "—" : `${uptime.availability24h.toFixed(1)}%`}</b><span>24h</span></div>
         <div className="bl-kpi"><b>{uptime?.availability7d == null ? "—" : `${uptime.availability7d.toFixed(1)}%`}</b><span>7d</span></div>
         <div className="bl-kpi"><b>{uptime?.availability30d == null ? "—" : `${uptime.availability30d.toFixed(1)}%`}</b><span>30d</span></div>
         <div className="bl-kpi"><b>{uptime?.availabilityAll == null ? "—" : `${uptime.availabilityAll.toFixed(1)}%`}</b><span>{ts("total")}</span></div>
-        <div className="bl-kpi"><b>{recurring.reduce((n, s) => n + s.checks_24h, 0).toLocaleString(locale)}</b><span>{t("checks24h")}</span></div>
+        <div className="bl-kpi"><b>{pipelineSources(uptime?.sources ?? []).reduce((n, s) => n + s.checks_24h, 0).toLocaleString(locale)}</b><span>{t("checks24h")}</span></div>
         <div className="bl-kpi"><b className="text-sm">{relTime(uptime?.lastHeartbeat ?? null)}</b><span>{t("heartbeat")}</span></div>
       </section>
       <section className="grid gap-4 md:grid-cols-3" aria-label={t("sources")}>
@@ -631,7 +679,9 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
           const src = bySource.get(engine);
           const rate30 =
             src && src.checks_30d > 0 ? (src.ok_30d / src.checks_30d) * 100 : null;
-          const last = syncFeed.find((e) => engineOf(e.title) === engine);
+          // Full 120-row window (syncFeedRaw) — potat's 96 rows/day would push
+          // the daily runs out of a 12-row slice.
+          const last = syncFeedRaw.find((e) => engineOf(e.title) === engine);
           return (
             <div className="chart-card" key={engine}>
               <div className="chart-head">
@@ -675,10 +725,15 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
 
   return (
     <div className="space-y-6">
-      {layout === "a" ? variantClassic : null}
-      {layout === "b" ? variantTimeline : null}
-      {layout === "c" ? variantLight : null}
-      {layout === "d" ? variantDashboard : null}
+      {STATUS_LAYOUT_PREVIEW
+        ? layout === "a"
+          ? variantClassic()
+          : layout === "b"
+            ? variantTimeline()
+            : layout === "c"
+              ? variantLight()
+              : variantDashboard
+        : variantDashboard}
     </div>
   );
 }

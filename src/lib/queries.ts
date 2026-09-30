@@ -526,7 +526,7 @@ const loadHomeData = unstable_cache(
         .from("changelog")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(6),
+        .limit(5),
       supabase
         .from("blog_posts")
         .select("*")

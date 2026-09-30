@@ -33,7 +33,8 @@
     "wheel": "Glücksrad",
     "mainNav": "Hauptnavigation",
     "mobileNav": "Mobile Navigation",
-    "acp": "Admin-Panel"
+    "acp": "Admin-Panel",
+    "status": "Status"
   },
   "common": {
     "search": "Badges suchen…",
@@ -403,7 +404,7 @@
     "allLeaderboards": "Alle Ranglisten",
     "availability": "Verfügbarkeit",
     "availabilityAll": "Gesamt",
-    "availabilitySub": "Erfolgreiche Sync- und Health-Checks",
+    "availabilitySub": "Erfolgreiche Sync-Pipeline-Prüfungen",
     "avg": "Ø",
     "avgLevel": "Ø Level",
     "badgeClaims": "Freigeschaltete Badges",

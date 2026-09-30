@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { listChangelog, type ChangelogRow } from "@/lib/queries";
+import { KIND_COLORS } from "@/lib/changelog-kinds";
 import { localeAlternates } from "@/lib/seo";
 import Reveal from "@/components/stats/Reveal";
 import RiskChip from "@/components/changelog/RiskChip";
@@ -22,17 +23,6 @@ export async function generateMetadata({
     description: t("subtitle"),
   };
 }
-
-const KIND_COLORS: Record<string, string> = {
-  badge_added: "var(--success)",
-  badge_updated: "var(--info)",
-  badge_removed: "var(--danger)",
-  data_sync: "var(--muted)",
-  feature: "var(--accent)",
-  bugfix: "var(--warning)",
-  blog: "var(--accent)",
-  push: "var(--info)",
-};
 
 const KINDS = [
   "all",
@@ -121,7 +111,11 @@ export default async function ChangelogPage({
 
   const filterHref = (value: string, layoutValue: string) => {
     const params = new URLSearchParams();
-    if (layoutValue !== "a") params.set("layout", layoutValue);
+    // The layout param only means something while preview is enabled —
+    // otherwise chips would keep propagating a dead ?layout= around.
+    if (CHANGELOG_LAYOUT_PREVIEW && layoutValue !== "a") {
+      params.set("layout", layoutValue);
+    }
     if (value !== "all") params.set("kind", value);
     const qs = params.toString();
     return qs === "" ? "/changelog" : `/changelog?${qs}`;
@@ -318,7 +312,7 @@ export default async function ChangelogPage({
   /* ---------------------------------------------------------------- */
   /* Variant B — "Timeline"                                            */
   /* ---------------------------------------------------------------- */
-  const variantTimeline = (
+  const variantTimeline = () => (
     <div className="space-y-8">
       {masthead}
       {filterRail}
@@ -386,7 +380,7 @@ export default async function ChangelogPage({
     n === 0 ? "0" : n >= maxDay ? "max" : String(Math.min(3, n));
 
   const featuredEntry = entries[0];
-  const variantDispatch = (
+  const variantDispatch = () => (
     <div className="space-y-8">
       {masthead}
       {featuredEntry ? (
@@ -538,7 +532,7 @@ export default async function ChangelogPage({
   /* Variant D — "Registry"                                            */
   /* ---------------------------------------------------------------- */
   const ruling = entries.find((e) => e.kind === "bugfix") ?? entries[0];
-  const variantRegistry = (
+  const variantRegistry = () => (
     <div className="space-y-8">
       <header className="space-y-4 text-center">
         <div>
@@ -616,10 +610,15 @@ export default async function ChangelogPage({
 
   return (
     <div className="space-y-6">
-      {variantLedger}
-      {CHANGELOG_LAYOUT_PREVIEW && layout === "b" ? variantTimeline : null}
-      {CHANGELOG_LAYOUT_PREVIEW && layout === "c" ? variantDispatch : null}
-      {CHANGELOG_LAYOUT_PREVIEW && layout === "d" ? variantRegistry : null}
+      {CHANGELOG_LAYOUT_PREVIEW
+        ? layout === "b"
+          ? variantTimeline()
+          : layout === "c"
+            ? variantDispatch()
+            : layout === "d"
+              ? variantRegistry()
+              : variantLedger
+        : variantLedger}
     </div>
   );
 }

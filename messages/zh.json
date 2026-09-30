@@ -33,7 +33,8 @@
     "wheel": "命运转盘",
     "mainNav": "主导航",
     "mobileNav": "移动端导航",
-    "acp": "管理面板"
+    "acp": "管理面板",
+    "status": "状态"
   },
   "common": {
     "search": "搜索徽章…",
@@ -403,7 +404,7 @@
     "allLeaderboards": "全部排行榜",
     "availability": "可用性",
     "availabilityAll": "累计",
-    "availabilitySub": "成功的同步与健康检查",
+    "availabilitySub": "同步管道检查成功",
     "avg": "平均",
     "avgLevel": "平均等级",
     "badgeClaims": "已解锁徽章",

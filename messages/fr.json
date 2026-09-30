@@ -33,7 +33,8 @@
     "wheel": "Roue de la fortune",
     "mainNav": "Navigation principale",
     "mobileNav": "Navigation mobile",
-    "acp": "Panneau d'admin"
+    "acp": "Panneau d'admin",
+    "status": "Statut"
   },
   "common": {
     "search": "Rechercher des badges…",
@@ -403,7 +404,7 @@
     "allLeaderboards": "Tous les classements",
     "availability": "Disponibilité",
     "availabilityAll": "Depuis toujours",
-    "availabilitySub": "Vérifications réussies",
+    "availabilitySub": "Vérifications réussies du pipeline de synchronisation",
     "avg": "moy.",
     "avgLevel": "Niveau moyen",
     "badgeClaims": "Badges débloqués",
