@@ -1,4 +1,45 @@
 /** Minimal, dependency-free markdown → HTML for trusted editorial content. */
+
+/** Stable anchor id for a heading — shared by the renderer and the TOC
+ *  extractor so the table of contents always matches the rendered ids. */
+function headingId(text: string, used: Set<string>): string {
+  const base =
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-") || "section";
+  let id = base;
+  let n = 2;
+  while (used.has(id)) id = `${base}-${n++}`;
+  used.add(id);
+  return id;
+}
+
+export interface MarkdownHeading {
+  id: string;
+  text: string;
+  level: 2 | 3;
+}
+
+/** Headings of a markdown document, with the exact ids renderMarkdown emits.
+ *  Feeds article tables of contents without parsing the rendered HTML. */
+export function extractHeadings(markdown: string): MarkdownHeading[] {
+  const used = new Set<string>();
+  const out: MarkdownHeading[] = [];
+  for (const line of markdown.split(/\r?\n/)) {
+    const heading = /^(#{2,3})\s+(.*)$/.exec(line.trimEnd());
+    if (!heading) continue;
+    const text = heading[2].replace(/[*`]/g, "").trim();
+    out.push({
+      id: headingId(text, used),
+      text,
+      level: heading[1].length === 2 ? 2 : 3,
+    });
+  }
+  return out;
+}
+
 export function renderMarkdown(markdown: string): string {
   const escape = (value: string) =>
     value
@@ -36,6 +77,7 @@ export function renderMarkdown(markdown: string): string {
         },
       );
 
+  const usedIds = new Set<string>();
   const blocks: string[] = [];
   let listOpen = false;
   for (const rawLine of markdown.split(/\r?\n/)) {
@@ -57,7 +99,8 @@ export function renderMarkdown(markdown: string): string {
     }
     if (heading) {
       const tag = heading[1].length === 2 ? "h2" : "h3";
-      blocks.push(`<${tag}>${inline(heading[2])}</${tag}>`);
+      const text = heading[2].replace(/[*`]/g, "").trim();
+      blocks.push(`<${tag} id="${headingId(text, usedIds)}">${inline(heading[2])}</${tag}>`);
     } else if (line.trim() === "") {
       // paragraph separator
     } else {

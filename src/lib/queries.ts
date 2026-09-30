@@ -110,6 +110,7 @@ export interface BlogPostRow {
 export interface ChangelogRow {
   id: number;
   kind: string;
+  risk: string;
   title: string;
   body: string | null;
   payload: Record<string, unknown> | null;
@@ -681,7 +682,10 @@ export async function listChangelog(
   let query = supabase
     .from("changelog")
     .select("*")
+    // id tiebreak: batch logChanges() inserts share timestamps, so created_at
+    // alone let same-second rows shuffle between requests.
     .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
     .limit(limit);
   if (kind && kind !== "all") query = query.eq("kind", kind);
   const { data } = await query;

@@ -334,7 +334,29 @@
       "laugh": "웃김",
       "fire": "불",
       "wow": "놀람"
-    }
+    },
+    "statPosts": "글",
+    "statLatest": "최신 업데이트",
+    "rss": "RSS",
+    "tagFilter": "태그로 필터",
+    "allTags": "전체",
+    "emptyFilter": "이 태그의 글이 아직 없습니다.",
+    "featured": "추천",
+    "wireDensity": "드롭 활동 밀도 · 최근 30일",
+    "open": "열기",
+    "readingTime": "{min}분 읽기",
+    "updatedAt": "업데이트 {date}",
+    "tocTitle": "목차",
+    "prevNext": "글 탐색",
+    "prevPost": "이전 글",
+    "nextPost": "다음 글",
+    "relatedTitle": "관련 글",
+    "widgetTitle": "뱃지 실시간 데이터",
+    "widgetOwners": "{count}명 보유",
+    "widgetClaim": "수령 기간: {start} — {end}",
+    "widgetNoWindow": "수령 기간 미공개.",
+    "widgetOpen": "뱃지 페이지 열기",
+    "statMonth": "이번 달 게시물"
   },
   "changelog": {
     "title": "체인지로그",
@@ -351,7 +373,22 @@
     "push": "알림",
     "empty": "아직 항목이 없습니다.",
     "source": "출처: {source}",
-    "emptyFilter": "이 필터에 해당하는 항목이 없습니다."
+    "emptyFilter": "이 필터에 해당하는 항목이 없습니다.",
+    "featured": "주요",
+    "statEntries": "항목",
+    "statMonth": "이번 달",
+    "statLatest": "최신 항목",
+    "signal": "주요",
+    "showing": "전체 {total}개 중 {shown}개 표시",
+    "filterLabel": "유형별 필터",
+    "wireDensity": "변경 활동 · 최근 30일",
+    "riskLow": "낮은 위험",
+    "riskMedium": "중간 위험",
+    "riskHigh": "높은 위험",
+    "riskLowHint": "표면적 또는 국소적; 데이터·기능 영향 없음.",
+    "riskMediumHint": "일부 사용자에게 기능 영향; 데이터 손실 없이 복구.",
+    "riskHighHint": "핵심 기능 또는 데이터 무결성 영향.",
+    "riskMix": "낮음 {low} · 중간 {medium} · 높음 {high}"
   },
   "stats": {
     "achCategories": "단계별 해금",
@@ -1057,7 +1094,8 @@
       "changelog": {
         "kind": "종류",
         "body": "설명",
-        "payload": "페이로드 (JSON)"
+        "payload": "페이로드 (JSON)",
+        "risk": "리스크"
       }
     },
     "badges": {

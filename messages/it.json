@@ -334,7 +334,29 @@
       "laugh": "Risata",
       "fire": "Fuoco",
       "wow": "Wow"
-    }
+    },
+    "statPosts": "Articoli",
+    "statLatest": "Ultimo aggiornamento",
+    "rss": "RSS",
+    "tagFilter": "Filtra per tag",
+    "allTags": "Tutti",
+    "emptyFilter": "Ancora nessun post con questo tag.",
+    "featured": "In evidenza",
+    "wireDensity": "Densità attività · ultimi 30 giorni",
+    "open": "Apri",
+    "readingTime": "{min} min di lettura",
+    "updatedAt": "Aggiornato {date}",
+    "tocTitle": "Indice",
+    "prevNext": "Navigazione post",
+    "prevPost": "Precedente",
+    "nextPost": "Più recente",
+    "relatedTitle": "Correlati",
+    "widgetTitle": "Dati live del badge",
+    "widgetOwners": "{count} possessori",
+    "widgetClaim": "Finestra: {start} — {end}",
+    "widgetNoWindow": "Nessuna finestra pubblicata.",
+    "widgetOpen": "Apri pagina badge",
+    "statMonth": "Post di questo mese"
   },
   "changelog": {
     "title": "Changelog",
@@ -351,7 +373,22 @@
     "push": "Notifiche",
     "empty": "Ancora nessuna voce.",
     "source": "Fonte: {source}",
-    "emptyFilter": "Nessuna voce per questo filtro."
+    "emptyFilter": "Nessuna voce per questo filtro.",
+    "featured": "In evidenza",
+    "statEntries": "Voci",
+    "statMonth": "Questo mese",
+    "statLatest": "Ultima voce",
+    "signal": "in evidenza",
+    "showing": "{shown} di {total} voci",
+    "filterLabel": "Filtra per tipo",
+    "wireDensity": "Attività · ultimi 30 giorni",
+    "riskLow": "Rischio basso",
+    "riskMedium": "Rischio medio",
+    "riskHigh": "Rischio alto",
+    "riskLowHint": "Estetico o localizzato; nessun impatto su dati o funzioni.",
+    "riskMediumHint": "Impatto funzionale per alcuni utenti; corretto senza perdita di dati.",
+    "riskHighHint": "Funzione principale o integrità dei dati interessata.",
+    "riskMix": "{low} basso · {medium} medio · {high} alto"
   },
   "stats": {
     "achCategories": "Sblocchi per livello",
@@ -1057,7 +1094,8 @@
       "changelog": {
         "kind": "Tipo",
         "body": "Spiegazione",
-        "payload": "Payload (JSON)"
+        "payload": "Payload (JSON)",
+        "risk": "Rischio"
       }
     },
     "badges": {

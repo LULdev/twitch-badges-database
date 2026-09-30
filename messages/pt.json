@@ -334,7 +334,29 @@
       "laugh": "Riso",
       "fire": "Fogo",
       "wow": "Uau"
-    }
+    },
+    "statPosts": "Artigos",
+    "statLatest": "Última atualização",
+    "rss": "RSS",
+    "tagFilter": "Filtrar por tag",
+    "allTags": "Todas",
+    "emptyFilter": "Ainda não há posts com esta tag.",
+    "featured": "Destaque",
+    "wireDensity": "Densidade de atividade · últimos 30 dias",
+    "open": "Abrir",
+    "readingTime": "{min} min de leitura",
+    "updatedAt": "Atualizado {date}",
+    "tocTitle": "Conteúdo",
+    "prevNext": "Navegação de posts",
+    "prevPost": "Anterior",
+    "nextPost": "Mais recente",
+    "relatedTitle": "Mais sobre isso",
+    "widgetTitle": "Dados ao vivo do badge",
+    "widgetOwners": "{count} proprietários",
+    "widgetClaim": "Período: {start} — {end}",
+    "widgetNoWindow": "Nenhum período publicado ainda.",
+    "widgetOpen": "Abrir página do badge",
+    "statMonth": "Posts neste mês"
   },
   "changelog": {
     "title": "Changelog",
@@ -351,7 +373,22 @@
     "push": "Notificações",
     "empty": "Ainda não há registros.",
     "source": "Fonte: {source}",
-    "emptyFilter": "Nenhuma entrada para este filtro."
+    "emptyFilter": "Nenhuma entrada para este filtro.",
+    "featured": "Destaque",
+    "statEntries": "Registros",
+    "statMonth": "Este mês",
+    "statLatest": "Último registro",
+    "signal": "destacados",
+    "showing": "Mostrando {shown} de {total} registros",
+    "filterLabel": "Filtrar por tipo",
+    "wireDensity": "Atividade · últimos 30 dias",
+    "riskLow": "Risco baixo",
+    "riskMedium": "Risco médio",
+    "riskHigh": "Risco alto",
+    "riskLowHint": "Cosmético ou localizado; sem impacto em dados ou recursos.",
+    "riskMediumHint": "Impacto funcional para alguns usuários; recuperado sem perda de dados.",
+    "riskHighHint": "Recurso principal ou integridade dos dados foi afetado.",
+    "riskMix": "{low} baixo · {medium} médio · {high} alto"
   },
   "stats": {
     "achCategories": "Desbloqueios por nível",
@@ -1057,7 +1094,8 @@
       "changelog": {
         "kind": "Tipo",
         "body": "Explicação",
-        "payload": "Payload (JSON)"
+        "payload": "Payload (JSON)",
+        "risk": "Risco"
       }
     },
     "badges": {

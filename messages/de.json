@@ -334,7 +334,29 @@
       "laugh": "Lachen",
       "fire": "Feuer",
       "wow": "Wow"
-    }
+    },
+    "statPosts": "Artikel",
+    "statLatest": "Letztes Update",
+    "rss": "RSS",
+    "tagFilter": "Nach Tag filtern",
+    "allTags": "Alle",
+    "emptyFilter": "Noch keine Beiträge mit diesem Tag.",
+    "featured": "Empfohlen",
+    "wireDensity": "Drop-Aktivität · letzte 30 Tage",
+    "open": "Öffnen",
+    "readingTime": "{min} Min. Lesezeit",
+    "updatedAt": "Aktualisiert {date}",
+    "tocTitle": "Inhalt",
+    "prevNext": "Beitrags-Navigation",
+    "prevPost": "Älterer",
+    "nextPost": "Neuerer",
+    "relatedTitle": "Mehr dazu",
+    "widgetTitle": "Live-Badge-Daten",
+    "widgetOwners": "{count} Besitzer",
+    "widgetClaim": "Zeitraum: {start} — {end}",
+    "widgetNoWindow": "Noch kein Zeitraum veröffentlicht.",
+    "widgetOpen": "Badge-Seite öffnen",
+    "statMonth": "Beiträge diesen Monat"
   },
   "changelog": {
     "title": "Changelog",
@@ -351,7 +373,22 @@
     "push": "Benachrichtigungen",
     "empty": "Noch keine Einträge.",
     "source": "Quelle: {source}",
-    "emptyFilter": "Keine Einträge für diesen Filter."
+    "emptyFilter": "Keine Einträge für diesen Filter.",
+    "featured": "Im Fokus",
+    "statEntries": "Einträge",
+    "statMonth": "Diesen Monat",
+    "statLatest": "Letzter Eintrag",
+    "signal": "hervorgehoben",
+    "showing": "{shown} von {total} Einträgen",
+    "filterLabel": "Nach Art filtern",
+    "wireDensity": "Aktivität · letzte 30 Tage",
+    "riskLow": "Geringes Risiko",
+    "riskMedium": "Mittleres Risiko",
+    "riskHigh": "Hohes Risiko",
+    "riskLowHint": "Kosmetisch oder lokal; keine Daten- oder Funktionsauswirkung.",
+    "riskMediumHint": "Funktionsauswirkung für manche Nutzer; ohne Datenverlust behoben.",
+    "riskHighHint": "Kernfunktion oder Datenintegrität war betroffen.",
+    "riskMix": "{low} gering · {medium} mittel · {high} hoch"
   },
   "stats": {
     "achCategories": "Freischaltungen nach Stufe",
@@ -1057,7 +1094,8 @@
       "changelog": {
         "kind": "Art",
         "body": "Erklärung",
-        "payload": "Payload (JSON)"
+        "payload": "Payload (JSON)",
+        "risk": "Risiko"
       }
     },
     "badges": {

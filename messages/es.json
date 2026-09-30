@@ -334,7 +334,29 @@
       "laugh": "Risa",
       "fire": "Fuego",
       "wow": "Asombro"
-    }
+    },
+    "statPosts": "Artículos",
+    "statLatest": "Última actualización",
+    "rss": "RSS",
+    "tagFilter": "Filtrar por etiqueta",
+    "allTags": "Todas",
+    "emptyFilter": "Todavía no hay posts con esta etiqueta.",
+    "featured": "Destacado",
+    "wireDensity": "Densidad de actividad · últimos 30 días",
+    "open": "Abrir",
+    "readingTime": "{min} min de lectura",
+    "updatedAt": "Actualizado {date}",
+    "tocTitle": "Contenido",
+    "prevNext": "Navegación de posts",
+    "prevPost": "Anterior",
+    "nextPost": "Más reciente",
+    "relatedTitle": "Más sobre esto",
+    "widgetTitle": "Datos en vivo del badge",
+    "widgetOwners": "{count} propietarios",
+    "widgetClaim": "Ventana: {start} — {end}",
+    "widgetNoWindow": "Sin ventana publicada todavía.",
+    "widgetOpen": "Abrir página del badge",
+    "statMonth": "Posts este mes"
   },
   "changelog": {
     "title": "Changelog",
@@ -351,7 +373,22 @@
     "push": "Notificaciones",
     "empty": "Aún no hay registros.",
     "source": "Fuente: {source}",
-    "emptyFilter": "No hay entradas para este filtro."
+    "emptyFilter": "No hay entradas para este filtro.",
+    "featured": "Destacado",
+    "statEntries": "Registros",
+    "statMonth": "Este mes",
+    "statLatest": "Último registro",
+    "signal": "destacados",
+    "showing": "Mostrando {shown} de {total} registros",
+    "filterLabel": "Filtrar por tipo",
+    "wireDensity": "Actividad · últimos 30 días",
+    "riskLow": "Riesgo bajo",
+    "riskMedium": "Riesgo medio",
+    "riskHigh": "Riesgo alto",
+    "riskLowHint": "Cosmético o localizado; sin impacto en datos o funciones.",
+    "riskMediumHint": "Impacto funcional para algunos usuarios; recuperado sin pérdida de datos.",
+    "riskHighHint": "Se vio afectada una función principal o la integridad de los datos.",
+    "riskMix": "{low} bajo · {medium} medio · {high} alto"
   },
   "stats": {
     "achCategories": "Desbloqueos por nivel",
@@ -1057,7 +1094,8 @@
       "changelog": {
         "kind": "Tipo",
         "body": "Explicación",
-        "payload": "Carga útil (JSON)"
+        "payload": "Carga útil (JSON)",
+        "risk": "Riesgo"
       }
     },
     "badges": {

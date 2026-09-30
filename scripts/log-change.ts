@@ -24,18 +24,29 @@ const KINDS = [
 
 type Kind = (typeof KINDS)[number];
 
+const RISKS = ["low", "medium", "high"] as const;
+type Risk = (typeof RISKS)[number];
+
 async function main() {
-  const [kind, title, body, payloadRaw] = process.argv.slice(2);
+  const [kind, title, body, payloadRaw, riskRaw] = process.argv.slice(2);
 
   if (!kind || !title) {
     console.error(
-      `Usage: npm run log:change -- <${KINDS.join("|")}> "<title>" ["<body>"] ["<json payload>"]`,
+      `Usage: npm run log:change -- <${KINDS.join("|")}> "<title>" ["<body>"] ["<json payload>"] [${RISKS.join("|")}]`,
     );
     process.exit(1);
   }
   if (!KINDS.includes(kind as Kind)) {
     console.error(`Unknown kind "${kind}". Use one of: ${KINDS.join(", ")}`);
     process.exit(1);
+  }
+  let risk: Risk | undefined;
+  if (riskRaw !== undefined) {
+    if (!RISKS.includes(riskRaw as Risk)) {
+      console.error(`Unknown risk "${riskRaw}". Use one of: ${RISKS.join(", ")}`);
+      process.exit(1);
+    }
+    risk = riskRaw as Risk;
   }
 
   let payload: Record<string, unknown> | null = null;
@@ -57,12 +68,13 @@ async function main() {
   const sql = postgres(url, { ssl: "prefer", max: 1 });
   try {
     const [row] = await sql`
-      insert into public.changelog (kind, title, body, payload)
+      insert into public.changelog (kind, title, body, payload, risk)
       values (
         ${kind},
         ${title},
         ${body ?? null},
-        ${payload ? JSON.stringify(payload) : null}::jsonb
+        ${payload ? JSON.stringify(payload) : null}::jsonb,
+        ${risk ?? "low"}
       )
       returning id, created_at
     `;

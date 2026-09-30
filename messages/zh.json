@@ -334,7 +334,29 @@
       "laugh": "大笑",
       "fire": "火",
       "wow": "惊讶"
-    }
+    },
+    "statPosts": "文章",
+    "statLatest": "最新更新",
+    "rss": "RSS",
+    "tagFilter": "按标签筛选",
+    "allTags": "全部",
+    "emptyFilter": "该标签下暂无文章。",
+    "featured": "精选",
+    "wireDensity": "掉落活跃度 · 近 30 天",
+    "open": "打开",
+    "readingTime": "{min} 分钟阅读",
+    "updatedAt": "更新于 {date}",
+    "tocTitle": "目录",
+    "prevNext": "文章导航",
+    "prevPost": "上一篇",
+    "nextPost": "下一篇",
+    "relatedTitle": "相关文章",
+    "widgetTitle": "徽章实时数据",
+    "widgetOwners": "{count} 名拥有者",
+    "widgetClaim": "领取窗口：{start} — {end}",
+    "widgetNoWindow": "尚未公布领取窗口。",
+    "widgetOpen": "打开徽章页面",
+    "statMonth": "本月文章"
   },
   "changelog": {
     "title": "更新日志",
@@ -351,7 +373,22 @@
     "push": "通知",
     "empty": "暂无记录。",
     "source": "来源：{source}",
-    "emptyFilter": "此筛选条件下暂无条目。"
+    "emptyFilter": "此筛选条件下暂无条目。",
+    "featured": "精选",
+    "statEntries": "条目",
+    "statMonth": "本月",
+    "statLatest": "最新条目",
+    "signal": "重点",
+    "showing": "共 {total} 条，显示 {shown} 条",
+    "filterLabel": "按类型筛选",
+    "wireDensity": "变更活跃度 · 近 30 天",
+    "riskLow": "低风险",
+    "riskMedium": "中风险",
+    "riskHigh": "高风险",
+    "riskLowHint": "外观或局部问题；不影响数据或功能。",
+    "riskMediumHint": "对部分用户有功能影响；已修复且无数据丢失。",
+    "riskHighHint": "核心功能或数据完整性受到影响。",
+    "riskMix": "低 {low} · 中 {medium} · 高 {high}"
   },
   "stats": {
     "achCategories": "各层级解锁数",
@@ -1057,7 +1094,8 @@
       "changelog": {
         "kind": "类型",
         "body": "说明",
-        "payload": "载荷（JSON）"
+        "payload": "载荷（JSON）",
+        "risk": "风险"
       }
     },
     "badges": {

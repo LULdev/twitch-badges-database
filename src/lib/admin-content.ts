@@ -164,14 +164,17 @@ export const CHANGELOG_KINDS = [
   "push",
 ] as const;
 
+export const CHANGELOG_RISKS = ["low", "medium", "high"] as const;
+
 export async function listChangelog(options: { limit?: number; offset?: number } = {}) {
   const supabase = createAdminClient();
   const limit = Math.min(Math.max(options.limit ?? 20, 1), 100);
   const offset = Math.max(options.offset ?? 0, 0);
   const { data, error, count } = await supabase
     .from("changelog")
-    .select("id, kind, title, body, payload, created_at", { count: "exact" })
+    .select("id, kind, risk, title, body, payload, created_at", { count: "exact" })
     .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
     .range(offset, offset + limit - 1);
   if (error) throw error;
   return { entries: data ?? [], total: count ?? 0 };
@@ -179,11 +182,17 @@ export async function listChangelog(options: { limit?: number; offset?: number }
 
 export async function upsertChangelog(
   ctx: AdminContext,
-  input: { kind: string; title: string; body?: string; payload?: unknown },
+  input: { kind: string; title: string; body?: string; payload?: unknown; risk?: string },
   id?: number,
 ): Promise<number> {
   if (!CHANGELOG_KINDS.includes(input.kind as (typeof CHANGELOG_KINDS)[number])) {
     throw new AdminValidationError("unknown changelog kind");
+  }
+  if (
+    input.risk !== undefined &&
+    !CHANGELOG_RISKS.includes(input.risk as (typeof CHANGELOG_RISKS)[number])
+  ) {
+    throw new AdminValidationError("unknown changelog risk");
   }
   const supabase = createAdminClient();
   const row: Record<string, unknown> = {
@@ -197,6 +206,12 @@ export async function upsertChangelog(
   // believes they are only renaming.
   if (input.payload !== undefined) {
     row.payload = (input.payload ?? null) as Record<string, unknown> | null;
+  }
+  // Risk, same rule: only write it when supplied, so an API caller that omits
+  // the field cannot reset a row's triage level as a side effect of an
+  // unrelated edit.
+  if (input.risk !== undefined) {
+    row.risk = input.risk;
   }
   if (id) {
     const { data: updated, error } = await supabase

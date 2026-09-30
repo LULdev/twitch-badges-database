@@ -334,7 +334,29 @@
       "laugh": "ضحك",
       "fire": "نار",
       "wow": "انبهار"
-    }
+    },
+    "statPosts": "مقالات",
+    "statLatest": "آخر تحديث",
+    "rss": "RSS",
+    "tagFilter": "تصفية حسب الوسم",
+    "allTags": "الكل",
+    "emptyFilter": "لا توجد مقالات بهذا الوسم بعد.",
+    "featured": "مميز",
+    "wireDensity": "كثافة النشاط · آخر 30 يومًا",
+    "open": "فتح",
+    "readingTime": "{min} دقيقة قراءة",
+    "updatedAt": "حدّث في {date}",
+    "tocTitle": "المحتويات",
+    "prevNext": "التنقل بين المقالات",
+    "prevPost": "الأقدم",
+    "nextPost": "الأحدث",
+    "relatedTitle": "المزيد عن هذا",
+    "widgetTitle": "بيانات الشارة المباشرة",
+    "widgetOwners": "{count} مالك",
+    "widgetClaim": "نافذة المطالبة: {start} — {end}",
+    "widgetNoWindow": "لم تُنشر نافذة مطالبة بعد.",
+    "widgetOpen": "فتح صفحة الشارة",
+    "statMonth": "منشورات هذا الشهر"
   },
   "changelog": {
     "title": "سجل التغييرات",
@@ -351,7 +373,22 @@
     "push": "الإشعارات",
     "empty": "لا توجد سجلات بعد.",
     "source": "المصدر: {source}",
-    "emptyFilter": "لا توجد إدخالات لهذا الفلتر."
+    "emptyFilter": "لا توجد إدخالات لهذا الفلتر.",
+    "featured": "مميز",
+    "statEntries": "الإدخالات",
+    "statMonth": "هذا الشهر",
+    "statLatest": "آخر إدخال",
+    "signal": "مميزة",
+    "showing": "عرض {shown} من {total} إدخالًا",
+    "filterLabel": "تصفية حسب النوع",
+    "wireDensity": "النشاط · آخر 30 يومًا",
+    "riskLow": "خطورة منخفضة",
+    "riskMedium": "خطورة متوسطة",
+    "riskHigh": "خطورة عالية",
+    "riskLowHint": "تجميلي أو محلي؛ لا تأثير على البيانات أو الميزات.",
+    "riskMediumHint": "تأثير وظيفي على بعض المستخدمين؛ تم الإصلاح دون فقدان بيانات.",
+    "riskHighHint": "تأثرت ميزة أساسية أو سلامة البيانات.",
+    "riskMix": "{low} منخفض · {medium} متوسط · {high} عالٍ"
   },
   "stats": {
     "achCategories": "الفتح حسب الدرجة",
@@ -1057,7 +1094,8 @@
       "changelog": {
         "kind": "النوع",
         "body": "الشرح",
-        "payload": "الحمولة (JSON)"
+        "payload": "الحمولة (JSON)",
+        "risk": "الخطورة"
       }
     },
     "badges": {

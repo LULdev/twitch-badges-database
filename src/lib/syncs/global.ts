@@ -30,6 +30,7 @@ type ExistingBadge = Record<string, unknown> & {
   title: string;
   status: string;
   source: string;
+  category: string;
   start_date: string | null;
   end_date: string | null;
   removed_at: string | null;
@@ -343,6 +344,9 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
   // the added-path fan-out must not abort the run before the other committed
   // mutations have their changelog rows.
   let fanoutError: unknown = null;
+  // Drop-post fan-out failures (createDropPost swallows its errors by design;
+  // without this count a total blog-posts outage would leave no DB trace).
+  let dropPostFailures = 0;
   if (addedTitles.length > 0) {
     // The catalog rows are committed by now, so a fan-out failure here must not
     // skip the changelog row below — that was the undocumented-mutation case the
@@ -356,7 +360,7 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
         const { data, error } = await supabase
           .from("badges")
           .select(
-            "id,slug,title,set_id,image_url_2x,category,is_paid,how_to_earn,start_date,end_date,rarity_tier,rarity_score",
+            "id,slug,title,set_id,image_url_2x,category,is_paid,how_to_earn,start_date,end_date,rarity_tier,rarity_score,description",
           )
           .in("slug", batch);
         if (error) throw error;
@@ -379,10 +383,15 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
       end_date: string | null;
       rarity_tier: "common";
       rarity_score: number;
+      description: string | null;
     }>;
 
     try {
       if (freshRows.length > 0) {
+        // NOTE: if the fresh-row fetch above failed partway, this fan-out runs
+        // on a PARTIAL batch — badges in unfetched batches never get events or
+        // a drop post on any later run (next run they already exist). The only
+        // signal is fanoutFailed: true below.
         const { error: eventsError } = await supabase.from("badge_events").insert(
           freshRows.map((row) => ({
             badge_id: row.id,
@@ -392,8 +401,22 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
         );
         if (eventsError) throw eventsError;
         if (!isInitialSeed) {
+          // Category context for the drop articles, computed from the
+          // in-memory catalog (pre-run rows + this run's additions).
+          const catTotals = new Map<string, number>();
+          const catActive = new Map<string, number>();
+          for (const row of existing.values()) {
+            catTotals.set(row.category, (catTotals.get(row.category) ?? 0) + 1);
+            if (row.status === "active") {
+              catActive.set(row.category, (catActive.get(row.category) ?? 0) + 1);
+            }
+          }
           for (const row of freshRows) {
-            await createDropPost(
+            catTotals.set(row.category, (catTotals.get(row.category) ?? 0) + 1);
+          }
+          let dropPostsFailed = 0;
+          for (const row of freshRows) {
+            const published = await createDropPost(
               {
                 slug: row.slug,
                 title: row.title,
@@ -406,10 +429,21 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
                 endDate: row.end_date,
                 rarityTier: row.rarity_tier,
                 rarityScore: row.rarity_score,
+                description: row.description,
               },
               supabase,
+              {
+                detectedAt: new Date().toISOString(),
+                source,
+                catalogTotal: existing.size + freshRows.length,
+                categoryCount: catTotals.get(row.category),
+                categoryActive: catActive.get(row.category),
+                coDropTitles: addedTitles,
+              },
             );
+            if (!published) dropPostsFailed += 1;
           }
+          dropPostFailures = dropPostsFailed;
         }
       }
     } catch (error) {
@@ -437,6 +471,7 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
           // (the summary row is skipped by the deferred rethrow).
           statusChanged,
           fanoutFailed: fanoutError !== null,
+          ...(dropPostFailures > 0 ? { dropPostsFailed: dropPostFailures } : {}),
         },
       },
       supabase,

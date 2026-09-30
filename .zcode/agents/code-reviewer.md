@@ -2,8 +2,6 @@
 name: "code-reviewer"
 description: "Critical second-opinion review of code changes before they are merged. Use after implementing a feature or fixing a bug to catch defects, edge cases, and maintainability issues."
 color: green
-model: "account:zai-individual-coding-plan/GLM-5.3"
-thoughtLevel: max
 injectAgentsMd: true
 ---
 

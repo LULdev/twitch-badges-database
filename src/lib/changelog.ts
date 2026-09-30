@@ -11,11 +11,15 @@ export type ChangelogKind =
   | "blog"
   | "push";
 
+export type ChangelogRisk = "low" | "medium" | "high";
+
 export interface ChangelogEntry {
   kind: ChangelogKind;
   title: string;
   body?: string | null;
   payload?: Record<string, unknown> | null;
+  /** Triage level; omit for 'low' (mirrors the column default). */
+  risk?: ChangelogRisk;
 }
 
 /**
@@ -34,6 +38,7 @@ export async function logChange(
       title: entry.title,
       body: entry.body ?? null,
       payload: entry.payload ?? null,
+      risk: entry.risk ?? "low",
     });
     if (error) throw error;
   } catch (error) {
@@ -54,6 +59,7 @@ export async function logChanges(
         title: entry.title,
         body: entry.body ?? null,
         payload: entry.payload ?? null,
+        risk: entry.risk ?? "low",
       })),
     );
     if (error) throw error;

@@ -24,6 +24,7 @@ interface PostFull extends Post {
 interface ChangelogRow {
   id: number;
   kind: string;
+  risk: string;
   title: string;
   body: string | null;
   created_at: string;
@@ -39,6 +40,8 @@ const KINDS = [
   "blog",
   "push",
 ] as const;
+
+const RISKS = ["low", "medium", "high"] as const;
 
 async function call(payload: Record<string, unknown>) {
   const res = await fetch("/api/admin/content", {
@@ -334,7 +337,7 @@ function ChangelogAdmin({
 }) {
   const t = useTranslations("admin.content");
   const [entries, setEntries] = useState<ChangelogRow[]>([]);
-  const [draft, setDraft] = useState<{ id?: number; kind: string; title: string; body: string; payload: string } | null>(null);
+  const [draft, setDraft] = useState<{ id?: number; kind: string; risk: string; title: string; body: string; payload: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -357,7 +360,7 @@ function ChangelogAdmin({
 
   return (
     <div className="space-y-3">
-      <button type="button" className="btn btn-primary px-3 py-1.5 text-xs" onClick={() => setDraft({ kind: "feature", title: "", body: "", payload: "" })}>
+      <button type="button" className="btn btn-primary px-3 py-1.5 text-xs" onClick={() => setDraft({ kind: "feature", risk: "low", title: "", body: "", payload: "" })}>
         {t("new")}
       </button>
 
@@ -388,6 +391,7 @@ function ChangelogAdmin({
                         setDraft({
                           id: entry.id,
                           kind: entry.kind,
+                          risk: entry.risk ?? "low",
                           title: entry.title,
                           body: entry.body ?? "",
                           payload: "",
@@ -412,6 +416,14 @@ function ChangelogAdmin({
               <select className="input mt-1 w-full" value={draft.kind} onChange={(e) => setDraft({ ...draft, kind: e.target.value })}>
                 {KINDS.map((kind) => (
                   <option key={kind} value={kind}>{kind}</option>
+                ))}
+              </select>
+            </label>
+            <label className="text-xs font-semibold text-muted">
+              {t("changelog.risk")}
+              <select className="input mt-1 w-full" value={draft.risk} onChange={(e) => setDraft({ ...draft, risk: e.target.value })}>
+                {RISKS.map((risk) => (
+                  <option key={risk} value={risk}>{risk}</option>
                 ))}
               </select>
             </label>
@@ -455,6 +467,7 @@ function ChangelogAdmin({
                 try {
                   const input: Record<string, unknown> = {
                     kind: draft.kind,
+                    risk: draft.risk,
                     title: draft.title,
                     body: draft.body,
                   };

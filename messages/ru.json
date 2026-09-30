@@ -334,7 +334,29 @@
       "laugh": "Смех",
       "fire": "Огонь",
       "wow": "Вау"
-    }
+    },
+    "statPosts": "Статьи",
+    "statLatest": "Последнее обновление",
+    "rss": "RSS",
+    "tagFilter": "Фильтр по тегу",
+    "allTags": "Все",
+    "emptyFilter": "С этим тегом пока нет записей.",
+    "featured": "Избранное",
+    "wireDensity": "Плотность активности · 30 дней",
+    "open": "Открыть",
+    "readingTime": "{min} мин чтения",
+    "updatedAt": "Обновлено {date}",
+    "tocTitle": "Содержание",
+    "prevNext": "Навигация по записям",
+    "prevPost": "Старее",
+    "nextPost": "Новее",
+    "relatedTitle": "Читайте также",
+    "widgetTitle": "Живые данные значка",
+    "widgetOwners": "{count} владельцев",
+    "widgetClaim": "Окно: {start} — {end}",
+    "widgetNoWindow": "Окно ещё не опубликовано.",
+    "widgetOpen": "Открыть страницу значка",
+    "statMonth": "Публикации за месяц"
   },
   "changelog": {
     "title": "Список изменений",
@@ -351,7 +373,22 @@
     "push": "Уведомления",
     "empty": "Пока нет записей.",
     "source": "Источник: {source}",
-    "emptyFilter": "Нет записей для этого фильтра."
+    "emptyFilter": "Нет записей для этого фильтра.",
+    "featured": "Избранное",
+    "statEntries": "Записи",
+    "statMonth": "В этом месяце",
+    "statLatest": "Последняя запись",
+    "signal": "важных",
+    "showing": "Показано {shown} из {total} записей",
+    "filterLabel": "Фильтр по типу",
+    "wireDensity": "Активность · 30 дней",
+    "riskLow": "Низкий риск",
+    "riskMedium": "Средний риск",
+    "riskHigh": "Высокий риск",
+    "riskLowHint": "Косметическое или локальное; нет влияния на данные или функции.",
+    "riskMediumHint": "Функциональное влияние на некоторых пользователей; исправлено без потери данных.",
+    "riskHighHint": "Затронута ключевая функция или целостность данных.",
+    "riskMix": "{low} низкий · {medium} средний · {high} высокий"
   },
   "stats": {
     "achCategories": "Открытия по уровням",
@@ -1057,7 +1094,8 @@
       "changelog": {
         "kind": "Тип",
         "body": "Пояснение",
-        "payload": "Полезная нагрузка (JSON)"
+        "payload": "Полезная нагрузка (JSON)",
+        "risk": "Риск"
       }
     },
     "badges": {

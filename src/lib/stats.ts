@@ -465,6 +465,81 @@ export async function getPlatformStats(): Promise<PlatformStats> {
   };
 }
 
+/**
+ * The uptime slice of getPlatformStats alone — the /status page needs nothing
+ * else and should not pay for the gamification/catalog reads.
+ */
+export async function getUptimeSnapshot(): Promise<PlatformStats["uptime"]> {
+  const supabase = await createClient();
+
+  const safe = async <T>(
+    run: () => PromiseLike<{ data: unknown }>,
+    fallback: T,
+  ): Promise<T> => {
+    try {
+      const { data } = await run();
+      return pick(data as T, fallback);
+    } catch {
+      return fallback;
+    }
+  };
+
+  const [uptimeSources, uptimeDaily, uptimeHourly] = await Promise.all([
+    safe(() => supabase.from("stats_uptime_sources").select("*"), []),
+    safe(() => supabase.from("stats_uptime_daily").select("*"), []),
+    safe(() => supabase.from("stats_uptime_hourly").select("*"), []),
+  ]);
+
+  const sources = (uptimeSources as UptimeSource[]).map((row) => ({
+    ...row,
+    checks_total: num(row.checks_total),
+    ok_total: num(row.ok_total),
+    error_total: num(row.error_total),
+    checks_24h: num(row.checks_24h),
+    ok_24h: num(row.ok_24h),
+    checks_7d: num(row.checks_7d),
+    ok_7d: num(row.ok_7d),
+    checks_30d: num(row.checks_30d),
+    ok_30d: num(row.ok_30d),
+    avg_ms_24h: row.avg_ms_24h === null ? null : num(row.avg_ms_24h),
+    max_ms: row.max_ms === null ? null : num(row.max_ms),
+    last_ms: row.last_ms === null ? null : num(row.last_ms),
+  }));
+
+  const sum = (key: "checks_total" | "ok_total" | "checks_24h" | "ok_24h" | "checks_7d" | "ok_7d" | "checks_30d" | "ok_30d") =>
+    sources.reduce((total, source) => total + num(source[key]), 0);
+
+  const heartbeatTimes = sources
+    .map((source) => source.last_at)
+    .filter((value): value is string => typeof value === "string")
+    .sort()
+    .reverse();
+  const lastHeartbeat = heartbeatTimes[0] ?? null;
+
+  return {
+    sources,
+    daily: (uptimeDaily as UptimeDailyRow[]).map((row) => ({
+      day: String(row.day),
+      source: String(row.source),
+      checks: num(row.checks),
+      ok: num(row.ok),
+      errors: num(row.errors),
+      avg_ms: row.avg_ms === null ? null : num(row.avg_ms),
+    })),
+    hourly: (uptimeHourly as UptimeHourlyRow[]).map((row) => ({
+      hour: String(row.hour),
+      checks: num(row.checks),
+      ok: num(row.ok),
+    })),
+    availability24h: availability(sum("ok_24h"), sum("checks_24h")),
+    availability7d: availability(sum("ok_7d"), sum("checks_7d")),
+    availability30d: availability(sum("ok_30d"), sum("checks_30d")),
+    availabilityAll: availability(sum("ok_total"), sum("checks_total")),
+    lastHeartbeat,
+    status: serviceStatus(sources),
+  };
+}
+
 /** Continuous day series for charts (missing days become zeros). */
 export function daySeries<T>(
   rows: Array<{ day: string } & T>,

@@ -334,7 +334,29 @@
       "laugh": "Rire",
       "fire": "Feu",
       "wow": "Wow"
-    }
+    },
+    "statPosts": "Articles",
+    "statLatest": "Dernière mise à jour",
+    "rss": "RSS",
+    "tagFilter": "Filtrer par tag",
+    "allTags": "Tous",
+    "emptyFilter": "Pas encore de posts avec ce tag.",
+    "featured": "À la une",
+    "wireDensity": "Densité d'activité · 30 derniers jours",
+    "open": "Ouvrir",
+    "readingTime": "{min} min de lecture",
+    "updatedAt": "Mis à jour {date}",
+    "tocTitle": "Sommaire",
+    "prevNext": "Navigation entre posts",
+    "prevPost": "Plus ancien",
+    "nextPost": "Plus récent",
+    "relatedTitle": "Sur le même sujet",
+    "widgetTitle": "Données en direct du badge",
+    "widgetOwners": "{count} propriétaires",
+    "widgetClaim": "Fenêtre : {start} — {end}",
+    "widgetNoWindow": "Aucune fenêtre publiée pour le moment.",
+    "widgetOpen": "Ouvrir la page du badge",
+    "statMonth": "Posts ce mois-ci"
   },
   "changelog": {
     "title": "Changelog",
@@ -351,7 +373,22 @@
     "push": "Notifications",
     "empty": "Aucune entrée pour le moment.",
     "source": "Source : {source}",
-    "emptyFilter": "Aucune entrée pour ce filtre."
+    "emptyFilter": "Aucune entrée pour ce filtre.",
+    "featured": "À la une",
+    "statEntries": "Entrées",
+    "statMonth": "Ce mois-ci",
+    "statLatest": "Dernière entrée",
+    "signal": "en vedette",
+    "showing": "{shown} sur {total} entrées",
+    "filterLabel": "Filtrer par type",
+    "wireDensity": "Activité · 30 derniers jours",
+    "riskLow": "Risque faible",
+    "riskMedium": "Risque moyen",
+    "riskHigh": "Risque élevé",
+    "riskLowHint": "Cosmétique ou localisé ; aucun impact sur les données ou les fonctionnalités.",
+    "riskMediumHint": "Impact fonctionnel pour certains utilisateurs ; corrigé sans perte de données.",
+    "riskHighHint": "Une fonctionnalité principale ou l'intégrité des données a été affectée.",
+    "riskMix": "{low} faible · {medium} moyen · {high} élevé"
   },
   "stats": {
     "achCategories": "Déblocages par palier",
@@ -1057,7 +1094,8 @@
       "changelog": {
         "kind": "Type",
         "body": "Explication",
-        "payload": "Charge utile (JSON)"
+        "payload": "Charge utile (JSON)",
+        "risk": "Risque"
       }
     },
     "badges": {
