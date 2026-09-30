@@ -1,7 +1,7 @@
 ---
 name: "i18n-translator"
 description: "Translates UI strings and sets up i18n files for multilingual websites (German/English first). Use when a site needs multiple languages."
-color: lavender
+color: yellow
 model: "account:zai-start-plan/GLM-5.3-Flash"
 thoughtLevel: low
 injectAgentsMd: true

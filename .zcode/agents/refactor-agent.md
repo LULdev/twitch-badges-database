@@ -1,7 +1,7 @@
 ---
 name: "refactor-agent"
 description: "Improves existing code structure without changing behavior: extracting functions, removing duplication, naming, and simplifying complex logic. Use when code works but is messy."
-color: yellow
+color: orange
 injectAgentsMd: true
 ---
 
