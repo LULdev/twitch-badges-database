@@ -196,6 +196,15 @@
     "membersOwn": "{count} membros da comunidade têm esta insígnia",
     "readDropPost": "Ler o anúncio do drop",
     "confirmedActive": "Atividade confirmada",
+    "react": "Reagir",
+    "reactions": {
+      "like": "Gostei",
+      "love": "Amor",
+      "fire": "Fogo",
+      "poop": "Cocô",
+      "sad": "Triste",
+      "dislike": "Não gostei"
+    },
     "ownersHeadlineShort": "Proprietários no total",
     "wearingNow": "Usam-na agora",
     "shareOfViewers": "Percentagem de espetadores",

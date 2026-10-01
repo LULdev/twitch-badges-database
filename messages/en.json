@@ -196,6 +196,15 @@
     "membersOwn": "{count} members here own this badge",
     "readDropPost": "Read the drop announcement",
     "confirmedActive": "Confirmed active",
+    "react": "React",
+    "reactions": {
+      "like": "Like",
+      "love": "Love",
+      "fire": "Fire",
+      "poop": "Poop",
+      "sad": "Sad",
+      "dislike": "Dislike"
+    },
     "ownersHeadlineShort": "Lifetime owners",
     "wearingNow": "Wearing it now",
     "shareOfViewers": "Share of viewers",

@@ -196,6 +196,15 @@
     "membersOwn": "{count} من أعضاء المجتمع يملكون هذه الشارة",
     "readDropPost": "اقرأ إعلان الإصدار",
     "confirmedActive": "نشاط مؤكد",
+    "react": "تفاعل",
+    "reactions": {
+      "like": "إعجاب",
+      "love": "حب",
+      "fire": "نار",
+      "poop": "كاكا",
+      "sad": "حزن",
+      "dislike": "عدم الإعجاب"
+    },
     "ownersHeadlineShort": "إجمالي المالكين",
     "wearingNow": "يرتدونها الآن",
     "shareOfViewers": "نسبة المشاهدين",

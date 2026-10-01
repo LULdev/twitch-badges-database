@@ -196,6 +196,15 @@
     "membersOwn": "이 사이트 회원 {count}명이 이 배지를 보유하고 있습니다",
     "readDropPost": "드롭 공지 읽기",
     "confirmedActive": "활성 확인됨",
+    "react": "반응",
+    "reactions": {
+      "like": "좋아요",
+      "love": "사랑",
+      "fire": "불꽃",
+      "poop": "똥",
+      "sad": "슬퍼요",
+      "dislike": "별로예요"
+    },
     "ownersHeadlineShort": "누적 소유자",
     "wearingNow": "현재 착용 중",
     "shareOfViewers": "시청자 비율",

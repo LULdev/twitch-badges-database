@@ -196,6 +196,15 @@
     "membersOwn": "{count} Mitglieder dieser Community besitzen dieses Abzeichen",
     "readDropPost": "Drop-Ankündigung lesen",
     "confirmedActive": "Als aktiv bestätigt",
+    "react": "Reagieren",
+    "reactions": {
+      "like": "Gefällt mir",
+      "love": "Liebe",
+      "fire": "Feuer",
+      "poop": "Kacke",
+      "sad": "Traurig",
+      "dislike": "Gefällt mir nicht"
+    },
     "ownersHeadlineShort": "Besitzer insgesamt",
     "wearingNow": "Tragen es jetzt",
     "shareOfViewers": "Anteil der Zuschauer",

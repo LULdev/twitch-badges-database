@@ -196,6 +196,15 @@
     "membersOwn": "{count} участников сообщества владеют этим значком",
     "readDropPost": "Читать анонс дропа",
     "confirmedActive": "Активность подтверждена",
+    "react": "Реагировать",
+    "reactions": {
+      "like": "Класс",
+      "love": "Любовь",
+      "fire": "Огонь",
+      "poop": "Кака",
+      "sad": "Грусть",
+      "dislike": "Не нравится"
+    },
     "ownersHeadlineShort": "Владельцы за всё время",
     "wearingNow": "Носят его сейчас",
     "shareOfViewers": "Доля зрителей",

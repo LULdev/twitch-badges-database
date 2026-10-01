@@ -196,6 +196,15 @@
     "membersOwn": "当サイトの{count}人のメンバーがこのバッジを保有しています",
     "readDropPost": "ドロップのアナウンスを読む",
     "confirmedActive": "アクティブ確認済み",
+    "react": "リアクション",
+    "reactions": {
+      "like": "いいね",
+      "love": "ラブ",
+      "fire": "ファイア",
+      "poop": "うんち",
+      "sad": "悲しい",
+      "dislike": "うーん"
+    },
     "ownersHeadlineShort": "累計所有者数",
     "wearingNow": "現在装着中",
     "shareOfViewers": "視聴者に占める割合",

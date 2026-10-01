@@ -196,6 +196,15 @@
     "membersOwn": "{count} 位社区成员拥有此徽章",
     "readDropPost": "阅读掉落公告",
     "confirmedActive": "已确认活跃",
+    "react": "发送反应",
+    "reactions": {
+      "like": "赞",
+      "love": "爱心",
+      "fire": "火",
+      "poop": "便便",
+      "sad": "难过",
+      "dislike": "点踩"
+    },
     "ownersHeadlineShort": "累计持有者",
     "wearingNow": "当前佩戴中",
     "shareOfViewers": "观众占比",

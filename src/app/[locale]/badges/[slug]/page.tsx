@@ -27,6 +27,10 @@ import BadgeGrid from "@/components/badges/BadgeGrid";
 import OwnersChart from "@/components/charts/OwnersChart";
 import ShareButtons from "@/components/ShareButtons";
 import LiveRefresher from "@/components/LiveRefresher";
+import BadgeReactions from "@/components/badges/BadgeReactions";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { visitorIpHash } from "@/lib/gamification/session";
 import { localeAlternates, siteUrl } from "@/lib/seo";
 import { fetchBadgeLiveStats } from "@/lib/twitch/potat";
 import {
@@ -194,6 +198,35 @@ export default async function BadgeDetailPage({ params }: PageProps) {
         ? Number(live.percentage)
         : null;
   const holding = live?.userCount ?? badge.active_count ?? null;
+
+  // Hero GIF reactions. Counts go through the anon server client (migration
+  // 0044 granted badge_id, reaction, created_at — never ip_hash); resolving
+  // which are the visitor's own needs the hash, so that one lookup uses the
+  // service-role client, mirroring the blog page's split. Best-effort: an
+  // un-migrated DB renders zero counts instead of crashing the page.
+  const reactionCounts: Record<string, number> = {};
+  let myReactions: string[] = [];
+  try {
+    const ipHash = await visitorIpHash();
+    const anon = await createClient();
+    const { data: rows } = await anon
+      .from("badge_reactions")
+      .select("reaction")
+      .eq("badge_id", badge.id);
+    for (const row of (rows ?? []) as Array<{ reaction: string }>) {
+      reactionCounts[row.reaction] = (reactionCounts[row.reaction] ?? 0) + 1;
+    }
+    const { data: mine } = await createAdminClient()
+      .from("badge_reactions")
+      .select("reaction")
+      .eq("badge_id", badge.id)
+      .eq("ip_hash", ipHash);
+    myReactions = [
+      ...new Set((mine ?? []).map((row) => (row as { reaction: string }).reaction)),
+    ];
+  } catch {
+    // counters are best-effort
+  }
 
   const faq = buildBadgeFaq(badge, {
     locale,
@@ -719,15 +752,19 @@ export default async function BadgeDetailPage({ params }: PageProps) {
           <TiltPedestal className="shrink-0">
             <figure className="gal-pedestal">
               <span className="gal-halo" aria-hidden="true" />
-              <span className="gal-ring" aria-hidden="true" />
-              <div className="gal-plinth">
-                <BadgeImage badge={badge} size={112} alt="" />
+              {/* Owner-validated ring treatment: the home hero's rotating
+                  rainbow emblem takes over from the flat gal-ring, floating
+                  over an empty plinth that only keeps the pedestal's height. */}
+              <div className="hero-emblem">
+                <span className="hero-emblem-halo" aria-hidden="true" />
+                <BadgeImage badge={badge} size={88} alt="" />
               </div>
+              <div className="gal-plinth" aria-hidden="true" />
               <span className="gal-plinth-shadow" aria-hidden="true" />
-              <figcaption className="gal-accession font-mono text-muted">
-                {badge.set_id} · {t("version")} {badge.version}
-              </figcaption>
             </figure>
+            <figcaption className="gal-accession font-mono text-muted">
+              {badge.set_id} · {t("version")} {badge.version}
+            </figcaption>
           </TiltPedestal>
           <div className="gal-placard card min-w-0 flex-1 p-5 text-center sm:text-start">
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
@@ -739,8 +776,17 @@ export default async function BadgeDetailPage({ params }: PageProps) {
             {badge.description && (
               <p className="mt-2 text-sm text-muted">{badge.description}</p>
             )}
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-              {actions}
+            {/* Reactions took the old button spot; copy-link + X moved to the
+                right edge of the same row. */}
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3 sm:justify-between">
+              <BadgeReactions
+                slug={badge.slug}
+                initial={reactionCounts}
+                initialActive={myReactions}
+              />
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {actions}
+              </div>
             </div>
           </div>
         </div>

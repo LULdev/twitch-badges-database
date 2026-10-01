@@ -196,6 +196,15 @@
     "membersOwn": "{count} membri della community possiedono questo badge",
     "readDropPost": "Leggi l'annuncio del drop",
     "confirmedActive": "Attività confermata",
+    "react": "Reagisci",
+    "reactions": {
+      "like": "Mi piace",
+      "love": "Amore",
+      "fire": "Fuoco",
+      "poop": "Popò",
+      "sad": "Triste",
+      "dislike": "Non mi piace"
+    },
     "ownersHeadlineShort": "Possessori in totale",
     "wearingNow": "Lo indossano ora",
     "shareOfViewers": "Percentuale di spettatori",

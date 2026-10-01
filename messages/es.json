@@ -196,6 +196,15 @@
     "membersOwn": "{count} miembros de la comunidad tienen esta insignia",
     "readDropPost": "Leer el anuncio del drop",
     "confirmedActive": "Actividad confirmada",
+    "react": "Reaccionar",
+    "reactions": {
+      "like": "Me gusta",
+      "love": "Amor",
+      "fire": "Fuego",
+      "poop": "Caca",
+      "sad": "Triste",
+      "dislike": "No me gusta"
+    },
     "ownersHeadlineShort": "Propietarios en total",
     "wearingNow": "La llevan puesta ahora",
     "shareOfViewers": "Porcentaje de espectadores",

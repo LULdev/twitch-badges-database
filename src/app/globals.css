@@ -2786,6 +2786,56 @@ html {
 }
 .gal-placard { outline: 1px solid var(--line); outline-offset: 5px; }
 
+/* Badge hero GIF reactions (the uploaded sticker set). The GIFs are square
+   stickers on black, so the chip is a circular crop with the count beside. */
+.badge-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.badge-reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem 0.25rem 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.badge-reaction:hover {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  transform: translateY(-1px);
+}
+.badge-reaction img {
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  object-fit: cover;
+  background: #000;
+  pointer-events: none;
+}
+.badge-reaction-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted, var(--foreground));
+  min-width: 1ch;
+}
+.badge-reaction-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 12px color-mix(in srgb, var(--accent) 35%, transparent);
+  animation: badge-reaction-pop 0.3s ease-out;
+}
+.badge-reaction-active .badge-reaction-count { color: var(--accent); }
+@keyframes badge-reaction-pop {
+  0% { transform: scale(0.9); }
+  55% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
 /* ==================================================================
    Blog system — premium layouts (index variants A–D + article page)
    ================================================================== */
