@@ -636,6 +636,7 @@
     "hubSubtitle": "13 款 Twitch 徽章游戏——押注 BadgesCoins，赢取 BadgesCoins，赚取 XP。",
     "recapNext": "下一份街机回顾将于 {time}（UTC）发布。",
     "recapLatest": "最新街机回顾",
+    "recapAll": "全部回顾",
     "back": "返回游戏",
     "bet": "押注",
     "betRange": "押注：{min}–{max}",
@@ -722,6 +723,7 @@
     "catcherDesc": "用篮子接住下落的徽章，避开炸弹。",
     "notEnoughBadges": "目录中的徽章还不够，暂时无法生成问答。",
     "streakDay": "第 {streak} 天",
+    "streakBonus": "每日连击奖励 +{n} XP",
     "disabled": "游戏厅目前已关闭，请稍后再来。",
     "scatter": "SCATTER!",
     "scratchFounder": "创始人",
@@ -1249,6 +1251,7 @@
       "devices": "设备",
       "browsers": "浏览器",
       "topPaths": "访问最多的页面",
+    "recapRefs": "回顾点击",
       "referrers": "来源",
       "locales": "语言",
       "privacy": "页面平均停留：{avg} 秒。统计不使用 IP 地址、Cookie 或完整来源网址。"

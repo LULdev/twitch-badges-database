@@ -636,6 +636,7 @@
     "hubSubtitle": "13 juegos de insignias de Twitch — apuesta BadgesCoins, gana BadgesCoins, consigue XP.",
     "recapNext": "El próximo resumen arcade se publica a las {time} UTC.",
     "recapLatest": "Último resumen arcade",
+    "recapAll": "Todos los resúmenes",
     "back": "Volver a los juegos",
     "bet": "Apuesta",
     "betRange": "Apuesta: {min}–{max}",
@@ -722,6 +723,7 @@
     "catcherDesc": "Atrapa insignias que caen en tu cesta, esquiva las bombas.",
     "notEnoughBadges": "Todavía no hay suficientes insignias en el catálogo para crear un cuestionario.",
     "streakDay": "Día {streak}",
+    "streakBonus": "+{n} XP de bonificación diaria",
     "disabled": "La sala de juegos está desactivada por ahora. Vuelve más tarde.",
     "scatter": "SCATTER!",
     "scratchFounder": "Fundador",
@@ -1249,6 +1251,7 @@
       "devices": "Dispositivos",
       "browsers": "Navegadores",
       "topPaths": "Páginas más vistas",
+    "recapRefs": "Clics desde resúmenes",
       "referrers": "Procedencias",
       "locales": "Idiomas",
       "privacy": "Tiempo medio en la página: {avg} s. Contado sin direcciones IP, cookies ni URL de referencia completas."

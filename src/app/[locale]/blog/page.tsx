@@ -325,6 +325,12 @@ export default async function BlogIndexPage({
   /* ---------------------------------------------------------------- */
   /* Dispatch list (full catalog, newest = highest index)              */
   /* ---------------------------------------------------------------- */
+  // Month headings computed purely by index comparison — no accumulator, per
+  // the React Compiler purity rule (the changelog Ledger's isNewMonth).
+  const monthOf = (value: string) =>
+    new Date(value).toLocaleDateString(locale, { month: "long", year: "numeric" });
+  const isNewMonth = (list: typeof posts, i: number) =>
+    i === 0 || monthOf(list[i].published_at) !== monthOf(list[i - 1].published_at);
   const dispatchList =
     posts.length === 0 ? (
       emptyState
@@ -333,6 +339,11 @@ export default async function BlogIndexPage({
         <ol>
           {posts.map((post, i) => (
             <li key={post.id}>
+              {isNewMonth(posts, i) && (
+                <div className="wire-month" role="presentation">
+                  {monthOf(post.published_at)}
+                </div>
+              )}
               <Link href={`/blog/${post.slug}`} className="wire-row">
                 <span className="wire-idx">
                   {String(posts.length - i).padStart(3, "0")}

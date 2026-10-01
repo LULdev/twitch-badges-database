@@ -636,6 +636,7 @@
     "hubSubtitle": "13 Twitch-Badge-Spiele — BadgesCoins setzen, BadgesCoins gewinnen, XP verdienen.",
     "recapNext": "Der nächste Arcade-Rückblick erscheint um {time} UTC.",
     "recapLatest": "Neuester Arcade-Rückblick",
+    "recapAll": "Alle Rückblicke",
     "back": "Zurück zur Spieleübersicht",
     "bet": "Einsatz",
     "betRange": "Einsatz: {min}–{max}",
@@ -722,6 +723,7 @@
     "catcherDesc": "Fange fallende Badges im Korb, weiche den Bomben aus.",
     "notEnoughBadges": "Es sind noch nicht genug Badges im Katalog, um ein Quiz zu erstellen.",
     "streakDay": "Tag {streak}",
+    "streakBonus": "+{n} XP Tagesstreak-Bonus",
     "disabled": "Die Spielhalle ist derzeit abgeschaltet. Bitte später noch einmal vorbeischauen.",
     "scatter": "SCATTER!",
     "scratchFounder": "Gründer",
@@ -1249,6 +1251,7 @@
       "devices": "Geräte",
       "browsers": "Browser",
       "topPaths": "Meistbesuchte Seiten",
+    "recapRefs": "Rückblick-Klicks",
       "referrers": "Verweise",
       "locales": "Sprachen",
       "privacy": "Durchschnittliche Verweildauer: {avg} s. Gezählt ohne IP-Adressen, Cookies oder vollständige Referrer-URLs."

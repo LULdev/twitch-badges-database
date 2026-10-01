@@ -175,6 +175,25 @@ export default function StatsPanel({ locale }: { locale: string }) {
 
       <Reveal>
         <div className="card p-4">
+          <h3 className="mb-2 text-sm font-bold">{t("recapRefs")}</h3>
+          {data.recapRefs.length > 0 ? (
+            <DistributionBars
+              rows={data.recapRefs.map((row) => ({
+                key: row.path,
+                label: row.path,
+                value: Number(row.hits),
+              }))}
+              locale={locale}
+              labelWidth="10rem"
+            />
+          ) : (
+            <p className="text-sm text-muted">{t("noData")}</p>
+          )}
+        </div>
+      </Reveal>
+
+      <Reveal>
+        <div className="card p-4">
           <h3 className="mb-2 text-sm font-bold">{t("locales")}</h3>
           {data.locales.length > 0 ? (
             <DistributionBars

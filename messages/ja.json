@@ -636,6 +636,7 @@
     "hubSubtitle": "Twitchバッジのゲーム13種 — BadgesCoinsを賭けてBadgesCoinsを獲得し、XPを稼ごう。",
     "recapNext": "次のアーケードまとめは{time}（UTC）に公開されます。",
     "recapLatest": "最新のアーケードまとめ",
+    "recapAll": "すべてのまとめ",
     "back": "ゲームに戻る",
     "bet": "ベット",
     "betRange": "ベット：{min}〜{max}",
@@ -722,6 +723,7 @@
     "catcherDesc": "落ちてくるバッジをカゴで受け、爆弾は避けよう。",
     "notEnoughBadges": "カタログにバッジがまだ足りないため、クイズを作成できません。",
     "streakDay": "{streak} 日目",
+    "streakBonus": "毎日ストリークボーナス +{n} XP",
     "disabled": "ゲームコーナーは現在停止中です。しばらくしてからお越しください。",
     "scatter": "SCATTER!",
     "scratchFounder": "ファウンダー",
@@ -1249,6 +1251,7 @@
       "devices": "デバイス",
       "browsers": "ブラウザ",
       "topPaths": "よく見られるページ",
+    "recapRefs": "まとめからのクリック",
       "referrers": "参照元",
       "locales": "言語",
       "privacy": "平均滞在時間: {avg} 秒。IPアドレス・Cookie・完全な参照元URLなしで計測しています。"

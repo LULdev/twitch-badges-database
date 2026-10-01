@@ -636,6 +636,7 @@
     "hubSubtitle": "13 jogos de emblemas da Twitch — aposte BadgesCoins, ganhe BadgesCoins, ganhe XP.",
     "recapNext": "O próximo resumo arcade é publicado às {time} UTC.",
     "recapLatest": "Último resumo arcade",
+    "recapAll": "Todos os resumos",
     "back": "Voltar aos jogos",
     "bet": "Aposta",
     "betRange": "Aposta: {min}–{max}",
@@ -722,6 +723,7 @@
     "catcherDesc": "Pegue emblemas que caem na sua cesta, evite as bombas.",
     "notEnoughBadges": "Ainda não há selos suficientes no catálogo para criar um quiz.",
     "streakDay": "Dia {streak}",
+    "streakBonus": "+{n} XP de bónus diário",
     "disabled": "O fliperama está desativado no momento. Volte mais tarde.",
     "scatter": "SCATTER!",
     "scratchFounder": "Fundador",
@@ -1249,6 +1251,7 @@
       "devices": "Dispositivos",
       "browsers": "Navegadores",
       "topPaths": "Páginas mais vistas",
+    "recapRefs": "Cliques dos resumos",
       "referrers": "Origens",
       "locales": "Idiomas",
       "privacy": "Tempo médio na página: {avg} s. Contado sem endereços IP, cookies ou URLs de referência completas."

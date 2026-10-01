@@ -3368,6 +3368,24 @@ html {
   font-variant-numeric: tabular-nums;
 }
 
+/* Blog dispatch list month heading (the changelog Ledger's sticky month bar,
+   without the meta span — the list itself dates every row). */
+.wire-month {
+  position: sticky;
+  top: 3.5rem;
+  z-index: 5;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface-2) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line);
+}
+
 /* Variant B — "Timeline": entries on the chron rail */
 .chron-entry {
   border-left: 2px solid var(--entry-color, var(--line));

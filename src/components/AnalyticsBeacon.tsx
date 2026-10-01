@@ -34,6 +34,14 @@ export default function AnalyticsBeacon({ locale }: { locale: string }) {
     // two rows while the old row kept the duration.
     let viewId: number | null = null;
 
+    // Attribution marker, NOT the query string: only the exact recap value is
+    // ever sent (the server allowlists it too). Reading location.search here
+    // is client-only effect code — the stored `path` stays query-free.
+    const refMatch = /\?ref=([a-z]+)/.exec(
+      typeof window === "undefined" ? "" : window.location.search,
+    );
+    const ref = refMatch?.[1] === "recap" ? "recap" : undefined;
+
     const payload = (durationS?: number) =>
       JSON.stringify({
         path,
@@ -43,6 +51,7 @@ export default function AnalyticsBeacon({ locale }: { locale: string }) {
         tzOffsetMins: new Date().getTimezoneOffset(),
         durationS,
         id: viewId ?? undefined,
+        ref,
       });
 
     const send = async (durationS?: number) => {

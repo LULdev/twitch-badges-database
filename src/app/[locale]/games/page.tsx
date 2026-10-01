@@ -129,15 +129,20 @@ export default async function GamesHubPage({
       {visible.length > 0 && (
         <div className="card flex flex-wrap items-center justify-between gap-3 p-4 text-sm text-muted">
           <span>{t("recapNext", { time: "06:00" })}</span>
-          {latestRecap && (
-            <Link
-              href={`/blog/${latestRecap.slug}`}
-              className="btn btn-secondary text-xs shrink-0"
-            >
-              {t("recapLatest")}
-              <span className="dir-arrow" aria-hidden="true">→</span>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link href="/blog?tag=arcade" className="btn btn-secondary text-xs shrink-0">
+              {t("recapAll")}
             </Link>
-          )}
+            {latestRecap && (
+              <Link
+                href={`/blog/${latestRecap.slug}`}
+                className="btn btn-secondary text-xs shrink-0"
+              >
+                {t("recapLatest")}
+                <span className="dir-arrow" aria-hidden="true">→</span>
+              </Link>
+            )}
+          </div>
         </div>
       )}
 

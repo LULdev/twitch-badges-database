@@ -27,6 +27,10 @@ export interface EconomySettings {
   /** XP for a won and a lost game round. */
   gameWinXp: number;
   gameLoseXp: number;
+  /** Daily game-activity streak bonus (own ceiling, outside the 100 XP
+   *  game cap — mirroring the daily-claim streak bonus). */
+  gameStreakXpPerDay: number;
+  gameStreakXpCap: number;
   /** Coins a visitor's coin rain gifts the profile owner. */
   coinRainCoins: number;
   /** Fallback steal settings for members who never configured their own. */
@@ -46,6 +50,8 @@ export const ECONOMY_DEFAULTS: EconomySettings = {
   streakCoinsCap: 250,
   gameWinXp: 10,
   gameLoseXp: 2,
+  gameStreakXpPerDay: 5,
+  gameStreakXpCap: 50,
   coinRainCoins: 1,
   stealPrice: 100,
   stealMax: 250,

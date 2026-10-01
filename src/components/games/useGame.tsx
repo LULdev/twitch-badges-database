@@ -172,10 +172,12 @@ export function GameError({ error }: { error: string | null }) {
 export function RoundOutcome({ last }: { last: PlayResponse | null }) {
   const t = useTranslations("games");
   if (!last) return null;
+  const streakBonus =
+    typeof last.result.streakBonusXp === "number" ? last.result.streakBonusXp : 0;
   return (
     <p
       role="status"
-      className={`flex items-center justify-center gap-2 rounded-[var(--radius-input)] px-4 py-2 text-sm font-semibold ${
+      className={`flex flex-wrap items-center justify-center gap-2 rounded-[var(--radius-input)] px-4 py-2 text-sm font-semibold ${
         last.won
           ? "border border-success/40 bg-success/10 text-success"
           : "border border-line bg-surface-2 text-muted"
@@ -186,6 +188,11 @@ export function RoundOutcome({ last }: { last: PlayResponse | null }) {
         <span className="inline-flex items-center gap-1 tabular-nums">
           +{last.payout}
           <Coin size={12} />
+        </span>
+      ) : null}
+      {streakBonus > 0 ? (
+        <span className="inline-flex items-center gap-1 text-xs text-accent tabular-nums">
+          {t("streakBonus", { n: streakBonus })}
         </span>
       ) : null}
     </p>

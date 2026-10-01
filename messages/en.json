@@ -636,6 +636,7 @@
     "hubSubtitle": "13 Twitch-badge games — bet BadgesCoins, win BadgesCoins, earn XP.",
     "recapNext": "The next arcade recap publishes at {time} UTC.",
     "recapLatest": "Latest arcade recap",
+    "recapAll": "All recaps",
     "back": "Back to games",
     "bet": "Bet",
     "betRange": "Bet: {min}–{max}",
@@ -722,6 +723,7 @@
     "catcherDesc": "Catch falling badges in your basket, dodge the bombs.",
     "notEnoughBadges": "There are not enough badges in the catalog to build a quiz yet.",
     "streakDay": "Day {streak}",
+    "streakBonus": "+{n} XP daily streak bonus",
     "disabled": "The arcade is currently switched off. Please check back later.",
     "scatter": "SCATTER!",
     "scratchFounder": "Founder",
@@ -1249,6 +1251,7 @@
       "devices": "Devices",
       "browsers": "Browsers",
       "topPaths": "Most visited pages",
+    "recapRefs": "Recap click-throughs",
       "referrers": "Referrers",
       "locales": "Languages",
       "privacy": "Average time on page: {avg} s. Counted without IP addresses, cookies or full referrer URLs."

@@ -54,6 +54,7 @@ export interface AnalyticsBundle {
   referrers: Array<{ referrer_host: string; hits: number }>;
   clients: AnalyticsClientRow[];
   locales: Array<{ locale: string; hits: number }>;
+  recapRefs: Array<{ path: string; hits: number }>;
 }
 
 const EMPTY_SUMMARY: AnalyticsSummary = {
@@ -85,7 +86,7 @@ export async function getAnalytics(): Promise<AnalyticsBundle> {
     }
   };
 
-  const [summary, daily, paths, referrers, clients, locales] = await Promise.all([
+  const [summary, daily, paths, referrers, clients, locales, recapRefs] = await Promise.all([
     safe<AnalyticsSummary | null>(
       () => supabase.from("stats_analytics_summary").select("*").maybeSingle(),
       null,
@@ -104,6 +105,10 @@ export async function getAnalytics(): Promise<AnalyticsBundle> {
       () => supabase.from("stats_analytics_locales").select("*"),
       [],
     ),
+    safe<Array<{ path: string; hits: number }>>(
+      () => supabase.from("stats_analytics_recap_refs").select("*"),
+      [],
+    ),
   ]);
 
   return {
@@ -113,6 +118,7 @@ export async function getAnalytics(): Promise<AnalyticsBundle> {
     referrers,
     clients,
     locales,
+    recapRefs,
   };
 }
 

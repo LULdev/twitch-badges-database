@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { award, bumpCoins, getProgress } from "./xp";
+import { award, bumpCoins, getProgress, logActivity } from "./xp";
 import { evaluateAchievements } from "./achievements";
 import { getEconomy, getFeatures, getGames } from "@/lib/settings";
 import { after } from "next/server";
@@ -299,6 +299,45 @@ export async function playGame(
     payload: { game: gameId, bet, payout },
   });
 
+  // Daily game-activity streak (migration 0047): the compare-and-set gate only
+  // advances on the day's FIRST settled round (-1 sentinel afterwards), runs
+  // strictly after the void paths so it never advances for a deleted round,
+  // and the bonus sits OUTSIDE the 100 XP game cap by design — mirroring the
+  // daily-claim streak bonus, with its own admin-editable ceiling. A bonus
+  // failure must never fail the round: streak advanced, next visit retries.
+  let streakBonusXp = 0;
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const { data: streak, error } = await supabase.rpc("game_streak_gate", {
+      p_user_id: userId,
+      p_today: today,
+    });
+    if (!error && typeof streak === "number" && streak > 0) {
+      const bonus = Math.min(
+        economy.gameStreakXpCap,
+        (streak - 1) * economy.gameStreakXpPerDay,
+      );
+      if (bonus > 0) {
+        const applied = await supabase.rpc("apply_xp_coins", {
+          p_user_id: userId,
+          p_xp: bonus,
+          p_coins: 0,
+        });
+        if (applied.error) throw applied.error;
+        streakBonusXp = bonus;
+        logActivity({
+          userId,
+          kind: "game",
+          title: `extended their game streak to day ${streak}`,
+          xpAmount: bonus,
+          payload: { game: gameId, streak },
+        }).catch(() => undefined);
+      }
+    }
+  } catch {
+    // streak bookkeeping is best-effort; the round itself is already settled
+  }
+
   // The achievement pass re-reads the whole player (17 aggregate queries, 8 of
   // them paged) and wrote nothing this round needs. It is handed to `after` so
   // the platform finishes it once the response is flushed, instead of holding
@@ -311,7 +350,7 @@ export async function playGame(
     payout,
     won,
     balance: awardResult.coins,
-    result,
+    result: streakBonusXp > 0 ? { ...result, streakBonusXp } : result,
   };
 }
 

@@ -233,14 +233,14 @@ export function buildArcadeHighlightsArticle(input: ArcadeHighlightsInput): {
     lines.push(
       "## Most played game",
       "",
-      `**[${top.game}](/en/games/${top.id})** drew the crowd with **${top.rounds.toLocaleString("en-US")} ${top.rounds === 1 ? "round" : "rounds"}**.`,
+      `**[${top.game}](/en/games/${top.id}?ref=recap)** drew the crowd with **${top.rounds.toLocaleString("en-US")} ${top.rounds === 1 ? "round" : "rounds"}**.`,
       runnerUp
-        ? `[${runnerUp.game}](/en/games/${runnerUp.id}) followed at ${runnerUp.rounds.toLocaleString("en-US")} rounds — a gap of ${(top.rounds - runnerUp.rounds).toLocaleString("en-US")} between first and second place.`
+        ? `[${runnerUp.game}](/en/games/${runnerUp.id}?ref=recap) followed at ${runnerUp.rounds.toLocaleString("en-US")} rounds — a gap of ${(top.rounds - runnerUp.rounds).toLocaleString("en-US")} between first and second place.`
         : "No other table saw action, making it a clean sweep for the day.",
       "",
       "The full board:",
       "",
-      ...sorted.map((g) => `- [${g.game}](/en/games/${g.id}): ${g.rounds.toLocaleString("en-US")} ${g.rounds === 1 ? "round" : "rounds"}`),
+      ...sorted.map((g) => `- [${g.game}](/en/games/${g.id}?ref=recap): ${g.rounds.toLocaleString("en-US")} ${g.rounds === 1 ? "round" : "rounds"}`),
       "",
     );
   }
@@ -251,8 +251,8 @@ export function buildArcadeHighlightsArticle(input: ArcadeHighlightsInput): {
       "## Biggest win of the day",
       "",
       input.biggestWin.username
-        ? `**${input.biggestWin.username}** took the day's largest payout on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id})** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`
-        : `The day's largest payout landed on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id})** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`,
+        ? `**${input.biggestWin.username}** took the day's largest payout on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id}?ref=recap)** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`
+        : `The day's largest payout landed on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id}?ref=recap)** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`,
       "",
       "Wins like this feed straight into XP, levels and the achievement catalog — the same ledger that the [live activity feed](/en/feed) shows in real time.",
       "",
@@ -315,12 +315,12 @@ export function buildArcadeWeeklyArticle(
     lines.push(
       "## Game of the week",
       "",
-      `**[${top.game}](/en/games/${top.id})** carried the week with **${top.rounds.toLocaleString("en-US")} ${top.rounds === 1 ? "round" : "rounds"}**.`,
+      `**[${top.game}](/en/games/${top.id}?ref=recap)** carried the week with **${top.rounds.toLocaleString("en-US")} ${top.rounds === 1 ? "round" : "rounds"}**.`,
       "",
       "The full weekly board:",
       "",
       ...sorted.map(
-        (g) => `- [${g.game}](/en/games/${g.id}): ${g.rounds.toLocaleString("en-US")} ${g.rounds === 1 ? "round" : "rounds"}`,
+        (g) => `- [${g.game}](/en/games/${g.id}?ref=recap): ${g.rounds.toLocaleString("en-US")} ${g.rounds === 1 ? "round" : "rounds"}`,
       ),
       "",
     );
@@ -332,8 +332,8 @@ export function buildArcadeWeeklyArticle(
       "## Biggest win of the week",
       "",
       input.biggestWin.username
-        ? `**${input.biggestWin.username}** landed the week's largest payout on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id})** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`
-        : `The week's largest payout landed on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id})** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`,
+        ? `**${input.biggestWin.username}** landed the week's largest payout on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id}?ref=recap)** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`
+        : `The week's largest payout landed on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id}?ref=recap)** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`,
       "",
       "Every payout flows into XP, levels and the achievement catalog — the same ledger behind the [live activity feed](/en/feed).",
       "",

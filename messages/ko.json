@@ -636,6 +636,7 @@
     "hubSubtitle": "Twitch 배지 게임 13종 — BadgesCoins를 걸고 BadgesCoins를 따고 XP를 획득하세요.",
     "recapNext": "다음 아케이드 요약은 {time}(UTC)에 게시됩니다.",
     "recapLatest": "최신 아케이드 요약",
+    "recapAll": "모든 요약",
     "back": "게임으로 돌아가기",
     "bet": "베팅",
     "betRange": "베팅: {min}~{max}",
@@ -722,6 +723,7 @@
     "catcherDesc": "떨어지는 배지를 바구니로 받고 폭탄은 피하세요.",
     "notEnoughBadges": "카탈로그에 배지가 아직 충분하지 않아 퀴즈를 만들 수 없습니다.",
     "streakDay": "{streak}일차",
+    "streakBonus": "매일 스트릭 보너스 +{n} XP",
     "disabled": "게임장이 현재 꺼져 있습니다. 나중에 다시 방문해 주세요.",
     "scatter": "SCATTER!",
     "scratchFounder": "파운더",
@@ -1249,6 +1251,7 @@
       "devices": "기기",
       "browsers": "브라우저",
       "topPaths": "가장 많이 본 페이지",
+    "recapRefs": "요약 클릭",
       "referrers": "유입 경로",
       "locales": "언어",
       "privacy": "페이지 평균 체류: {avg}초. IP 주소, 쿠키, 전체 참조 URL 없이 집계합니다."

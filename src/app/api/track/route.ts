@@ -43,6 +43,8 @@ export async function POST(request: Request) {
       durationS?: number;
       /** The row this page view created on mount, for the duration update. */
       id?: number;
+      /** Allowlisted attribution marker ("recap"), never a raw query string. */
+      ref?: string;
     } | null;
 
     // A beacon without a path is not a page view. Accepting it wrote a "/" row
@@ -95,6 +97,11 @@ export async function POST(request: Request) {
           : rawDuration > MAX_DURATION_S
             ? null
             : Math.trunc(rawDuration);
+
+    // Attribution marker, allowlisted twice (the beacon only ever sends
+    // "recap", the CHECK constraint in 0046 only ever accepts ''/'recap').
+    // Deliberately NOT the raw query string — that stays privacy-stripped.
+    const ref = body?.ref === "recap" ? "recap" : "";
 
     // A duration beacon carries the id of the row its own page view created on
     // mount, so the visit is UPDATED instead of inserting a second row. The old
@@ -166,6 +173,7 @@ export async function POST(request: Request) {
         screen_w: dnt ? null : clamp(body?.screenW, 0, 10000),
         tz_offset_mins: dnt ? null : clamp(body?.tzOffsetMins, -1440, 1440),
         duration_s: durationS,
+        ref,
       })
       .select("id")
       .maybeSingle();

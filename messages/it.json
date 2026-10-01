@@ -636,6 +636,7 @@
     "hubSubtitle": "13 giochi di badge Twitch — punta BadgesCoins, vinci BadgesCoins, guadagna XP.",
     "recapNext": "Il prossimo recap arcade viene pubblicato alle {time} UTC.",
     "recapLatest": "Ultimo recap arcade",
+    "recapAll": "Tutti i recap",
     "back": "Torna ai giochi",
     "bet": "Puntata",
     "betRange": "Puntata: {min}–{max}",
@@ -722,6 +723,7 @@
     "catcherDesc": "Cattura i badge che cadono nel cesto, evita le bombe.",
     "notEnoughBadges": "Non ci sono ancora abbastanza badge nel catalogo per creare un quiz.",
     "streakDay": "Giorno {streak}",
+    "streakBonus": "+{n} XP bonus giornaliero",
     "disabled": "La sala giochi è al momento disattivata. Torna più tardi.",
     "scatter": "SCATTER!",
     "scratchFounder": "Fondatore",
@@ -1249,6 +1251,7 @@
       "devices": "Dispositivi",
       "browsers": "Browser",
       "topPaths": "Pagine più viste",
+    "recapRefs": "Clic dai recap",
       "referrers": "Provenienze",
       "locales": "Lingue",
       "privacy": "Tempo medio sulla pagina: {avg} s. Contato senza indirizzi IP, cookie o URL di provenienza completi."
