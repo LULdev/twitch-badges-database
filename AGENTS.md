@@ -107,11 +107,17 @@ feed are generated from that table, so an undocumented change is invisible.
   machine with little free RAM the worker dies with exit code 134 /
   3221226505 and no readable error. Close the dev server, free memory and
   re-run; `NODE_OPTIONS=--max-old-space-size=4096` helps.
-- **i18n keys must exist before the page renders**: next-intl throws
-  `MISSING_MESSAGE` for unknown keys, and a page that builds keys dynamically
-  (see `FAQ_KEYS` in `[locale]/faq/page.tsx`) fails silently per locale. After
-  touching messages, check the build log for `MISSING_MESSAGE` — the build
-  still succeeds, so nothing else will warn you.
+- **i18n keys must exist, and client namespaces must ship**: next-intl 4.x
+  NEVER throws `MISSING_MESSAGE` — it console.errors and renders the raw key
+  path, and dynamic pages (the `[locale]` layout reads cookies) never render
+  during `next build`, so log-scraping is blind. Two failure classes, both
+  caught by `npm run i18n:check` (`scripts/i18n-check.ts`, chained into
+  `npm run build`, exits non-zero): missing keys per locale, and — the
+  BadgeReactions bug — a `useTranslations("ns")` in a client component whose
+  namespace is not in `CLIENT_NAMESPACES` (`[locale]/layout.tsx` ships only a
+  subset to keep RSC payloads small; server `getTranslations` reads the full
+  catalog, which is why the page still renders). Dynamic keys
+  (`t(map[k])`, template literals) stay warn-only in the script.
 - `useSearchParams()` must sit inside a `<Suspense>` boundary or prerendering
   fails (see `[locale]/auth/callback/page.tsx`).
 - **satori OG images** (`/api/og/profile`): every div with >1 child needs an

@@ -113,14 +113,16 @@ export default async function LocaleLayout({
   // messages prop the provider serializes the entire catalog (58–86 KB per
   // locale) into every RSC payload — on every navigation and router.refresh().
   // Server components are unaffected: they read via getTranslations on the
-  // server. Keep this list in sync with the useTranslations("…") namespaces in
-  // client components (grep it when adding one).
+  // server. Keeping this list in sync is enforced by `npm run i18n:check`
+  // (scripts/i18n-check.ts), which fails the build when a client component
+  // asks for a namespace this subset does not ship — next-intl then renders
+  // raw key paths and only console.errors, so nothing else warns.
   const allMessages = (await getMessages()) as Record<string, unknown>;
   const CLIENT_NAMESPACES = [
     "nav", "common", "footer", "login", "errors", "account", "profile",
     "customizer", "inventory", "notifications", "feed", "blog", "compare",
     "countdown", "rarity", "roles", "stats", "wheel", "steal", "games",
-    "admin",
+    "admin", "badges",
   ];
   const clientMessages = Object.fromEntries(
     CLIENT_NAMESPACES.filter((ns) => ns in allMessages).map((ns) => [ns, allMessages[ns]]),
