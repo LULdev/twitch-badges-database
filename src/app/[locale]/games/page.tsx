@@ -47,11 +47,13 @@ export default async function GamesHubPage({
   const userId = await authUserId();
   let level: ReturnType<typeof levelFromXp> | null = null;
   let coins = 0;
+  let gameStreak = 0;
   if (userId) {
     const progress = await getProgress(userId).catch(() => null);
     if (progress) {
       level = levelFromXp(progress.xp);
       coins = progress.coins;
+      gameStreak = progress.game_streak;
     }
   }
 
@@ -112,7 +114,7 @@ export default async function GamesHubPage({
                 />
               </div>
               <p className="mt-1.5 text-xs text-muted tabular-nums">
-                {t("level")} {level.level} · {level.xpIntoLevel}/{level.xpForNext || "∞"} XP · <span className="inline-flex items-center gap-1">{coins.toLocaleString(locale)} <Coin size={13} /></span>
+                {t("level")} {level.level} · {level.xpIntoLevel}/{level.xpForNext || "∞"} XP · <span className="inline-flex items-center gap-1">{coins.toLocaleString(locale)} <Coin size={13} /></span>{gameStreak > 0 && <> · {t("gameStreak", { n: gameStreak })}</>}
               </p>
             </div>
           )}

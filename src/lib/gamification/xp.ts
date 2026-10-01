@@ -22,6 +22,10 @@ export interface ProgressRow {
   game_xp_today: number;
   game_xp_day: string | null;
   achievements_points: number;
+  /** Daily game-activity streak (0047) — owned by game_streak_gate. */
+  game_streak: number;
+  best_game_streak: number;
+  game_streak_last: string | null;
 }
 
 export type FeedKind =
@@ -234,6 +238,9 @@ export async function getProgress(userId: string): Promise<ProgressRow> {
     game_xp_today: 0,
     game_xp_day: null,
     achievements_points: 0,
+    game_streak: 0,
+    best_game_streak: 0,
+    game_streak_last: null,
   }) as ProgressRow;
 }
 
@@ -405,6 +412,9 @@ export async function award(
     best_login_streak: _bestStreak,
     last_login_date: _lastLogin,
     last_wheel_date: _lastWheel,
+    game_streak: _gameStreak,
+    best_game_streak: _bestGameStreak,
+    game_streak_last: _gameStreakLast,
     ...rest
   } = current;
   void _xp;
@@ -424,6 +434,9 @@ export async function award(
   void _bestStreak;
   void _lastLogin;
   void _lastWheel;
+  void _gameStreak;
+  void _bestGameStreak;
+  void _gameStreakLast;
 
   const patch: Record<string, unknown> = {
     ...rest,

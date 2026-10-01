@@ -219,6 +219,7 @@ export interface PlatformStats {
     availabilityAll: number | null;
     lastHeartbeat: string | null;
     status: ServiceStatus;
+    recapClicks7d: number | null;
   };
 }
 
@@ -481,6 +482,7 @@ export async function getPlatformStats(): Promise<PlatformStats> {
       availabilityAll: availability(sum("ok_total"), sum("checks_total")),
       lastHeartbeat,
       status: serviceStatus(sources),
+      recapClicks7d: null,
     },
   };
 }
@@ -504,10 +506,11 @@ export async function getUptimeSnapshot(): Promise<PlatformStats["uptime"]> {
     }
   };
 
-  const [uptimeSources, uptimeDaily, uptimeHourly] = await Promise.all([
+  const [uptimeSources, uptimeDaily, uptimeHourly, recapWeek] = await Promise.all([
     safe(() => supabase.from("stats_uptime_sources").select("*"), []),
     safe(() => supabase.from("stats_uptime_daily").select("*"), []),
     safe(() => supabase.from("stats_uptime_hourly").select("*"), []),
+    safe(() => supabase.from("stats_analytics_recap_week").select("clicks_7d").maybeSingle(), null),
   ]);
 
   const sources = (uptimeSources as UptimeSource[]).map((row) => ({
@@ -561,6 +564,8 @@ export async function getUptimeSnapshot(): Promise<PlatformStats["uptime"]> {
     availabilityAll: availability(sum("ok_total"), sum("checks_total")),
     lastHeartbeat,
     status: serviceStatus(sources),
+    recapClicks7d:
+      (recapWeek as { clicks_7d?: number } | null)?.clicks_7d ?? null,
   };
 }
 

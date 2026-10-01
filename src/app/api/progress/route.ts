@@ -22,6 +22,8 @@ export async function GET() {
     // LevelInfo object, so a consumer reading `level` would render an object.
     level: levelFromXp(progress.xp).level,
     loginStreak: progress.login_streak,
+      gameStreak: progress.game_streak,
+      bestGameStreak: progress.best_game_streak,
     // Lets the wheel show its used state on load instead of offering a button
     // that can only answer "already spun today".
     wheelSpunToday:

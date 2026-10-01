@@ -674,6 +674,9 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
         <div className="bl-kpi"><b>{pipelineSources(uptime?.sources ?? []).reduce((n, s) => n + s.checks_24h, 0).toLocaleString(locale)}</b><span>{t("checks24h")}</span></div>
         <div className="bl-kpi"><b className="text-sm">{relTime(uptime?.lastHeartbeat ?? null)}</b><span>{t("heartbeat")}</span></div>
       </section>
+      {uptime?.recapClicks7d != null && (
+        <p className="text-xs text-muted">{t("recapImpact", { n: uptime.recapClicks7d.toLocaleString(locale) })}</p>
+      )}
       <section className="grid gap-4 md:grid-cols-3" aria-label={t("sources")}>
         {engines.map((engine) => {
           const src = bySource.get(engine);

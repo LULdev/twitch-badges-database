@@ -21,6 +21,7 @@ export interface AchStats {
     coins_won: number; coins_lost: number; wheel_spins: number;
     steals_successful: number; steals_failed: number; times_robbed: number;
     game_xp_today: number; achievements_points: number;
+    best_game_streak: number;
   };
   badgesOwned: number;
   activeOwned: number;
@@ -104,6 +105,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   COMMON("c_daily_1", "First Steps", "Claim your first daily login bonus.", (s) => s.dailyCount >= 1),
   COMMON("c_daily_7", "Regular", "7-day login streak.", (s) => s.progress.best_login_streak >= 7),
   COMMON("c_daily_30", "Creature of Habit", "30-day login streak.", (s) => s.progress.best_login_streak >= 30, 300, 300),
+  COMMON("c_streak_7", "Warm-Up Streak", "Play at least one game 7 days in a row.", (s) => s.progress.best_game_streak >= 7),
+  COMMON("c_streak_30", "Grindstone", "Play at least one game 30 days in a row.", (s) => s.progress.best_game_streak >= 30, 300, 300),
   COMMON("c_sync_first", "Collector Born", "Sync your Twitch badges once.", (s) => s.badgesOwned >= 1),
   COMMON("c_badges_10", "Ten Badges", "Own 10 catalog badges.", (s) => s.badgesOwned >= 10),
   COMMON("c_badges_50", "Fifty Badges", "Own 50 catalog badges.", (s) => s.badgesOwned >= 50, 200, 200),
@@ -262,6 +265,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   SPECIAL("s_level_42", "Answer to Everything", "Reach level 42.", (s) => s.progress.level >= 42, 420, 420),
   SPECIAL("s_level_69", "Nice", "Reach level 69.", (s) => s.progress.level >= 69, 690, 690),
   SPECIAL("s_daily_cap", "Cap Crasher", "Hit the 100 XP daily game cap.", (s) => s.progress.game_xp_today >= 100),
+  SPECIAL("s_streak_100", "Centurion of Days", "Keep a 100-day game streak alive.", (s) => s.progress.best_game_streak >= 100),
   SPECIAL("s_wheel_misfortune", "Wheel of Misfortune", "Spin 20 times without ever winning more than 100 XP.", (s) => s.progress.wheel_spins >= 20 && s.wheelBest <= 100, 300, 300),
   SPECIAL("s_sniper", "Sniper", "Steal 200+ coins in a single successful heist.", (s) => s.bestStealAmount >= 200),
   SPECIAL("s_slots_jackpot", "Ra's Jackpot", "Win 5,000+ coins in a single Badges of Ra spin.", (s) => s.recentResults.some((r) => r.game === "slots" && r.payout >= 5000)),
@@ -775,7 +779,7 @@ async function buildStats(userId: string): Promise<AchStats> {
   return {
     progress: {
       xp: progress.xp, coins: progress.coins, level: progress.level,
-      login_streak: progress.login_streak, best_login_streak: progress.best_login_streak,
+      login_streak: progress.login_streak, best_login_streak: progress.best_login_streak, best_game_streak: progress.best_game_streak,
       games_played: progress.games_played, games_won: progress.games_won,
       coins_won: progress.coins_won, coins_lost: progress.coins_lost,
       wheel_spins: progress.wheel_spins, steals_successful: progress.steals_successful,

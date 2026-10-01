@@ -604,6 +604,20 @@ export default async function ProfilePage({ params }: PageProps) {
               <dt className="stat-label">{t("communityPoints")}</dt>
             </div>
           )}
+          {/* Game-activity streak (0047): never publish zeros for a member
+              who has not played yet. Best streak survives lost days. */}
+          {progress && (progress.game_streak > 0 || progress.best_game_streak > 0) && (
+            <>
+              <div className="card stat-tile">
+                <dd className="stat-value">{progress.game_streak}</dd>
+                <dt className="stat-label">{t("gameStreak")}</dt>
+              </div>
+              <div className="card stat-tile">
+                <dd className="stat-value">{progress.best_game_streak}</dd>
+                <dt className="stat-label">{t("gameStreakBest")}</dt>
+              </div>
+            </>
+          )}
         </section>
       )}
 
