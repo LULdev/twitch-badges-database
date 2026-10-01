@@ -113,7 +113,7 @@
     "heroF2Title": "Índice de raridade TBRI",
     "heroF2Desc": "Uma pontuação de 0 a 100 baseada em escassez, adoção e momento — saiba quais emblemas são realmente raros antes de resgatá-los.",
     "heroF3Title": "Jogue enquanto coleciona",
-    "heroF3Desc": "13 jogos de fliperama, XP, níveis, moedas e 128 conquistas — mais uma roleta diária com um jackpot de Twitch Turbo com chances reais de 1 em 100.000.000.",
+    "heroF3Desc": "13 jogos de fliperama, XP, níveis, moedas e 130 conquistas — mais uma roleta diária com um jackpot de Twitch Turbo com chances reais de 1 em 100.000.000.",
     "heroF4Title": "Seu perfil de coleção",
     "heroF4Desc": "Entre com a Twitch para sincronizar os emblemas que já possui, montar uma vitrine e subir nos rankings mundiais — em 11 idiomas."
   },
@@ -295,6 +295,12 @@
     "itemShelf": "Prateleira de itens",
     "freezeName": "Congelamento de sequência",
     "freezeExplain": "Um congelamento pausa a sua sequência de jogos por um dia perdido em vez de reiniciá-la. Começa com 2 ao ligar-se ao Twitch e ganha mais um a cada 7 dias de sequência (7, 14, 21…). Gasta-se um por dia compensado — nesse dia a sequência não cresce nem diminui.",
+    "freezeHistory": "Protegeste a tua sequência em {dates}",
+    "guardianProgress": "Ice Guardian {n}/5",
+    "buyFreeze": "Comprar um congelamento de sequência",
+    "buyDone": "Comprado!",
+    "buyCapped": "Já tens o máximo de {max} congelamentos de sequência.",
+    "buyInsufficient": "Não tens BadgesCoins suficientes — um congelamento de sequência custa {price}.",
     "inventoryHidden": "Este colecionador mantém o inventário privado.",
     "lastSync": "Última sincronização",
     "latestVisitors": "Últimas visitas",
@@ -774,6 +780,7 @@
     "steal": "Roubo",
     "steal_defended": "Defendido",
     "level_up": "Subiu de nível",
+    "streak_freeze": "Congelamento de sequência",
     "turbo_win": "Jackpot Turbo",
     "coin_rain": "Chuva de BadgesCoins",
     "profile": "Perfil",
@@ -1220,7 +1227,8 @@
         "stealPrice": "Preço de roubo padrão",
         "stealMax": "Roubo máximo padrão",
         "stealFloodMinutes": "Espera entre roubos (minutos)",
-        "stealPerHour": "Tentativas de roubo por hora"
+        "stealPerHour": "Tentativas de roubo por hora",
+        "freezePrice": "Preço do congelamento"
       },
       "games": {
         "title": "Jogos",
@@ -1431,6 +1439,7 @@
     "downTitle": "Falha em andamento",
     "heartbeat": "Último heartbeat",
     "recapImpact": "Os artigos de resumo geraram {n} cliques esta semana",
+    "freezeLine": "Congelamentos de sequência em circulação: {circulation} — {saves} sequências salvas esta semana",
     "sources": "Serviços",
     "lastRun": "Última execução",
     "duration": "Duração",

@@ -113,7 +113,7 @@
     "heroF2Title": "TBRI 稀有度指数",
     "heroF2Desc": "基于稀缺度、持有量和涨势的 0–100 评分——在领取之前就知道哪些徽章真正稀有。",
     "heroF3Title": "边收集边玩",
-    "heroF3Desc": "13 款街机游戏、XP、等级、硬币和 128 个成就——还有每日幸运转盘，Twitch Turbo 大奖真实概率为亿分之一。",
+    "heroF3Desc": "13 款街机游戏、XP、等级、硬币和 130 个成就——还有每日幸运转盘，Twitch Turbo 大奖真实概率为亿分之一。",
     "heroF4Title": "你的收藏主页",
     "heroF4Desc": "使用 Twitch 登录，同步你已有的徽章、搭建展示柜并在全球排行榜上攀升——支持 11 种语言。"
   },
@@ -295,6 +295,12 @@
     "itemShelf": "物品架",
     "freezeName": "连击冻结",
     "freezeExplain": "连击冻结在你漏掉一天时暂停游戏连击，而不是让它清零。连接 Twitch 即获赠 2 个，每连续 7 天再得一个（7、14、21…）。每补上一天消耗一个——当天连击既不增长也不缩短。",
+    "freezeHistory": "已于 {dates} 保护了你的连击",
+    "guardianProgress": "Ice Guardian {n}/5",
+    "buyFreeze": "购买连击冻结",
+    "buyDone": "已购买！",
+    "buyCapped": "你已持有上限 {max} 个连击冻结。",
+    "buyInsufficient": "BadgesCoins 不足 — 一个连击冻结需要 {price}。",
     "inventoryHidden": "该收藏家的收藏已设为私密。",
     "lastSync": "上次同步",
     "latestVisitors": "最近访客",
@@ -774,6 +780,7 @@
     "steal": "偷取",
     "steal_defended": "防守成功",
     "level_up": "升级",
+    "streak_freeze": "连击冻结",
     "turbo_win": "Turbo 头奖",
     "coin_rain": "BadgesCoins 雨",
     "profile": "主页",
@@ -1220,7 +1227,8 @@
         "stealPrice": "默认偷取价格",
         "stealMax": "默认偷取上限",
         "stealFloodMinutes": "偷取等待（分钟）",
-        "stealPerHour": "每小时偷取次数"
+        "stealPerHour": "每小时偷取次数",
+        "freezePrice": "冻结价格"
       },
       "games": {
         "title": "游戏",
@@ -1431,6 +1439,7 @@
     "downTitle": "正在故障",
     "heartbeat": "最后心跳",
     "recapImpact": "回顾文章本周带来 {n} 次点击",
+    "freezeLine": "流通中的连击冻结：{circulation} 个——本周保住 {saves} 个连击",
     "sources": "服务",
     "lastRun": "上次运行",
     "duration": "耗时",

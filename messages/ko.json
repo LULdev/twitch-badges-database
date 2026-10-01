@@ -113,7 +113,7 @@
     "heroF2Title": "TBRI 희귀도 지수",
     "heroF2Desc": "희소성, 보유량, 추세로 계산한 0~100 점수 — 받기 전에 어떤 배지가 진짜 희귀한지 알 수 있습니다.",
     "heroF3Title": "수집하며 플레이",
-    "heroF3Desc": "13개의 아케이드 게임, XP, 레벨, 코인, 128개 업적 — 매일 돌리는 룰렛에는 1억 분의 1의 실제 확률로 Twitch Turbo 잭팟이.",
+    "heroF3Desc": "13개의 아케이드 게임, XP, 레벨, 코인, 130개 업적 — 매일 돌리는 룰렛에는 1억 분의 1의 실제 확률로 Twitch Turbo 잭팟이.",
     "heroF4Title": "나의 컬렉션 프로필",
     "heroF4Desc": "Twitch로 로그인하면 보유 배지가 동기화되고, 쇼케이스를 꾸미고, 세계 랭킹을 오를 수 있습니다 — 11개 언어 지원."
   },
@@ -295,6 +295,12 @@
     "itemShelf": "아이템 선반",
     "freezeName": "스트릭 프리즈",
     "freezeExplain": "스트릭 프리즈는 놓친 하루 동안 게임 연속 기록을 일시 정지시켜 초기화를 막습니다. Twitch 연결 시 2개를 받고, 7일 연속 기록마다(7, 14, 21…) 1개를 더 얻습니다. 메운 하루마다 1개가 사용되며 그날의 기록은 늘지도 줄지도 않습니다.",
+    "freezeHistory": "{dates}에 스트릭을 보호했습니다",
+    "guardianProgress": "Ice Guardian {n}/5",
+    "buyFreeze": "스트릭 프리즈 구매",
+    "buyDone": "구매 완료!",
+    "buyCapped": "이미 최대 {max}개의 스트릭 프리즈를 보유하고 있습니다.",
+    "buyInsufficient": "BadgesCoins가 부족합니다 — 스트릭 프리즈는 {price}개가 필요합니다.",
     "inventoryHidden": "이 수집가는 인벤토리를 비공개로 유지합니다.",
     "lastSync": "마지막 동기화",
     "latestVisitors": "최근 방문자",
@@ -774,6 +780,7 @@
     "steal": "강탈",
     "steal_defended": "방어 성공",
     "level_up": "레벨 업",
+    "streak_freeze": "스트릭 프리즈",
     "turbo_win": "Turbo 잭팟",
     "coin_rain": "BadgesCoins 비",
     "profile": "프로필",
@@ -1220,7 +1227,8 @@
         "stealPrice": "기본 훔치기 가격",
         "stealMax": "기본 훔치기 최대",
         "stealFloodMinutes": "훔치기 대기(분)",
-        "stealPerHour": "시간당 훔치기 횟수"
+        "stealPerHour": "시간당 훔치기 횟수",
+        "freezePrice": "프리즈 가격"
       },
       "games": {
         "title": "게임",
@@ -1431,6 +1439,7 @@
     "downTitle": "장애 진행 중",
     "heartbeat": "마지막 신호",
     "recapImpact": "요약 아티클이 이번 주에 {n}회 클릭을 유도했습니다",
+    "freezeLine": "스트릭 프리즈 {circulation}개 유통 중 — 이번 주에 {saves}개의 스트릭을 보호했습니다",
     "sources": "서비스",
     "lastRun": "마지막 실행",
     "duration": "소요 시간",

@@ -29,6 +29,7 @@ const KIND_COLORS: Record<string, string> = {
   level_up: "#a970ff",
   turbo_win: "#fbbf24",
   coin_rain: "var(--info)",
+  streak_freeze: "#38bdf8",
 };
 
 /** Public live feed with 5-second polling (real-time-ish). */

@@ -68,15 +68,24 @@ async function main(): Promise<void> {
         username: (profile as { username: string | null } | null)?.username ?? null,
       };
     }
+    const { count: saveCount } = await supabase
+      .from("activity_events")
+      .select("id", { count: "exact", head: true })
+      .eq("kind", "streak_freeze")
+      .gte("created_at", start.toISOString())
+      .lt("created_at", end.toISOString());
+    const streakSaves = saveCount ?? 0;
     const article = buildArcadeHighlightsArticle({
       day: start.toISOString().slice(0, 10),
       roundsByGame: counts,
       biggestWin,
+      streakSaves,
     });
     console.log("=== DRY — nothing written ===");
     console.log("title:", article.title);
     console.log("excerpt:", article.excerpt);
     console.log("content chars:", article.content.length, "(floor 600)");
+    console.log("streak saves:", streakSaves, "| sentence present:", article.content.includes("Streak Freeze"));
     console.log(counts.filter((c) => c.rounds > 0));
     if (biggestWin) console.log("biggest win:", biggestWin);
     return;

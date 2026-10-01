@@ -677,6 +677,14 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
       {uptime?.recapClicks7d != null && (
         <p className="text-xs text-muted">{t("recapImpact", { n: uptime.recapClicks7d.toLocaleString(locale) })}</p>
       )}
+      {uptime?.freezeCirculation != null && uptime?.freezeSaves7d != null && (
+        <p className="text-xs text-muted">
+          {t("freezeLine", {
+            circulation: uptime.freezeCirculation.toLocaleString(locale),
+            saves: uptime.freezeSaves7d.toLocaleString(locale),
+          })}
+        </p>
+      )}
       <section className="grid gap-4 md:grid-cols-3" aria-label={t("sources")}>
         {engines.map((engine) => {
           const src = bySource.get(engine);

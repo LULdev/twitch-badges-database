@@ -28,6 +28,8 @@ import { getEconomy } from "@/lib/settings";
 import { ProfileAutoRain, ProfileParticles, ProfileTilt } from "@/components/profile/ProfileEffects";
 import { levelFromXp } from "@/lib/gamification/levels";
 import ItemIcon, { ITEM_COLORS } from "@/components/items/ItemIcon";
+import BuyFreezeButton from "@/components/items/BuyFreezeButton";
+import { FREEZE_MAX } from "@/lib/gamification/items";
 import { ACH_BY_ID } from "@/lib/gamification/achievements";
 import { recordProfileVisit } from "@/lib/gamification/visits";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -69,6 +71,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
   };
 }
+
+// Cold item-shelf state (one freeze left): fixed snow-dot geometry as a
+// module literal — no randomness during render (React Compiler purity rule;
+// cf. ProfileEffects, which seeds post-mount in rAF). Identical on server
+// and client, so hydration is stable.
+const SNOW_DOTS = [
+  { left: "7%", size: 4, delay: "-1.2s", duration: "9s" },
+  { left: "26%", size: 3, delay: "-5.4s", duration: "11s" },
+  { left: "48%", size: 5, delay: "-3.1s", duration: "8.5s" },
+  { left: "69%", size: 3, delay: "-7.8s", duration: "10s" },
+  { left: "88%", size: 4, delay: "-2.3s", duration: "12s" },
+] as const;
 
 export default async function ProfilePage({ params }: PageProps) {
   const { locale, username } = await params;
@@ -320,9 +334,12 @@ export default async function ProfilePage({ params }: PageProps) {
   let level = null as ReturnType<typeof levelFromXp> | null;
   let unlockedAchievements: Array<{ achievement_id: string; unlocked_at: string }> = [];
   let itemFreezes: number | null = null;
+  let rescueDates: string[] = [];
+  // Total rescues = the Ice Guardian signal (same count buildStats uses).
+  let guardianRescues = 0;
   if (profile) {
     const admin = createAdminClient();
-    const [progressRow, achievementRes, itemsRes] = await Promise.all([
+    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes] = await Promise.all([
       readProgress(profile.id).catch(() => null),
       admin
         .from("user_achievements")
@@ -338,6 +355,22 @@ export default async function ProfilePage({ params }: PageProps) {
         .eq("user_id", profile.id)
         .eq("item_key", "streak_freeze")
         .maybeSingle(),
+      // Rescue history: activity_events user_id/payload are NOT anon-readable
+      // (0040 column grants), so this filter needs the service-role client —
+      // same split as the items read above. The (user_id, created_at desc)
+      // index serves the top-3.
+      admin
+        .from("activity_events")
+        .select("created_at")
+        .eq("user_id", profile.id)
+        .eq("kind", "streak_freeze")
+        .order("created_at", { ascending: false })
+        .limit(3),
+      admin
+        .from("activity_events")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", profile.id)
+        .eq("kind", "streak_freeze"),
     ]);
     const achievementRows = (achievementRes.data ?? []) as Array<{
       achievement_id: string;
@@ -351,6 +384,10 @@ export default async function ProfilePage({ params }: PageProps) {
     unlockedAchievements = achievementRows;
     itemFreezes =
       (itemsRes.data as { quantity: number } | null)?.quantity ?? null;
+    rescueDates = ((rescuesRes.data ?? []) as Array<{ created_at: string }>).map(
+      (row) => row.created_at,
+    );
+    guardianRescues = rescuesCountRes.count ?? 0;
   }
 
   return (
@@ -636,13 +673,39 @@ export default async function ProfilePage({ params }: PageProps) {
       {/* Item shelf, in the badge-detail gallery style: one gal-stage card per
           owned item kind. Visibility rides the same compound flag the badge
           inventory uses — hiding your inventory hides the shelf too, while
-          the owner always sees their own stock. */}
-      {profile && inventoryVisible && itemFreezes !== null && itemFreezes > 0 && (
+          the owner always sees their own stock. A member who burned every
+          freeze keeps the shelf when rescue history exists (the ×0 chip is
+          real usage, not a never-played zero — that member has no item row
+          at all and stays hidden). With one or zero left the stage runs the
+          cold snow state. */}
+      {profile &&
+        inventoryVisible &&
+        itemFreezes !== null &&
+        (itemFreezes > 0 || rescueDates.length > 0) && (
         <section
-          className="gal-stage card flex flex-col items-center gap-5 p-6 sm:flex-row sm:p-8"
+          className={`gal-stage card flex flex-col items-center gap-5 p-6 sm:flex-row sm:p-8${
+            itemFreezes <= 1 ? " item-shelf-cold" : ""
+          }`}
           style={{ ["--tier-color" as string]: ITEM_COLORS.streak_freeze }}
           aria-labelledby="profile-items"
         >
+          {itemFreezes <= 1 && (
+            <span className="item-snow-field" aria-hidden="true">
+              {SNOW_DOTS.map((dot) => (
+                <span
+                  key={dot.left}
+                  className="item-snow"
+                  style={{
+                    left: dot.left,
+                    width: dot.size,
+                    height: dot.size,
+                    animationDelay: dot.delay,
+                    animationDuration: dot.duration,
+                  }}
+                />
+              ))}
+            </span>
+          )}
           <figure className="gal-pedestal shrink-0">
             <span className="gal-halo" aria-hidden="true" />
             <div className="hero-emblem">
@@ -669,11 +732,45 @@ export default async function ProfilePage({ params }: PageProps) {
               >
                 {t("freezeName")}
               </span>
+              {/* Ice Guardian progress — the 5 mirrors the s_ice_guardian
+                  threshold in achievements.ts; shown once rescue history exists. */}
+              {guardianRescues > 0 && (
+                <span className="chip pointer-events-none font-bold">
+                  {t("guardianProgress", { n: guardianRescues })}
+                </span>
+              )}
             </div>
             <h2 className="mt-3 text-lg font-extrabold tracking-tight">
               {t("itemShelf")}
             </h2>
             <p className="mt-1 text-sm text-muted">{t("freezeExplain")}</p>
+            {rescueDates.length > 0 && (
+              <p className="mt-1 text-xs text-muted">
+                {t("freezeHistory", {
+                  dates: rescueDates
+                    .map((d) =>
+                      new Date(d).toLocaleDateString(locale, { dateStyle: "medium" }),
+                    )
+                    .join(" · "),
+                })}
+              </p>
+            )}
+            {/* The shop is self-service: only the viewer's own shelf may sell
+                into their own account (the shelf itself renders for all). */}
+            {isOwn &&
+              (itemFreezes >= FREEZE_MAX ? (
+                <p className="mt-2 text-xs text-muted">
+                  {t("buyCapped", { max: FREEZE_MAX })}
+                </p>
+              ) : (
+                <div className="mt-2">
+                  <BuyFreezeButton
+                    price={economy.freezePrice}
+                    canAfford={(progress?.coins ?? 0) >= economy.freezePrice}
+                    max={FREEZE_MAX}
+                  />
+                </div>
+              ))}
           </div>
         </section>
       )}

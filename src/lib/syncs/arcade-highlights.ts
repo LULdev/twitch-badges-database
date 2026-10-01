@@ -51,6 +51,23 @@ async function countRounds(
   );
 }
 
+/** Streak Freeze saves in [start, end) — one activity_events row per rescue
+ *  (the gate's -1 sentinel caps one per user per UTC day). Served by the
+ *  (kind, created_at desc) index from 0009; head count, no row cap. */
+async function countStreakSaves(
+  supabase: ReturnType<typeof createAdminClient>,
+  start: Date,
+  end: Date,
+): Promise<number> {
+  const { count } = await supabase
+    .from("activity_events")
+    .select("id", { count: "exact", head: true })
+    .eq("kind", "streak_freeze")
+    .gte("created_at", start.toISOString())
+    .lt("created_at", end.toISOString());
+  return count ?? 0;
+}
+
 /** Biggest won round in [start, end): server-side max ordering returns the
  *  true maximum in one row (the achievements trick). Net is computed by the
  *  caller — the table never stores the difference. */
@@ -139,7 +156,10 @@ export async function runArcadeHighlights(
 
   const counts = await countRounds(supabase, start, end);
   summary.totalRounds = counts.reduce((sum, g) => sum + g.rounds, 0);
-  const win = await biggestWin(supabase, start, end);
+  const [win, daySaves] = await Promise.all([
+    biggestWin(supabase, start, end),
+    countStreakSaves(supabase, start, end),
+  ]);
   summary.biggestWinUsername = win?.username ?? null;
 
   const played = counts.filter((g) => g.rounds > 0);
@@ -164,6 +184,7 @@ export async function runArcadeHighlights(
       day,
       roundsByGame: counts,
       biggestWin: win,
+      streakSaves: daySaves,
     });
     summary.published = await createFeaturePost({
       slug,
@@ -212,6 +233,7 @@ export async function runArcadeHighlights(
           totalRounds: summary.totalRounds,
           topGame: summary.topGame,
           chars: content.length,
+          streakSaves: daySaves,
         },
       },
       supabase,
@@ -238,10 +260,11 @@ export async function runArcadeHighlights(
       const isoWeek = isoWeekLabel(wStart);
       const wSlug = `arcade-weekly-${isoWeek}`;
 
-      const [wCounts, pCounts, wWin] = await Promise.all([
+      const [wCounts, pCounts, wWin, wSaves] = await Promise.all([
         countRounds(supabase, wStart, wEnd),
         countRounds(supabase, pStart, wStart),
         biggestWin(supabase, wStart, wEnd),
+        countStreakSaves(supabase, wStart, wEnd),
       ]);
       const wTotal = wCounts.reduce((sum, g) => sum + g.rounds, 0);
       const pTotal = pCounts.reduce((sum, g) => sum + g.rounds, 0);
@@ -285,6 +308,7 @@ export async function runArcadeHighlights(
           roundsByGame: wCounts,
           priorWeekTotal: pTotal,
           biggestWin: wWin,
+          streakSaves: wSaves,
         });
         weekly.published = await createFeaturePost({
           slug: wSlug,
@@ -334,6 +358,7 @@ export async function runArcadeHighlights(
               priorWeekTotal: pTotal,
               topGame: weekly.topGame,
               chars: wArticle.content.length,
+              streakSaves: wSaves,
             },
           },
           supabase,

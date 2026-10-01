@@ -2815,9 +2815,41 @@ html {
   filter: drop-shadow(0 1px 2px rgba(22, 22, 44, 0.16))
           drop-shadow(0 0 8px color-mix(in srgb, var(--info) 30%, transparent));
 }
+
+/* Cold state (≤1 freeze left): deterministic snow dots drift down inside the
+   stage. z-index:-1 matches .gal-stage::before, so the drift sits above the
+   card surface/aurora but under the pedestal and placard; the stage's
+   overflow:hidden clips it at the card edge. */
+.item-snow-field {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.item-snow {
+  position: absolute;
+  top: -0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tier-color, var(--info)) 72%, transparent);
+  opacity: 0;
+  animation: item-snow-fall linear infinite;
+}
+@keyframes item-snow-fall {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  10%, 80% { opacity: 0.65; }
+  100% { transform: translate3d(0.9rem, 13rem, 0); opacity: 0; }
+}
+.light .item-snow {
+  background: color-mix(in srgb, var(--info) 65%, transparent);
+}
 @media (prefers-reduced-motion: reduce) {
   .item-flake {
     animation: none;
+  }
+  .item-snow {
+    animation: none;
+    opacity: 0;
   }
 }
 

@@ -113,7 +113,7 @@
     "heroF2Title": "Indice di rarità TBRI",
     "heroF2Desc": "Un punteggio 0–100 costruito da scarsità, diffusione e slancio — scopri quali badge sono davvero rari prima di ottenerli.",
     "heroF3Title": "Gioca mentre collezioni",
-    "heroF3Desc": "13 giochi arcade, XP, livelli, monete e 128 obiettivi — più una ruota quotidiana con un jackpot Twitch Turbo a probabilità reali di 1 su 100.000.000.",
+    "heroF3Desc": "13 giochi arcade, XP, livelli, monete e 130 obiettivi — più una ruota quotidiana con un jackpot Twitch Turbo a probabilità reali di 1 su 100.000.000.",
     "heroF4Title": "Il tuo profilo da collezionista",
     "heroF4Desc": "Accedi con Twitch per sincronizzare i badge che già possiedi, creare una vetrina e scalare le classifiche mondiali — in 11 lingue."
   },
@@ -295,6 +295,12 @@
     "itemShelf": "Scaffale oggetti",
     "freezeName": "Congelamento di serie",
     "freezeExplain": "Un congelamento mette in pausa la tua serie di gioco per un giorno perso invece di azzerarla. Parti con 2 al collegamento con Twitch e ne guadagni uno ogni 7 giorni di serie (7, 14, 21…). Se ne consuma uno per giorno colmato — in quel giorno la serie né cresce né cala.",
+    "freezeHistory": "Serie protetta il {dates}",
+    "guardianProgress": "Ice Guardian {n}/5",
+    "buyFreeze": "Compra un congelamento di serie",
+    "buyDone": "Acquistato!",
+    "buyCapped": "Hai già il massimo di {max} congelamenti di serie.",
+    "buyInsufficient": "BadgesCoins insufficienti — un congelamento di serie costa {price}.",
     "inventoryHidden": "Questo collezionista mantiene l'inventario privato.",
     "lastSync": "Ultima sincronizzazione",
     "latestVisitors": "Ultime visite",
@@ -774,6 +780,7 @@
     "steal": "Furto",
     "steal_defended": "Difeso",
     "level_up": "Salita di livello",
+    "streak_freeze": "Congelamento di serie",
     "turbo_win": "Jackpot Turbo",
     "coin_rain": "Pioggia di BadgesCoins",
     "profile": "Profilo",
@@ -1220,7 +1227,8 @@
         "stealPrice": "Prezzo furto predefinito",
         "stealMax": "Furto massimo predefinito",
         "stealFloodMinutes": "Attesa tra furti (minuti)",
-        "stealPerHour": "Tentativi di furto all'ora"
+        "stealPerHour": "Tentativi di furto all'ora",
+        "freezePrice": "Prezzo del congelamento"
       },
       "games": {
         "title": "Giochi",
@@ -1431,6 +1439,7 @@
     "downTitle": "Interruzione in corso",
     "heartbeat": "Ultimo heartbeat",
     "recapImpact": "Gli articoli di recap hanno generato {n} clic questa settimana",
+    "freezeLine": "Congelamenti serie in circolazione: {circulation} — {saves} serie salvate questa settimana",
     "sources": "Servizi",
     "lastRun": "Ultima esecuzione",
     "duration": "Durata",

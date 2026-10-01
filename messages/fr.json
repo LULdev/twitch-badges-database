@@ -113,7 +113,7 @@
     "heroF2Title": "Indice de rareté TBRI",
     "heroF2Desc": "Un score de 0 à 100 fondé sur la rareté, la diffusion et la dynamique — sache quels badges sont vraiment rares avant de les récupérer.",
     "heroF3Title": "Joue pendant que tu collectionnes",
-    "heroF3Desc": "13 jeux d'arcade, de l'XP, des niveaux, des pièces et 128 succès — plus une roue quotidienne avec un jackpot Twitch Turbo à de vraies chances de 1 sur 100 000 000.",
+    "heroF3Desc": "13 jeux d'arcade, de l'XP, des niveaux, des pièces et 130 succès — plus une roue quotidienne avec un jackpot Twitch Turbo à de vraies chances de 1 sur 100 000 000.",
     "heroF4Title": "Ton profil de collectionneur",
     "heroF4Desc": "Connecte-toi avec Twitch pour synchroniser les badges que tu possèdes déjà, créer une vitrine et grimper dans les classements mondiaux — en 11 langues."
   },
@@ -295,6 +295,12 @@
     "itemShelf": "Étagère d'objets",
     "freezeName": "Gel de série",
     "freezeExplain": "Un gel met votre série de jeux en pause pour un jour manqué au lieu de la réinitialiser. Vous démarrez avec 2 dès la connexion avec Twitch et en gagnez un de plus tous les 7 jours de série (7, 14, 21…). Un gel brûle par jour comblé — ce jour-là, la série ne grandit ni ne diminue.",
+    "freezeHistory": "Série protégée le {dates}",
+    "guardianProgress": "Ice Guardian {n}/5",
+    "buyFreeze": "Acheter un gel de série",
+    "buyDone": "Acheté !",
+    "buyCapped": "Vous détenez déjà le maximum de {max} gels de série.",
+    "buyInsufficient": "Pas assez de BadgesCoins — un gel de série coûte {price}.",
     "inventoryHidden": "Ce collectionneur garde son inventaire privé.",
     "lastSync": "Dernière synchronisation",
     "latestVisitors": "Dernières visites",
@@ -774,6 +780,7 @@
     "steal": "Vol",
     "steal_defended": "Défendu",
     "level_up": "Montée de niveau",
+    "streak_freeze": "Gel de série",
     "turbo_win": "Jackpot Turbo",
     "coin_rain": "Pluie de BadgesCoins",
     "profile": "Profil",
@@ -1220,7 +1227,8 @@
         "stealPrice": "Prix de vol par défaut",
         "stealMax": "Vol maximum par défaut",
         "stealFloodMinutes": "Attente entre vols (minutes)",
-        "stealPerHour": "Tentatives de vol par heure"
+        "stealPerHour": "Tentatives de vol par heure",
+        "freezePrice": "Prix du gel"
       },
       "games": {
         "title": "Jeux",
@@ -1431,6 +1439,7 @@
     "downTitle": "Panne en cours",
     "heartbeat": "Dernier signal",
     "recapImpact": "Les articles récap ont généré {n} clics cette semaine",
+    "freezeLine": "Gels de série en circulation : {circulation} — {saves} séries sauvées cette semaine",
     "sources": "Services",
     "lastRun": "Dernière exécution",
     "duration": "Durée",

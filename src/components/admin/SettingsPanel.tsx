@@ -11,6 +11,7 @@ interface Economy {
   gameWinXp: number; gameLoseXp: number;
   coinRainCoins: number; stealPrice: number; stealMax: number;
   stealFloodMinutes: number; stealPerHour: number;
+  freezePrice: number;
 }
 interface GameSetting { enabled: boolean; minBet: number; maxBet: number }
 interface Features {
@@ -41,6 +42,7 @@ const ECONOMY_FIELDS: Array<[keyof Economy, string]> = [
   ["stealMax", "stealMax"],
   ["stealFloodMinutes", "stealFloodMinutes"],
   ["stealPerHour", "stealPerHour"],
+  ["freezePrice", "freezePrice"],
 ];
 
 const FEATURE_KEYS: Array<keyof Features> = [

@@ -113,7 +113,7 @@
     "heroF2Title": "TBRI レア度指数",
     "heroF2Desc": "希少性・保有度・勢いから算出する 0～100 のスコア — 獲得前にどのバッジが本当にレアか分かります。",
     "heroF3Title": "集めながら遊ぶ",
-    "heroF3Desc": "13 のアーケード ゲーム、XP、レベル、コイン、128 個の実績 — 毎日のルーレットには本物の確率 1 億分の 1 で Twitch Turbo ジャックポット。",
+    "heroF3Desc": "13 のアーケード ゲーム、XP、レベル、コイン、130 個の実績 — 毎日のルーレットには本物の確率 1 億分の 1 で Twitch Turbo ジャックポット。",
     "heroF4Title": "あなたのコレクション プロフィール",
     "heroF4Desc": "Twitch でログインして保有バッジを同期し、ショーケースを作り、世界ランキングを登りましょう — 11 言語対応。"
   },
@@ -295,6 +295,12 @@
     "itemShelf": "アイテム棚",
     "freezeName": "ストリークフリーズ",
     "freezeExplain": "ストリークフリーズは、プレイできなかった一日のあいだゲーム連続記録を一時停止し、リセットを防ぎます。Twitch接続時に2個をプレゼント、7ストリーク日ごと（7、14、21…）に1個獲得。補埋した一日につき1個消費し、その日の記録は伸びも縮みもしまません。",
+    "freezeHistory": "{dates} にストリークを保護しました",
+    "guardianProgress": "Ice Guardian {n}/5",
+    "buyFreeze": "ストリークフリーズを購入",
+    "buyDone": "購入しました！",
+    "buyCapped": "ストリークフリーズはすでに上限の{max}個あります。",
+    "buyInsufficient": "BadgesCoinsが足りません — ストリークフリーズは{price}枚必要です。",
     "inventoryHidden": "このコレクターは所持リストを非公開にしています。",
     "lastSync": "最終同期",
     "latestVisitors": "最近の訪問者",
@@ -774,6 +780,7 @@
     "steal": "強奪",
     "steal_defended": "防衛成功",
     "level_up": "レベルアップ",
+    "streak_freeze": "ストリークフリーズ",
     "turbo_win": "Turboジャックポット",
     "coin_rain": "BadgesCoinsの雨",
     "profile": "プロフィール",
@@ -1220,7 +1227,8 @@
         "stealPrice": "既定の奪取価格",
         "stealMax": "既定の奪取上限",
         "stealFloodMinutes": "奪取の待ち時間（分）",
-        "stealPerHour": "1時間あたりの奪取回数"
+        "stealPerHour": "1時間あたりの奪取回数",
+        "freezePrice": "フリーズ価格"
       },
       "games": {
         "title": "ゲーム",
@@ -1431,6 +1439,7 @@
     "downTitle": "障害発生中",
     "heartbeat": "最後のハートビート",
     "recapImpact": "まとめ記事が今週 {n} 件のクリックを獲得しました",
+    "freezeLine": "ストリークフリーズは {circulation} 個流通中、今週 {saves} 件のストリークを救いました",
     "sources": "サービス",
     "lastRun": "前回の実行",
     "duration": "所要時間",

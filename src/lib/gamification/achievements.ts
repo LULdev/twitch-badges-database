@@ -56,6 +56,8 @@ export interface AchStats {
   moodSet: boolean;
   activityCount: number;
   dailyCount: number;
+  /** Streak Freeze saves (activity_events kind=streak_freeze) — the Ice Guardian signal. */
+  freezeRescues: number;
   /** UTC hour of the most recent daily-bonus claim, or null if none yet. */
   lastDailyHour: number | null;
   userCount: number;
@@ -107,6 +109,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   COMMON("c_daily_30", "Creature of Habit", "30-day login streak.", (s) => s.progress.best_login_streak >= 30, 300, 300),
   COMMON("c_streak_7", "Warm-Up Streak", "Play at least one game 7 days in a row.", (s) => s.progress.best_game_streak >= 7),
   COMMON("c_streak_30", "Grindstone", "Play at least one game 30 days in a row.", (s) => s.progress.best_game_streak >= 30, 300, 300),
+  SPECIAL("s_ice_guardian", "Ice Guardian", "Rescue five game streaks with Streak Freezes.", (s) => s.freezeRescues >= 5, 1500, 1000),
+  COMMON("c_guardian_initiate", "Guardian Initiate", "Rescue your first game streak with a Streak Freeze.", (s) => s.freezeRescues >= 1),
   COMMON("c_sync_first", "Collector Born", "Sync your Twitch badges once.", (s) => s.badgesOwned >= 1),
   COMMON("c_badges_10", "Ten Badges", "Own 10 catalog badges.", (s) => s.badgesOwned >= 10),
   COMMON("c_badges_50", "Fifty Badges", "Own 50 catalog badges.", (s) => s.badgesOwned >= 50, 200, 200),
@@ -829,6 +833,7 @@ async function buildStats(userId: string): Promise<AchStats> {
     moodSet: Boolean(profileRes.data?.mood),
     activityCount: (achRes.data ?? []).length,
     dailyCount: (achRes.data ?? []).filter((k) => (k as { kind?: string }).kind === "daily").length,
+    freezeRescues: (achRes.data ?? []).filter((k) => (k as { kind?: string }).kind === "streak_freeze").length,
     lastDailyHour: (() => {
       const at = (lastDailyRes.data as { created_at?: string } | null)?.created_at;
       return at ? new Date(String(at)).getUTCHours() : null;

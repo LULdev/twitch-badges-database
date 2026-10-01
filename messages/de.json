@@ -113,7 +113,7 @@
     "heroF2Title": "TBRI-Seltenheitsindex",
     "heroF2Desc": "Ein 0–100-Score aus Knappheit, Verbreitung und Dynamik — erkenne vor dem Einsammeln, welche Badges wirklich selten sind.",
     "heroF3Title": "Spielen beim Sammeln",
-    "heroF3Desc": "13 Arcade-Spiele, XP, Level, Coins und 128 Erfolge — plus ein tägliches Glücksrad mit einem Twitch-Turbo-Jackpot mit echten 1-zu-100.000.000-Chancen.",
+    "heroF3Desc": "13 Arcade-Spiele, XP, Level, Coins und 130 Erfolge — plus ein tägliches Glücksrad mit einem Twitch-Turbo-Jackpot mit echten 1-zu-100.000.000-Chancen.",
     "heroF4Title": "Dein Sammlerprofil",
     "heroF4Desc": "Melde dich mit Twitch an, um deine Badges zu synchronisieren, eine Vitrine aufzubauen und in weltweiten Ranglisten aufzusteigen — in 11 Sprachen."
   },
@@ -295,6 +295,12 @@
     "itemShelf": "Item-Regal",
     "freezeName": "Streak-Freeze",
     "freezeExplain": "Ein Streak-Freeze pausiert deine Spiel-Serie für einen verpassten Tag, statt sie zurückzusetzen. Du startest mit 2, sobald du dich mit Twitch verbindest, und verdienst einen weiteren alle 7 Streak-Tage (7, 14, 21…). Pro überbrücktem Tag verbrennt ein Freeze — an dem Tag selbst wächst oder schrumpft die Serie nicht.",
+    "freezeHistory": "Deine Serie gerettet am {dates}",
+    "guardianProgress": "Ice Guardian {n}/5",
+    "buyFreeze": "Streak-Freeze kaufen",
+    "buyDone": "Gekauft!",
+    "buyCapped": "Du hast bereits das Maximum von {max} Streak-Freezes.",
+    "buyInsufficient": "Nicht genug BadgesCoins — ein Streak-Freeze kostet {price}.",
     "inventoryHidden": "Dieser Sammler hält sein Inventar privat.",
     "lastSync": "Letzte Synchronisierung",
     "latestVisitors": "Letzte Besucher",
@@ -774,6 +780,7 @@
     "steal": "Diebstahl",
     "steal_defended": "Abgewehrt",
     "level_up": "Level-Up",
+    "streak_freeze": "Streak-Freeze",
     "turbo_win": "Turbo-Jackpot",
     "coin_rain": "BadgesCoin-Regen",
     "profile": "Profil",
@@ -1220,7 +1227,8 @@
         "stealPrice": "Standard-Steal-Preis",
         "stealMax": "Standard-Steal-Maximum",
         "stealFloodMinutes": "Steal-Wartezeit (Minuten)",
-        "stealPerHour": "Steal-Versuche pro Stunde"
+        "stealPerHour": "Steal-Versuche pro Stunde",
+        "freezePrice": "Freeze-Preis"
       },
       "games": {
         "title": "Spiele",
@@ -1431,6 +1439,7 @@
     "downTitle": "Ausfall aktiv",
     "heartbeat": "Letzter Herzschlag",
     "recapImpact": "Rückblick-Artikel brachten diese Woche {n} Klicks",
+    "freezeLine": "Streak Freezes im Umlauf: {circulation} — diese Woche {saves} Serien gerettet",
     "sources": "Dienste",
     "lastRun": "Letzter Lauf",
     "duration": "Dauer",

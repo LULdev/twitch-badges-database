@@ -168,6 +168,8 @@ export interface ArcadeHighlightsInput {
     payout: number;
     username: string | null;
   } | null;
+  /** Streak Freeze saves in the covered day (kind='streak_freeze' rows). */
+  streakSaves: number;
 }
 
 /** Weekly recap inputs: one ISO week (Mon–Sun UTC) plus the prior week's
@@ -189,6 +191,8 @@ export interface ArcadeWeeklyInput {
     payout: number;
     username: string | null;
   } | null;
+  /** Streak Freeze saves in the covered week (kind='streak_freeze' rows). */
+  streakSaves: number;
 }
 
 /** ISO week label ("2026-W39") from a UTC date inside that week, via the
@@ -224,7 +228,7 @@ export function buildArcadeHighlightsArticle(input: ArcadeHighlightsInput): {
     `## The day in the Badge Arcade`,
     "",
     totalRounds > 0
-      ? `On ${dateLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 13 games`}. Every round was server-authoritative, capped at the house stake, and graded by the same engine that powers the [statistics dashboard](/en/stats).`
+      ? `On ${dateLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 13 games`}. Every round was server-authoritative, capped at the house stake, and graded by the same engine that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` The same ledger also recorded **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** spent — ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} bridged through a missed day instead of resetting.` : ""}`
       : `On ${dateLabel} the arcade floors stayed quiet — not a single round was settled. The boards are always open: pick a game on the [arcade overview](/en/games), set a stake between the posted limits, and the next recap could carry your name.`,
     "",
   ];
@@ -267,7 +271,7 @@ export function buildArcadeHighlightsArticle(input: ArcadeHighlightsInput): {
   const title = `Arcade highlights — ${dateLabel}`;
   const excerpt =
     totalRounds > 0
-      ? `${dateLabel} in the Badge Arcade: ${totalRounds.toLocaleString("en-US")} settled rounds, ${top ? `${top.game} on top` : "a quiet board"}${input.biggestWin ? `, and the day's biggest win of +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}.`
+      ? `${dateLabel} in the Badge Arcade: ${totalRounds.toLocaleString("en-US")} settled rounds, ${top ? `${top.game} on top` : "a quiet board"}${input.biggestWin ? `, and the day's biggest win of +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} spent` : ""}.`
       : `${dateLabel} in the Badge Arcade: a quiet day with no settled rounds — the boards stay open for the next player.`;
 
   return { content, excerpt, title };
@@ -306,7 +310,7 @@ export function buildArcadeWeeklyArticle(
     "## The week in the Badge Arcade",
     "",
     totalRounds > 0
-      ? `From Monday ${startLabel} to Sunday ${endLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 13 games`}${trend ? ` — ${trend}` : ""}. One post per week, computed from the same server-authoritative ledger that powers the [statistics dashboard](/en/stats).`
+      ? `From Monday ${startLabel} to Sunday ${endLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 13 games`}${trend ? ` — ${trend}` : ""}. One post per week, computed from the same server-authoritative ledger that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` Across the week, **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** bridged missed days and kept ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} alive.` : ""}`
       : `From Monday ${startLabel} to Sunday ${endLabel} the arcade floors stayed completely quiet — not a single settled round in seven days. The boards never close: pick a game on the [arcade overview](/en/games), and next week's recap could open with your name.`,
     "",
   ];
@@ -350,7 +354,7 @@ export function buildArcadeWeeklyArticle(
   const title = `Arcade weekly — ${input.isoWeek}`;
   const excerpt =
     totalRounds > 0
-      ? `Week ${input.isoWeek} (${startLabel}–${endLabel}): ${totalRounds.toLocaleString("en-US")} settled rounds${top ? `, ${top.game} as game of the week` : ""}${input.biggestWin ? `, biggest win +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}.`
+      ? `Week ${input.isoWeek} (${startLabel}–${endLabel}): ${totalRounds.toLocaleString("en-US")} settled rounds${top ? `, ${top.game} as game of the week` : ""}${input.biggestWin ? `, biggest win +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} bridged missed days` : ""}.`
       : `Week ${input.isoWeek} (${startLabel}–${endLabel}): a silent week with no settled rounds.`;
 
   return { content, excerpt, title };

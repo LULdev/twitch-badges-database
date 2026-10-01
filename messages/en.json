@@ -113,7 +113,7 @@
     "heroF2Title": "TBRI rarity index",
     "heroF2Desc": "A 0–100 score built from scarcity, wear and momentum — know which badges are genuinely rare before you claim them.",
     "heroF3Title": "Play while you collect",
-    "heroF3Desc": "13 arcade games, XP, levels, coins and 128 achievements — plus a daily Wheel of Fortune with a Twitch Turbo jackpot at real 1-in-100,000,000 odds.",
+    "heroF3Desc": "13 arcade games, XP, levels, coins and 130 achievements — plus a daily Wheel of Fortune with a Twitch Turbo jackpot at real 1-in-100,000,000 odds.",
     "heroF4Title": "Your collection profile",
     "heroF4Desc": "Log in with Twitch to sync the badges you already own, build a showcase and climb worldwide leaderboards — in 11 languages."
   },
@@ -295,6 +295,12 @@
     "itemShelf": "Item shelf",
     "freezeName": "Streak Freeze",
     "freezeExplain": "A Streak Freeze pauses your game streak for one missed day instead of letting it reset. You start with 2 when you connect with Twitch and earn one more every 7 streak days (7, 14, 21…). One freeze burns per bridged day — the streak itself neither grows nor shrinks on that day.",
+    "freezeHistory": "Protected your streak on {dates}",
+    "guardianProgress": "Ice Guardian {n}/5",
+    "buyFreeze": "Buy a Streak Freeze",
+    "buyDone": "Purchased!",
+    "buyCapped": "You already hold the maximum of {max} Streak Freezes.",
+    "buyInsufficient": "Not enough BadgesCoins — a Streak Freeze costs {price}.",
     "inventoryHidden": "This collector keeps their inventory private.",
     "lastSync": "Last synced",
     "latestVisitors": "Latest visitors",
@@ -774,6 +780,7 @@
     "steal": "Steal",
     "steal_defended": "Defended",
     "level_up": "Level up",
+    "streak_freeze": "Streak freeze",
     "turbo_win": "Turbo jackpot",
     "coin_rain": "BadgesCoin rain",
     "profile": "Profile",
@@ -1220,7 +1227,8 @@
         "stealPrice": "Default steal price",
         "stealMax": "Default steal maximum",
         "stealFloodMinutes": "Steal wait (minutes)",
-        "stealPerHour": "Steal attempts per hour"
+        "stealPerHour": "Steal attempts per hour",
+        "freezePrice": "Freeze price"
       },
       "games": {
         "title": "Games",
@@ -1431,6 +1439,7 @@
     "downTitle": "Outage in progress",
     "heartbeat": "Last heartbeat",
     "recapImpact": "Recap articles drove {n} clicks this week",
+    "freezeLine": "Streak Freezes in circulation: {circulation} — {saves} streaks saved this week",
     "sources": "Services",
     "lastRun": "Last run",
     "duration": "Duration",

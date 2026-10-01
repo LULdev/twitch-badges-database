@@ -31,6 +31,8 @@ export interface EconomySettings {
    *  game cap — mirroring the daily-claim streak bonus). */
   gameStreakXpPerDay: number;
   gameStreakXpCap: number;
+  /** Coin price of one Streak Freeze in the shelf shop. */
+  freezePrice: number;
   /** Coins a visitor's coin rain gifts the profile owner. */
   coinRainCoins: number;
   /** Fallback steal settings for members who never configured their own. */
@@ -52,6 +54,7 @@ export const ECONOMY_DEFAULTS: EconomySettings = {
   gameLoseXp: 2,
   gameStreakXpPerDay: 5,
   gameStreakXpCap: 50,
+  freezePrice: 500,
   coinRainCoins: 1,
   stealPrice: 100,
   stealMax: 250,

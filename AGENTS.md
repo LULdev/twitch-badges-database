@@ -27,7 +27,7 @@ Read `README.md` for data sources and setup; read this file before editing.
 - `src/lib/` — queries.ts (DB reads via server client), rarity.ts (TBRI),
   changelog.ts, inventory.ts, push.ts, markdown.ts, seo.ts, health.ts
   (heartbeats), stats.ts (reads the `stats_*` views for `/stats`)
-- `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 125 achievements
+- `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 128 achievements
   (achievements.ts, self-evaluating), games.ts (13 server-authoritative games),
   wheel.ts (daily wheel + Turbo jackpot 1:1e8), daily.ts (login bonus, heists,
   coin rain), visits.ts (5-min-IP-dedup view counters), session.ts

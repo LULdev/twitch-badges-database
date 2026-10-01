@@ -346,6 +346,17 @@ export async function playGame(
           }).catch(() => undefined);
         }
       }
+      // The rescue lands in the public feed AND serves as the profile's
+      // rescue history — the -1 sentinel on every later call that day means
+      // freeze_used can surface at most once per UTC day, so no duplicates.
+      if (freezeUsed) {
+        logActivity({
+          userId,
+          kind: "streak_freeze",
+          title: `used a Streak Freeze to protect their ${streak}-day game streak`,
+          payload: { item: "streak_freeze", streak, game: gameId },
+        }).catch(() => undefined);
+      }
     }
   } catch {
     // streak bookkeeping is best-effort; the round itself is already settled
