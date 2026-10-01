@@ -288,6 +288,21 @@ function noteAwardedProgress(userId: string, xp: number, coins: number): void {
  * the reward and told they had already collected it. ON CONFLICT DO NOTHING is
  * idempotent, so this is safe on every path (and needs no new SQL).
  */
+/**
+ * Grant the 2 starter Streak Freezes exactly once (0049). The RPC's
+ * compare-and-set predicate IS the guarantee — of two concurrent callers
+ * exactly one UPDATE matches — so this may run on every authenticated
+ * touchpoint. Best-effort: a failed grant must never block the caller.
+ */
+export async function ensureStarterItems(userId: string): Promise<void> {
+  try {
+    const supabase = createAdminClient();
+    await supabase.rpc("grant_starter_items", { p_user_id: userId });
+  } catch (error) {
+    console.warn("[xp] starter item grant failed:", error);
+  }
+}
+
 export async function ensureProgress(userId: string): Promise<void> {
   const supabase = createAdminClient();
   const { error } = await supabase

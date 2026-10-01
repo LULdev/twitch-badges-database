@@ -15,6 +15,7 @@ const FAQ_KEYS = [
   "badges",
   "games",
   "fair",
+  "streakFreeze",
   "achievements",
   "steal",
   "stealCost",

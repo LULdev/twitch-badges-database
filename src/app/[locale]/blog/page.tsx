@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { listPosts, type BlogPostRow } from "@/lib/queries";
+import { getRecapClicks7d, listPosts, type BlogPostRow } from "@/lib/queries";
 import { localeAlternates } from "@/lib/seo";
 import Reveal from "@/components/stats/Reveal";
 
@@ -82,6 +82,9 @@ export default async function BlogIndexPage({
   const t = await getTranslations("blog");
 
   const allPosts = await listPosts().catch(() => []);
+  // Recap impact KPI: the 0048 view is anon-readable, so the blog masthead
+  // can show the weekly click-through number without any service-role read.
+  const recapClicks = await getRecapClicks7d().catch(() => null);
 
   // Server-side tag filter (?tag=) — same pattern as the changelog's ?kind=.
   const tags = [...new Set(allPosts.flatMap((p) => p.tags))].sort();
@@ -138,6 +141,12 @@ export default async function BlogIndexPage({
           <b className="text-sm">{latestLabel}</b>
           <span>{t("statLatest")}</span>
         </div>
+        {recapClicks != null && (
+          <div className="bl-kpi">
+            <b>{recapClicks.toLocaleString(locale)}</b>
+            <span>{t("recapClicks")}</span>
+          </div>
+        )}
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- API route serving XML, not a page */}
         <a href="/api/blog/rss" className="btn btn-secondary text-xs" title={t("rss")}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>

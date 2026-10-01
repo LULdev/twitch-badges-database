@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { award, bumpCoins, getProgress, logActivity } from "./xp";
+import { award, bumpCoins, getProgress, logActivity, ensureStarterItems } from "./xp";
 import { evaluateAchievements } from "./achievements";
 import { getEconomy, getFeatures, getGames } from "@/lib/settings";
 import { after } from "next/server";
@@ -118,10 +118,15 @@ export async function playGame(
   // the arcade/bet/rate gates run — turning a "switched off" or rate-limited
   // request into a 500. It is therefore carried the same way as the resolver
   // and unwrapped only after the gates have had their say.
-  const progressAttempt = getProgress(userId).then(
-    (value) => ({ ok: true as const, value }),
-    (error: unknown) => ({ ok: false as const, error }),
-  );
+  const progressAttempt = getProgress(userId)
+    .then((value) => {
+      // Starter-item grant rides the settlement touchpoint: the RPC predicate
+      // makes it exactly-once no matter how often it runs. Not awaited — the
+      // round never depends on it, and the gate's own earn path re-checks.
+      void ensureStarterItems(userId);
+      return { ok: true as const, value };
+    })
+    .catch((error: unknown) => ({ ok: false as const, error }));
 
   const [settings, features, lastRound, streak, progress, economy, outcome] = await Promise.all([
     getGames(GAMES),
@@ -299,39 +304,47 @@ export async function playGame(
     payload: { game: gameId, bet, payout },
   });
 
-  // Daily game-activity streak (migration 0047): the compare-and-set gate only
+  // Daily game-activity streak (0047/0049): the compare-and-set gate only
   // advances on the day's FIRST settled round (-1 sentinel afterwards), runs
   // strictly after the void paths so it never advances for a deleted round,
   // and the bonus sits OUTSIDE the 100 XP game cap by design — mirroring the
-  // daily-claim streak bonus, with its own admin-editable ceiling. A bonus
-  // failure must never fail the round: streak advanced, next visit retries.
+  // daily-claim streak bonus, with its own admin-editable ceiling. The gate
+  // also burns a Streak Freeze on a missed day and earns one when the best
+  // crosses a multiple of 7 — same locked transaction. A bookkeeping failure
+  // must never fail the round: streak advanced, next visit retries.
   let streakBonusXp = 0;
+  let freezeUsed = false;
   try {
     const today = new Date().toISOString().slice(0, 10);
-    const { data: streak, error } = await supabase.rpc("game_streak_gate", {
+    const { data: gate, error } = await supabase.rpc("game_streak_gate", {
       p_user_id: userId,
       p_today: today,
     });
-    if (!error && typeof streak === "number" && streak > 0) {
-      const bonus = Math.min(
-        economy.gameStreakXpCap,
-        (streak - 1) * economy.gameStreakXpPerDay,
-      );
-      if (bonus > 0) {
-        const applied = await supabase.rpc("apply_xp_coins", {
-          p_user_id: userId,
-          p_xp: bonus,
-          p_coins: 0,
-        });
-        if (applied.error) throw applied.error;
-        streakBonusXp = bonus;
-        logActivity({
-          userId,
-          kind: "game",
-          title: `extended their game streak to day ${streak}`,
-          xpAmount: bonus,
-          payload: { game: gameId, streak },
-        }).catch(() => undefined);
+    if (!error && gate) {
+      const row = Array.isArray(gate) ? gate[0] : gate;
+      const streak = Number((row as { streak?: number })?.streak ?? -1);
+      freezeUsed = Boolean((row as { freeze_used?: boolean })?.freeze_used);
+      if (streak > 0) {
+        const bonus = Math.min(
+          economy.gameStreakXpCap,
+          (streak - 1) * economy.gameStreakXpPerDay,
+        );
+        if (bonus > 0) {
+          const applied = await supabase.rpc("apply_xp_coins", {
+            p_user_id: userId,
+            p_xp: bonus,
+            p_coins: 0,
+          });
+          if (applied.error) throw applied.error;
+          streakBonusXp = bonus;
+          logActivity({
+            userId,
+            kind: "game",
+            title: `extended their game streak to day ${streak}`,
+            xpAmount: bonus,
+            payload: { game: gameId, streak },
+          }).catch(() => undefined);
+        }
       }
     }
   } catch {
@@ -350,7 +363,11 @@ export async function playGame(
     payout,
     won,
     balance: awardResult.coins,
-    result: streakBonusXp > 0 ? { ...result, streakBonusXp } : result,
+    result: {
+      ...result,
+      ...(streakBonusXp > 0 && { streakBonusXp }),
+      ...(freezeUsed && { freezeUsed: true }),
+    },
   };
 }
 

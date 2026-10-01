@@ -5,6 +5,7 @@ import {
   getMostOwnedBadges,
   getRarestBadges,
   getSiteLeaderboard,
+  getStreakLeaderboard,
 } from "@/lib/queries";
 import {
   fetchOwnedLeaderboard,
@@ -59,12 +60,13 @@ export default async function LeaderboardsPage({
   const t = await getTranslations("leaderboards");
   const tc = await getTranslations("common");
 
-  const [potat, badgesblog, mostOwned, rarest, site] = await Promise.all([
+  const [potat, badgesblog, mostOwned, rarest, site, streaks] = await Promise.all([
     fetchOwnedLeaderboard(2).catch(() => []),
     fetchBadgesBlogRanking().catch(() => []),
     getMostOwnedBadges(10).catch(() => []),
     getRarestBadges(10).catch(() => []),
     getSiteLeaderboard(25).catch(() => []),
+    getStreakLeaderboard().catch(() => []),
   ]);
 
   return (
@@ -257,6 +259,50 @@ export default async function LeaderboardsPage({
                     </td>
                     <td className="text-end font-semibold tabular-nums">
                       {new Intl.NumberFormat(locale).format(entry.badges_owned)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="p-6 text-sm text-muted">{t("empty")}</p>
+          )}
+        </section>
+
+        {/* Best game streaks */}
+        <section aria-labelledby="best-streaks" className="card overflow-hidden">
+          <div className="border-b border-line px-5 py-4">
+            <h2 id="best-streaks" className="font-bold">{t("streakTitle")}</h2>
+            <p className="mt-0.5 text-xs text-muted">{t("streakDesc")}</p>
+          </div>
+          {streaks.length > 0 ? (
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th className="w-14">{t("rank")}</th>
+                  <th>{t("collector")}</th>
+                  <th className="text-end">{t("streakUnit")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {streaks.map((entry, index) => (
+                  <tr key={entry.user_id} className="hover:bg-surface-2">
+                    <td className="font-bold tabular-nums text-muted">#{index + 1}</td>
+                    <td>
+                      {entry.profile ? (
+                        <Link
+                          href={`/profile/${entry.profile.username}`}
+                          className="flex items-center gap-2.5 font-semibold hover:text-accent"
+                        >
+                          <Avatar src={entry.profile.avatar_url} name={entry.profile.username} />
+                          {entry.profile.username}
+                        </Link>
+                      ) : (
+                        <span className="text-muted">—</span>
+                      )}
+                    </td>
+                    <td className="text-end font-semibold tabular-nums">
+                      {new Intl.NumberFormat(locale).format(entry.best_game_streak)}
                     </td>
                   </tr>
                 ))}

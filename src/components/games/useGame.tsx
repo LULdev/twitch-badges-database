@@ -174,6 +174,7 @@ export function RoundOutcome({ last }: { last: PlayResponse | null }) {
   if (!last) return null;
   const streakBonus =
     typeof last.result.streakBonusXp === "number" ? last.result.streakBonusXp : 0;
+  const freezeUsed = last.result.freezeUsed === true;
   return (
     <p
       role="status"
@@ -194,6 +195,9 @@ export function RoundOutcome({ last }: { last: PlayResponse | null }) {
         <span className="inline-flex items-center gap-1 text-xs text-accent tabular-nums">
           {t("streakBonus", { n: streakBonus })}
         </span>
+      ) : null}
+      {freezeUsed ? (
+        <span className="text-xs text-info">{t("freezeUsed")}</span>
       ) : null}
     </p>
   );

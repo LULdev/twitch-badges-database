@@ -2793,6 +2793,34 @@ html {
   height: 8.5rem;
 }
 
+/* Item shelf — Streak Freeze: the snowflake turns slowly inside the still
+   shield while a frost glow breathes on the svg root. Strokes stay
+   currentColor (the .light foreground) — frost color lives only in the
+   glow, so contrast survives light mode. The wrapper .hero-emblem already
+   owns float+ring transforms, so the flake rotates only (no transform
+   collision); transform-box: fill-box centres the spin on the shield's
+   visual center (the flake group's bbox). */
+.item-icon {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--tier-color, var(--info)) 45%, transparent));
+}
+.item-icon .item-flake {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: item-flake-spin 16s linear infinite;
+}
+@keyframes item-flake-spin {
+  to { transform: rotate(360deg); }
+}
+.light .item-icon {
+  filter: drop-shadow(0 1px 2px rgba(22, 22, 44, 0.16))
+          drop-shadow(0 0 8px color-mix(in srgb, var(--info) 30%, transparent));
+}
+@media (prefers-reduced-motion: reduce) {
+  .item-flake {
+    animation: none;
+  }
+}
+
 /* Badge hero GIF reactions (the uploaded sticker set). The GIFs are square
    stickers on black, so the chip is a circular crop with the count beside. */
 .badge-reactions {

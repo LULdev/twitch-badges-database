@@ -27,6 +27,7 @@ import { readProgress } from "@/lib/gamification/xp";
 import { getEconomy } from "@/lib/settings";
 import { ProfileAutoRain, ProfileParticles, ProfileTilt } from "@/components/profile/ProfileEffects";
 import { levelFromXp } from "@/lib/gamification/levels";
+import ItemIcon, { ITEM_COLORS } from "@/components/items/ItemIcon";
 import { ACH_BY_ID } from "@/lib/gamification/achievements";
 import { recordProfileVisit } from "@/lib/gamification/visits";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -318,9 +319,10 @@ export default async function ProfilePage({ params }: PageProps) {
   let progress: Awaited<ReturnType<typeof readProgress>> = null;
   let level = null as ReturnType<typeof levelFromXp> | null;
   let unlockedAchievements: Array<{ achievement_id: string; unlocked_at: string }> = [];
+  let itemFreezes: number | null = null;
   if (profile) {
     const admin = createAdminClient();
-    const [progressRow, achievementRes] = await Promise.all([
+    const [progressRow, achievementRes, itemsRes] = await Promise.all([
       readProgress(profile.id).catch(() => null),
       admin
         .from("user_achievements")
@@ -328,6 +330,14 @@ export default async function ProfilePage({ params }: PageProps) {
         .eq("user_id", profile.id)
         .order("unlocked_at", { ascending: false })
         .limit(25),
+      // user_items is service-role-write only (0049, no policies); the public
+      // profile reads it the same way it reads user_achievements.
+      admin
+        .from("user_items")
+        .select("item_key, quantity")
+        .eq("user_id", profile.id)
+        .eq("item_key", "streak_freeze")
+        .maybeSingle(),
     ]);
     const achievementRows = (achievementRes.data ?? []) as Array<{
       achievement_id: string;
@@ -339,6 +349,8 @@ export default async function ProfilePage({ params }: PageProps) {
     // the level-1 display instead of hiding it.
     level = levelFromXp(progressRow?.xp ?? 0);
     unlockedAchievements = achievementRows;
+    itemFreezes =
+      (itemsRes.data as { quantity: number } | null)?.quantity ?? null;
   }
 
   return (
@@ -618,6 +630,51 @@ export default async function ProfilePage({ params }: PageProps) {
               </div>
             </>
           )}
+        </section>
+      )}
+
+      {/* Item shelf, in the badge-detail gallery style: one gal-stage card per
+          owned item kind. Visibility rides the same compound flag the badge
+          inventory uses — hiding your inventory hides the shelf too, while
+          the owner always sees their own stock. */}
+      {profile && inventoryVisible && itemFreezes !== null && itemFreezes > 0 && (
+        <section
+          className="gal-stage card flex flex-col items-center gap-5 p-6 sm:flex-row sm:p-8"
+          style={{ ["--tier-color" as string]: ITEM_COLORS.streak_freeze }}
+          aria-labelledby="profile-items"
+        >
+          <figure className="gal-pedestal shrink-0">
+            <span className="gal-halo" aria-hidden="true" />
+            <div className="hero-emblem">
+              <span className="hero-emblem-halo" aria-hidden="true" />
+              <ItemIcon id="streak_freeze" />
+            </div>
+            <div className="gal-plinth" aria-hidden="true" />
+            <span className="gal-plinth-shadow" aria-hidden="true" />
+          </figure>
+          <figcaption className="sr-only">{t("itemShelf")}</figcaption>
+          <div
+            className="gal-placard card min-w-0 flex-1 p-5 text-center sm:text-start"
+            id="profile-items"
+          >
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+              <span className="chip pointer-events-none font-bold text-accent">
+                ×{itemFreezes}
+              </span>
+              <span
+                className="chip pointer-events-none"
+                title={t("freezeExplain")}
+                aria-label={t("freezeExplain")}
+                tabIndex={0}
+              >
+                {t("freezeName")}
+              </span>
+            </div>
+            <h2 className="mt-3 text-lg font-extrabold tracking-tight">
+              {t("itemShelf")}
+            </h2>
+            <p className="mt-1 text-sm text-muted">{t("freezeExplain")}</p>
+          </div>
         </section>
       )}
 

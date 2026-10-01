@@ -19,6 +19,7 @@ import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 const OUT_DIR = resolve("public", "games", "art");
+const ITEMS_DIR = resolve("public", "items");
 /** globals.css :root — dark-first site; the vault arc's green zone. */
 const SUCCESS = "#34d399";
 
@@ -57,6 +58,31 @@ async function main(): Promise<void> {
     }
 
     const file = resolve(OUT_DIR, `${id}.svg`);
+    writeFileSync(file, markup + "\n", "utf8");
+    console.log(`wrote ${file} (${markup.length} bytes)`);
+  }
+
+  // Economy items (ItemIcon): same contract, own namespace + directory. The
+  // runtime hue for an item is only a decorative token (--tier-color on the
+  // shelf), so the baked ITEM_COLORS value is the faithful standalone color.
+  const { default: ItemIcon, ITEM_COLORS } = await import(
+    "@/components/items/ItemIcon"
+  );
+  mkdirSync(ITEMS_DIR, { recursive: true });
+  for (const id of Object.keys(ITEM_COLORS)) {
+    const hue = ITEM_COLORS[id];
+    if (!hue) throw new Error(`ITEM_COLORS is missing a hue for '${id}'`);
+    let markup = renderToStaticMarkup(React.createElement(ItemIcon, { id }));
+    markup = markup.replace(
+      "<svg ",
+      `<svg xmlns="http://www.w3.org/2000/svg" color="${hue}" `,
+    );
+    if (markup.includes("var(")) {
+      throw new Error(
+        `ItemIcon '${id}' now emits an unresolvable var() — bake it above`,
+      );
+    }
+    const file = resolve(ITEMS_DIR, `${id}.svg`);
     writeFileSync(file, markup + "\n", "utf8");
     console.log(`wrote ${file} (${markup.length} bytes)`);
   }

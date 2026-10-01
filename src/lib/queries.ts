@@ -653,6 +653,46 @@ export async function getSiteLeaderboard(
   return (data ?? []) as CollectorStatsRow[];
 }
 
+/**
+ * Weekly recap click-throughs for public KPI tiles — reads the anon-granted
+ * aggregate view (0048), one number, no paths.
+ */
+export async function getRecapClicks7d(): Promise<number | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("stats_analytics_recap_week")
+    .select("clicks_7d")
+    .maybeSingle();
+  return (data as { clicks_7d?: number } | null)?.clicks_7d ?? null;
+}
+
+/**
+ * Best game streaks, top 10 — user_progress is public-read (0003) and the
+ * profile embed rides the FK, mirroring the profile_visits visitor embed.
+ * Zeros are filtered so members who never played stay off the board.
+ */
+export async function getStreakLeaderboard(): Promise<
+  Array<{ user_id: string; best_game_streak: number; profile: { username: string; avatar_url: string | null } | null }>
+> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("user_progress")
+    .select("user_id, best_game_streak, profile:profiles(username, avatar_url)")
+    .gt("best_game_streak", 0)
+    .order("best_game_streak", { ascending: false })
+    .limit(10);
+  return ((data ?? []) as unknown as Array<{
+    user_id: string;
+    best_game_streak: number;
+    profile: { username: string; avatar_url: string | null } | null;
+  }>).map((row) => ({
+    user_id: row.user_id,
+    best_game_streak: row.best_game_streak,
+    // PostgREST may return the embed as a one-element array (to-one ambiguity).
+    profile: Array.isArray(row.profile) ? row.profile[0] : row.profile,
+  }));
+}
+
 export async function listPosts(publishedOnly = true): Promise<BlogPostRow[]> {
   const supabase = await createClient();
   let query = supabase
