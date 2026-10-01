@@ -4,12 +4,14 @@ export type HeartbeatSource =
   | "sync/global"
   | "sync/badgebase"
   | "sync/potat"
+  | "sync/arcade-highlights"
   | "cron/global"
   | "cron/potat"
   | "cron/badgebase"
   | "manual/global"
   | "manual/badgebase"
   | "manual/potat"
+  | "manual/arcade-highlights"
   | "web";
 
 export type HeartbeatStatus = "ok" | "degraded" | "error";

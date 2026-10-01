@@ -2844,6 +2844,129 @@ html {
 }
 
 /* ==================================================================
+   Games hub — premium tiles with per-game artwork (gg-*)
+   ================================================================== */
+
+/* Art stage: the site's 16:9 cover convention (blog drop tiles) with the
+   featured-cover radial wash, parameterized by the tile's --gg-color. */
+.gg-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(120% 90% at 50% 0%,
+      color-mix(in srgb, var(--gg-color, var(--accent)) 14%, transparent),
+      transparent 70%),
+    linear-gradient(180deg, var(--surface-3), var(--surface-2));
+}
+.gg-art-inner {
+  /* float wrapper — separate node so the hover scale on the svg never
+     fights the bob keyframe's transform */
+  animation: bl-float 7s ease-in-out infinite;
+}
+.gg-art svg {
+  display: block;
+  width: min(60%, 9.5rem);
+  height: auto;
+  color: var(--gg-color, var(--accent));
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.35));
+  transition: transform 0.25s ease;
+}
+.gg-tile:hover .gg-art svg {
+  transform: scale(1.07);
+}
+/* one-shot sheen sweep across the art on hover (kpi-sheen recipe) */
+.gg-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg,
+    transparent 40%, rgba(255, 255, 255, 0.07) 50%, transparent 60%);
+  transform: translateX(-130%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+.gg-tile:hover .gg-art::after {
+  transform: translateX(130%);
+}
+/* tile: color-locked hover border + glow + soft wash over the body */
+.gg-tile {
+  position: relative;
+  overflow: hidden;
+}
+.gg-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 60% at 50% 100%,
+    color-mix(in srgb, var(--gg-color, var(--accent)) 8%, transparent), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+.gg-tile:hover {
+  border-color: color-mix(in srgb, var(--gg-color, var(--accent)) 45%, var(--line));
+  box-shadow: var(--shadow-glow);
+}
+.gg-tile:hover::before {
+  opacity: 1;
+}
+.gg-flag {
+  position: absolute;
+  top: 0.5rem;
+  inset-inline-start: 0.5rem;
+  z-index: 1;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(4px);
+}
+.gg-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  flex: 1;
+  padding: 0.875rem 1rem 1rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gg-art-inner,
+  .gg-art svg {
+    animation: none !important;
+    transition: none !important;
+  }
+  .gg-art::after {
+    display: none;
+  }
+}
+
+/* Game page hero art: .gg-art is a full-bleed 16/9 tile-topper with a bottom
+   seam; the detail-page hero wants a contained, rounded frame beside the
+   title. Same wash recipe, own shape. */
+.gg-hero {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 7.5rem;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background:
+    radial-gradient(120% 90% at 50% 0%,
+      color-mix(in srgb, var(--gg-color, var(--accent)) 14%, transparent),
+      transparent 70%),
+    linear-gradient(180deg, var(--surface-3), var(--surface-2));
+}
+.gg-hero svg {
+  display: block;
+  width: min(60%, 9.5rem);
+  height: auto;
+  color: var(--gg-color, var(--accent));
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.35));
+}
+
+/* ==================================================================
    Blog system — premium layouts (index variants A–D + article page)
    ================================================================== */
 

@@ -575,7 +575,9 @@
     "testSent": "Test-Benachrichtigung gesendet!",
     "feed": "Aktuelle Meldungen",
     "feedEmpty": "Noch keine Meldungen. Neue Badge-Drops erscheinen hier.",
-    "pushFailed": "Registrierung für Push-Benachrichtigungen fehlgeschlagen."
+    "pushFailed": "Registrierung für Push-Benachrichtigungen fehlgeschlagen.",
+    "recapToggle": "Arcade-Rückblicke",
+    "recapHint": "Tägliche und wöchentliche Arcade-Rückblick-Benachrichtigungen. Lassen sie sich hier abschalten, ohne andere Hinweise zu verlieren; die Rückblicke erscheinen weiter im Feed unten."
   },
   "account": {
     "title": "Einstellungen",
@@ -632,7 +634,12 @@
   "games": {
     "hubTitle": "Badge-Arcade",
     "hubSubtitle": "13 Twitch-Badge-Spiele — BadgesCoins setzen, BadgesCoins gewinnen, XP verdienen.",
+    "recapNext": "Der nächste Arcade-Rückblick erscheint um {time} UTC.",
+    "recapLatest": "Neuester Arcade-Rückblick",
+    "back": "Zurück zur Spieleübersicht",
     "bet": "Einsatz",
+    "betRange": "Einsatz: {min}–{max}",
+    "lastRound": "Letzte Runde",
     "payout": "Auszahlung",
     "you": "Du",
     "bot": "Bot",

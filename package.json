@@ -20,7 +20,9 @@
     "seed:ideas": "tsx scripts/seed-acp-ideas.ts",
     "ideas:inventory": "tsx scripts/export-idea-inventory.ts",
     "ideas:verify": "tsx scripts/verify-new-ideas.ts",
-    "ideas:import": "tsx scripts/import-new-ideas.ts --write"
+    "ideas:import": "tsx scripts/import-new-ideas.ts --write",
+    "sync:highlights": "tsx scripts/sync-highlights.ts",
+    "art:export": "tsx scripts/export-game-art.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

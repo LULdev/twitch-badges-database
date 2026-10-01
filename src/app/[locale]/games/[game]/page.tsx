@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { GAMES } from "@/lib/gamification/games";
+import GameArt, { GAME_COLORS } from "@/components/games/GameArt";
+import Coin from "@/components/Coin";
 import { createClient } from "@/lib/supabase/server";
 import { authUserId } from "@/lib/gamification/session";
 import { getFeatures, getGames } from "@/lib/settings";
@@ -53,8 +57,16 @@ export default async function GamePage({ params }: PageProps) {
   const { locale, game } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("games");
+  const tc = await getTranslations("common");
   const meta = GAMES.find((g) => g.id === game);
   if (!meta) notFound();
+
+  // Shared hero vars: the aurora wash reads --tier-color, the art frame
+  // --gg-color — both set once here and inherited.
+  const heroVars = {
+    ["--tier-color" as string]: GAME_COLORS[game] ?? "var(--accent)",
+    ["--gg-color" as string]: GAME_COLORS[game] ?? "var(--accent)",
+  };
 
   // The playable board is gated by all three arcade switches, not only the hub's
   // tile list. With the master off or `features.games` disabled the page used to
@@ -63,11 +75,50 @@ export default async function GamePage({ params }: PageProps) {
   // error per round. Master / feature off shows the arcade-off copy; a single
   // disabled game 404s, matching the hub hiding its tile.
   const [settings, features] = await Promise.all([getGames(GAMES), getFeatures()]);
+
+  // The bet range a tile/hero may advertise — same merge the hub uses, so the
+  // hero can never promise limits the engine would refuse.
+  const range = settings.games[game] ?? meta;
+
+  // One hero shell for EVERY state (playable, login wall, arcade off): the
+  // game art makes the page recognizable even before login. `stats` is the
+  // state-specific chip (last-round result) that only the playable state has.
+  const hero = (stats?: ReactNode) => (
+    <header
+      className="gal-stage card flex flex-col items-center gap-5 p-6 sm:flex-row sm:p-8"
+      style={heroVars}
+    >
+      <div className="gg-hero shrink-0" aria-hidden="true">
+        <div className="gg-art-inner">
+          <GameArt id={game} />
+        </div>
+      </div>
+      <div className="min-w-0 flex-1 text-center sm:text-start">
+        <nav className="text-xs text-muted" aria-label={tc("breadcrumb")}>
+          <Link href="/games" className="hover:text-foreground">
+            {t("back")}
+          </Link>
+        </nav>
+        <h1 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">
+          {t(`${game}Title`)}
+        </h1>
+        <p className="mt-1 text-sm text-muted">{t(`${game}Desc`)}</p>
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+          <span className="chip pointer-events-none">
+            {t("betRange", { min: range.minBet, max: range.maxBet })}{" "}
+            <Coin size={11} />
+          </span>
+          {stats}
+        </div>
+      </div>
+    </header>
+  );
+
   if (!settings.enabled || !features.games) {
     return (
-      <div className="mx-auto max-w-lg py-16 text-center">
-        <h1 className="text-2xl font-extrabold tracking-tight">{t(`${game}Title`)}</h1>
-        <p className="mx-auto mt-3 max-w-md text-sm text-muted">{t("disabled")}</p>
+      <div className="mx-auto max-w-2xl space-y-6">
+        {hero()}
+        <p className="card p-6 text-center text-sm text-muted">{t("disabled")}</p>
       </div>
     );
   }
@@ -76,11 +127,13 @@ export default async function GamePage({ params }: PageProps) {
   const userId = await authUserId();
   if (!userId) {
     return (
-      <div className="mx-auto max-w-lg py-16 text-center">
-        <h1 className="text-2xl font-extrabold tracking-tight">{t(`${game}Title`)}</h1>
-        <p className="mx-auto mt-3 max-w-md text-sm text-muted">{t("loginRequired")}</p>
-        <div className="mt-8">
-          <TwitchLoginButton />
+      <div className="mx-auto max-w-2xl space-y-6">
+        {hero()}
+        <div className="card p-6 text-center">
+          <p className="text-sm text-muted">{t("loginRequired")}</p>
+          <div className="mt-6">
+            <TwitchLoginButton />
+          </div>
         </div>
       </div>
     );
@@ -101,12 +154,64 @@ export default async function GamePage({ params }: PageProps) {
       .filter((row) => row.image);
   }
 
+  // The visitor's most recent settled rounds on THIS game, for the hero chip:
+  // the last one as a signed amount plus a five-dot win/loss streak.
+  // game_rounds is public-read under RLS, so the anon server client suffices
+  // (same access pattern as the catalog read on the same page); the (user_id,
+  // created_at desc) index serves the top-5. Net is computed here — the table
+  // stores absolute payout and bet, never the difference.
+  let lastRoundChip: ReactNode = null;
+  {
+    const supabase = await createClient();
+    const { data: recent } = await supabase
+      .from("game_rounds")
+      .select("bet,payout")
+      .eq("user_id", userId)
+      .eq("game", game)
+      .order("created_at", { ascending: false })
+      .limit(5);
+    const rounds = (recent ?? []) as Array<{ bet: number; payout: number }>;
+    if (rounds.length > 0) {
+      const net = rounds[0].payout - rounds[0].bet;
+      lastRoundChip = (
+        <span
+          className={`chip pointer-events-none ${
+            net > 0 ? "chip-live" : net < 0 ? "chip-danger" : ""
+          }`}
+        >
+          {t("lastRound")}{" "}
+          {/* dir="ltr" island: a bare "+200" text node loses its sign in the
+              RTL paragraph (Arabic-Indic digits never attach to it) — the
+              FeedList win/loss pattern. */}
+          <span dir="ltr" className="inline-flex items-center gap-1 tabular-nums">
+            {net > 0 ? "+" : net < 0 ? "−" : ""}
+            {Math.abs(net).toLocaleString(locale)} <Coin size={12} />
+          </span>
+          {/* Five-dot streak, newest left (the roulette round-history
+              direction), pinned with dir="ltr" so RTL keeps the order. Purely
+              decorative: the signed amount beside it is the accessible
+              summary, so color-only dots stay aria-hidden. */}
+          <span aria-hidden="true" dir="ltr" className="ms-1 inline-flex items-center gap-1">
+            {rounds.map((r, i) => {
+              const n = r.payout - r.bet;
+              return (
+                <span
+                  key={i}
+                  className={`size-2 rounded-full ${
+                    n > 0 ? "bg-success" : n < 0 ? "bg-danger" : "bg-muted"
+                  } ${i === 0 ? "ring-1 ring-accent" : ""}`}
+                />
+              );
+            })}
+          </span>
+        </span>
+      );
+    }
+  }
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <header>
-        <h1 className="text-2xl font-extrabold tracking-tight">{t(`${game}Title`)}</h1>
-        <p className="mt-1 text-sm text-muted">{t(`${game}Desc`)}</p>
-      </header>
+      {hero(lastRoundChip)}
       {game === "rps" && <RpsGame />}
       {game === "coinflip" && <CoinflipGame />}
       {game === "hilo" && <HiloGame />}

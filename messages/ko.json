@@ -575,7 +575,9 @@
     "testSent": "테스트 알림을 보냈습니다!",
     "feed": "최근 알림",
     "feedEmpty": "아직 알림이 없습니다. 새 배지 드롭이 여기 표시됩니다.",
-    "pushFailed": "푸시 알림에 등록할 수 없습니다."
+    "pushFailed": "푸시 알림에 등록할 수 없습니다.",
+    "recapToggle": "아케이드 요약",
+    "recapHint": "매일·매주 아케이드 요약 알림입니다. 다른 알림은 그대로 둔 채 여기서 끌 수 있고, 요약은 아래 피드에 계속 표시됩니다."
   },
   "account": {
     "title": "설정",
@@ -632,7 +634,12 @@
   "games": {
     "hubTitle": "아케이드",
     "hubSubtitle": "Twitch 배지 게임 13종 — BadgesCoins를 걸고 BadgesCoins를 따고 XP를 획득하세요.",
+    "recapNext": "다음 아케이드 요약은 {time}(UTC)에 게시됩니다.",
+    "recapLatest": "최신 아케이드 요약",
+    "back": "게임으로 돌아가기",
     "bet": "베팅",
+    "betRange": "베팅: {min}~{max}",
+    "lastRound": "지난 라운드",
     "payout": "지급액",
     "you": "나",
     "bot": "Bot",

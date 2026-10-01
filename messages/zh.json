@@ -575,7 +575,9 @@
     "testSent": "测试通知已发送！",
     "feed": "最近提醒",
     "feedEmpty": "暂无提醒。新徽章掉落会显示在这里。",
-    "pushFailed": "无法注册推送通知。"
+    "pushFailed": "无法注册推送通知。",
+    "recapToggle": "街机回顾",
+    "recapHint": "每日和每周街机回顾通知。可在此关闭而不影响其他提醒；回顾仍会显示在下方的动态中。"
   },
   "account": {
     "title": "设置",
@@ -632,7 +634,12 @@
   "games": {
     "hubTitle": "街机厅",
     "hubSubtitle": "13 款 Twitch 徽章游戏——押注 BadgesCoins，赢取 BadgesCoins，赚取 XP。",
+    "recapNext": "下一份街机回顾将于 {time}（UTC）发布。",
+    "recapLatest": "最新街机回顾",
+    "back": "返回游戏",
     "bet": "押注",
+    "betRange": "押注：{min}–{max}",
+    "lastRound": "上一局",
     "payout": "派彩",
     "you": "你",
     "bot": "Bot",

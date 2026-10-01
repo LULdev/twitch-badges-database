@@ -30,8 +30,13 @@ export interface PushResult {
   configured: boolean;
 }
 
-/** Fan out a web push to every stored subscription; prunes dead endpoints. */
-export async function sendPushToAll(payload: PushPayload): Promise<PushResult> {
+/** Fan out a web push to every stored subscription; prunes dead endpoints.
+ *  `recapOnly` filters to subscriptions that have not opted out of the daily
+ *  and weekly arcade recaps (migration 0045) — generic alerts ignore the flag. */
+export async function sendPushToAll(
+  payload: PushPayload,
+  opts: { recapOnly?: boolean } = {},
+): Promise<PushResult> {
   if (!pushConfigured()) {
     return { sent: 0, failed: 0, configured: false };
   }
@@ -43,11 +48,13 @@ export async function sendPushToAll(payload: PushPayload): Promise<PushResult> {
   type Subscription = { endpoint: string; p256dh: string; auth: string };
   const subscriptions: Subscription[] = [];
   for (let offset = 0; ; offset += 1000) {
-    const { data, error } = await supabase
+    let query = supabase
       .from("push_subscriptions")
       .select("endpoint, p256dh, auth")
       .order("endpoint")
       .range(offset, offset + 999);
+    if (opts.recapOnly) query = query.eq("recap", true);
+    const { data, error } = await query;
     if (error) throw error;
     const page = (data ?? []) as Subscription[];
     subscriptions.push(...page);

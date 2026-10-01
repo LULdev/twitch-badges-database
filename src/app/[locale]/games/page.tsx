@@ -6,10 +6,14 @@ import { getProgress } from "@/lib/gamification/xp";
 import { levelFromXp } from "@/lib/gamification/levels";
 import { GAMES } from "@/lib/gamification/games";
 import { getFeatures, getGames } from "@/lib/settings";
+import { getPostBySlug } from "@/lib/queries";
+import { isoWeekLabel } from "@/lib/blog";
 import DailyClaim from "@/components/DailyClaim";
 import LevelBadge from "@/components/LevelBadge";
 import Coin from "@/components/Coin";
 import GameIcon from "@/components/GameIcon";
+import GameArt, { GAME_COLORS } from "@/components/games/GameArt";
+import Reveal from "@/components/stats/Reveal";
 import { localeAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -61,12 +65,43 @@ export default async function GamesHubPage({
       ? GAMES.filter((game) => settings.games[game.id]?.enabled !== false)
       : [];
 
+  // Recap banner data: the newest recap post is looked up by its EXACT
+  // date/week-stamped slug through the public-read catalog (blog_posts is
+  // anon-readable; the heartbeat table is not since 0043), so no service
+  // role is involved. Candidates: today's post (published 06:00), yesterday's,
+  // and — on Mondays — the weekly one. `new Date()` in a dynamic server
+  // component is hydration-safe (no client re-render of this text).
+  const now = new Date();
+  const daySlug = (offset: number) =>
+    `arcade-highlights-${
+      new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - offset),
+      )
+        .toISOString()
+        .slice(0, 10)
+    }`;
+  const candidates = [daySlug(0), daySlug(1)];
+  if (now.getUTCDay() === 1) {
+    const monday = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 7),
+    );
+    candidates.push(`arcade-weekly-${isoWeekLabel(monday)}`);
+  }
+  const recaps = (
+    await Promise.all(candidates.map((slug) => getPostBySlug(slug).catch(() => null)))
+  ).filter((p): p is NonNullable<typeof p> => !!p);
+  const latestRecap =
+    recaps.sort(
+      (a, b) =>
+        new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
+    )[0] ?? null;
+
   return (
     <div className="space-y-8">
-      <header className="card flex flex-col items-center gap-5 p-6 sm:flex-row">
+      <header className="gal-stage card flex flex-col items-center gap-5 p-6 sm:flex-row sm:p-8">
         {level && <LevelBadge level={level.level} size={72} />}
-        <div className="flex-1 text-center sm:text-start">
-          <h1 className="text-2xl font-extrabold tracking-tight">{t("hubTitle")}</h1>
+        <div className="min-w-0 flex-1 text-center sm:text-start">
+          <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t("hubTitle")}</h1>
           <p className="mt-1 text-sm text-muted">{t("hubSubtitle")}</p>
           {level && (
             <div className="mt-3">
@@ -82,7 +117,7 @@ export default async function GamesHubPage({
             </div>
           )}
         </div>
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex shrink-0 flex-col items-center gap-2">
           <DailyClaim compact />
           <Link href="/wheel" className="btn btn-primary text-xs">
             <GameIcon id="wheel" size={14} />
@@ -91,32 +126,53 @@ export default async function GamesHubPage({
         </div>
       </header>
 
+      {visible.length > 0 && (
+        <div className="card flex flex-wrap items-center justify-between gap-3 p-4 text-sm text-muted">
+          <span>{t("recapNext", { time: "06:00" })}</span>
+          {latestRecap && (
+            <Link
+              href={`/blog/${latestRecap.slug}`}
+              className="btn btn-secondary text-xs shrink-0"
+            >
+              {t("recapLatest")}
+              <span className="dir-arrow" aria-hidden="true">→</span>
+            </Link>
+          )}
+        </div>
+      )}
+
       {visible.length === 0 ? (
         <div className="card p-8 text-center text-sm text-muted">{t("disabled")}</div>
       ) : (
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {visible.map((game) => {
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {visible.map((game, i) => {
           const range = settings.games[game.id] ?? game;
           return (
-          <Link
-            key={game.id}
-            href={`/games/${game.id}`}
-            className="card card-interactive flex flex-col gap-2 p-5"
-          >
-            <span className="text-accent">
-              <GameIcon id={game.id} size={30} />
-            </span>
-            <h2 className="font-bold leading-tight">{t(`${game.id}Title`)}</h2>
-            <p className="text-xs leading-relaxed text-muted">{t(`${game.id}Desc`)}</p>
-            <div className="mt-auto flex items-center gap-1.5 pt-2">
-              <span className="chip pointer-events-none text-[0.5625rem]">
-                {game.type === "luck" ? t("luck") : t("skill")}
-              </span>
-              <span className="chip pointer-events-none text-[0.5625rem]">
-                {range.minBet}–{range.maxBet} <Coin size={11} />
-              </span>
-            </div>
-          </Link>
+          <Reveal key={game.id} delay={i * 70} className="h-full">
+            <Link
+              href={`/games/${game.id}`}
+              className="card card-interactive gg-tile flex h-full flex-col"
+              style={{ ["--gg-color" as string]: GAME_COLORS[game.id] ?? "var(--accent)" }}
+            >
+              <div className="gg-art" aria-hidden="true">
+                <span className="gg-flag chip pointer-events-none text-[0.5625rem]">
+                  {game.type === "luck" ? t("luck") : t("skill")}
+                </span>
+                <div className="gg-art-inner">
+                  <GameArt id={game.id} />
+                </div>
+              </div>
+              <div className="gg-body">
+                <h2 className="font-bold leading-tight">{t(`${game.id}Title`)}</h2>
+                <p className="text-xs leading-relaxed text-muted">{t(`${game.id}Desc`)}</p>
+                <div className="mt-auto flex items-center gap-1.5 pt-2">
+                  <span className="chip pointer-events-none text-[0.5625rem]">
+                    {range.minBet}–{range.maxBet} <Coin size={11} />
+                  </span>
+                </div>
+              </div>
+            </Link>
+          </Reveal>
           );
         })}
       </div>

@@ -575,7 +575,9 @@
     "testSent": "¡Notificación de prueba enviada!",
     "feed": "Alertas recientes",
     "feedEmpty": "Aún no hay alertas. Los nuevos drops de insignias aparecerán aquí.",
-    "pushFailed": "No se pudo registrar para notificaciones push."
+    "pushFailed": "No se pudo registrar para notificaciones push.",
+    "recapToggle": "Resúmenes arcade",
+    "recapHint": "Notificaciones diarias y semanales de resúmenes arcade. Puedes desactivarlas aquí sin perder otras alertas; los resúmenes siguen apareciendo en el feed de abajo."
   },
   "account": {
     "title": "Ajustes",
@@ -632,7 +634,12 @@
   "games": {
     "hubTitle": "Sala de juegos",
     "hubSubtitle": "13 juegos de insignias de Twitch — apuesta BadgesCoins, gana BadgesCoins, consigue XP.",
+    "recapNext": "El próximo resumen arcade se publica a las {time} UTC.",
+    "recapLatest": "Último resumen arcade",
+    "back": "Volver a los juegos",
     "bet": "Apuesta",
+    "betRange": "Apuesta: {min}–{max}",
+    "lastRound": "Última ronda",
     "payout": "Pago",
     "you": "Tú",
     "bot": "Bot",

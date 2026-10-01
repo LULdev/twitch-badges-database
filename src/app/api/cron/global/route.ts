@@ -1,6 +1,7 @@
 import { isAuthorizedCron } from "@/lib/cron-auth";
 import { runGlobalSync } from "@/lib/syncs/global";
 import { runBadgebaseSync } from "@/lib/syncs/badgebase";
+import { runArcadeHighlights } from "@/lib/syncs/arcade-highlights";
 import { pruneHeartbeats, recordHeartbeat, withHeartbeat } from "@/lib/health";
 import { prunedCoinRainGate } from "@/lib/gamification/daily";
 
@@ -73,10 +74,40 @@ export async function GET(request: Request) {
   const pruned = await pruneHeartbeats(90).catch(() => 0);
   const prunedRainGate = await prunedCoinRainGate().catch(() => 0);
 
+  // Daily arcade recap post (previous UTC day). Own heartbeat unit so the
+  // status page shows it separately; failures degrade the run but never block
+  // the catalog sync above, and a quiet day is a recorded skip, not an error.
+  let highlights: unknown = null;
+  let highlightsFailed = false;
+  let highlightsError: string | null = null;
+  try {
+    highlights = await withHeartbeat(
+      "sync/arcade-highlights",
+      () => runArcadeHighlights(),
+      (result) => result as unknown as Record<string, unknown>,
+      (result) => {
+        const r = result as { skipped?: boolean; weekly?: { failed?: boolean } };
+        if (r?.weekly?.failed) {
+          return { status: "degraded", message: "weekly recap failed" };
+        }
+        return r?.skipped
+          ? { status: "degraded", message: "no rounds — recap skipped" }
+          : { status: "ok" };
+      },
+    );
+  } catch (error) {
+    console.error("[cron/global] arcade highlights", error);
+    highlightsFailed = true;
+    highlightsError = error instanceof Error ? error.message : "failed";
+  }
+
   const durationMs = Date.now() - started;
   await recordHeartbeat({
     source: "cron/global",
-    status: globalFailed || badgebaseFailed || badgebaseSkipped ? "degraded" : "ok",
+    status:
+      globalFailed || badgebaseFailed || badgebaseSkipped || highlightsFailed
+        ? "degraded"
+        : "ok",
     durationMs,
     message: globalFailed
       ? (globalError ?? "catalog sync failed")
@@ -84,13 +115,16 @@ export async function GET(request: Request) {
         ? (badgebaseError ?? "drop-window enrichment failed")
         : badgebaseSkipped
           ? "drop-window enrichment skipped"
-          : null,
+          : highlightsFailed
+            ? (highlightsError ?? "arcade highlights failed")
+            : null,
     payload: {
       prunedHeartbeats: pruned,
       prunedRainGate,
       globalFailed,
       badgebaseFailed,
       badgebaseSkipped,
+      highlightsFailed,
     },
   });
 
@@ -109,6 +143,9 @@ export async function GET(request: Request) {
       badgebase,
       badgebaseFailed,
       badgebaseSkipped,
+      highlights,
+      highlightsFailed,
+      highlightsError,
       durationMs,
       pruned,
       prunedRainGate,

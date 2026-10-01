@@ -46,6 +46,9 @@ export default function PushToggle() {
     [],
   );
   const [error, setError] = useState(false);
+  // Recap opt-out (migration 0045): endpoint-scoped, loaded once subscribed.
+  const [recap, setRecap] = useState(true);
+  const [recapBusy, setRecapBusy] = useState(false);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -55,10 +58,23 @@ export default function PushToggle() {
     let cancelled = false;
     navigator.serviceWorker.ready
       .then((registration) =>
-        registration.pushManager.getSubscription().then((subscription) => {
+        registration.pushManager.getSubscription().then(async (subscription) => {
           if (cancelled) return;
-          if (subscription) setState("on");
-          else if (Notification.permission === "denied") setState("denied");
+          if (subscription) {
+            setState("on");
+            // Load the stored recap flag; default true on any read failure.
+            try {
+              const res = await fetch(
+                `/api/push/subscribe?endpoint=${encodeURIComponent(subscription.endpoint)}`,
+              );
+              if (res.ok) {
+                const data = (await res.json()) as { recap?: boolean };
+                if (!cancelled) setRecap(data.recap ?? true);
+              }
+            } catch {
+              // keep the default
+            }
+          } else if (Notification.permission === "denied") setState("denied");
           else setState("off");
         }),
       )
@@ -163,39 +179,81 @@ export default function PushToggle() {
     }
   }
 
+  async function toggleRecap() {
+    if (recapBusy) return;
+    setRecapBusy(true);
+    try {
+      const registration = await serviceWorkerReady();
+      const subscription = await registration.pushManager.getSubscription();
+      if (!subscription) return;
+      const next = !recap;
+      const res = await fetch("/api/push/subscribe", {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ endpoint: subscription.endpoint, recap: next }),
+      });
+      // Follow the server's answer instead of guessing from local state.
+      if (!res.ok) return;
+      const data = (await res.json()) as { recap?: boolean };
+      if (typeof data.recap === "boolean") setRecap(data.recap);
+    } catch {
+      // keep the old state on failure
+    } finally {
+      setRecapBusy(false);
+    }
+  }
+
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2">
+        {state === "on" ? (
+          <>
+            <span className="chip chip-active pointer-events-none">
+              <span className="size-1.5 rounded-full bg-success" aria-hidden />
+              {t("enabled")}
+            </span>
+            <button type="button" className="btn btn-secondary text-xs" onClick={sendTest}>
+              {testSent ? t("testSent") : t("test")}
+            </button>
+            <button type="button" className="btn btn-ghost text-xs" onClick={disable}>
+              {t("disable")}
+            </button>
+          </>
+        ) : state === "unsupported" ? (
+          <p className="text-sm text-muted">{t("notSupported")}</p>
+        ) : state === "denied" ? (
+          <p className="text-sm text-warning">{t("permissionDenied")}</p>
+        ) : (
+          <button
+            type="button"
+            className="btn btn-primary text-xs"
+            onClick={enable}
+            disabled={state === "enabling"}
+          >
+            {state === "enabling" ? t("enabling") : t("enable")}
+          </button>
+        )}
+        {error ? (
+          <p className="w-full text-xs text-danger" role="alert">
+            {t("pushFailed")}
+          </p>
+        ) : null}
+      </div>
       {state === "on" ? (
-        <>
-          <span className="chip chip-active pointer-events-none">
-            <span className="size-1.5 rounded-full bg-success" aria-hidden />
-            {t("enabled")}
+        <label className="flex items-start gap-2.5 text-xs text-muted">
+          <input
+            type="checkbox"
+            checked={recap}
+            onChange={toggleRecap}
+            disabled={recapBusy}
+            className="mt-0.5 size-4 accent-[var(--accent)]"
+          />
+          <span>
+            <span className="font-semibold text-foreground">{t("recapToggle")}</span>
+            <br />
+            {t("recapHint")}
           </span>
-          <button type="button" className="btn btn-secondary text-xs" onClick={sendTest}>
-            {testSent ? t("testSent") : t("test")}
-          </button>
-          <button type="button" className="btn btn-ghost text-xs" onClick={disable}>
-            {t("disable")}
-          </button>
-        </>
-      ) : state === "unsupported" ? (
-        <p className="text-sm text-muted">{t("notSupported")}</p>
-      ) : state === "denied" ? (
-        <p className="text-sm text-warning">{t("permissionDenied")}</p>
-      ) : (
-        <button
-          type="button"
-          className="btn btn-primary text-xs"
-          onClick={enable}
-          disabled={state === "enabling"}
-        >
-          {state === "enabling" ? t("enabling") : t("enable")}
-        </button>
-      )}
-      {error ? (
-        <p className="w-full text-xs text-danger" role="alert">
-          {t("pushFailed")}
-        </p>
+        </label>
       ) : null}
     </div>
   );

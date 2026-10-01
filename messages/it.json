@@ -575,7 +575,9 @@
     "testSent": "Notifica di prova inviata!",
     "feed": "Avvisi recenti",
     "feedEmpty": "Nessun avviso. I nuovi drop compariranno qui.",
-    "pushFailed": "Impossibile registrarsi alle notifiche push."
+    "pushFailed": "Impossibile registrarsi alle notifiche push.",
+    "recapToggle": "Recap arcade",
+    "recapHint": "Notifiche giornaliere e settimanali dei recap arcade. Puoi disattivarle qui senza perdere gli altri avvisi; i recap restano visibili nel feed qui sotto."
   },
   "account": {
     "title": "Impostazioni",
@@ -632,7 +634,12 @@
   "games": {
     "hubTitle": "Sala giochi",
     "hubSubtitle": "13 giochi di badge Twitch — punta BadgesCoins, vinci BadgesCoins, guadagna XP.",
+    "recapNext": "Il prossimo recap arcade viene pubblicato alle {time} UTC.",
+    "recapLatest": "Ultimo recap arcade",
+    "back": "Torna ai giochi",
     "bet": "Puntata",
+    "betRange": "Puntata: {min}–{max}",
+    "lastRound": "Ultimo round",
     "payout": "Vincita",
     "you": "Tu",
     "bot": "Bot",

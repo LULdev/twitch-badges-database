@@ -575,7 +575,9 @@
     "testSent": "テスト通知を送信しました！",
     "feed": "最近のアラート",
     "feedEmpty": "アラートはまだありません。新しいドロップはここに表示されます。",
-    "pushFailed": "プッシュ通知の登録ができませんでした。"
+    "pushFailed": "プッシュ通知の登録ができませんでした。",
+    "recapToggle": "アーケードまとめ",
+    "recapHint": "毎日・毎週のアーケードまとめ通知。ほかの通知を保ったままここでオフにできます。まとめ自体は下のフィードに表示されます。"
   },
   "account": {
     "title": "設定",
@@ -632,7 +634,12 @@
   "games": {
     "hubTitle": "アーケード",
     "hubSubtitle": "Twitchバッジのゲーム13種 — BadgesCoinsを賭けてBadgesCoinsを獲得し、XPを稼ごう。",
+    "recapNext": "次のアーケードまとめは{time}（UTC）に公開されます。",
+    "recapLatest": "最新のアーケードまとめ",
+    "back": "ゲームに戻る",
     "bet": "ベット",
+    "betRange": "ベット：{min}〜{max}",
+    "lastRound": "前回",
     "payout": "配当",
     "you": "あなた",
     "bot": "Bot",

@@ -32,6 +32,21 @@ interface SubscriptionPayload {
   userAgent?: string;
 }
 
+/** Ownership guard for endpoint-scoped reads/writes (the admin client
+ *  bypasses RLS, so the check lives here): a signed-in caller may only touch
+ *  their own subscription, an anonymous caller only an unowned one. */
+async function isOwnedByCaller(endpoint: string, user: { id: string } | null) {
+  const admin = createAdminClient();
+  const { data: row, error } = await admin
+    .from("push_subscriptions")
+    .select("user_id")
+    .eq("endpoint", endpoint)
+    .maybeSingle();
+  if (error || !row) return false;
+  const owned = (row as { user_id: string | null }).user_id;
+  return user ? owned === user.id : owned === null;
+}
+
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as
     | SubscriptionPayload
@@ -97,6 +112,8 @@ export async function POST(request: Request) {
       p256dh,
       auth,
       user_agent: userAgent,
+      // recap is only ever set through PATCH below; the upsert must not
+      // reset an existing opt-out when the browser re-subscribes.
     },
     { onConflict: "endpoint" },
   );
@@ -105,6 +122,57 @@ export async function POST(request: Request) {
     return Response.json({ error: "subscription failed" }, { status: 500 });
   }
   return Response.json({ ok: true });
+}
+
+/** Read the caller's recap opt-out flag. The endpoint identifies the
+ *  subscription (the browser knows it from pushManager.getSubscription());
+ *  the ownership guard prevents probing third-party settings. */
+export async function GET(request: Request) {
+  const endpoint = new URL(request.url).searchParams.get("endpoint");
+  if (!endpoint) {
+    return Response.json({ error: "endpoint required" }, { status: 400 });
+  }
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!(await isOwnedByCaller(endpoint, user))) {
+    return Response.json({ error: "not found" }, { status: 404 });
+  }
+  const admin = createAdminClient();
+  const { data: row } = await admin
+    .from("push_subscriptions")
+    .select("recap")
+    .eq("endpoint", endpoint)
+    .maybeSingle();
+  return Response.json({ recap: (row as { recap: boolean } | null)?.recap ?? true });
+}
+
+/** Toggle the recap flag for the caller's subscription. */
+export async function PATCH(request: Request) {
+  const body = (await request.json().catch(() => null)) as
+    | { endpoint?: string; recap?: boolean }
+    | null;
+  if (!body?.endpoint || typeof body.recap !== "boolean") {
+    return Response.json({ error: "invalid payload" }, { status: 400 });
+  }
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!(await isOwnedByCaller(body.endpoint, user))) {
+    return Response.json({ error: "not found" }, { status: 404 });
+  }
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("push_subscriptions")
+    .update({ recap: body.recap })
+    .eq("endpoint", body.endpoint);
+  if (error) {
+    console.warn("[push] recap toggle failed:", error.message);
+    return Response.json({ error: "toggle failed" }, { status: 500 });
+  }
+  return Response.json({ ok: true, recap: body.recap });
 }
 
 export async function DELETE(request: Request) {

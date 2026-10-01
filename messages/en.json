@@ -575,7 +575,9 @@
     "testSent": "Test notification sent!",
     "feed": "Recent alerts",
     "feedEmpty": "No alerts yet. New badge drops will show up here.",
-    "pushFailed": "Could not register for push notifications."
+    "pushFailed": "Could not register for push notifications.",
+    "recapToggle": "Arcade recaps",
+    "recapHint": "Daily and weekly arcade recap notifications. You can switch them off here without losing other alerts; recaps still appear in the feed below."
   },
   "account": {
     "title": "Settings",
@@ -632,7 +634,12 @@
   "games": {
     "hubTitle": "Badge Arcade",
     "hubSubtitle": "13 Twitch-badge games — bet BadgesCoins, win BadgesCoins, earn XP.",
+    "recapNext": "The next arcade recap publishes at {time} UTC.",
+    "recapLatest": "Latest arcade recap",
+    "back": "Back to games",
     "bet": "Bet",
+    "betRange": "Bet: {min}–{max}",
+    "lastRound": "Last round",
     "payout": "Payout",
     "you": "You",
     "bot": "Bot",

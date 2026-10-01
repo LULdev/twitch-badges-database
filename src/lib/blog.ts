@@ -153,6 +153,209 @@ export function buildDropArticle(
   return { content, excerpt };
 }
 
+/** Inputs for the daily arcade recap, gathered by the sync engine. Every
+ *  field except the day itself can be missing on a quiet day — the builder
+ *  must stand on fallbacks exactly like buildDropArticle. */
+export interface ArcadeHighlightsInput {
+  /** UTC calendar day the recap covers (YYYY-MM-DD). */
+  day: string;
+  /** Human-readable game name -> settled round count that day. */
+  roundsByGame: Array<{ id: string; game: string; rounds: number }>;
+  biggestWin: {
+    id: string;
+    game: string;
+    bet: number;
+    payout: number;
+    username: string | null;
+  } | null;
+}
+
+/** Weekly recap inputs: one ISO week (Mon–Sun UTC) plus the prior week's
+ *  total for the trend line. Fallback-safe like the daily builder. */
+export interface ArcadeWeeklyInput {
+  /** ISO week label for the slug (e.g. "2026-W39"). */
+  isoWeek: string;
+  /** Inclusive Monday of the covered week (YYYY-MM-DD). */
+  weekStart: string;
+  /** Inclusive Sunday of the covered week (YYYY-MM-DD). */
+  weekEnd: string;
+  roundsByGame: Array<{ id: string; game: string; rounds: number }>;
+  /** Total settled rounds in the week BEFORE — null when unknowable. */
+  priorWeekTotal: number | null;
+  biggestWin: {
+    id: string;
+    game: string;
+    bet: number;
+    payout: number;
+    username: string | null;
+  } | null;
+}
+
+/** ISO week label ("2026-W39") from a UTC date inside that week, via the
+ *  Thursday rule — the ISO year must come from Thursday, not the calendar
+ *  year, or year boundaries mislabel (2026-12-28 belongs to 2027-W01). */
+export function isoWeekLabel(date: Date): string {
+  const thursday = new Date(date.getTime());
+  thursday.setUTCDate(thursday.getUTCDate() + 3);
+  const isoYear = thursday.getUTCFullYear();
+  const jan4 = Date.UTC(isoYear, 0, 4);
+  const week1Mon = jan4 - ((new Date(jan4).getUTCDay() + 6) % 7) * 86_400_000;
+  const week = Math.floor((thursday.getTime() - week1Mon) / 604_800_000) + 1;
+  return `${isoYear}-W${String(week).padStart(2, "0")}`;
+}
+
+/** Pure builder for the daily arcade recap article (>= MIN_CONTENT_CHARS,
+ *  GENERIC_CONTEXT_BLOCK as the backstop). */
+export function buildArcadeHighlightsArticle(input: ArcadeHighlightsInput): {
+  content: string;
+  excerpt: string;
+  title: string;
+} {
+  const totalRounds = input.roundsByGame.reduce((sum, g) => sum + g.rounds, 0);
+  const played = input.roundsByGame.filter((g) => g.rounds > 0);
+  const sorted = [...played].sort((a, b) => b.rounds - a.rounds);
+  const top = sorted[0] ?? null;
+  const runnerUp = sorted[1] ?? null;
+  const [y, m, d] = input.day.split("-");
+  const dateLabel = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d)))
+    .toLocaleDateString("en-US", { timeZone: "UTC", month: "long", day: "numeric", year: "numeric" });
+
+  const lines: string[] = [
+    `## The day in the Badge Arcade`,
+    "",
+    totalRounds > 0
+      ? `On ${dateLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 13 games`}. Every round was server-authoritative, capped at the house stake, and graded by the same engine that powers the [statistics dashboard](/en/stats).`
+      : `On ${dateLabel} the arcade floors stayed quiet — not a single round was settled. The boards are always open: pick a game on the [arcade overview](/en/games), set a stake between the posted limits, and the next recap could carry your name.`,
+    "",
+  ];
+
+  if (top) {
+    lines.push(
+      "## Most played game",
+      "",
+      `**[${top.game}](/en/games/${top.id})** drew the crowd with **${top.rounds.toLocaleString("en-US")} ${top.rounds === 1 ? "round" : "rounds"}**.`,
+      runnerUp
+        ? `[${runnerUp.game}](/en/games/${runnerUp.id}) followed at ${runnerUp.rounds.toLocaleString("en-US")} rounds — a gap of ${(top.rounds - runnerUp.rounds).toLocaleString("en-US")} between first and second place.`
+        : "No other table saw action, making it a clean sweep for the day.",
+      "",
+      "The full board:",
+      "",
+      ...sorted.map((g) => `- [${g.game}](/en/games/${g.id}): ${g.rounds.toLocaleString("en-US")} ${g.rounds === 1 ? "round" : "rounds"}`),
+      "",
+    );
+  }
+
+  if (input.biggestWin) {
+    const net = input.biggestWin.payout - input.biggestWin.bet;
+    lines.push(
+      "## Biggest win of the day",
+      "",
+      input.biggestWin.username
+        ? `**${input.biggestWin.username}** took the day's largest payout on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id})** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`
+        : `The day's largest payout landed on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id})** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`,
+      "",
+      "Wins like this feed straight into XP, levels and the achievement catalog — the same ledger that the [live activity feed](/en/feed) shows in real time.",
+      "",
+    );
+  }
+
+  let content = lines.join("\n");
+  if (content.length < MIN_CONTENT_CHARS) {
+    content += (content.endsWith("\n") ? "" : "\n") + "\n" + GENERIC_CONTEXT_BLOCK;
+  }
+
+  const title = `Arcade highlights — ${dateLabel}`;
+  const excerpt =
+    totalRounds > 0
+      ? `${dateLabel} in the Badge Arcade: ${totalRounds.toLocaleString("en-US")} settled rounds, ${top ? `${top.game} on top` : "a quiet board"}${input.biggestWin ? `, and the day's biggest win of +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}.`
+      : `${dateLabel} in the Badge Arcade: a quiet day with no settled rounds — the boards stay open for the next player.`;
+
+  return { content, excerpt, title };
+}
+
+/** Pure builder for the weekly arcade recap article (>= MIN_CONTENT_CHARS,
+ *  GENERIC_CONTEXT_BLOCK as the backstop). */
+export function buildArcadeWeeklyArticle(
+  input: ArcadeWeeklyInput,
+): { content: string; excerpt: string; title: string } {
+  const totalRounds = input.roundsByGame.reduce((sum, g) => sum + g.rounds, 0);
+  const played = input.roundsByGame.filter((g) => g.rounds > 0);
+  const sorted = [...played].sort((a, b) => b.rounds - a.rounds);
+  const top = sorted[0] ?? null;
+  const [y, m, d] = input.weekStart.split("-");
+  const startLabel = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d)))
+    .toLocaleDateString("en-US", { timeZone: "UTC", month: "long", day: "numeric" });
+  const [ey, em, ed] = input.weekEnd.split("-");
+  const endLabel = new Date(Date.UTC(Number(ey), Number(em) - 1, Number(ed)))
+    .toLocaleDateString("en-US", { timeZone: "UTC", month: "long", day: "numeric", year: "numeric" });
+
+  const priorLabel =
+    input.priorWeekTotal === null
+      ? null
+      : `${input.priorWeekTotal.toLocaleString("en-US")} ${input.priorWeekTotal === 1 ? "round" : "rounds"}`;
+  const trend =
+    input.priorWeekTotal === null
+      ? null
+      : input.priorWeekTotal === 0
+        ? "up from a silent week before"
+        : totalRounds >= input.priorWeekTotal
+          ? `up ${Math.round(((totalRounds - input.priorWeekTotal) / input.priorWeekTotal) * 100)}% on the week before (${priorLabel})`
+          : `down ${Math.round(((input.priorWeekTotal - totalRounds) / input.priorWeekTotal) * 100)}% on the week before (${priorLabel})`;
+
+  const lines: string[] = [
+    "## The week in the Badge Arcade",
+    "",
+    totalRounds > 0
+      ? `From Monday ${startLabel} to Sunday ${endLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 13 games`}${trend ? ` — ${trend}` : ""}. One post per week, computed from the same server-authoritative ledger that powers the [statistics dashboard](/en/stats).`
+      : `From Monday ${startLabel} to Sunday ${endLabel} the arcade floors stayed completely quiet — not a single settled round in seven days. The boards never close: pick a game on the [arcade overview](/en/games), and next week's recap could open with your name.`,
+    "",
+  ];
+
+  if (top) {
+    lines.push(
+      "## Game of the week",
+      "",
+      `**[${top.game}](/en/games/${top.id})** carried the week with **${top.rounds.toLocaleString("en-US")} ${top.rounds === 1 ? "round" : "rounds"}**.`,
+      "",
+      "The full weekly board:",
+      "",
+      ...sorted.map(
+        (g) => `- [${g.game}](/en/games/${g.id}): ${g.rounds.toLocaleString("en-US")} ${g.rounds === 1 ? "round" : "rounds"}`,
+      ),
+      "",
+    );
+  }
+
+  if (input.biggestWin) {
+    const net = input.biggestWin.payout - input.biggestWin.bet;
+    lines.push(
+      "## Biggest win of the week",
+      "",
+      input.biggestWin.username
+        ? `**${input.biggestWin.username}** landed the week's largest payout on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id})** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`
+        : `The week's largest payout landed on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id})** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`,
+      "",
+      "Every payout flows into XP, levels and the achievement catalog — the same ledger behind the [live activity feed](/en/feed).",
+      "",
+      "Daily recaps with per-day numbers publish every morning; this weekly edition steps back for the record book.",
+      "",
+    );
+  }
+
+  let content = lines.join("\n");
+  if (content.length < MIN_CONTENT_CHARS) {
+    content += (content.endsWith("\n") ? "" : "\n") + "\n" + GENERIC_CONTEXT_BLOCK;
+  }
+
+  const title = `Arcade weekly — ${input.isoWeek}`;
+  const excerpt =
+    totalRounds > 0
+      ? `Week ${input.isoWeek} (${startLabel}–${endLabel}): ${totalRounds.toLocaleString("en-US")} settled rounds${top ? `, ${top.game} as game of the week` : ""}${input.biggestWin ? `, biggest win +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}.`
+      : `Week ${input.isoWeek} (${startLabel}–${endLabel}): a silent week with no settled rounds.`;
+
+  return { content, excerpt, title };
+}
+
 /**
  * Auto-publish a "new badge drop" blog post when the catalog sync detects a
  * badge for the first time. Marked is_auto so editors can tell machine posts
@@ -229,8 +432,12 @@ export interface FeaturePostInput {
 /**
  * Auto-publish a blog post for a shipped feature, game or special event
  * (turbo jackpot, …). Idempotent by slug.
+ *
+ * Returns whether a post was published this call (false on an idempotent
+ * re-run) so daily callers can gate push fan-out on it — createDropPost's
+ * contract, which the daily arcade-highlights sync relies on.
  */
-export async function createFeaturePost(post: FeaturePostInput): Promise<void> {
+export async function createFeaturePost(post: FeaturePostInput): Promise<boolean> {
   const supabase = createAdminClient();
   // `.select("id")` makes the upsert report whether it inserted: with
   // `ignoreDuplicates` a re-run writes nothing, but the changelog row below was
@@ -253,11 +460,12 @@ export async function createFeaturePost(post: FeaturePostInput): Promise<void> {
     )
     .select("id");
   if (error) throw error;
-  if (!inserted || inserted.length === 0) return;
+  if (!inserted || inserted.length === 0) return false;
   await supabase.from("changelog").insert({
     kind: "blog",
     title: `Blog post published: ${post.title}`,
     body: post.excerpt,
     payload: { slug: post.slug },
   }).then(() => undefined, () => undefined);
+  return true;
 }
