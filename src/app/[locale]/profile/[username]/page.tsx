@@ -32,6 +32,10 @@ import CoinFlowCard, {
   fetchCoinRows,
   type CoinFlowRow,
 } from "@/components/profile/CoinFlowCard";
+import BestRoundsCard, {
+  type BestRoundRow,
+  type RecordHistoryEntry,
+} from "@/components/profile/BestRoundsCard";
 import ItemIcon, { ITEM_COLORS } from "@/components/items/ItemIcon";
 import BuyFreezeButton from "@/components/items/BuyFreezeButton";
 import { FREEZE_MAX } from "@/lib/gamification/items";
@@ -344,11 +348,13 @@ export default async function ProfilePage({ params }: PageProps) {
   let guardianRescues = 0;
   // Feed-logged coin movements of the last 30 UTC days (the coin-flow card).
   let coinRows: CoinFlowRow[] = [];
+  let bestRows: BestRoundRow[] = [];
+  let recordHistory: RecordHistoryEntry[] = [];
   if (profile) {
     const admin = createAdminClient();
     // 30 rendered UTC days starting today-29 (the card strip's window).
     const since = coinFlowSince();
-    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes, coinsRes] = await Promise.all([
+    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes, coinsRes, bestRes, historyRes] = await Promise.all([
       readProgress(profile.id).catch(() => null),
       admin
         .from("user_achievements")
@@ -383,6 +389,17 @@ export default async function ProfilePage({ params }: PageProps) {
       // Feed-logged coin movements, 30d window (the coin-flow card). Same
       // admin-client split as above — user_id is not anon-readable (0040).
       fetchCoinRows(admin, profile.id, since).catch(() => []),
+      // Best single-round net per played game (view 0055): one aggregate read
+      // instead of paging a lifetime of rounds. Anon-granted; admin works too.
+      admin
+        .from("stats_player_best_rounds")
+        .select("game,best_net,rounds")
+        .eq("user_id", profile.id)
+        .order("best_net", { ascending: false }),
+      // Record-break history for the card (RPC 0056): the last five rounds
+      // that beat every prior round, most recent first. Invoker rights —
+      // game_rounds is public-read.
+      admin.rpc("player_record_history", { p_user: profile.id, p_limit: 5 }),
     ]);
     const achievementRows = (achievementRes.data ?? []) as Array<{
       achievement_id: string;
@@ -401,6 +418,8 @@ export default async function ProfilePage({ params }: PageProps) {
     );
     guardianRescues = rescuesCountRes.count ?? 0;
     coinRows = coinsRes;
+    bestRows = (bestRes.data ?? []) as BestRoundRow[];
+    recordHistory = (historyRes.data ?? []) as RecordHistoryEntry[];
   }
 
 
@@ -687,6 +706,15 @@ export default async function ProfilePage({ params }: PageProps) {
       {/* Coin flow — the shared card, also rendered on /stats for the owner. */}
       {profile && progress && showCoins && (
         <CoinFlowCard rows={coinRows} id="profile-coin-flow" />
+      )}
+
+      {/* Best rounds — owner-only tile row from the per-player view (0055). */}
+      {isOwn && bestRows.length > 0 && (
+        <BestRoundsCard
+          rows={bestRows}
+          history={recordHistory}
+          id="profile-best-rounds"
+        />
       )}
 
       {/* Item shelf, in the badge-detail gallery style: one gal-stage card per

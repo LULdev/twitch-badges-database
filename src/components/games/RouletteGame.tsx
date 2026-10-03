@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, NewBestMoment } from "./useGame";
 
 export default function RouletteGame() {
   const { bet, setBet, busy, error, balance, play, t } = useGame("roulette");
@@ -11,6 +11,9 @@ export default function RouletteGame() {
   // The list PREPENDS, so an array index is not a stable identity: every round
   // shifted the indices and React reused the wrong node for the wrong spin.
   const nextId = useRef(0);
+  // The personal-best moment rides beside the history trail and survives the
+  // trail's 12-entry trim (the trail is history, the moment is the verdict).
+  const [record, setRecord] = useState(false);
 
   async function pick(choice: string) {
     const result = await play({ choice });
@@ -22,6 +25,7 @@ export default function RouletteGame() {
         ...prev,
       ].slice(0, 12),
     );
+    setRecord(result.result.newPersonalBest === true);
   }
 
   return (
@@ -56,6 +60,7 @@ export default function RouletteGame() {
             </span>
           ))}
         </div>
+        <NewBestMoment show={record} />
       </div>
     </div>
   );

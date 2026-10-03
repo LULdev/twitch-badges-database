@@ -113,7 +113,7 @@
     "heroF2Title": "Indice de rareté TBRI",
     "heroF2Desc": "Un score de 0 à 100 fondé sur la rareté, la diffusion et la dynamique — sache quels badges sont vraiment rares avant de les récupérer.",
     "heroF3Title": "Joue pendant que tu collectionnes",
-    "heroF3Desc": "13 jeux d'arcade, de l'XP, des niveaux, des pièces et 130 succès — plus une roue quotidienne avec un jackpot Twitch Turbo à de vraies chances de 1 sur 100 000 000.",
+    "heroF3Desc": "13 jeux d'arcade, de l'XP, des niveaux, des pièces et 131 succès — plus une roue quotidienne avec un jackpot Twitch Turbo à de vraies chances de 1 sur 100 000 000.",
     "heroF4Title": "Ton profil de collectionneur",
     "heroF4Desc": "Connecte-toi avec Twitch pour synchroniser les badges que tu possèdes déjà, créer une vitrine et grimper dans les classements mondiaux — en 11 langues."
   },
@@ -289,6 +289,9 @@
     "coinFlowNet": "Net · 30 jours",
     "coinFlowNote": "Uniquement les mouvements enregistrés dans le fil en direct — les parties d'arcade et les achats en boutique ne comptent pas.",
     "coinFlowEmpty": "Aucun mouvement de pièces ces 30 derniers jours.",
+    "bestRoundsTitle": "Tes meilleures manches",
+    "bestRoundsNote": "Meilleur gain net en une manche, par jeu joué.",
+    "recordHistoryTitle": "Records récemment battus",
     "coinRainHint": "Offre 1 pièce à ce collectionneur — une fois par jour.",
     "communityLevel": "Niveau communautaire",
     "communityPoints": "Points communautaires",
@@ -387,7 +390,10 @@
     "widgetNoWindow": "Aucune fenêtre publiée pour le moment.",
     "widgetOpen": "Ouvrir la page du badge",
     "statMonth": "Posts ce mois-ci",
-    "recapClicks": "Clics récap · 7 j"
+    "recapClicks": "Clics récap · 7 j",
+    "recapPersonalOne": "Sur cette période, tu as établi un nouveau record personnel : {amount} pièces dans {game}.",
+    "recapPersonalMany": "Sur cette période, tu as établi {n} nouveaux records personnels — le meilleur : {amount} pièces dans {game}.",
+    "recapPersonalNote": "Un record battu est une manche dont le gain net dépasse toutes tes manches précédentes."
   },
   "changelog": {
     "title": "Changelog",
@@ -671,6 +677,8 @@
     "bigWinsEmpty": "Pas encore de gros gain — soyez le premier.",
     "bigWinsBet": "Mise",
     "bigWinsWin": "Gain",
+    "bigWinsYou": "Tu es sur ce podium !",
+    "bigWinsYourBest": "Ton meilleur gros gain : {amount} pièces · place #{rank}",
     "lastRound": "Dernière manche",
     "payout": "Gain",
     "you": "Toi",
@@ -755,6 +763,7 @@
     "notEnoughBadges": "Il n'y a pas encore assez de badges dans le catalogue pour créer un quiz.",
     "streakDay": "Jour {streak}",
     "streakBonus": "+{n} XP de bonus quotidien",
+    "newPersonalBest": "Nouveau record personnel !",
     "freezeUsed": "Un gel de série a protégé votre série !",
     "gameStreak": "Série de {n} jours",
     "disabled": "La salle de jeux est actuellement désactivée. Revenez plus tard.",

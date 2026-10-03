@@ -113,7 +113,7 @@
     "heroF2Title": "TBRI レア度指数",
     "heroF2Desc": "希少性・保有度・勢いから算出する 0～100 のスコア — 獲得前にどのバッジが本当にレアか分かります。",
     "heroF3Title": "集めながら遊ぶ",
-    "heroF3Desc": "13 のアーケード ゲーム、XP、レベル、コイン、130 個の実績 — 毎日のルーレットには本物の確率 1 億分の 1 で Twitch Turbo ジャックポット。",
+    "heroF3Desc": "13 のアーケード ゲーム、XP、レベル、コイン、131 個の実績 — 毎日のルーレットには本物の確率 1 億分の 1 で Twitch Turbo ジャックポット。",
     "heroF4Title": "あなたのコレクション プロフィール",
     "heroF4Desc": "Twitch でログインして保有バッジを同期し、ショーケースを作り、世界ランキングを登りましょう — 11 言語対応。"
   },
@@ -289,6 +289,9 @@
     "coinFlowNet": "純増 · 30日間",
     "coinFlowNote": "ライブフィードに記録されたコインの動きのみ — アーケードのラウンドとショップ購入は含まれません。",
     "coinFlowEmpty": "過去30日間のコインの動きはありません。",
+    "bestRoundsTitle": "あなたのベストラウンド",
+    "bestRoundsNote": "プレイした各ゲームの1ラウンド最高純利益。",
+    "recordHistoryTitle": "最近の記録更新",
     "coinRainHint": "このコレクターに1コインを贈れます（1日1回）。",
     "communityLevel": "コミュニティレベル",
     "communityPoints": "コミュニティポイント",
@@ -387,7 +390,10 @@
     "widgetNoWindow": "受取期間は未発表です。",
     "widgetOpen": "バッジページを開く",
     "statMonth": "今月の投稿",
-    "recapClicks": "まとめクリック · 7日"
+    "recapClicks": "まとめクリック · 7日",
+    "recapPersonalOne": "この期間に自己ベストを更新しました：{game} で {amount} コイン。",
+    "recapPersonalMany": "この期間に自己ベストを {n} 回更新 — 最高：{game} で {amount} コイン。",
+    "recapPersonalNote": "記録更新とは、それまでの全ラウンドの純利益を上回ったラウンドのことです。"
   },
   "changelog": {
     "title": "変更履歴",
@@ -671,6 +677,8 @@
     "bigWinsEmpty": "まだ大当たりはありません — 最初の一人になりましょう。",
     "bigWinsBet": "ベット",
     "bigWinsWin": "獲得",
+    "bigWinsYou": "この台座に名を連ねています！",
+    "bigWinsYourBest": "あなたの最高の大勝ち：{amount} コイン · ランク #{rank}",
     "lastRound": "前回",
     "payout": "配当",
     "you": "あなた",
@@ -755,6 +763,7 @@
     "notEnoughBadges": "カタログにバッジがまだ足りないため、クイズを作成できません。",
     "streakDay": "{streak} 日目",
     "streakBonus": "毎日ストリークボーナス +{n} XP",
+    "newPersonalBest": "自己ベスト更新！",
     "freezeUsed": "ストリークフリーズが連続記録を守りました！",
     "gameStreak": "{n}日連続",
     "disabled": "ゲームコーナーは現在停止中です。しばらくしてからお越しください。",

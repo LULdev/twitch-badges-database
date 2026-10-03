@@ -7,6 +7,7 @@ import { levelFromXp } from "@/lib/gamification/levels";
 import { GAMES } from "@/lib/gamification/games";
 import { getFeatures, getGames } from "@/lib/settings";
 import { getPostBySlug } from "@/lib/queries";
+import { createClient } from "@/lib/supabase/server";
 import { isoWeekLabel } from "@/lib/blog";
 import DailyClaim from "@/components/DailyClaim";
 import LevelBadge from "@/components/LevelBadge";
@@ -98,6 +99,30 @@ export default async function GamesHubPage({
         new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
     )[0] ?? null;
 
+  // Big-wins ticker: the three newest big wins across ALL games, from the
+  // public aggregate view stats_game_big_wins (0054) — an anon read, no
+  // service role. Hidden entirely while no big win has ever landed.
+  let ticker: Array<{
+    id: number;
+    created_at: string;
+    username: string;
+    coins_amount: number | null;
+    game: string | null;
+  }> = [];
+  {
+    const supabase = await createClient();
+    try {
+      const { data } = await supabase
+        .from("stats_game_big_wins")
+        .select("id,created_at,username,coins_amount,game")
+        .order("created_at", { ascending: false })
+        .limit(3);
+      ticker = (data ?? []) as typeof ticker;
+    } catch {
+      ticker = [];
+    }
+  }
+
   return (
     <div className="space-y-8">
       <header className="gal-stage card flex flex-col items-center gap-5 p-6 sm:flex-row sm:p-8">
@@ -127,6 +152,40 @@ export default async function GamesHubPage({
           </Link>
         </div>
       </header>
+
+      {ticker.length > 0 && (
+        <div className="card flex flex-wrap items-center gap-x-4 gap-y-2 p-4 text-sm">
+          <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted">
+            <span
+              className="size-2 rounded-full"
+              style={{ background: "var(--warning)" }}
+              aria-hidden
+            />
+            {t("bigWinsTitle")}
+          </span>
+          {ticker.map((win) => (
+            <Link
+              key={win.id}
+              href={`/games/${win.game ?? ""}`}
+              className="group flex items-center gap-2"
+            >
+              <span
+                className="size-2 rounded-full"
+                style={{ background: GAME_COLORS[win.game ?? ""] ?? "var(--accent)" }}
+                aria-hidden
+              />
+              <span className="font-bold group-hover:text-accent">{win.username}</span>
+              {win.game && <span className="text-xs text-muted">{t(`${win.game}Title`)}</span>}
+              <span
+                dir="ltr"
+                className="inline-flex items-center gap-1 font-bold text-success tabular-nums"
+              >
+                +{(win.coins_amount ?? 0).toLocaleString(locale)} <Coin size={12} />
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {visible.length > 0 && (
         <div className="card flex flex-wrap items-center justify-between gap-3 p-4 text-sm text-muted">

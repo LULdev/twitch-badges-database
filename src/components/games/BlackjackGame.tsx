@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, NewBestMoment } from "./useGame";
 
 export default function BlackjackGame() {
   const { bet, setBet, busy, error, balance, play, t } = useGame("blackjack");
@@ -12,6 +12,7 @@ export default function BlackjackGame() {
     playerTotal: number;
     dealerTotal: number;
     outcome: string;
+    newPersonalBest?: boolean;
   } | null>(null);
 
   async function deal() {
@@ -75,6 +76,7 @@ export default function BlackjackGame() {
             <p className={`col-span-2 text-lg font-extrabold ${last.outcome === "win" ? "text-success" : last.outcome === "push" ? "text-muted" : "text-danger"}`}>
               {last.outcome === "win" ? t("youWin") : last.outcome === "push" ? t("push") : t("youLose")}
             </p>
+            <NewBestMoment show={last.newPersonalBest === true} />
           </div>
         )}
       </div>

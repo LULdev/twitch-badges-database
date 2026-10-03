@@ -113,7 +113,7 @@
     "heroF2Title": "Indice di rarità TBRI",
     "heroF2Desc": "Un punteggio 0–100 costruito da scarsità, diffusione e slancio — scopri quali badge sono davvero rari prima di ottenerli.",
     "heroF3Title": "Gioca mentre collezioni",
-    "heroF3Desc": "13 giochi arcade, XP, livelli, monete e 130 obiettivi — più una ruota quotidiana con un jackpot Twitch Turbo a probabilità reali di 1 su 100.000.000.",
+    "heroF3Desc": "13 giochi arcade, XP, livelli, monete e 131 obiettivi — più una ruota quotidiana con un jackpot Twitch Turbo a probabilità reali di 1 su 100.000.000.",
     "heroF4Title": "Il tuo profilo da collezionista",
     "heroF4Desc": "Accedi con Twitch per sincronizzare i badge che già possiedi, creare una vetrina e scalare le classifiche mondiali — in 11 lingue."
   },
@@ -289,6 +289,9 @@
     "coinFlowNet": "Netto · 30 giorni",
     "coinFlowNote": "Solo i movimenti registrati nel feed dal vivo — le partite arcade e gli acquisti in negozio non contano.",
     "coinFlowEmpty": "Nessun movimento di monete negli ultimi 30 giorni.",
+    "bestRoundsTitle": "Le tue migliori partite",
+    "bestRoundsNote": "Miglior netto di una singola partita per gioco giocato.",
+    "recordHistoryTitle": "Record battuti di recente",
     "coinRainHint": "Regala 1 moneta a questo collezionista — una volta al giorno.",
     "communityLevel": "Livello community",
     "communityPoints": "Punti community",
@@ -387,7 +390,10 @@
     "widgetNoWindow": "Nessuna finestra pubblicata.",
     "widgetOpen": "Apri pagina badge",
     "statMonth": "Post di questo mese",
-    "recapClicks": "Clic recap · 7 gg"
+    "recapClicks": "Clic recap · 7 gg",
+    "recapPersonalOne": "In questo periodo hai stabilito un nuovo record personale: {amount} monete in {game}.",
+    "recapPersonalMany": "In questo periodo hai stabilito {n} nuovi record personali — il migliore: {amount} monete in {game}.",
+    "recapPersonalNote": "Un record battuto è una partita il cui netto supera tutte le partite giocate prima."
   },
   "changelog": {
     "title": "Changelog",
@@ -671,6 +677,8 @@
     "bigWinsEmpty": "Ancora nessuna grande vincita: sii il primo.",
     "bigWinsBet": "Puntata",
     "bigWinsWin": "Vincita",
+    "bigWinsYou": "Sei su questo podio!",
+    "bigWinsYourBest": "La tua grande vincita migliore: {amount} monete · posto #{rank}",
     "lastRound": "Ultimo round",
     "payout": "Vincita",
     "you": "Tu",
@@ -755,6 +763,7 @@
     "notEnoughBadges": "Non ci sono ancora abbastanza badge nel catalogo per creare un quiz.",
     "streakDay": "Giorno {streak}",
     "streakBonus": "+{n} XP bonus giornaliero",
+    "newPersonalBest": "Nuovo record personale!",
     "freezeUsed": "Un congelamento di serie ha protetto la tua serie!",
     "gameStreak": "Serie di {n} giorni",
     "disabled": "La sala giochi è al momento disattivata. Torna più tardi.",

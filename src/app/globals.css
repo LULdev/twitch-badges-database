@@ -1150,6 +1150,11 @@ html {
   .bcoin-ceremony::before {
     opacity: 0;
   }
+  /* Homepage big-win strip: freeze on the newest win (the :first-child base
+     rule keeps it visible; the other two stay hidden). */
+  .home-win-item {
+    animation: none;
+  }
 }
 
 /* ============================================================
@@ -3454,6 +3459,31 @@ html {
 .feed-bigwin {
   border-color: color-mix(in srgb, var(--warning) 45%, var(--line));
   box-shadow: var(--shadow-card), inset 0 0 0 1px color-mix(in srgb, var(--warning) 16%, transparent);
+}
+
+/* Homepage big-win strip: the three newest wins crossfade in place. Grid
+   stacking keeps the height of the tallest item; visibility (not just
+   opacity) makes faded-out links unclickable. Delays: each item must be at
+   local 0 exactly when the previous one fades out, so item 2 carries -12s
+   and item 3 -6s (order 1 → 2 → 3, not 1 → 3 → 2). */
+.home-win-cycle {
+  display: grid;
+}
+.home-win-item {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  animation: home-win-fade 18s linear infinite;
+}
+.home-win-item:first-child {
+  visibility: visible;
+  animation-delay: 0s;
+}
+.home-win-item:nth-child(2) { animation-delay: -12s; }
+.home-win-item:nth-child(3) { animation-delay: -6s; }
+@keyframes home-win-fade {
+  0%, 29% { opacity: 1; visibility: visible; }
+  36%, 95% { opacity: 0; visibility: hidden; }
+  100% { opacity: 1; visibility: visible; }
 }
 
 /* Article page — cover stage, byline placard, TOC rail, prev/next */

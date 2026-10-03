@@ -113,7 +113,7 @@
     "heroF2Title": "Índice de rareza TBRI",
     "heroF2Desc": "Una puntuación de 0 a 100 basada en escasez, difusión y momentum — sabe qué insignias son realmente raras antes de conseguirlas.",
     "heroF3Title": "Juega mientras coleccionas",
-    "heroF3Desc": "13 juegos arcade, XP, niveles, monedas y 130 logros — más una ruleta diaria con un jackpot de Twitch Turbo con probabilidades reales de 1 entre 100.000.000.",
+    "heroF3Desc": "13 juegos arcade, XP, niveles, monedas y 131 logros — más una ruleta diaria con un jackpot de Twitch Turbo con probabilidades reales de 1 entre 100.000.000.",
     "heroF4Title": "Tu perfil de colección",
     "heroF4Desc": "Inicia sesión con Twitch para sincronizar las insignias que ya tienes, montar una vitrina y escalar en las clasificaciones mundiales — en 11 idiomas."
   },
@@ -289,6 +289,9 @@
     "coinFlowNet": "Neto · 30 días",
     "coinFlowNote": "Solo los movimientos registrados en el feed en vivo — las partidas de arcade y las compras de la tienda no cuentan.",
     "coinFlowEmpty": "Sin movimiento de monedas en los últimos 30 días.",
+    "bestRoundsTitle": "Tus mejores rondas",
+    "bestRoundsNote": "Mejor resultado neto de una sola ronda por juego jugado.",
+    "recordHistoryTitle": "Récords rotos recientemente",
     "coinRainHint": "Regala 1 moneda a este coleccionista — una vez al día.",
     "communityLevel": "Nivel de comunidad",
     "communityPoints": "Puntos de comunidad",
@@ -387,7 +390,10 @@
     "widgetNoWindow": "Sin ventana publicada todavía.",
     "widgetOpen": "Abrir página del badge",
     "statMonth": "Posts este mes",
-    "recapClicks": "Clics de resumen · 7 d"
+    "recapClicks": "Clics de resumen · 7 d",
+    "recapPersonalOne": "En este periodo lograste un nuevo récord personal: {amount} monedas en {game}.",
+    "recapPersonalMany": "En este periodo lograste {n} nuevos récords personales — el mejor: {amount} monedas en {game}.",
+    "recapPersonalNote": "Un récord roto es una ronda cuyo neto supera todas las rondas que jugaste antes."
   },
   "changelog": {
     "title": "Changelog",
@@ -671,6 +677,8 @@
     "bigWinsEmpty": "Aún no hay grandes victorias: sé el primero.",
     "bigWinsBet": "Apuesta",
     "bigWinsWin": "Ganancia",
+    "bigWinsYou": "¡Estás en este podio!",
+    "bigWinsYourBest": "Tu mejor gran victoria: {amount} monedas · puesto #{rank}",
     "lastRound": "Última ronda",
     "payout": "Pago",
     "you": "Tú",
@@ -755,6 +763,7 @@
     "notEnoughBadges": "Todavía no hay suficientes insignias en el catálogo para crear un cuestionario.",
     "streakDay": "Día {streak}",
     "streakBonus": "+{n} XP de bonificación diaria",
+    "newPersonalBest": "¡Nuevo récord personal!",
     "freezeUsed": "¡Un congelamiento de racha protegió tu racha!",
     "gameStreak": "Racha de {n} días",
     "disabled": "La sala de juegos está desactivada por ahora. Vuelve más tarde.",

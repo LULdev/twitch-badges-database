@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useLocale } from "next-intl";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, NewBestMoment } from "./useGame";
 import Coin from "@/components/Coin";
 
 export default function TowerGame() {
@@ -13,6 +13,7 @@ export default function TowerGame() {
     floor: number;
     survived: boolean;
     payout: number;
+    record?: boolean;
   } | null>(null);
 
   async function climb() {
@@ -29,6 +30,7 @@ export default function TowerGame() {
       floor: typeof raw.floor === "number" ? raw.floor : 0,
       survived: raw.survived === true,
       payout: res.payout,
+      record: res.result.newPersonalBest === true,
     });
   }
 
@@ -98,6 +100,7 @@ export default function TowerGame() {
             {last.survived ? t("youWin") : t("crashed")} (<span className="inline-flex items-center gap-1">{last.payout.toLocaleString(locale)} <Coin size={14} /></span>)
           </p>
         )}
+        <NewBestMoment show={last?.record === true} />
       </div>
     </div>
   );

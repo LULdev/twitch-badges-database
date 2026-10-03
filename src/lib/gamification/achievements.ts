@@ -65,6 +65,8 @@ export interface AchStats {
   accountAgeDays: number;
   /** Whether the user is one of the three richest collectors. */
   isTopCoinHolder: boolean;
+  /** Whether the user's username sits in ANY game's all-time big-win top 3. */
+  podiumFinish: boolean;
   twitchBirthday: boolean;
   recentPerfectFlags: Record<string, boolean>;
   recentResults: Array<{ game: string; won: boolean; bet: number; payout: number; hour: number; at: number; flags: Record<string, number | boolean> }>;
@@ -245,6 +247,10 @@ export const ACHIEVEMENTS: Achievement[] = [
   CREATIVE("k_sharer", "Influencer", "Get 10 visits through your steal/share link.", () => false),
   CREATIVE("k_big_spender", "Big Spender", "Wager 10,000+ coins in total losses.", (s) => s.progress.coins_lost >= 10000),
   CREATIVE("k_profiteer", "Profiteer", "Win 10,000+ coins in total winnings.", (s) => s.progress.coins_won >= 10000),
+  // Same deferred-unlock caveat as s_top_percent: the podium spot is earned by
+  // this user's own big round, but the big_win feed row lands in
+  // afterResponse — the unlock picks up on the first evaluation afterwards.
+  CREATIVE("k_podium_finish", "Podium Finish", "Hold a top-3 spot on any game's all-time big-win podium.", (s) => s.podiumFinish),
   CREATIVE("k_xp_100k", "Six Figures", "Earn 100,000 lifetime XP.", (s) => s.progress.xp >= 100000, 1000, 1000),
   CREATIVE("k_coin_millionaire", "Coin Millionaire", "Hold 1,000,000 coins.", (s) => s.progress.coins >= 1000000, 5000, 0),
 
@@ -581,7 +587,7 @@ async function buildStats(userId: string): Promise<AchStats> {
   const todayStr = new Date().toISOString().slice(0, 10);
 
   const [badgesRes, gamesRes, roundsRes, todayRoundsRes, wheelRes, turboRes, profileRes,
-    rainRes, stealRes, reactRes, visitsRes, usersRes, topCoinsRes, achRes, visitorsRes,
+    rainRes, stealRes, reactRes, visitsRes, usersRes, topCoinsRes, podiumRes, achRes, visitorsRes,
     maxBetRes, lastDailyRes] =
     await Promise.all([
       // Paged: PostgREST caps one response at 1000 rows and these grow without
@@ -623,7 +629,7 @@ async function buildStats(userId: string): Promise<AchStats> {
           .range(from, to),
       ),
       supabase.from("turbo_wins").select("id", { count: "exact", head: true }).eq("user_id", userId),
-      supabase.from("profiles").select("view_count, customization, mood, twitch_created_at, showcase_slots, created_at").eq("id", userId).maybeSingle(),
+      supabase.from("profiles").select("username, view_count, customization, mood, twitch_created_at, showcase_slots, created_at").eq("id", userId).maybeSingle(),
       pageAll<{ payload: Record<string, unknown> | null }>((from, to) =>
         supabase
           .from("activity_events")
@@ -666,6 +672,14 @@ async function buildStats(userId: string): Promise<AchStats> {
         .select("user_id")
         .order("coins", { ascending: false })
         .limit(3),
+      // All-time big-win podium per game: the global top-100 payouts contain
+      // every game's top-3 (13 games × 3 places = 39 ≤ 100), so ONE ordered
+      // read answers "is this username on ANY podium". Rows arrive payout desc.
+      supabase
+        .from("stats_game_big_wins")
+        .select("game,username,payout")
+        .order("payout", { ascending: false })
+        .limit(100),
       pageAll<{ kind: string }>((from, to) =>
         supabase
           .from("activity_events")
@@ -850,6 +864,21 @@ async function buildStats(userId: string): Promise<AchStats> {
         (row) => row.user_id,
       ),
     ).has(userId),
+    podiumFinish: (() => {
+      const me = profileRes.data?.username ?? null;
+      if (!me) return false;
+      const perGame = new Map<string, number>();
+      for (const row of (podiumRes.data ?? []) as Array<{
+        game: string;
+        username: string | null;
+      }>) {
+        const seen = perGame.get(row.game) ?? 0;
+        if (seen >= 3) continue;
+        perGame.set(row.game, seen + 1);
+        if (row.username === me) return true;
+      }
+      return false;
+    })(),
     twitchBirthday,
     recentPerfectFlags: {},
     recentResults: recentRounds,

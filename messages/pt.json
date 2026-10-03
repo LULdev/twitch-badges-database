@@ -113,7 +113,7 @@
     "heroF2Title": "Índice de raridade TBRI",
     "heroF2Desc": "Uma pontuação de 0 a 100 baseada em escassez, adoção e momento — saiba quais emblemas são realmente raros antes de resgatá-los.",
     "heroF3Title": "Jogue enquanto coleciona",
-    "heroF3Desc": "13 jogos de fliperama, XP, níveis, moedas e 130 conquistas — mais uma roleta diária com um jackpot de Twitch Turbo com chances reais de 1 em 100.000.000.",
+    "heroF3Desc": "13 jogos de fliperama, XP, níveis, moedas e 131 conquistas — mais uma roleta diária com um jackpot de Twitch Turbo com chances reais de 1 em 100.000.000.",
     "heroF4Title": "Seu perfil de coleção",
     "heroF4Desc": "Entre com a Twitch para sincronizar os emblemas que já possui, montar uma vitrine e subir nos rankings mundiais — em 11 idiomas."
   },
@@ -289,6 +289,9 @@
     "coinFlowNet": "Líquido · 30 dias",
     "coinFlowNote": "Apenas movimentos registados no feed ao vivo — rondas de arcada e compras na loja não contam.",
     "coinFlowEmpty": "Sem movimentos de moedas nos últimos 30 dias.",
+    "bestRoundsTitle": "Suas melhores rodadas",
+    "bestRoundsNote": "Melhor resultado líquido de rodada única por jogo jogado.",
+    "recordHistoryTitle": "Recordes quebrados recentemente",
     "coinRainHint": "Presenteie este colecionador com 1 moeda — uma vez por dia.",
     "communityLevel": "Nível de comunidade",
     "communityPoints": "Pontos de comunidade",
@@ -387,7 +390,10 @@
     "widgetNoWindow": "Nenhum período publicado ainda.",
     "widgetOpen": "Abrir página do badge",
     "statMonth": "Posts neste mês",
-    "recapClicks": "Cliques de resumo · 7 d"
+    "recapClicks": "Cliques de resumo · 7 d",
+    "recapPersonalOne": "Neste período você bateu um recorde pessoal: {amount} moedas em {game}.",
+    "recapPersonalMany": "Neste período você bateu {n} recordes pessoais — o melhor: {amount} moedas em {game}.",
+    "recapPersonalNote": "Um recorde quebrado é uma rodada cujo líquido supera todas as rodadas jogadas antes."
   },
   "changelog": {
     "title": "Changelog",
@@ -671,6 +677,8 @@
     "bigWinsEmpty": "Ainda não há grandes vitórias — seja o primeiro.",
     "bigWinsBet": "Aposta",
     "bigWinsWin": "Prêmio",
+    "bigWinsYou": "Você está neste pódio!",
+    "bigWinsYourBest": "Sua melhor grande vitória: {amount} moedas · posição #{rank}",
     "lastRound": "Última rodada",
     "payout": "Pagamento",
     "you": "Você",
@@ -755,6 +763,7 @@
     "notEnoughBadges": "Ainda não há selos suficientes no catálogo para criar um quiz.",
     "streakDay": "Dia {streak}",
     "streakBonus": "+{n} XP de bónus diário",
+    "newPersonalBest": "Novo recorde pessoal!",
     "freezeUsed": "Um congelamento de sequência protegeu a sua!",
     "gameStreak": "Sequência de {n} dias",
     "disabled": "O fliperama está desativado no momento. Volte mais tarde.",

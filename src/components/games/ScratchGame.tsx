@@ -32,7 +32,7 @@ export default function ScratchGame() {
   // The card's outcome, kept client-side for the verdict line and the
   // jackpot ceremony (the server already emits mult/jackpot — previously
   // discarded, so the game showed no payout at all).
-  const [lastCard, setLastCard] = useState<{ payout: number; bet: number; mult: number; jackpot: boolean } | null>(null);
+  const [lastCard, setLastCard] = useState<{ payout: number; bet: number; mult: number; jackpot: boolean; record?: boolean } | null>(null);
 
   async function newCard() {
     setLastCard(null);
@@ -46,6 +46,7 @@ export default function ScratchGame() {
       bet: result.bet,
       mult: Number(r.mult ?? 0),
       jackpot: Boolean(r.jackpot),
+      record: result.result.newPersonalBest === true,
     });
   }
 
@@ -131,6 +132,12 @@ export default function ScratchGame() {
             <CeremonyCoin />
           </div>
         )}
+        {lastCard?.record ? (
+          <p className="flex items-center justify-center gap-1.5 text-xs font-bold text-warning">
+            <Coin variant="b" size={14} className="bcoin-lg" />
+            {t("newPersonalBest")}
+          </p>
+        ) : null}
         <button type="button" disabled={busy} onClick={newCard} className="btn btn-primary w-full">
           {t("newCard")}
         </button>

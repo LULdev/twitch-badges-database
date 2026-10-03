@@ -5,6 +5,8 @@ import { siteUrl } from "@/lib/seo";
 import { jsonLdScript } from "@/lib/jsonld";
 import { KIND_COLORS } from "@/lib/changelog-kinds";
 import { getHomeData } from "@/lib/queries";
+import Coin from "@/components/Coin";
+import { createClient } from "@/lib/supabase/server";
 import BadgeGrid from "@/components/badges/BadgeGrid";
 import { BadgeImage } from "@/components/badges/BadgeImage";
 import { formatCompact } from "@/components/badges/BadgeCard";
@@ -55,6 +57,7 @@ export default async function HomePage({
   const t = await getTranslations("home");
   const tc = await getTranslations("common");
   const tMeta = await getTranslations("meta");
+  const tg = await getTranslations("games");
 
   let data = null;
   try {
@@ -65,6 +68,27 @@ export default async function HomePage({
     // operational claim on a healthy installation. Mirrors the badges explorer.
     data = null;
     console.warn("[home] catalog load failed:", error);
+  }
+
+  // Latest big win for the hero's live strip — one anon read of the public
+  // aggregate view (0054). Hidden entirely until the first big win lands;
+  // a network failure renders without the strip, never with a broken page.
+  let latestWins: Array<{
+    id: number;
+    username: string;
+    coins_amount: number | null;
+    game: string | null;
+  }> = [];
+  try {
+    const supabase = await createClient();
+    const { data: winData } = await supabase
+      .from("stats_game_big_wins")
+      .select("id,username,coins_amount,game")
+      .order("created_at", { ascending: false })
+      .limit(3);
+    latestWins = (winData ?? []) as typeof latestWins;
+  } catch {
+    latestWins = [];
   }
 
   // `null` (not 0) when the load failed, so the tiles read "—" instead of a number
@@ -179,6 +203,45 @@ export default async function HomePage({
               ))}
             </dl>
           </div>
+
+          {latestWins.length > 0 ? (
+            <div className="border-t border-line px-6 py-4 sm:px-10">
+              {/* The three newest wins crossfade in place (pure CSS, see the
+                  home-win-* rules in globals.css). The label describes the
+                  rotating set, not one row. */}
+              <div className="home-win-cycle mx-auto max-w-3xl">
+                {latestWins.map((win) => (
+                  <div
+                    key={win.id}
+                    className="home-win-item flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm"
+                  >
+                    <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                      <span className="live-dot" aria-hidden="true" />
+                      {tg("bigWinsTitle")}
+                    </span>
+                    <Link href={`/profile/${win.username}`} className="font-bold hover:text-accent">
+                      {win.username}
+                    </Link>
+                    <span
+                      dir="ltr"
+                      className="inline-flex items-center gap-1 font-bold text-success tabular-nums"
+                    >
+                      +{(win.coins_amount ?? 0).toLocaleString(locale)} <Coin size={12} />
+                    </span>
+                    {win.game ? (
+                      <Link
+                        href={`/games/${win.game}`}
+                        className="inline-flex items-center gap-1 text-xs text-muted hover:text-foreground"
+                      >
+                        {tg(`${win.game}Title`)}
+                        <span aria-hidden>→</span>
+                      </Link>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       </section>
 

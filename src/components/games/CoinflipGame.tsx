@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useLocale } from "next-intl";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, NewBestMoment } from "./useGame";
 
 export default function CoinflipGame() {
   const { bet, setBet, busy, error, balance, play, t } = useGame("coinflip");
@@ -14,6 +14,9 @@ export default function CoinflipGame() {
   // against the live `side` re-coloured the whole history after toggling, so a
   // past win could suddenly render as a loss.
   const [playedSide, setPlayedSide] = useState<"heads" | "tails">("heads");
+  // The personal-best moment rides alongside the flip trail (the game's only
+  // verdict surface) and clears with it on a rejected round.
+  const [record, setRecord] = useState(false);
 
   async function go() {
     const result = await play({ choice: side, target });
@@ -21,11 +24,13 @@ export default function CoinflipGame() {
     // signal this game renders. `playedSide` stays: it is the player own pick.
     if (!result) {
       setFlips(null);
+      setRecord(false);
       return;
     }
     const reported = result.result.side;
     setPlayedSide(reported === "tails" ? "tails" : "heads");
     setFlips((result.result.flips as string[]) ?? []);
+    setRecord(result.result.newPersonalBest === true);
   }
 
   return (
@@ -77,6 +82,7 @@ export default function CoinflipGame() {
             ))}
           </div>
         )}
+        <NewBestMoment show={record} />
       </div>
     </div>
   );

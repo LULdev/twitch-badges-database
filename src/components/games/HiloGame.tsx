@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, NewBestMoment } from "./useGame";
 
 export default function HiloGame() {
   const { bet, setBet, busy, error, balance, play, t } = useGame("hilo");
@@ -14,6 +14,7 @@ export default function HiloGame() {
     actual?: string;
     won?: boolean;
     tie?: boolean;
+    record?: boolean;
   }>({ currentScore: null });
 
   async function guess(choice: "higher" | "lower") {
@@ -36,6 +37,7 @@ export default function HiloGame() {
       actual: r.actual,
       won: r.won,
       tie: r.tie,
+      record: result.result.newPersonalBest === true,
     });
   }
 
@@ -60,6 +62,7 @@ export default function HiloGame() {
             ({state.actual === "higher" ? t("higher") : state.actual === "lower" ? t("lower") : t("tie")})
           </p>
         )}
+        <NewBestMoment show={state.record === true} />
         <div className="flex justify-center gap-3">
           <button type="button" disabled={busy} onClick={() => guess("higher")} className="btn btn-primary px-8">
             ▲ {t("higher")}

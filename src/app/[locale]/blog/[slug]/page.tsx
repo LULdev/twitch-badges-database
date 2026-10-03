@@ -12,7 +12,7 @@ import { localeAlternates, siteUrl } from "@/lib/seo";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { recordBlogView } from "@/lib/gamification/visits";
-import { visitorIpHash } from "@/lib/gamification/session";
+import { visitorIpHash, authUserId } from "@/lib/gamification/session";
 import EmojiReactions from "@/components/EmojiReactions";
 
 interface PageProps {
@@ -63,6 +63,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   setRequestLocale(locale);
   const t = await getTranslations("blog");
   const tc = await getTranslations("common");
+  const tGames = await getTranslations("games");
 
   const post = await getPostBySlug(slug).catch(() => null);
   if (!post || post.status !== "published") notFound();
@@ -87,6 +88,53 @@ export default async function BlogPostPage({ params }: PageProps) {
     badgeSlug !== null
       ? await getBadgeBySlug(badgeSlug).catch(() => null)
       : null;
+
+  // Recap articles carry their covered period in the slug — daily
+  // arcade-highlights-YYYY-MM-DD, weekly arcade-weekly-YYYY-Www. For a
+  // logged-in reader the page asks the record-history RPC (0056) for their own
+  // record breaks inside that window; the page is request-dynamic
+  // (visitorIpHash reads headers), so the line is per-viewer and never cached.
+  const viewerId = await authUserId();
+  let recapBreaks: Array<{
+    out_created_at: string;
+    out_game: string;
+    out_net: number | null;
+  }> = [];
+  const dailyMatch = /^arcade-highlights-(\d{4}-\d{2}-\d{2})$/.exec(post.slug);
+  const weeklyMatch = /^arcade-weekly-(\d{4}-W\d{1,2})$/.exec(post.slug);
+  if (viewerId && (dailyMatch || weeklyMatch)) {
+    let from: Date | null = null;
+    let to: Date | null = null;
+    if (dailyMatch) {
+      from = new Date(`${dailyMatch[1]}T00:00:00.000Z`);
+      to = new Date(from.getTime() + 86_400_000);
+    } else if (weeklyMatch) {
+      const m = /^(\d{4})-W(\d{1,2})$/.exec(weeklyMatch[1]);
+      if (m) {
+        // Jan 4 always sits in ISO week 1: back up to its Monday, then step
+        // forward week-1 times to reach the covered week's Monday.
+        const jan4 = new Date(Date.UTC(Number(m[1]), 0, 4));
+        const jan4Day = jan4.getUTCDay() || 7;
+        from = new Date(jan4);
+        from.setUTCDate(jan4.getUTCDate() - jan4Day + 1 + (Number(m[2]) - 1) * 7);
+        to = new Date(from.getTime() + 7 * 86_400_000);
+      }
+    }
+    if (from && to) {
+      const supabase = await createClient();
+      try {
+        const { data: breaks } = await supabase.rpc("player_record_history", {
+          p_user: viewerId,
+          p_limit: 5,
+          p_from: from.toISOString(),
+          p_to: to.toISOString(),
+        });
+        recapBreaks = (breaks ?? []) as typeof recapBreaks;
+      } catch {
+        recapBreaks = [];
+      }
+    }
+  }
 
   // View counter (5-minute per-IP dedup) + emoji reactions.
   let viewCount = 0;
@@ -263,6 +311,30 @@ export default async function BlogPostPage({ params }: PageProps) {
           )}
         </aside>
       </div>
+
+      {recapBreaks.length > 0 ? (
+        <div className="card mt-8 p-4 text-sm">
+          <p className="font-bold text-warning">
+            {recapBreaks.length === 1
+              ? t("recapPersonalOne", {
+                  amount: (recapBreaks[0].out_net ?? 0).toLocaleString(locale),
+                  game: tGames(`${recapBreaks[0].out_game}Title`),
+                })
+              : t("recapPersonalMany", {
+                  n: recapBreaks.length,
+                  amount: Math.max(
+                    ...recapBreaks.map((b) => b.out_net ?? 0),
+                  ).toLocaleString(locale),
+                  game: tGames(
+                    `${recapBreaks.reduce((best, b) =>
+                      (b.out_net ?? 0) > (best.out_net ?? 0) ? b : best,
+                    ).out_game}Title`,
+                  ),
+                })}
+          </p>
+          <p className="mt-1 text-xs text-muted">{t("recapPersonalNote")}</p>
+        </div>
+      ) : null}
 
       <nav className="bl-pn mt-8" aria-label={t("prevNext")}>
         {older ? (

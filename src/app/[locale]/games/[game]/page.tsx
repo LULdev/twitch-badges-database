@@ -91,17 +91,84 @@ export default async function GamePage({ params }: PageProps) {
     bet: number | null;
     payout: number | null;
   }> = [];
+  // The all-time podium is a second ordering of the same view — the top
+  // payouts may all be older than the recent-8 list. Newest-first breaks
+  // payout ties; both reads stay anonymous and ride the same view.
+  let topWins: Array<{
+    id: number;
+    created_at: string;
+    username: string;
+    payout: number | null;
+  }> = [];
   {
     const supabase = await createClient();
-    const { data } = await supabase
-      .from("stats_game_big_wins")
-      .select("id,created_at,username,bet,payout")
-      .eq("game", game)
-      .order("created_at", { ascending: false })
-      .limit(8);
-    bigWins = (data ?? []) as typeof bigWins;
+    try {
+      const [recentRes, podiumRes] = await Promise.all([
+        supabase
+          .from("stats_game_big_wins")
+          .select("id,created_at,username,bet,payout")
+          .eq("game", game)
+          .order("created_at", { ascending: false })
+          .limit(8),
+        supabase
+          .from("stats_game_big_wins")
+          .select("id,created_at,username,payout")
+          .eq("game", game)
+          .order("payout", { ascending: false })
+          .order("created_at", { ascending: false })
+          .limit(3),
+      ]);
+      bigWins = (recentRes.data ?? []) as typeof bigWins;
+      topWins = (podiumRes.data ?? []) as typeof topWins;
+    } catch {
+      bigWins = [];
+      topWins = [];
+    }
   }
   const winsDate = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short" });
+  // Theme-aware medal tints — the .rank-row podium tokens (dark + light).
+  const podiumColors = ["var(--rank-gold)", "var(--rank-silver)", "var(--rank-bronze)"];
+
+  // Session read moved above the early returns so the podium card can greet
+  // the viewer in every state; authUserId() only reads the session cookie.
+  const userId = await authUserId();
+
+  // Viewer standing for the podium card: their best big_win row on THIS game
+  // and how many rows outrank it — the "progress" toward a podium place.
+  let standing: { rank: number; payout: number } | null = null;
+  let viewerName: string | null = null;
+  if (userId) {
+    try {
+      const supabase = await createClient();
+      const { data: profRow } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", userId)
+        .maybeSingle();
+      viewerName = (profRow as { username: string | null } | null)?.username ?? null;
+      if (viewerName) {
+        const { data: best } = await supabase
+          .from("stats_game_big_wins")
+          .select("payout")
+          .eq("game", game)
+          .eq("username", viewerName)
+          .order("payout", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        const payout = Number((best as { payout: number | null } | null)?.payout ?? 0);
+        if (payout > 0) {
+          const { count } = await supabase
+            .from("stats_game_big_wins")
+            .select("id", { count: "exact", head: true })
+            .eq("game", game)
+            .gt("payout", payout);
+          standing = { rank: (count ?? 0) + 1, payout };
+        }
+      }
+    } catch {
+      standing = null;
+    }
+  }
 
   // One hero shell for EVERY state (playable, login wall, arcade off): the
   // game art makes the page recognizable even before login. `stats` is the
@@ -145,6 +212,48 @@ export default async function GamePage({ params }: PageProps) {
       <h2 id="big-wins-head" className="text-lg font-extrabold tracking-tight">
         {t("bigWinsTitle")}
       </h2>
+      {topWins.length > 0 ? (
+        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          {topWins.map((entry, index) => (
+            <div
+              key={entry.id}
+              className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"
+              style={{
+                borderColor: `color-mix(in srgb, ${podiumColors[index]} 40%, var(--line))`,
+              }}
+            >
+              <span className="font-extrabold" style={{ color: podiumColors[index] }}>
+                {index + 1}.
+              </span>
+              <Link
+                href={`/profile/${entry.username}`}
+                className="min-w-0 truncate font-bold hover:text-accent"
+              >
+                {entry.username}
+              </Link>
+              <span
+                dir="ltr"
+                className="ml-auto inline-flex shrink-0 items-center gap-1 text-xs font-bold tabular-nums"
+                style={{ color: podiumColors[index] }}
+              >
+                {(entry.payout ?? 0).toLocaleString(locale)} <Coin size={11} />
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {standing ? (
+        <p className="mt-3 text-xs text-muted">
+          {viewerName && topWins.some((entry) => entry.username === viewerName) ? (
+            <span className="font-bold text-success">{t("bigWinsYou")}</span>
+          ) : (
+            t("bigWinsYourBest", {
+              amount: standing.payout.toLocaleString(locale),
+              rank: standing.rank,
+            })
+          )}
+        </p>
+      ) : null}
       {bigWins.length > 0 ? (
         <ul className="mt-4 space-y-2.5">
           {bigWins.map((win) => (
@@ -187,7 +296,6 @@ export default async function GamePage({ params }: PageProps) {
   }
   if (settings.games[game]?.enabled === false) notFound();
 
-  const userId = await authUserId();
   if (!userId) {
     return (
       <div className="mx-auto max-w-2xl space-y-6">

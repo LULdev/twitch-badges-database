@@ -27,7 +27,7 @@ export default function SlotsGame() {
     Array.from({ length: 3 }, () => Array(5).fill("")),
   );
   const [spinning, setSpinning] = useState(false);
-  const [lastWin, setLastWin] = useState<{ payout: number; bet: number; lines: number; scatter: number } | null>(null);
+  const [lastWin, setLastWin] = useState<{ payout: number; bet: number; lines: number; scatter: number; record?: boolean } | null>(null);
   const spinTimer = useRef<number>(0);
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function SlotsGame() {
       scatter: number;
     };
     setReels(r.reels);
-    setLastWin({ payout: result.payout, bet, lines: r.lineWins?.length ?? 0, scatter: r.scatter });
+    setLastWin({ payout: result.payout, bet, lines: r.lineWins?.length ?? 0, scatter: r.scatter, record: result.result.newPersonalBest === true });
   }
 
   function renderSymbol(id: string) {
@@ -139,6 +139,12 @@ export default function SlotsGame() {
                   <CeremonyCoin />
                 </div>
               )}
+              {lastWin.record ? (
+                <p className="mt-1 flex items-center justify-center gap-1.5 text-xs font-bold text-warning">
+                  <Coin variant="b" size={14} className="bcoin-lg" />
+                  {t("newPersonalBest")}
+                </p>
+              ) : null}
             </>
           )}
         </div>

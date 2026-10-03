@@ -113,7 +113,7 @@
     "heroF2Title": "TBRI 稀有度指数",
     "heroF2Desc": "基于稀缺度、持有量和涨势的 0–100 评分——在领取之前就知道哪些徽章真正稀有。",
     "heroF3Title": "边收集边玩",
-    "heroF3Desc": "13 款街机游戏、XP、等级、硬币和 130 个成就——还有每日幸运转盘，Twitch Turbo 大奖真实概率为亿分之一。",
+    "heroF3Desc": "13 款街机游戏、XP、等级、硬币和 131 个成就——还有每日幸运转盘，Twitch Turbo 大奖真实概率为亿分之一。",
     "heroF4Title": "你的收藏主页",
     "heroF4Desc": "使用 Twitch 登录，同步你已有的徽章、搭建展示柜并在全球排行榜上攀升——支持 11 种语言。"
   },
@@ -289,6 +289,9 @@
     "coinFlowNet": "净额 · 30 天",
     "coinFlowNote": "仅统计实时动态中记录的硬币变动 — 街机对局与商店购买不计入。",
     "coinFlowEmpty": "最近 30 天没有硬币变动。",
+    "bestRoundsTitle": "你的最佳回合",
+    "bestRoundsNote": "你玩过的每个游戏的单回合最佳净胜。",
+    "recordHistoryTitle": "最近的破纪录",
     "coinRainHint": "送这位收藏者 1 枚硬币——每天一次。",
     "communityLevel": "社区等级",
     "communityPoints": "社区积分",
@@ -387,7 +390,10 @@
     "widgetNoWindow": "尚未公布领取窗口。",
     "widgetOpen": "打开徽章页面",
     "statMonth": "本月文章",
-    "recapClicks": "回顾点击 · 7天"
+    "recapClicks": "回顾点击 · 7天",
+    "recapPersonalOne": "在此期间你创造了新的个人纪录：{game} 赢得 {amount} 金币。",
+    "recapPersonalMany": "在此期间你创造了 {n} 项个人纪录——最佳：{game} 赢得 {amount} 金币。",
+    "recapPersonalNote": "破纪录指单回合净胜超过你之前所有回合。"
   },
   "changelog": {
     "title": "更新日志",
@@ -671,6 +677,8 @@
     "bigWinsEmpty": "还没有巨额赢奖——成为第一个。",
     "bigWinsBet": "下注",
     "bigWinsWin": "赢奖",
+    "bigWinsYou": "你就在这个领奖台上！",
+    "bigWinsYourBest": "你的最佳大胜：{amount} 金币 · 排名 #{rank}",
     "lastRound": "上一局",
     "payout": "派彩",
     "you": "你",
@@ -755,6 +763,7 @@
     "notEnoughBadges": "目录中的徽章还不够，暂时无法生成问答。",
     "streakDay": "第 {streak} 天",
     "streakBonus": "每日连击奖励 +{n} XP",
+    "newPersonalBest": "新的个人纪录！",
     "freezeUsed": "连击冻结保护了你的连击！",
     "gameStreak": "连续 {n} 天",
     "disabled": "游戏厅目前已关闭，请稍后再来。",

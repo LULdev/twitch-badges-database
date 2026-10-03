@@ -176,29 +176,52 @@ export function RoundOutcome({ last }: { last: PlayResponse | null }) {
     typeof last.result.streakBonusXp === "number" ? last.result.streakBonusXp : 0;
   const freezeUsed = last.result.freezeUsed === true;
   return (
-    <p
-      role="status"
-      className={`flex flex-wrap items-center justify-center gap-2 rounded-[var(--radius-input)] px-4 py-2 text-sm font-semibold ${
-        last.won
-          ? "border border-success/40 bg-success/10 text-success"
-          : "border border-line bg-surface-2 text-muted"
-      }`}
-    >
-      <span>{last.won ? t("youWin") : t("youLose")}</span>
-      {last.payout > 0 ? (
-        <span className="inline-flex items-center gap-1 tabular-nums">
-          +{last.payout}
-          <Coin size={12} />
-        </span>
+    <>
+      <p
+        role="status"
+        className={`flex flex-wrap items-center justify-center gap-2 rounded-[var(--radius-input)] px-4 py-2 text-sm font-semibold ${
+          last.won
+            ? "border border-success/40 bg-success/10 text-success"
+            : "border border-line bg-surface-2 text-muted"
+        }`}
+      >
+        <span>{last.won ? t("youWin") : t("youLose")}</span>
+        {last.payout > 0 ? (
+          <span className="inline-flex items-center gap-1 tabular-nums">
+            +{last.payout}
+            <Coin size={12} />
+          </span>
+        ) : null}
+        {streakBonus > 0 ? (
+          <span className="inline-flex items-center gap-1 text-xs text-accent tabular-nums">
+            {t("streakBonus", { n: streakBonus })}
+          </span>
+        ) : null}
+        {freezeUsed ? (
+          <span className="text-xs text-info">{t("freezeUsed")}</span>
+        ) : null}
+      </p>
+      {last.result.newPersonalBest === true ? (
+        <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-warning">
+          <Coin variant="b" size={14} className="bcoin-lg" />
+          {t("newPersonalBest")}
+        </div>
       ) : null}
-      {streakBonus > 0 ? (
-        <span className="inline-flex items-center gap-1 text-xs text-accent tabular-nums">
-          {t("streakBonus", { n: streakBonus })}
-        </span>
-      ) : null}
-      {freezeUsed ? (
-        <span className="text-xs text-info">{t("freezeUsed")}</span>
-      ) : null}
-    </p>
+    </>
+  );
+}
+
+/** The "New personal best!" moment for bespoke verdict UIs: the server sets
+ *  result.newPersonalBest when a strictly better positive net settles. The
+ *  shared RoundOutcome renders its own copy; games with custom verdict blocks
+ *  drop this one in with the flag captured into local state. */
+export function NewBestMoment({ show }: { show: boolean }) {
+  const t = useTranslations("games");
+  if (!show) return null;
+  return (
+    <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-warning">
+      <Coin variant="b" size={14} className="bcoin-lg" />
+      {t("newPersonalBest")}
+    </div>
   );
 }

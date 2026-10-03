@@ -3,6 +3,7 @@ import { award, bumpCoins, getProgress, logActivity, ensureStarterItems } from "
 import { evaluateAchievements } from "./achievements";
 import { getEconomy, getFeatures, getGames } from "@/lib/settings";
 import { after } from "next/server";
+import { recordNotification, sendPushToAll } from "@/lib/push";
 
 /**
  * The arcade: 13 badge-themed games, all server-authoritative.
@@ -128,7 +129,7 @@ export async function playGame(
     })
     .catch((error: unknown) => ({ ok: false as const, error }));
 
-  const [settings, features, lastRound, streak, progress, economy, outcome] = await Promise.all([
+  const [settings, features, lastRound, streak, prevBestRes, progress, economy, outcome] = await Promise.all([
     getGames(GAMES),
     getFeatures(),
     // Flood check: max one round per second.
@@ -151,6 +152,15 @@ export async function playGame(
       .eq("game", gameId)
       .order("created_at", { ascending: false })
       .limit(10),
+    // Previous personal best for THIS game (max payout-bet, view 0055). Read in
+    // the same wave for the same reason: the current round is not yet inserted,
+    // so best_net is the true previous record. bigint arrives as a string.
+    supabase
+      .from("stats_player_best_rounds")
+      .select("best_net")
+      .eq("user_id", userId)
+      .eq("game", gameId)
+      .maybeSingle(),
     progressAttempt,
     getEconomy(),
     outcomeAttempt,
@@ -310,7 +320,10 @@ export async function playGame(
   // mirror the client ceremonies exactly: slots on the POST-CAP payout vs the
   // stake (the server `jackpot` flag is coin-denominated and must not gate
   // this), scratch on the resolver's mult-based jackpot flag.
-  if (gameId === "slots" && payout >= bet * 15) {
+  // bet > 0 on every gate: an admin-configured minBet of 0 would otherwise
+  // make the payout thresholds trivially true (0 >= 0) and fire for every
+  // free round.
+  if (gameId === "slots" && bet > 0 && payout >= bet * 15) {
     afterResponse(() =>
       logActivity({
         userId,
@@ -321,7 +334,7 @@ export async function playGame(
       }),
     );
   }
-  if (gameId === "scratch" && result.jackpot === true) {
+  if (gameId === "scratch" && bet > 0 && result.jackpot === true) {
     afterResponse(() =>
       logActivity({
         userId,
@@ -330,6 +343,24 @@ export async function playGame(
         coinsAmount: net,
         payload: { game: gameId, bet, payout, mult: result.mult },
       }),
+    );
+  }
+
+  // Jackpot alert: a rare win is a broadcast moment. Fires after the round
+  // settled, inside afterResponse; the alert task fetches the winner's
+  // username itself (playGame never handles identity), then records the
+  // notification row and fans out a web push — the badge-drop house pattern,
+  // both fire-and-catch so a push failure can never touch the round. The
+  // slots gate sits at the resolver's 25x cap (the maximum payout), one tier
+  // above the 15x feed garnish.
+  if (gameId === "slots" && bet > 0 && payout >= bet * 25) {
+    afterResponse(() =>
+      sendJackpotAlert(supabase, userId, gameId, `Big win on ${meta.title}!`, net),
+    );
+  }
+  if (gameId === "scratch" && bet > 0 && result.jackpot === true) {
+    afterResponse(() =>
+      sendJackpotAlert(supabase, userId, gameId, `Jackpot on ${meta.title}!`, net),
     );
   }
 
@@ -397,6 +428,16 @@ export async function playGame(
   // the spinner for a fifth of a second on every round.
   afterResponse(() => evaluateAchievements(userId).catch(() => undefined));
 
+  // Personal best: the Wave-A read of stats_player_best_rounds predates this
+  // round's insert, so best_net is the true previous record (null → first
+  // round, bigint arrives as a string). Strictly beating it with a positive
+  // net earns the moment; voided rounds never reach this return, so the flag
+  // can never describe a deleted row.
+  const prevBest = Number(
+    (prevBestRes.data as { best_net: string | number } | null)?.best_net ?? NaN,
+  );
+  const newPersonalBest = net > 0 && (!Number.isFinite(prevBest) || net > prevBest);
+
   return {
     ok: true,
     bet,
@@ -405,6 +446,7 @@ export async function playGame(
     balance: awardResult.coins,
     result: {
       ...result,
+      ...(newPersonalBest && { newPersonalBest: true }),
       ...(streakBonusXp > 0 && { streakBonusXp }),
       ...(freezeUsed && { freezeUsed: true }),
     },
@@ -431,6 +473,40 @@ function afterResponse(task: () => Promise<unknown>): void {
     after(task);
   } catch {
     void task().catch(() => undefined);
+  }
+}
+
+/**
+ * Broadcast a rare-win alert: one notifications row plus a web push to every
+ * subscriber (the badge-drop house pattern — recordNotification first, then
+ * sendPushToAll, each fire-and-catch). Runs inside afterResponse, strictly
+ * after the round settled; the winner's username is fetched here because
+ * playGame only ever handles the id. The whole task swallows its own errors.
+ */
+async function sendJackpotAlert(
+  supabase: ReturnType<typeof createAdminClient>,
+  userId: string,
+  gameId: string,
+  title: string,
+  net: number,
+): Promise<void> {
+  try {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", userId)
+      .maybeSingle();
+    const who = (profile as { username: string | null } | null)?.username ?? "Someone";
+    const payload = {
+      title,
+      body: `${who} won ${net.toLocaleString("en-US")} BadgesCoins`,
+      url: `/games/${gameId}`,
+      tag: "jackpot",
+    };
+    await recordNotification({ kind: "jackpot", ...payload }).catch(() => undefined);
+    await sendPushToAll(payload).catch(() => undefined);
+  } catch {
+    // A failed alert must never surface to the player.
   }
 }
 

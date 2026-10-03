@@ -630,21 +630,26 @@ export async function getCommunityCoinFlow(): Promise<CommunityCoinFlowData | nu
   const since = new Date();
   since.setUTCHours(0, 0, 0, 0);
   since.setUTCDate(since.getUTCDate() - 29);
-  const { data, error } = await supabase
-    .from("stats_coin_flow_daily")
-    .select("day,earned,spent,net")
-    .gte("day", since.toISOString().slice(0, 10))
-    .order("day", { ascending: true });
-  if (error || !data) return null;
-  const days = (
-    data as Array<{ day: string; earned: number; spent: number; net: number }>
-  ).map((row) => ({
-    day: String(row.day).slice(0, 10),
-    earned: Number(row.earned ?? 0),
-    spent: Number(row.spent ?? 0),
-    net: Number(row.net ?? 0),
-  }));
-  const earned = days.reduce((sum, day) => sum + day.earned, 0);
-  const spent = days.reduce((sum, day) => sum + day.spent, 0);
-  return { days, earned, spent, net: earned - spent };
+  try {
+    const { data, error } = await supabase
+      .from("stats_coin_flow_daily")
+      .select("day,earned,spent,net")
+      .gte("day", since.toISOString().slice(0, 10))
+      .order("day", { ascending: true });
+    if (error || !data) return null;
+    const days = (
+      data as Array<{ day: string; earned: number; spent: number; net: number }>
+    ).map((row) => ({
+      day: String(row.day).slice(0, 10),
+      earned: Number(row.earned ?? 0),
+      spent: Number(row.spent ?? 0),
+      net: Number(row.net ?? 0),
+    }));
+    const earned = days.reduce((sum, day) => sum + day.earned, 0);
+    const spent = days.reduce((sum, day) => sum + day.spent, 0);
+    return { days, earned, spent, net: earned - spent };
+  } catch {
+    // Network-level failure: /stats must render without the card, not crash.
+    return null;
+  }
 }

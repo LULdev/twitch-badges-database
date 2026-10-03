@@ -113,7 +113,7 @@
     "heroF2Title": "TBRI 희귀도 지수",
     "heroF2Desc": "희소성, 보유량, 추세로 계산한 0~100 점수 — 받기 전에 어떤 배지가 진짜 희귀한지 알 수 있습니다.",
     "heroF3Title": "수집하며 플레이",
-    "heroF3Desc": "13개의 아케이드 게임, XP, 레벨, 코인, 130개 업적 — 매일 돌리는 룰렛에는 1억 분의 1의 실제 확률로 Twitch Turbo 잭팟이.",
+    "heroF3Desc": "13개의 아케이드 게임, XP, 레벨, 코인, 131개 업적 — 매일 돌리는 룰렛에는 1억 분의 1의 실제 확률로 Twitch Turbo 잭팟이.",
     "heroF4Title": "나의 컬렉션 프로필",
     "heroF4Desc": "Twitch로 로그인하면 보유 배지가 동기화되고, 쇼케이스를 꾸미고, 세계 랭킹을 오를 수 있습니다 — 11개 언어 지원."
   },
@@ -289,6 +289,9 @@
     "coinFlowNet": "순증 · 30일",
     "coinFlowNote": "실시간 피드에 기록된 코인 이동만 집계됩니다 — 아케이드 라운드와 상점 구매는 포함되지 않습니다.",
     "coinFlowEmpty": "최근 30일간 코인 이동이 없습니다.",
+    "bestRoundsTitle": "당신의 최고 라운드",
+    "bestRoundsNote": "플레이한 각 게임의 1라운드 최고 순수익.",
+    "recordHistoryTitle": "최근 기록 갱신",
     "coinRainHint": "이 수집가에게 코인 1개를 선물하세요 — 하루 한 번.",
     "communityLevel": "커뮤니티 레벨",
     "communityPoints": "커뮤니티 포인트",
@@ -387,7 +390,10 @@
     "widgetNoWindow": "수령 기간 미공개.",
     "widgetOpen": "뱃지 페이지 열기",
     "statMonth": "이번 달 게시물",
-    "recapClicks": "요약 클릭 · 7일"
+    "recapClicks": "요약 클릭 · 7일",
+    "recapPersonalOne": "이 기간에 개인 최고 기록을 세웠습니다: {game}에서 {amount} 코인.",
+    "recapPersonalMany": "이 기간에 개인 최고 기록 {n}회 갱신 — 최고: {game}에서 {amount} 코인.",
+    "recapPersonalNote": "기록 갱신은 이전에 플레이한 모든 라운드의 순수익을 넘은 라운드입니다."
   },
   "changelog": {
     "title": "체인지로그",
@@ -671,6 +677,8 @@
     "bigWinsEmpty": "아직 대박이 없습니다 — 첫 번째가 되어보세요.",
     "bigWinsBet": "베팅",
     "bigWinsWin": "당첨",
+    "bigWinsYou": "이 시상대에 올라 있습니다!",
+    "bigWinsYourBest": "당신의 최고 대승: {amount} 코인 · 순위 #{rank}",
     "lastRound": "지난 라운드",
     "payout": "지급액",
     "you": "나",
@@ -755,6 +763,7 @@
     "notEnoughBadges": "카탈로그에 배지가 아직 충분하지 않아 퀴즈를 만들 수 없습니다.",
     "streakDay": "{streak}일차",
     "streakBonus": "매일 스트릭 보너스 +{n} XP",
+    "newPersonalBest": "개인 최고 기록 달성!",
     "freezeUsed": "스트릭 프리즈가 연속 기록을 지켰습니다!",
     "gameStreak": "{n}일 연속",
     "disabled": "게임장이 현재 꺼져 있습니다. 나중에 다시 방문해 주세요.",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, NewBestMoment } from "./useGame";
 
 const ICONS: Record<string, string> = {
   rock: "M12 3a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5.2A3 3 0 0 0 9 17a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z",
@@ -11,7 +11,7 @@ const ICONS: Record<string, string> = {
 
 export default function RpsGame() {
   const { bet, setBet, busy, error, balance, play, t } = useGame("rps");
-  const [last, setLast] = useState<{ player: string; bot: string; tie: boolean; won: boolean } | null>(null);
+  const [last, setLast] = useState<{ player: string; bot: string; tie: boolean; won: boolean; newPersonalBest?: boolean } | null>(null);
 
   async function choose(choice: string) {
     const result = await play({ choice });
@@ -49,6 +49,9 @@ export default function RpsGame() {
           <p className={`mt-1 text-lg font-extrabold ${last.tie ? "text-muted" : last.won ? "text-success" : "text-danger"}`}>
             {last.tie ? t("tie") : last.won ? t("youWin") : t("youLose")}
           </p>
+          {/* The wholesale result cast carries the server flag at runtime; the
+              optional field makes it legible to TypeScript. */}
+          <NewBestMoment show={last.newPersonalBest === true} />
         </div>
       )}
     </div>
