@@ -30,6 +30,7 @@ const KIND_COLORS: Record<string, string> = {
   turbo_win: "#fbbf24",
   coin_rain: "var(--info)",
   streak_freeze: "#38bdf8",
+  big_win: "#fbbf24",
 };
 
 /** Public live feed with 5-second polling (real-time-ish). */
@@ -110,12 +111,24 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
 
       <ol className="space-y-2">
         {events.map((event) => (
-          <li key={event.id} className="card flex items-start gap-3 p-3.5">
-            <span
-              aria-hidden
-              className="mt-1.5 size-2 shrink-0 rounded-full"
-              style={{ backgroundColor: KIND_COLORS[event.kind] ?? "var(--muted)" }}
-            />
+          <li
+            key={event.id}
+            className={`card flex items-start gap-3 p-3.5 ${event.kind === "big_win" ? "feed-bigwin" : ""}`}
+          >
+            {event.kind === "big_win" ? (
+              // Big wins trade the plain kind dot for the Jewel coin; the
+              // aria-hidden wrapper keeps the coin's own role="img" label out
+              // of the row (the kind label below already says "Big win").
+              <span aria-hidden className="mt-0.5 shrink-0">
+                <Coin variant="b" size={16} className="bcoin-lg" />
+              </span>
+            ) : (
+              <span
+                aria-hidden
+                className="mt-1.5 size-2 shrink-0 rounded-full"
+                style={{ backgroundColor: KIND_COLORS[event.kind] ?? "var(--muted)" }}
+              />
+            )}
             {event.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={event.avatar_url} alt="" width={28} height={28} className="mt-0.5 rounded-full" />

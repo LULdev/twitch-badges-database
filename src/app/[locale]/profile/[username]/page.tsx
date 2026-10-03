@@ -27,6 +27,11 @@ import { readProgress } from "@/lib/gamification/xp";
 import { getEconomy } from "@/lib/settings";
 import { ProfileAutoRain, ProfileParticles, ProfileTilt } from "@/components/profile/ProfileEffects";
 import { levelFromXp } from "@/lib/gamification/levels";
+import CoinFlowCard, {
+  coinFlowSince,
+  fetchCoinRows,
+  type CoinFlowRow,
+} from "@/components/profile/CoinFlowCard";
 import ItemIcon, { ITEM_COLORS } from "@/components/items/ItemIcon";
 import BuyFreezeButton from "@/components/items/BuyFreezeButton";
 import { FREEZE_MAX } from "@/lib/gamification/items";
@@ -337,9 +342,13 @@ export default async function ProfilePage({ params }: PageProps) {
   let rescueDates: string[] = [];
   // Total rescues = the Ice Guardian signal (same count buildStats uses).
   let guardianRescues = 0;
+  // Feed-logged coin movements of the last 30 UTC days (the coin-flow card).
+  let coinRows: CoinFlowRow[] = [];
   if (profile) {
     const admin = createAdminClient();
-    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes] = await Promise.all([
+    // 30 rendered UTC days starting today-29 (the card strip's window).
+    const since = coinFlowSince();
+    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes, coinsRes] = await Promise.all([
       readProgress(profile.id).catch(() => null),
       admin
         .from("user_achievements")
@@ -371,6 +380,9 @@ export default async function ProfilePage({ params }: PageProps) {
         .select("id", { count: "exact", head: true })
         .eq("user_id", profile.id)
         .eq("kind", "streak_freeze"),
+      // Feed-logged coin movements, 30d window (the coin-flow card). Same
+      // admin-client split as above — user_id is not anon-readable (0040).
+      fetchCoinRows(admin, profile.id, since).catch(() => []),
     ]);
     const achievementRows = (achievementRes.data ?? []) as Array<{
       achievement_id: string;
@@ -388,7 +400,9 @@ export default async function ProfilePage({ params }: PageProps) {
       (row) => row.created_at,
     );
     guardianRescues = rescuesCountRes.count ?? 0;
+    coinRows = coinsRes;
   }
+
 
   return (
     <div
@@ -668,6 +682,11 @@ export default async function ProfilePage({ params }: PageProps) {
             </>
           )}
         </section>
+      )}
+
+      {/* Coin flow — the shared card, also rendered on /stats for the owner. */}
+      {profile && progress && showCoins && (
+        <CoinFlowCard rows={coinRows} id="profile-coin-flow" />
       )}
 
       {/* Item shelf, in the badge-detail gallery style: one gal-stage card per

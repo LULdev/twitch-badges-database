@@ -75,17 +75,35 @@ async function main(): Promise<void> {
       .gte("created_at", start.toISOString())
       .lt("created_at", end.toISOString());
     const streakSaves = saveCount ?? 0;
+    // Feed-logged coin movement (gross), same filter as the card/engine.
+    let coinFlow = 0;
+    for (let offset = 0; ; offset += 1000) {
+      const { data: coinPage, error: coinError } = await supabase
+        .from("activity_events")
+        .select("id, coins_amount")
+        .not("coins_amount", "is", null)
+        .neq("coins_amount", 0)
+        .gte("created_at", start.toISOString())
+        .lt("created_at", end.toISOString())
+        .order("id")
+        .range(offset, offset + 999);
+      if (coinError) throw coinError;
+      const page = (coinPage ?? []) as Array<{ coins_amount: number | null }>;
+      coinFlow += page.reduce((sum, row) => sum + Math.abs(row.coins_amount ?? 0), 0);
+      if (page.length < 1000) break;
+    }
     const article = buildArcadeHighlightsArticle({
       day: start.toISOString().slice(0, 10),
       roundsByGame: counts,
       biggestWin,
       streakSaves,
+      coinFlow,
     });
     console.log("=== DRY — nothing written ===");
     console.log("title:", article.title);
     console.log("excerpt:", article.excerpt);
     console.log("content chars:", article.content.length, "(floor 600)");
-    console.log("streak saves:", streakSaves, "| sentence present:", article.content.includes("Streak Freeze"));
+    console.log("streak saves:", streakSaves, "| coin flow:", coinFlow, "| sentences:", article.content.includes("Streak Freeze"), article.content.includes("BadgesCoins moved"));
     console.log(counts.filter((c) => c.rounds > 0));
     if (biggestWin) console.log("biggest win:", biggestWin);
     return;

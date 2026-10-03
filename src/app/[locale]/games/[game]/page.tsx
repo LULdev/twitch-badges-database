@@ -80,6 +80,29 @@ export default async function GamePage({ params }: PageProps) {
   // hero can never promise limits the engine would refuse.
   const range = settings.games[game] ?? meta;
 
+  // Recent big wins on this game for the card below — an anon read of the
+  // public aggregate view stats_game_big_wins (0054). The view projects
+  // game/bet/payout out of the payload as named columns, so the payload
+  // itself never leaves the database and this page needs no service role.
+  let bigWins: Array<{
+    id: number;
+    created_at: string;
+    username: string;
+    bet: number | null;
+    payout: number | null;
+  }> = [];
+  {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("stats_game_big_wins")
+      .select("id,created_at,username,bet,payout")
+      .eq("game", game)
+      .order("created_at", { ascending: false })
+      .limit(8);
+    bigWins = (data ?? []) as typeof bigWins;
+  }
+  const winsDate = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short" });
+
   // One hero shell for EVERY state (playable, login wall, arcade off): the
   // game art makes the page recognizable even before login. `stats` is the
   // state-specific chip (last-round result) that only the playable state has.
@@ -106,7 +129,7 @@ export default async function GamePage({ params }: PageProps) {
         <div className="mt-3 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
           <span className="chip pointer-events-none">
             {t("betRange", { min: range.minBet, max: range.maxBet })}{" "}
-            <Coin size={11} />
+            <Coin size={12} />
           </span>
           {stats}
         </div>
@@ -114,11 +137,51 @@ export default async function GamePage({ params }: PageProps) {
     </header>
   );
 
+  // Promotional hill, shown in EVERY state (playable, login wall, arcade off):
+  // "someone already won this here" is the argument for logging in or for
+  // switching the arcade back on.
+  const bigWinsSection = (
+    <section className="card p-6" aria-labelledby="big-wins-head">
+      <h2 id="big-wins-head" className="text-lg font-extrabold tracking-tight">
+        {t("bigWinsTitle")}
+      </h2>
+      {bigWins.length > 0 ? (
+        <ul className="mt-4 space-y-2.5">
+          {bigWins.map((win) => (
+            <li key={win.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
+              <Link href={`/profile/${win.username}`} className="font-bold hover:text-accent">
+                {win.username}
+              </Link>
+              {/* dir="ltr" island: "bet → win" is a numeric expression that must
+                  keep its order under RTL (the FeedList/hero-chip pattern). */}
+              <span dir="ltr" className="inline-flex items-center gap-1.5 text-xs text-muted tabular-nums">
+                {t("bigWinsBet")}
+                <span className="inline-flex items-center gap-1 font-bold text-foreground">
+                  {win.bet?.toLocaleString(locale) ?? "–"} <Coin size={11} />
+                </span>
+                <span aria-hidden>→</span>
+                <span className="inline-flex items-center gap-1 font-bold text-success">
+                  {win.payout?.toLocaleString(locale) ?? "–"} <Coin size={11} />
+                </span>
+              </span>
+              <time dateTime={win.created_at} className="ms-auto text-xs text-muted">
+                {winsDate.format(new Date(win.created_at))}
+              </time>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-3 text-sm text-muted">{t("bigWinsEmpty")}</p>
+      )}
+    </section>
+  );
+
   if (!settings.enabled || !features.games) {
     return (
       <div className="mx-auto max-w-2xl space-y-6">
         {hero()}
         <p className="card p-6 text-center text-sm text-muted">{t("disabled")}</p>
+        {bigWinsSection}
       </div>
     );
   }
@@ -135,6 +198,7 @@ export default async function GamePage({ params }: PageProps) {
             <TwitchLoginButton />
           </div>
         </div>
+        {bigWinsSection}
       </div>
     );
   }
@@ -234,6 +298,7 @@ export default async function GamePage({ params }: PageProps) {
           </div>
         ))}
       {game === "catcher" && <CatcherGame />}
+      {bigWinsSection}
     </div>
   );
 }

@@ -3,7 +3,15 @@ import type { CSSProperties, ReactNode } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getSiteStats } from "@/lib/queries";
-import { daySeries, getPlatformStats } from "@/lib/stats";
+import { daySeries, getCommunityCoinFlow, getPlatformStats } from "@/lib/stats";
+import { authUserId } from "@/lib/gamification/session";
+import { createAdminClient } from "@/lib/supabase/admin";
+import CoinFlowCard, {
+  coinFlowSince,
+  fetchCoinRows,
+  type CoinFlowRow,
+} from "@/components/profile/CoinFlowCard";
+import CommunityCoinFlow from "@/components/stats/CommunityCoinFlow";
 import {
   ACH_BY_ID,
   ACTIVE_ACHIEVEMENTS,
@@ -55,6 +63,7 @@ const PALETTE: Record<string, string> = {
   level_up: "#60a5fa",
   turbo_win: "#fde047",
   coin_rain: "#34d399",
+  big_win: "#fbbf24",
   profile: "#c084fc",
   first_login: "#9aa0b0",
   rps: "#a970ff",
@@ -195,12 +204,28 @@ export default async function StatsPage({
   const tr = await getTranslations("rarity");
   const tf = await getTranslations("feed");
 
-  const [catalog, platform] = await Promise.all([
+  const [catalog, platform, communityCoin] = await Promise.all([
     getSiteStats().catch(() => null),
     getPlatformStats(),
+    getCommunityCoinFlow(),
   ]);
 
-  // "now" anchors the 30-day calendar; the page revalidates every 5 minutes.
+  // Owner-only view: the logged-in viewer's own 30-day coin flow, same card
+  // as the profile page. user_id is not anon-readable (0040 column grants),
+  // so this read needs the service-role client — the profile page's exact
+  // exception, cited there.
+  const viewerId = await authUserId();
+  let coinRows: CoinFlowRow[] = [];
+  if (viewerId) {
+    coinRows = await fetchCoinRows(
+      createAdminClient(),
+      viewerId,
+      coinFlowSince(),
+    ).catch(() => []);
+  }
+
+  // "now" anchors the 30-day calendar; authUserId() reads cookies, so the
+  // page renders per request (no route-segment revalidate applies).
   // eslint-disable-next-line react-hooks/purity -- async server component
   const now = Date.now();
   const number = new Intl.NumberFormat(locale);
@@ -577,6 +602,12 @@ export default async function StatsPage({
         </nav>
       </section>
 
+      {/* Owner-only coin flow — the shared card, same as on the profile. */}
+      {viewerId && <CoinFlowCard rows={coinRows} id="stats-coin-flow" />}
+
+      {/* Public aggregate card — everyone's feed-logged coin movement. */}
+      {communityCoin && <CommunityCoinFlow data={communityCoin} />}
+
       {/* ---------------------------------------------------- economy */}
       <section id="economy" className="scroll-mt-24 space-y-4">
         <SectionHead
@@ -856,7 +887,7 @@ export default async function StatsPage({
                         {GAMES.find((entry) => entry.id === win.game)?.title ?? win.game}
                       </span>
                       <span className="flex w-20 items-center justify-end gap-1 text-xs font-bold tabular-nums text-warning">
-                        <Coin size={11} />
+                        <Coin size={12} />
                         {formatCompact(win.payout, locale)}
                       </span>
                     </li>

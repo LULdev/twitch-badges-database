@@ -976,12 +976,179 @@ html {
   filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.45));
 }
 
+/* ------------------------------------------------------------
+   Coin premium variants — CSS-only restyles of the same span
+   structure. Variant A "Mint" is the site default (owner
+   decision 2026-10-02); B "Jewel" is the ceremonial coin at the
+   wheel's big-win moment; C "Proof" stays wired for future
+   reuse. Recipes reused verbatim: the wheel rim's 8-stop milled
+   conic, the jewel's purple core, and the light-mode-corrected
+   --rank-* tokens.
+   ------------------------------------------------------------ */
+
+/* Variant A — "Mint": rotating milled edge + inner radial sphere. */
+.bcoin-a {
+  background: conic-gradient(
+    from var(--rarity-angle),
+    #fde68a 0deg, #b45309 60deg, #fbbf24 120deg, #7c2d12 170deg,
+    #fde68a 220deg, #f59e0b 290deg, #92400e 340deg, #fde68a 360deg
+  );
+  border: 0.06em solid color-mix(in srgb, #7c2d12 80%, #000);
+  box-shadow:
+    inset 0 0.06em 0.12em rgba(255, 255, 255, 0.4),
+    inset 0 -0.1em 0.16em rgba(0, 0, 0, 0.55),
+    0 0 4px rgba(251, 191, 36, 0.55);
+  animation: bcoin-flip 3.4s ease-in-out infinite, rarity-spin 7s linear infinite;
+}
+.bcoin-a .bcoin-face {
+  margin: 16%;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 32% 28%,
+    var(--coin-gold-1) 0%,
+    var(--coin-gold-2) 48%,
+    var(--coin-gold-3) 100%
+  );
+  border: 0.05em solid rgba(120, 53, 15, 0.55);
+  box-shadow:
+    inset 0 0.05em 0.08em rgba(255, 235, 170, 0.7),
+    inset 0 -0.06em 0.1em rgba(120, 53, 15, 0.4);
+  animation: none;
+}
+
+/* Variant B — "Jewel": gold bezel coin with amethyst-set core and
+   specular dot (the wheel pointer's gem, promoted to currency). */
+.bcoin-b {
+  background:
+    radial-gradient(circle at 32% 28%, var(--coin-gold-1), var(--coin-gold-2) 55%, var(--coin-gold-3))
+      padding-box,
+    conic-gradient(from 210deg, #fde68a, #b45309, #fbbf24, #7c2d12, #fde68a)
+      border-box;
+  border: 0.14em solid transparent;
+  box-shadow:
+    0 0 5px rgba(251, 191, 36, 0.6),
+    inset 0 0 0 0.04em rgba(253, 230, 138, 0.5);
+  animation: bcoin-flip 3.4s ease-in-out infinite;
+}
+.bcoin-b .bcoin-face {
+  margin: 12%;
+  border: none;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(233, 213, 255, 0.95), rgba(167, 112, 255, 0.55) 45%, rgba(109, 40, 217, 0.35) 75%, transparent);
+  color: #4c1d95;
+  text-shadow: 0 0.05em 0 rgba(255, 235, 170, 0.6);
+  box-shadow: inset 0 0 0.1em rgba(109, 40, 217, 0.5);
+  animation: bcoin-emboss 3.4s ease-in-out infinite;
+}
+.bcoin-b::after {
+  /* Specular dot at the site-wide 32%/28% light anchor (the jewel recipe). */
+  content: "";
+  position: absolute;
+  top: 24%;
+  left: 26%;
+  width: 0.16em;
+  height: 0.16em;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.8));
+  z-index: 2;
+}
+
+/* Variant C — "Proof": flat mint-condition disc on the light-safe
+   --rank-* tokens, thin conic accent ring, one calm shimmer. */
+.bcoin-c {
+  --pc-metal: var(--rank-gold, #fbbf24);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--pc-metal) 82%, #fff),
+      var(--pc-metal)
+    ) padding-box,
+    conic-gradient(
+      from 40deg,
+      color-mix(in srgb, var(--pc-metal) 30%, #fff),
+      var(--pc-metal),
+      color-mix(in srgb, var(--pc-metal) 55%, #000),
+      color-mix(in srgb, var(--pc-metal) 30%, #fff)
+    ) border-box;
+  border: 0.1em solid transparent;
+  box-shadow:
+    inset 0 0.05em 0.06em rgba(255, 255, 255, 0.55),
+    inset 0 -0.06em 0.1em rgba(120, 53, 15, 0.35),
+    0 0.05em 0.12em rgba(0, 0, 0, 0.25);
+  animation: none;
+}
+.bcoin-c .bcoin-face {
+  margin: 14%;
+  border: none;
+  background: none;
+  color: #5c3a06;
+  text-shadow: 0 0.04em 0 color-mix(in srgb, var(--pc-metal) 45%, #fff);
+  animation: none;
+}
+.bcoin-c .bcoin-shine::before {
+  /* The calmest premium motion the site has: the 6s hero shimmer. */
+  animation: hero-shimmer 6s ease-in-out infinite;
+}
+.bcoin-c .bcoin-sparkle {
+  display: none;
+}
+
+/* Mint on light surfaces: the pure-black inset reads heavy against white
+   cards — warm brown instead (the wheel-rim light recipe's move). */
+.light .bcoin-a {
+  box-shadow:
+    inset 0 0.06em 0.12em rgba(255, 255, 255, 0.4),
+    inset 0 -0.1em 0.16em rgba(120, 53, 15, 0.4),
+    0 0 4px rgba(251, 191, 36, 0.55);
+}
+
+/* Ceremonial coin — the wheel's big-win moment (Jewel at ~30px): a one-shot
+   "stamp into place" then the idle flip resumes, crowned by a finite gold
+   halo (the wheel-win-ring keyframe, fired twice). Rotation/scale is
+   direction-agnostic, so no RTL twin is needed. */
+.bcoin-ceremony {
+  animation:
+    bcoin-stamp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both,
+    bcoin-flip 3.4s ease-in-out 0.7s infinite;
+}
+@keyframes bcoin-stamp {
+  0% { transform: scale(1.9) rotate(-200deg); opacity: 0; }
+  60% { transform: scale(0.92) rotate(0deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.bcoin-ceremony::before {
+  content: "";
+  position: absolute;
+  inset: -14%;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--warning, #fbbf24) 70%, transparent);
+  opacity: 0;
+  animation: wheel-win-ring 1.5s cubic-bezier(0, 0, 0.2, 1) 2;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bcoin,
   .bcoin-face,
   .bcoin-shine::before,
   .bcoin-sparkle {
     animation: none;
+  }
+  .bcoin-a,
+  .bcoin-b,
+  .bcoin-b .bcoin-face,
+  .bcoin-c .bcoin-shine::before {
+    animation: none;
+  }
+  /* Static, legible ceremony state: no stamp, no ring — just the glow. */
+  .bcoin-ceremony,
+  .bcoin-ceremony::before {
+    animation: none;
+  }
+  .bcoin-ceremony::before {
+    opacity: 0;
   }
 }
 
@@ -3256,6 +3423,38 @@ html {
 .bl-day-cell[data-count="3"] { background: color-mix(in srgb, var(--accent) 70%, var(--surface-3)); color: var(--surface); }
 .bl-day-cell[data-count="max"] { background: var(--accent); color: var(--surface); }
 .bl-day-cell:hover { transform: scale(1.18); }
+
+/* Coin flow — the profile's signed 30-day strip (profile page). Heights are
+   inline per bar (30 arbitrary values); data-dir only switches the tint.
+   direction:ltr keeps calendar order left→right in RTL locales. */
+.coin-flow-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 3rem;
+  direction: ltr;
+}
+.coin-flow-bar {
+  flex: 1;
+  min-height: 2px;
+  border-radius: 2px;
+  background: var(--surface-3);
+}
+.coin-flow-bar[data-dir="in"] {
+  background: color-mix(in srgb, var(--success) 70%, var(--surface-3));
+}
+.coin-flow-bar[data-dir="out"] {
+  background: color-mix(in srgb, var(--danger) 70%, var(--surface-3));
+}
+
+/* Big wins in the feed: the card gets a warning-toned border and a soft inset
+   ring next to the Jewel coin in the kind slot. The row itself never animates
+   (static, reduced-motion-safe); the coin keeps its own flip, which the
+   reduced-motion block kills. */
+.feed-bigwin {
+  border-color: color-mix(in srgb, var(--warning) 45%, var(--line));
+  box-shadow: var(--shadow-card), inset 0 0 0 1px color-mix(in srgb, var(--warning) 16%, transparent);
+}
 
 /* Article page — cover stage, byline placard, TOC rail, prev/next */
 .bl-cover-stage {

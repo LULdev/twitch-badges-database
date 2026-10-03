@@ -4,12 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import { useGame, BetBar, GameError } from "./useGame";
 import Coin from "@/components/Coin";
+import CeremonyCoin from "@/components/items/CeremonyCoin";
 
 interface Symbol {
   id: string;
   label: string;
   image: string | null;
 }
+
+/** Scaffolding for proving the big-win ceremony without a real jackpot
+ *  (flip true, mount temporarily, screenshot, revert — the wheel's
+ *  CEREMONY_PREVIEW precedent). Seeds a capped 25x win so the verdict and
+ *  the ceremony coin render deterministically. */
+const CEREMONY_PREVIEW = false;
 
 /** Badges of Ra 6 Deluxe — 5 reels × 3 rows, real Twitch badge symbols. */
 export default function SlotsGame() {
@@ -29,6 +36,20 @@ export default function SlotsGame() {
       .then((data: { symbols: Symbol[] }) => setSymbols(data.symbols ?? []))
       .catch(() => undefined);
     return () => window.clearInterval(spinTimer.current);
+  }, []);
+
+  // Ceremony proof seeding — see CEREMONY_PREVIEW above.
+  useEffect(() => {
+    if (!CEREMONY_PREVIEW) return;
+    const timer = setTimeout(() => {
+      setReels([
+        ["premium-v1", "premium-v1", "premium-v1", "premium-v1", "premium-v1"],
+        ["turbo-v1", "bits-v1", "founder-v1", "subtember-2026-v1", "wsci-2026-v1"],
+        ["scatter", "premium-v1", "turbo-v1", "bits-v1", "founder-v1"],
+      ]);
+      setLastWin({ payout: 50000, bet: 2000, lines: 1, scatter: 0 });
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const symbolById = new Map(symbols.map((s) => [s.id, s]));
@@ -102,11 +123,23 @@ export default function SlotsGame() {
             {spinning ? t("spinning") : (<span>{t("spin")} (<span className="inline-flex items-center gap-1">{bet.toLocaleString(locale)} <Coin size={14} /></span>)</span>)}
           </button>
           {lastWin && (
-            <p className={`mt-3 text-center text-lg font-extrabold ${lastWin.payout > lastWin.bet ? "text-success" : "text-muted"}`}>
-              {lastWin.payout > lastWin.bet
-                ? (<span><span dir="ltr">{`+${(lastWin.payout - lastWin.bet).toLocaleString(locale)}`}</span> <Coin size={14} /> — {lastWin.lines} {t("paylines")}{lastWin.scatter >= 3 ? ` · ${lastWin.scatter}x ${t("scatter")}` : ""}</span>)
-                : t("noWin")}
-            </p>
+            <>
+              <p className={`mt-3 text-center text-lg font-extrabold ${lastWin.payout > lastWin.bet ? "text-success" : "text-muted"}`}>
+                {lastWin.payout > lastWin.bet
+                  ? (<span><span dir="ltr">{`+${(lastWin.payout - lastWin.bet).toLocaleString(locale)}`}</span> <Coin size={14} /> — {lastWin.lines} {t("paylines")}{lastWin.scatter >= 3 ? ` · ${lastWin.scatter}x ${t("scatter")}` : ""}</span>)
+                  : t("noWin")}
+              </p>
+              {/* Big win (>=15x the stake: five-scatter tier, multi-premium
+                  lines or the 25x cap — scatter-3/4 tiers stay below): the
+                  shared ceremony coin stamps in. Gated on lastWin only, so
+                  it never mounts mid-spin; lastWin nulls on every spin, so
+                  consecutive big wins re-trigger the stamp. */}
+              {lastWin.payout >= lastWin.bet * 15 && (
+                <div className="mt-1 text-center">
+                  <CeremonyCoin />
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

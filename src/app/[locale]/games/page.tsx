@@ -174,7 +174,7 @@ export default async function GamesHubPage({
                 <p className="text-xs leading-relaxed text-muted">{t(`${game.id}Desc`)}</p>
                 <div className="mt-auto flex items-center gap-1.5 pt-2">
                   <span className="chip pointer-events-none text-[0.5625rem]">
-                    {range.minBet}–{range.maxBet} <Coin size={11} />
+                    {range.minBet}–{range.maxBet} <Coin size={12} />
                   </span>
                 </div>
               </div>

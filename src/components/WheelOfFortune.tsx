@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Coin from "@/components/Coin";
+import CeremonyCoin from "@/components/items/CeremonyCoin";
 
 /**
  * Presentational wheel face only: the order and the labels drawn on the segments.
@@ -24,6 +25,12 @@ interface SpinResult {
   coins: number;
   turbo: boolean;
 }
+
+/** Scaffolding for proving the big-win ceremony card without a real spin
+ *  (flipped true for the 2026-10-02 live proof, then back). Seeds the one
+ *  non-turbo slot with coins >= 1000 so the Jewel coin and its halo render
+ *  on the real anonymous /wheel page. */
+const CEREMONY_PREVIEW = false;
 
 const SEGMENTS: Slot[] = [
   { id: "xp25", label: "+25 XP" },
@@ -125,6 +132,16 @@ export default function WheelOfFortune() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  // Ceremony proof seeding — see CEREMONY_PREVIEW above. The setState lives
+  // in the timeout callback (the repo's set-state-in-effect convention).
+  useEffect(() => {
+    if (!CEREMONY_PREVIEW) return;
+    const timer = setTimeout(() => {
+      setResult({ id: "xp2500", label: "+2,500 XP", xp: 2500, coins: 1000, turbo: false });
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const wheelStyle = useMemo(
@@ -382,6 +399,9 @@ export default function WheelOfFortune() {
           >
             <p className="text-xs font-bold uppercase tracking-wider text-muted">{t("youWon")}</p>
             <p dir="ltr" className="text-2xl font-black">{result.turbo ? t("turboWon") : result.label}</p>
+            {/* Ceremonial moment for big wins (the jackpot or the top paid
+                segment), shared with slots and scratch via CeremonyCoin. */}
+            {(result.turbo || result.coins >= 1000) && <CeremonyCoin className="mt-3" />}
             <p className="mt-1 text-sm text-muted">
               {result.turbo ? t("turboWon") : (<span dir="ltr" className="inline-flex items-center gap-1.5">+{result.coins.toLocaleString(locale)} <Coin size={16} className="bcoin-lg" /></span>)}
             </p>

@@ -68,6 +68,35 @@ async function countStreakSaves(
   return count ?? 0;
 }
 
+/** Feed-logged coin movement in [start, end): gross sum of |coins_amount|
+ *  (net would cancel earn against spend and understate the flow). PostgREST
+ *  cannot aggregate, so the rows are read and reduced — paged defensively
+ *  because a single response caps at 1000 rows (the achievements pageAll
+ *  doctrine). Volume today is < 100 rows/week for the whole site. */
+async function countCoinFlow(
+  supabase: ReturnType<typeof createAdminClient>,
+  start: Date,
+  end: Date,
+): Promise<number> {
+  let total = 0;
+  for (let offset = 0; ; offset += 1000) {
+    const { data, error } = await supabase
+      .from("activity_events")
+      .select("id, coins_amount")
+      .not("coins_amount", "is", null)
+      .neq("coins_amount", 0)
+      .gte("created_at", start.toISOString())
+      .lt("created_at", end.toISOString())
+      .order("id")
+      .range(offset, offset + 999);
+    if (error) throw error;
+    const page = (data ?? []) as Array<{ coins_amount: number | null }>;
+    total += page.reduce((sum, row) => sum + Math.abs(row.coins_amount ?? 0), 0);
+    if (page.length < 1000) break;
+  }
+  return total;
+}
+
 /** Biggest won round in [start, end): server-side max ordering returns the
  *  true maximum in one row (the achievements trick). Net is computed by the
  *  caller — the table never stores the difference. */
@@ -156,9 +185,10 @@ export async function runArcadeHighlights(
 
   const counts = await countRounds(supabase, start, end);
   summary.totalRounds = counts.reduce((sum, g) => sum + g.rounds, 0);
-  const [win, daySaves] = await Promise.all([
+  const [win, daySaves, dayCoinFlow] = await Promise.all([
     biggestWin(supabase, start, end),
     countStreakSaves(supabase, start, end),
+    countCoinFlow(supabase, start, end),
   ]);
   summary.biggestWinUsername = win?.username ?? null;
 
@@ -185,6 +215,7 @@ export async function runArcadeHighlights(
       roundsByGame: counts,
       biggestWin: win,
       streakSaves: daySaves,
+      coinFlow: dayCoinFlow,
     });
     summary.published = await createFeaturePost({
       slug,
@@ -234,6 +265,7 @@ export async function runArcadeHighlights(
           topGame: summary.topGame,
           chars: content.length,
           streakSaves: daySaves,
+          coinFlow: dayCoinFlow,
         },
       },
       supabase,
@@ -260,11 +292,12 @@ export async function runArcadeHighlights(
       const isoWeek = isoWeekLabel(wStart);
       const wSlug = `arcade-weekly-${isoWeek}`;
 
-      const [wCounts, pCounts, wWin, wSaves] = await Promise.all([
+      const [wCounts, pCounts, wWin, wSaves, wCoinFlow] = await Promise.all([
         countRounds(supabase, wStart, wEnd),
         countRounds(supabase, pStart, wStart),
         biggestWin(supabase, wStart, wEnd),
         countStreakSaves(supabase, wStart, wEnd),
+        countCoinFlow(supabase, wStart, wEnd),
       ]);
       const wTotal = wCounts.reduce((sum, g) => sum + g.rounds, 0);
       const pTotal = pCounts.reduce((sum, g) => sum + g.rounds, 0);
@@ -309,6 +342,7 @@ export async function runArcadeHighlights(
           priorWeekTotal: pTotal,
           biggestWin: wWin,
           streakSaves: wSaves,
+          coinFlow: wCoinFlow,
         });
         weekly.published = await createFeaturePost({
           slug: wSlug,
@@ -359,6 +393,7 @@ export async function runArcadeHighlights(
               topGame: weekly.topGame,
               chars: wArticle.content.length,
               streakSaves: wSaves,
+              coinFlow: wCoinFlow,
             },
           },
           supabase,

@@ -30,12 +30,14 @@ export default function CoinRainButton({ profileId }: { profileId: string }) {
         // little coin-shower effect
         for (let i = 0; i < 12; i += 1) {
           const coin = document.createElement("span");
-          coin.className = "bcoin";
-          coin.style.width = "18px";
-          coin.style.height = "18px";
-          coin.style.fontSize = "9px";
+          // Mirror of the Coin component's default look (Mint, owner decision
+          // 2026-10-02). The single cssText assignment used to WIPE the
+          // width/height set just before it, so every sprite rendered 0x0 —
+          // the box size now lives inside the one style string.
+          coin.className = "bcoin bcoin-a";
           coin.innerHTML = '<span class="bcoin-face">B</span>';
-          coin.style.cssText = `position:fixed;left:${10 + Math.random() * 80}vw;top:-2rem;font-size:${14 + Math.random() * 14}px;pointer-events:none;z-index:9999;transition:top 1.4s ease-in,opacity 1.4s;`;
+          const px = 14 + Math.random() * 14;
+          coin.style.cssText = `position:fixed;left:${10 + Math.random() * 80}vw;top:-2rem;width:${px}px;height:${px}px;font-size:${px * 0.52}px;pointer-events:none;z-index:9999;transition:top 1.4s ease-in,opacity 1.4s;`;
           document.body.append(coin);
           requestAnimationFrame(() => {
             coin.style.top = "100vh";

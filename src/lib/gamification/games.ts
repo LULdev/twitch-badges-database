@@ -304,6 +304,35 @@ export async function playGame(
     payload: { game: gameId, bet, payout },
   });
 
+  // Big-win garnish: the standard "game" row above already landed — these are
+  // ADDITIONAL best-effort rows (the wheel's turbo_win precedent), delivered
+  // via afterResponse so they survive the response flush on Vercel. The gates
+  // mirror the client ceremonies exactly: slots on the POST-CAP payout vs the
+  // stake (the server `jackpot` flag is coin-denominated and must not gate
+  // this), scratch on the resolver's mult-based jackpot flag.
+  if (gameId === "slots" && payout >= bet * 15) {
+    afterResponse(() =>
+      logActivity({
+        userId,
+        kind: "big_win",
+        title: "hit a 15x+ win on Badges of Ra",
+        coinsAmount: net,
+        payload: { game: gameId, bet, payout },
+      }),
+    );
+  }
+  if (gameId === "scratch" && result.jackpot === true) {
+    afterResponse(() =>
+      logActivity({
+        userId,
+        kind: "big_win",
+        title: "scratched the 10x jackpot",
+        coinsAmount: net,
+        payload: { game: gameId, bet, payout, mult: result.mult },
+      }),
+    );
+  }
+
   // Daily game-activity streak (0047/0049): the compare-and-set gate only
   // advances on the day's FIRST settled round (-1 sentinel afterwards), runs
   // strictly after the void paths so it never advances for a deleted round,

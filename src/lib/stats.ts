@@ -609,3 +609,42 @@ export function daySeries<T>(
   }
   return out;
 }
+
+export interface CommunityCoinFlowData {
+  /** Per UTC day within the rendered 30-day window (gross on both sides). */
+  days: Array<{ day: string; earned: number; spent: number; net: number }>;
+  earned: number;
+  spent: number;
+  net: number;
+}
+
+/**
+ * Community-wide feed-logged coin flow over the last 30 UTC days, from the
+ * public aggregate view stats_coin_flow_daily (0054). Days without movement
+ * stay absent — the strip zero-fills. Returns null when the view is missing
+ * or the read fails, so /stats renders without the card on an un-migrated
+ * database (the safe() doctrine for the stats surfaces).
+ */
+export async function getCommunityCoinFlow(): Promise<CommunityCoinFlowData | null> {
+  const supabase = await createClient();
+  const since = new Date();
+  since.setUTCHours(0, 0, 0, 0);
+  since.setUTCDate(since.getUTCDate() - 29);
+  const { data, error } = await supabase
+    .from("stats_coin_flow_daily")
+    .select("day,earned,spent,net")
+    .gte("day", since.toISOString().slice(0, 10))
+    .order("day", { ascending: true });
+  if (error || !data) return null;
+  const days = (
+    data as Array<{ day: string; earned: number; spent: number; net: number }>
+  ).map((row) => ({
+    day: String(row.day).slice(0, 10),
+    earned: Number(row.earned ?? 0),
+    spent: Number(row.spent ?? 0),
+    net: Number(row.net ?? 0),
+  }));
+  const earned = days.reduce((sum, day) => sum + day.earned, 0);
+  const spent = days.reduce((sum, day) => sum + day.spent, 0);
+  return { days, earned, spent, net: earned - spent };
+}
