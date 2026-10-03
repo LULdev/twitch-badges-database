@@ -653,3 +653,50 @@ export async function getCommunityCoinFlow(): Promise<CommunityCoinFlowData | nu
     return null;
   }
 }
+
+export interface RecordBreakLeader {
+  username: string;
+  avatar_url: string | null;
+  breaks: number;
+  bestNet: number;
+}
+
+export type RecordBreakPeriod = "7" | "30" | "all";
+
+/**
+ * Record-break leaderboard (RPC 0058, supersedes the 0057 view): the players
+ * whose ALL-TIME personal best rose most often in the selected period —
+ * p_days 7 / 30, or null for all time. Returns null when the function is
+ * missing or the read fails, so /stats renders without the card (the safe()
+ * doctrine for the stats surfaces).
+ */
+export async function getRecordBreakLeaders(
+  period: RecordBreakPeriod = "7",
+): Promise<RecordBreakLeader[] | null> {
+  const supabase = await createClient();
+  try {
+    const { data, error } = await supabase
+      .rpc("record_break_leaders", { p_days: period === "all" ? null : Number(period) })
+      // Explicit ordering: a set-returning function's own ORDER BY is NOT
+      // guaranteed to survive without an outer sort.
+      .order("out_breaks", { ascending: false })
+      .order("out_best_net", { ascending: false })
+      .limit(10);
+    if (error || !data) return null;
+    return (
+      data as Array<{
+        out_username: string;
+        out_avatar_url: string | null;
+        out_breaks: number;
+        out_best_net: number;
+      }>
+    ).map((row) => ({
+      username: row.out_username,
+      avatar_url: row.out_avatar_url ?? null,
+      breaks: Number(row.out_breaks ?? 0),
+      bestNet: Number(row.out_best_net ?? 0),
+    }));
+  } catch {
+    return null;
+  }
+}

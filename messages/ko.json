@@ -593,7 +593,11 @@
     "communityCoinSpent": "사용 · 30일",
     "communityCoinNet": "순증 · 30일",
     "communityCoinNote": "지난 30일간 모든 플레이어의 피드에 기록된 BadgesCoins — 일별 집계, 개인 데이터 없음. 아케이드 라운드와 상점 구매는 피드 밖에서 코인을 움직입니다.",
-    "communityCoinEmpty": "지난 30일 동안 기록된 코인 이동이 없습니다."
+    "communityCoinEmpty": "지난 30일 동안 기록된 코인 이동이 없습니다.",
+    "recordLeadersTitle": "기록 갱신 리더",
+    "recordLeadersNote": "×N은 선택한 기간 동안 각 플레이어의 개인 최고 기록이 오른 횟수이며, 코인은 해당 기간의 최고 순수익입니다.",
+    "periodDays": "{n}일",
+    "periodAll": "전체 기간"
   },
   "notifications": {
     "title": "알림",

@@ -593,7 +593,11 @@
     "communityCoinSpent": "Spent · 30 days",
     "communityCoinNet": "Net · 30 days",
     "communityCoinNote": "Feed-logged BadgesCoins moved by all players over the last 30 days — aggregated per day, no personal data. Arcade rounds and shop purchases move coins outside the feed.",
-    "communityCoinEmpty": "No coin movement recorded in the last 30 days."
+    "communityCoinEmpty": "No coin movement recorded in the last 30 days.",
+    "recordLeadersTitle": "Record-break leaders",
+    "recordLeadersNote": "×N counts how often each player's all-time personal best rose in the selected period; the coin shows that period's best net.",
+    "periodDays": "{n} days",
+    "periodAll": "All time"
   },
   "notifications": {
     "title": "Notifications",

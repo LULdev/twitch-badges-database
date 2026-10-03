@@ -593,7 +593,11 @@
     "communityCoinSpent": "Gastas · 30 dias",
     "communityCoinNet": "Líquido · 30 dias",
     "communityCoinNote": "BadgesCoins registrados no feed por todos os jogadores nos últimos 30 dias — agregados por dia, sem dados pessoais. Rodadas do arcade e compras na loja movem moedas fora do feed.",
-    "communityCoinEmpty": "Nenhuma movimentação de moedas registrada nos últimos 30 dias."
+    "communityCoinEmpty": "Nenhuma movimentação de moedas registrada nos últimos 30 dias.",
+    "recordLeadersTitle": "Líderes de recordes quebrados",
+    "recordLeadersNote": "×N conta quantas vezes o recorde pessoal de cada jogador subiu no período escolhido; a moeda mostra o melhor líquido desse período.",
+    "periodDays": "{n} dias",
+    "periodAll": "Sempre"
   },
   "notifications": {
     "title": "Notificações",

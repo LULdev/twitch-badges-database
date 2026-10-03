@@ -3,7 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getSiteStats } from "@/lib/queries";
-import { daySeries, getCommunityCoinFlow, getPlatformStats } from "@/lib/stats";
+import { daySeries, getCommunityCoinFlow, getPlatformStats, getRecordBreakLeaders } from "@/lib/stats";
 import { authUserId } from "@/lib/gamification/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import CoinFlowCard, {
@@ -12,6 +12,7 @@ import CoinFlowCard, {
   type CoinFlowRow,
 } from "@/components/profile/CoinFlowCard";
 import CommunityCoinFlow from "@/components/stats/CommunityCoinFlow";
+import RecordLeaders from "@/components/stats/RecordLeaders";
 import {
   ACH_BY_ID,
   ACTIVE_ACHIEVEMENTS,
@@ -195,19 +196,26 @@ function SectionHead({
 
 export default async function StatsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ period?: string }>;
 }) {
   const { locale } = await params;
+  const sp = await searchParams;
+  // Record-break leaderboard period (?period=7|30|all); anything else falls
+  // back to the default 7-day view.
+  const period = sp.period === "30" ? "30" : sp.period === "all" ? "all" : "7";
   setRequestLocale(locale);
   const t = await getTranslations("stats");
   const tr = await getTranslations("rarity");
   const tf = await getTranslations("feed");
 
-  const [catalog, platform, communityCoin] = await Promise.all([
+  const [catalog, platform, communityCoin, recordLeaders] = await Promise.all([
     getSiteStats().catch(() => null),
     getPlatformStats(),
     getCommunityCoinFlow(),
+    getRecordBreakLeaders(period),
   ]);
 
   // Owner-only view: the logged-in viewer's own 30-day coin flow, same card
@@ -607,6 +615,11 @@ export default async function StatsPage({
 
       {/* Public aggregate card — everyone's feed-logged coin movement. */}
       {communityCoin && <CommunityCoinFlow data={communityCoin} />}
+
+      {/* Record-break leaderboard — whose personal best rose most this period. */}
+      {recordLeaders && recordLeaders.length > 0 && (
+        <RecordLeaders leaders={recordLeaders} activePeriod={period} />
+      )}
 
       {/* ---------------------------------------------------- economy */}
       <section id="economy" className="scroll-mt-24 space-y-4">

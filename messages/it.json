@@ -593,7 +593,11 @@
     "communityCoinSpent": "Spese · 30 giorni",
     "communityCoinNet": "Netto · 30 giorni",
     "communityCoinNote": "BadgesCoins registrati nel feed da tutti i giocatori negli ultimi 30 giorni — aggregati per giorno, senza dati personali. Le partite arcade e gli acquisti in negozio muovono monete fuori dal feed.",
-    "communityCoinEmpty": "Nessun movimento di monete registrato negli ultimi 30 giorni."
+    "communityCoinEmpty": "Nessun movimento di monete registrato negli ultimi 30 giorni.",
+    "recordLeadersTitle": "Primati dei record battuti",
+    "recordLeadersNote": "×N conta quante volte il record personale di ogni giocatore è salito nel periodo scelto; la moneta mostra il miglior netto di quel periodo.",
+    "periodDays": "{n} giorni",
+    "periodAll": "Sempre"
   },
   "notifications": {
     "title": "Notifiche",

@@ -593,7 +593,11 @@
     "communityCoinSpent": "使用 · 30日間",
     "communityCoinNet": "純増 · 30日間",
     "communityCoinNote": "過去30日間に全プレイヤーのフィードに記録されたBadgesCoins — 日別に集計、個人データなし。アーケードのラウンドやショップ購入はフィード外でコインを動かします。",
-    "communityCoinEmpty": "過去30日間にコインの動きは記録されていません。"
+    "communityCoinEmpty": "過去30日間にコインの動きは記録されていません。",
+    "recordLeadersTitle": "記録更新リーダー",
+    "recordLeadersNote": "×N は選択した期間で各プレイヤーの自己ベストが更新された回数、コインはその期間の最高純利益を示します。",
+    "periodDays": "{n} 日間",
+    "periodAll": "全期間"
   },
   "notifications": {
     "title": "通知",

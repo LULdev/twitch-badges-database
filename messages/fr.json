@@ -593,7 +593,11 @@
     "communityCoinSpent": "Dépensées · 30 jours",
     "communityCoinNet": "Net · 30 jours",
     "communityCoinNote": "BadgesCoins enregistrés dans le fil par tous les joueurs sur les 30 derniers jours — agrégés par jour, sans données personnelles. Les manches arcade et les achats en boutique déplacent des pièces hors du fil.",
-    "communityCoinEmpty": "Aucun mouvement de pièces enregistré ces 30 derniers jours."
+    "communityCoinEmpty": "Aucun mouvement de pièces enregistré ces 30 derniers jours.",
+    "recordLeadersTitle": "Champions des records battus",
+    "recordLeadersNote": "×N compte combien de fois le record personnel de chaque joueur a progressé sur la période choisie ; la pièce montre le meilleur gain net de cette période.",
+    "periodDays": "{n} jours",
+    "periodAll": "Depuis le début"
   },
   "notifications": {
     "title": "Notifications",

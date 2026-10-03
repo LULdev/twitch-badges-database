@@ -593,7 +593,11 @@
     "communityCoinSpent": "Ausgegeben · 30 Tage",
     "communityCoinNet": "Netto · 30 Tage",
     "communityCoinNote": "Feed-geloggte BadgesCoins aller Spieler der letzten 30 Tage — tageweise aggregiert, ohne persönliche Daten. Arcade-Runden und Shop-Käufe bewegen Coins außerhalb des Feeds.",
-    "communityCoinEmpty": "In den letzten 30 Tagen wurden keine Coin-Bewegungen erfasst."
+    "communityCoinEmpty": "In den letzten 30 Tagen wurden keine Coin-Bewegungen erfasst.",
+    "recordLeadersTitle": "Rekord-Bruch-Bestenliste",
+    "recordLeadersNote": "×N zählt, wie oft der persönliche Allzeit-Rekord jedes Spielers im gewählten Zeitraum gestiegen ist; die Münze zeigt den Bestwert dieses Zeitraums.",
+    "periodDays": "{n} Tage",
+    "periodAll": "Gesamt"
   },
   "notifications": {
     "title": "Benachrichtigungen",

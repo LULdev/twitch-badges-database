@@ -593,7 +593,11 @@
     "communityCoinSpent": "支出 · 30 天",
     "communityCoinNet": "净额 · 30 天",
     "communityCoinNote": "所有玩家过去 30 天在动态中记录的 BadgesCoins —— 按日聚合，不含个人数据。街机回合与商店购买会在动态之外移动金币。",
-    "communityCoinEmpty": "过去 30 天没有金币流动记录。"
+    "communityCoinEmpty": "过去 30 天没有金币流动记录。",
+    "recordLeadersTitle": "破纪录领先者",
+    "recordLeadersNote": "×N 表示所选期间内每位玩家个人纪录上升的次数；金币为该期间的最佳净胜。",
+    "periodDays": "{n} 天",
+    "periodAll": "全部时间"
   },
   "notifications": {
     "title": "通知",
