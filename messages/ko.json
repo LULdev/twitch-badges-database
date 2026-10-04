@@ -290,7 +290,7 @@
     "coinFlowEarned": "획득 · 30일",
     "coinFlowSpent": "사용 · 30일",
     "coinFlowNet": "순증 · 30일",
-    "coinFlowNote": "실시간 피드에 기록된 코인 이동만 집계됩니다 — 아케이드 라운드와 상점 구매는 포함되지 않습니다.",
+    "coinFlowNote": "라이브 피드에 기록된 코인 이동만 포함 — 일반 아케이드 라운드는 제외됩니다.",
     "coinFlowEmpty": "최근 30일간 코인 이동이 없습니다.",
     "bestRoundsTitle": "당신의 최고 라운드",
     "bestRoundsNote": "플레이한 각 게임의 1라운드 최고 순수익.",
@@ -352,7 +352,8 @@
     "emptyMissing": "부족한 배지가 없습니다 — 대단해요!",
     "channelNote": "채널 전용 배지(예: 내 구독자 등급)는 집계되지만 전역 카탈로그에는 포함되지 않습니다.",
     "moreHidden": "+{count}개 더 — 희귀도순",
-    "transactions": "최근 거래"
+    "transactions": "최근 거래",
+    "transactionsNote": "아케이드 라운드와 상점 구매가 포함됩니다."
   },
   "blog": {
     "title": "Twitch 배지 블로그",
@@ -821,7 +822,8 @@
     "turbo_win": "Turbo 잭팟",
     "coin_rain": "BadgesCoins 비",
     "profile": "프로필",
-    "first_login": "첫 로그인"
+    "first_login": "첫 로그인",
+    "item_purchase": "아이템 구매"
   },
   "achievements": {
     "title": "업적",

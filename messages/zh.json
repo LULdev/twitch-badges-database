@@ -290,7 +290,7 @@
     "coinFlowEarned": "获得 · 30 天",
     "coinFlowSpent": "支出 · 30 天",
     "coinFlowNet": "净额 · 30 天",
-    "coinFlowNote": "仅统计实时动态中记录的硬币变动 — 街机对局与商店购买不计入。",
+    "coinFlowNote": "仅统计直播动态中记录的金币变动 — 普通街机回合不计入。",
     "coinFlowEmpty": "最近 30 天没有硬币变动。",
     "bestRoundsTitle": "你的最佳回合",
     "bestRoundsNote": "你玩过的每个游戏的单回合最佳净胜。",
@@ -352,7 +352,8 @@
     "emptyMissing": "一个不缺——太惊人了！",
     "channelNote": "频道专属徽章（例如你自己的订阅等级）会被计数，但不属于全球目录。",
     "moreHidden": "还有 {count} 枚——按稀有度排序",
-    "transactions": "最近交易"
+    "transactions": "最近交易",
+    "transactionsNote": "包含街机回合和商店购买。"
   },
   "blog": {
     "title": "Twitch 徽章博客",
@@ -821,7 +822,8 @@
     "turbo_win": "Turbo 头奖",
     "coin_rain": "BadgesCoins 雨",
     "profile": "主页",
-    "first_login": "首次登录"
+    "first_login": "首次登录",
+    "item_purchase": "物品购买"
   },
   "achievements": {
     "title": "成就",

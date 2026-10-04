@@ -31,6 +31,7 @@ const KIND_COLORS: Record<string, string> = {
   coin_rain: "var(--info)",
   streak_freeze: "#38bdf8",
   big_win: "#fbbf24",
+  item_purchase: "var(--accent)",
 };
 
 /** Public live feed with 5-second polling (real-time-ish). */

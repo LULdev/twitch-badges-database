@@ -290,7 +290,7 @@
     "coinFlowEarned": "Earned · 30 days",
     "coinFlowSpent": "Spent · 30 days",
     "coinFlowNet": "Net · 30 days",
-    "coinFlowNote": "Only coin movements recorded in the live feed — arcade rounds and shop purchases are not counted.",
+    "coinFlowNote": "Only coin movements recorded in the live feed — regular arcade rounds are not counted.",
     "coinFlowEmpty": "No coin movement in the last 30 days.",
     "bestRoundsTitle": "Your best rounds",
     "bestRoundsNote": "Best single-round net per game you have played.",
@@ -352,7 +352,8 @@
     "emptyMissing": "Nothing missing — incredible!",
     "channelNote": "Channel-specific badges (e.g. your own subscriber tiers) are counted but not part of the global catalog.",
     "moreHidden": "+{count} more — sorted by rarity",
-    "transactions": "Recent transactions"
+    "transactions": "Recent transactions",
+    "transactionsNote": "Includes arcade rounds and shop purchases."
   },
   "blog": {
     "title": "Twitch Badge Blog",
@@ -821,7 +822,8 @@
     "turbo_win": "Turbo jackpot",
     "coin_rain": "BadgesCoin rain",
     "profile": "Profile",
-    "first_login": "First login"
+    "first_login": "First login",
+    "item_purchase": "Item purchase"
   },
   "achievements": {
     "title": "Achievements",

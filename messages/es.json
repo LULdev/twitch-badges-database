@@ -290,7 +290,7 @@
     "coinFlowEarned": "Ganadas · 30 días",
     "coinFlowSpent": "Gastadas · 30 días",
     "coinFlowNet": "Neto · 30 días",
-    "coinFlowNote": "Solo los movimientos registrados en el feed en vivo — las partidas de arcade y las compras de la tienda no cuentan.",
+    "coinFlowNote": "Solo los movimientos de monedas registrados en el feed en vivo: las rondas normales de arcade no cuentan.",
     "coinFlowEmpty": "Sin movimiento de monedas en los últimos 30 días.",
     "bestRoundsTitle": "Tus mejores rondas",
     "bestRoundsNote": "Mejor resultado neto de una sola ronda por juego jugado.",
@@ -352,7 +352,8 @@
     "emptyMissing": "No falta nada — ¡increíble!",
     "channelNote": "Las insignias específicas de canal (p. ej., tus propios niveles de suscriptor) se cuentan, pero no forman parte del catálogo global.",
     "moreHidden": "+{count} más — ordenadas por rareza",
-    "transactions": "Transacciones recientes"
+    "transactions": "Transacciones recientes",
+    "transactionsNote": "Incluye rondas de arcade y compras en la tienda."
   },
   "blog": {
     "title": "Blog de insignias de Twitch",
@@ -821,7 +822,8 @@
     "turbo_win": "Jackpot Turbo",
     "coin_rain": "Lluvia de BadgesCoins",
     "profile": "Perfil",
-    "first_login": "Primer inicio de sesión"
+    "first_login": "Primer inicio de sesión",
+    "item_purchase": "Compra de objeto"
   },
   "achievements": {
     "title": "Logros",

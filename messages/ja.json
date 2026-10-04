@@ -290,7 +290,7 @@
     "coinFlowEarned": "獲得 · 30日間",
     "coinFlowSpent": "使用 · 30日間",
     "coinFlowNet": "純増 · 30日間",
-    "coinFlowNote": "ライブフィードに記録されたコインの動きのみ — アーケードのラウンドとショップ購入は含まれません。",
+    "coinFlowNote": "ライブフィードに記録されたコインの動きのみ — 通常のアーケードラウンドは含まれません。",
     "coinFlowEmpty": "過去30日間のコインの動きはありません。",
     "bestRoundsTitle": "あなたのベストラウンド",
     "bestRoundsNote": "プレイした各ゲームの1ラウンド最高純利益。",
@@ -352,7 +352,8 @@
     "emptyMissing": "不足なし — 素晴らしい！",
     "channelNote": "チャンネル固有のバッジ（自分のサブスクライバー段位など）はカウントされますが、グローバルカタログには含まれません。",
     "moreHidden": "ほか{count}個 — レアリティ順",
-    "transactions": "最近の取引"
+    "transactions": "最近の取引",
+    "transactionsNote": "アーケードラウンドとショップ購入を含みます。"
   },
   "blog": {
     "title": "Twitchバッジブログ",
@@ -821,7 +822,8 @@
     "turbo_win": "Turboジャックポット",
     "coin_rain": "BadgesCoinsの雨",
     "profile": "プロフィール",
-    "first_login": "初回ログイン"
+    "first_login": "初回ログイン",
+    "item_purchase": "アイテム購入"
   },
   "achievements": {
     "title": "実績",

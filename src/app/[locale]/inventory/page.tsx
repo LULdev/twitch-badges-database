@@ -34,13 +34,12 @@ const SNOW_DOTS = [
   { left: "88%", size: 4, delay: "-2.3s", duration: "12s" },
 ] as const;
 
-/** One feed-logged coin movement in the recent-transactions list. */
+/** One merged entry of the recent-transactions list. */
 interface CoinTxRow {
-  id: number;
+  key: string;
   created_at: string;
-  kind: string;
-  title: string | null;
-  coins_amount: number | null;
+  title: string;
+  coins_amount: number;
 }
 
 export async function generateMetadata({
@@ -133,14 +132,15 @@ export default async function InventoryPage({
     itemsRes,
     rescuesRes,
     rescuesCountRes,
+    roundsRes,
   ] = await Promise.all([
     readProgress(user.id).catch(() => null),
     fetchCoinRows(admin, user.id, since).catch(() => []),
-    // The last 30 feed-logged coin movements, all-time (no 30-day window):
-    // the transaction log under the coin-flow card. Same admin-client split —
-    // user_id is not anon-readable (0040). `id` is the unique order key;
-    // title/kind ride along from the feed row itself. Lifted into a real
-    // Promise — PostgrestBuilder is only a PromiseLike without .catch.
+    // Feed-logged coin movements (the coin-flow card's source): daily bonus,
+    // wheel, rain, steals, big wins and — since the purchase RPC writes its
+    // own feed row — shop purchases. Same admin-client split: user_id is not
+    // anon-readable (0040). Lifted into a real Promise — PostgrestBuilder is
+    // only a PromiseLike without .catch.
     Promise.resolve(
       admin
         .from("activity_events")
@@ -151,8 +151,8 @@ export default async function InventoryPage({
         .order("id", { ascending: false })
         .limit(30),
     )
-      .then((r) => (r.data ?? []) as CoinTxRow[])
-      .catch(() => [] as CoinTxRow[]),
+      .then((r) => (r.data ?? []) as Array<{ id: number; created_at: string; kind: string; title: string | null; coins_amount: number | string | null }>)
+      .catch(() => []),
     // PostgrestBuilder is only a PromiseLike (no .catch of its own), so both
     // view reads are lifted into a real Promise first — a network rejection
     // must degrade to an empty section, not 500 the page.
@@ -188,6 +188,37 @@ export default async function InventoryPage({
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
       .eq("kind", "streak_freeze"),
+    // Arcade rounds: every settled round carries bet/payout — the net is the
+    // transaction. Read wider than 30 because net-less rounds (bet 0,
+    // payout 0) are filtered below; the merge then slices 30 from the union.
+    Promise.resolve(
+      admin
+        .from("game_rounds")
+        .select("id, game, bet, payout, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(60),
+    )
+      .then(
+        (r) =>
+          (r.data ?? []) as Array<{
+            id: number;
+            game: string;
+            bet: number | string;
+            payout: number | string;
+            created_at: string;
+          }>,
+      )
+      .catch(
+        () =>
+          [] as Array<{
+            id: number;
+            game: string;
+            bet: number | string;
+            payout: number | string;
+            created_at: string;
+          }>,
+      ),
   ]);
   const itemFreezes =
     (itemsRes.data as { quantity: number } | null)?.quantity ?? null;
@@ -195,6 +226,41 @@ export default async function InventoryPage({
     (row) => row.created_at,
   );
   const guardianRescues = rescuesCountRes.count ?? 0;
+
+  // Merge both sources into one transaction log, newest first, capped at 30.
+  // Reading 60 per source keeps the top-30 correct: any entry in the true
+  // global top-30 is inside each source's own top-60. bigint columns arrive
+  // as PostgREST strings (or numbers, depending on the column) — Number()
+  // both sides. Net-less rounds are noise and dropped; the game title comes
+  // from the games namespace the same way BestRoundsCard resolves it.
+  const tg = await getTranslations("games");
+  const roundRows = ((roundsRes ?? []) as Array<{
+    id: number;
+    game: string;
+    bet: number | string;
+    payout: number | string;
+    created_at: string;
+  }>)
+    .map((r) => ({
+      key: `r-${r.id}`,
+      created_at: r.created_at,
+      title: tg(`${r.game}Title`),
+      coins_amount: Number(r.payout) - Number(r.bet),
+    }))
+    .filter((r) => r.coins_amount !== 0);
+  const mergedTx: CoinTxRow[] = [
+    ...((txRows ?? []) as Array<{ id: number; created_at: string; kind: string; title: string | null; coins_amount: number | string | null }>).map(
+      (row) => ({
+        key: `e-${row.id}`,
+        created_at: row.created_at,
+        title: row.title ?? row.kind,
+        coins_amount: Number(row.coins_amount ?? 0),
+      }),
+    ),
+    ...roundRows,
+  ]
+    .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
+    .slice(0, 30);
 
   return (
     <div className="space-y-8">
@@ -300,11 +366,10 @@ export default async function InventoryPage({
           who never earned a coin has no row and gets no zero-card. */}
       {progressRow && <CoinFlowCard rows={coinRows} id="inventory-coin-flow" />}
 
-      {/* Recent transactions — the last 30 feed-logged coin movements,
-          all-time, newest first. Same source as the coin-flow card above:
-          arcade rounds and shop purchases write no feed row, so they do not
-          appear here either. */}
-      {txRows.length > 0 && (
+      {/* Recent transactions — the merged log: feed-logged coin movements
+          (daily bonus, wheel, rain, steals, big wins, shop purchases) plus
+          every arcade round that settled in game_rounds, newest first. */}
+      {mergedTx.length > 0 && (
         <section className="card p-5" aria-labelledby="inventory-transactions">
           <h2
             id="inventory-transactions"
@@ -312,12 +377,13 @@ export default async function InventoryPage({
           >
             {t("transactions")}
           </h2>
+          <p className="mt-1 text-xs text-muted">{t("transactionsNote")}</p>
           <ul className="mt-3 divide-y divide-line">
-            {txRows.map((row) => {
-              const amount = row.coins_amount ?? 0;
+            {mergedTx.map((row) => {
+              const amount = row.coins_amount;
               return (
                 <li
-                  key={row.id}
+                  key={row.key}
                   className="flex items-center justify-between gap-3 py-2.5 text-sm"
                 >
                   <div className="min-w-0">
