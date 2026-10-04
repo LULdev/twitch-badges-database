@@ -82,6 +82,17 @@ feed are generated from that table, so an undocumented change is invisible.
   locale = `src/i18n/routing.ts` (locales + `localeNames` + `localeHtmlLang`,
   all three are `Record<Locale,…>` — TS enforces completeness) + a new
   messages file + README count update. Keep all 11 files key-identical.
+- **Locale negotiation order is load-bearing** (`src/proxy.ts` +
+  `src/i18n/geo.ts`): NEXT_LOCALE cookie → Accept-Language (next-intl) →
+  `x-vercel-ip-country` fallback (~50 countries in geo.ts) → default `en`.
+  Do not reorder: a visitor's browser language deliberately outranks their
+  country; the geo layer only catches requests the first two drop. The
+  first-visit hint chip (`src/components/LanguageHint.tsx`, mounted by the
+  `[locale]` layout when the geo locale ≠ served locale) is permanently
+  suppressed via the shared `lang-hint-dismissed` localStorage flag
+  (`src/i18n/lang-hint.ts`), set by the chip's dismiss/switch AND the header
+  switcher's `select()` — any new explicit-choice path must call
+  `suppressLangHint()` too.
 - Internal links: `import { Link } from "@/i18n/navigation"` — **named
   import, not default** (createNavigation exports named members).
 - Styling: use the component classes in `src/app/globals.css`
