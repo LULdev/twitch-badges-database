@@ -2,9 +2,41 @@ import createIntlMiddleware from "next-intl/middleware";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { envOr } from "@/lib/env";
-import { routing } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
+import { COUNTRY_TO_LOCALE, acceptLanguageLocale } from "@/i18n/geo";
 
 const handleI18nRouting = createIntlMiddleware(routing);
+
+/**
+ * Country-of-origin fallback for the locale negotiation. next-intl's own
+ * middleware already handles the first two layers — the explicit choice
+ * (NEXT_LOCALE cookie, set by the language switcher) and the browser's
+ * language preference (Accept-Language) — and otherwise redirects every
+ * unprefixed path to the default locale (en). This step fires in exactly
+ * that gap: neither cookie nor a matching Accept-Language exists, but Vercel
+ * tells us where the request came from, so a visitor with a browser whose
+ * language the catalog does not cover still lands on their region's locale.
+ * Accept-Language outranks the country on purpose: it expresses the reader's
+ * actual preference, while the origin is a guess. Returning null hands the
+ * request back to next-intl untouched.
+ */
+function geoLocaleRedirect(request: NextRequest): NextResponse | null {
+  const { pathname, search } = request.nextUrl;
+  const firstSegment = pathname.split("/")[1];
+  if (routing.locales.includes(firstSegment as Locale)) return null;
+
+  const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
+  if (cookieLocale && routing.locales.includes(cookieLocale as Locale)) return null;
+
+  if (acceptLanguageLocale(request.headers.get("accept-language"))) return null;
+
+  const country = request.headers.get("x-vercel-ip-country");
+  const locale = country ? COUNTRY_TO_LOCALE[country.toUpperCase()] : undefined;
+  if (!locale) return null;
+
+  const rest = pathname === "/" ? "" : pathname;
+  return NextResponse.redirect(new URL(`/${locale}${rest}${search}`, request.url));
+}
 
 /**
  * The refresh below costs a blocking round trip to Supabase Auth on EVERY
@@ -109,10 +141,11 @@ export async function proxy(request: NextRequest) {
   // from this middleware the rotated token was dropped, so the next call
   // arrived with a superseded token and the session died silently.
   // Built after the refresh so the forwarded request headers carry the new
-  // cookie set.
+  // cookie set. The geo redirect runs before next-intl and only claims
+  // requests the i18n negotiation would otherwise drop to the default locale.
   const response = isApi
     ? NextResponse.next({ request })
-    : handleI18nRouting(request);
+    : (geoLocaleRedirect(request) ?? handleI18nRouting(request));
 
   for (const [name, { value, options }] of refreshed) {
     response.cookies.set(name, value, options);
