@@ -6,7 +6,9 @@
     "badgeDescription": "{title} ({setId}): cómo conseguirla, rareza, número de propietarios y periodo de disponibilidad.",
     "profileTitle": "Colección de insignias de {username}",
     "profileDescription": "Mira las insignias de Twitch que posee {username}, destacados de rareza y el progreso de su colección.",
-    "postTitle": "{title} — Blog de insignias de Twitch"
+    "postTitle": "{title} — Blog de insignias de Twitch",
+    "langHint": "Esta página también está disponible en {lang}.",
+    "langHintDismiss": "Cerrar"
   },
   "nav": {
     "badges": "Insignias",

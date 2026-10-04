@@ -6,7 +6,9 @@
     "badgeDescription": "{title} ({setId}) : comment l'obtenir, rareté, nombre de détenteurs et période de disponibilité.",
     "profileTitle": "Collection de badges de {username}",
     "profileDescription": "Découvrez les badges Twitch que {username} possède, ses raretés et la progression de sa collection.",
-    "postTitle": "{title} — Blog des badges Twitch"
+    "postTitle": "{title} — Blog des badges Twitch",
+    "langHint": "Cette page est également disponible en {lang}.",
+    "langHintDismiss": "Fermer"
   },
   "nav": {
     "badges": "Badges",

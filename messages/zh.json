@@ -6,7 +6,9 @@
     "badgeDescription": "{title}（{setId}）：获取方式、稀有度、持有者数量和可用时间窗口。",
     "profileTitle": "{username} 的徽章收藏",
     "profileDescription": "查看 {username} 拥有的 Twitch 徽章、稀有度亮点和收藏进度。",
-    "postTitle": "{title} — Twitch 徽章博客"
+    "postTitle": "{title} — Twitch 徽章博客",
+    "langHint": "此页面也提供{lang}版本。",
+    "langHintDismiss": "关闭"
   },
   "nav": {
     "badges": "徽章",

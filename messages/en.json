@@ -6,7 +6,9 @@
     "badgeDescription": "{title} ({setId}): how to earn it, rarity, owner count and availability window.",
     "profileTitle": "{username}'s badge collection",
     "profileDescription": "See the Twitch badges {username} owns, rarity highlights and collection progress.",
-    "postTitle": "{title} — Twitch Badges Blog"
+    "postTitle": "{title} — Twitch Badges Blog",
+    "langHint": "This page is also available in {lang}.",
+    "langHintDismiss": "Dismiss"
   },
   "nav": {
     "badges": "Badges",

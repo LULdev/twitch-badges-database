@@ -6,7 +6,9 @@
     "badgeDescription": "{title} ({setId}): как получить, редкость, количество владельцев и период доступности.",
     "profileTitle": "Коллекция значков {username}",
     "profileDescription": "Смотрите значки Twitch, которыми владеет {username}, его редкие находки и прогресс коллекции.",
-    "postTitle": "{title} — Блог о значках Twitch"
+    "postTitle": "{title} — Блог о значках Twitch",
+    "langHint": "Эта страница также доступна на {lang}.",
+    "langHintDismiss": "Закрыть"
   },
   "nav": {
     "badges": "Значки",

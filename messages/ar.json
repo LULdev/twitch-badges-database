@@ -6,7 +6,9 @@
     "badgeDescription": "{title} ({setId}): كيفية الحصول عليها، والندرة، وعدد المالكين، وفترة التوفر.",
     "profileTitle": "مجموعة شارات {username}",
     "profileDescription": "شاهد شارات Twitch التي يملكها {username} وأبرز المقتنيات النادرة وتقدم المجموعة.",
-    "postTitle": "{title} — مدونة شارات Twitch"
+    "postTitle": "{title} — مدونة شارات Twitch",
+    "langHint": "هذه الصفحة متاحة أيضًا بـ{lang}.",
+    "langHintDismiss": "إغلاق"
   },
   "nav": {
     "badges": "الشارات",

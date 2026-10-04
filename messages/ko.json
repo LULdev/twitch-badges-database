@@ -6,7 +6,9 @@
     "badgeDescription": "{title}({setId}): 획득 방법, 희귀도, 소유자 수, 획득 가능 기간.",
     "profileTitle": "{username}님의 배지 컬렉션",
     "profileDescription": "{username}님이 소유한 Twitch 배지, 희귀 하이라이트, 컬렉션 진행률을 확인하세요.",
-    "postTitle": "{title} — Twitch 배지 블로그"
+    "postTitle": "{title} — Twitch 배지 블로그",
+    "langHint": "이 페이지는 {lang}로도 볼 수 있습니다.",
+    "langHintDismiss": "닫기"
   },
   "nav": {
     "badges": "배지",

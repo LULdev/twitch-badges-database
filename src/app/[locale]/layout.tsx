@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
-import { routing, isRtl, localeHtmlLang } from "@/i18n/routing";
+import { headers } from "next/headers";
+import { routing, isRtl, localeHtmlLang, localeNames, type Locale } from "@/i18n/routing";
+import { COUNTRY_TO_LOCALE } from "@/i18n/geo";
 import { createClient } from "@/lib/supabase/server";
 import { siteUrl, localeAlternates } from "@/lib/seo";
 import { getFeatures } from "@/lib/settings";
@@ -11,6 +14,7 @@ import Footer from "@/components/Footer";
 import ThemeScript from "@/components/ThemeScript";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import AnalyticsBeacon from "@/components/AnalyticsBeacon";
+import LanguageHint from "@/components/LanguageHint";
 import "../globals.css";
 
 export function generateStaticParams() {
@@ -108,6 +112,22 @@ export default async function LocaleLayout({
   }
 
   const features = await getFeatures();
+  const t = await getTranslations("meta");
+
+  // Country-of-origin language hint: when the visitor's country maps to a
+  // catalog locale that differs from the one being served, offer it. A
+  // German visitor whose browser prefers English lands on /en and is offered
+  // Deutsch; a visitor whose origin and page agree sees nothing. The geo
+  // header is set by Vercel's edge; locally (and on any host that omits it)
+  // the hint simply never fires.
+  let hintTarget: Locale | null = null;
+  try {
+    const country = (await headers()).get("x-vercel-ip-country")?.toUpperCase();
+    const geoLocale = country ? COUNTRY_TO_LOCALE[country] : undefined;
+    if (geoLocale && geoLocale !== locale) hintTarget = geoLocale;
+  } catch {
+    hintTarget = null;
+  }
 
   // Ship ONLY the namespaces client components actually read. Without a
   // messages prop the provider serializes the entire catalog (58–86 KB per
@@ -146,8 +166,20 @@ export default async function LocaleLayout({
           </div>
           {/* Inside the provider on purpose: the beacon uses the i18n-aware
               usePathname, which throws without a locale context — that broke
-              the prerender of every locale page. */}
+              the prerender of every locale page. The hint chip needs the same
+              context for its locale-switching Link, and a Suspense boundary
+              because it reads search params (useSearchParams prerender rule). */}
           <AnalyticsBeacon locale={locale} />
+          {hintTarget && (
+            <Suspense fallback={null}>
+              <LanguageHint
+                target={hintTarget}
+                langName={localeNames[hintTarget]}
+                hint={t("langHint", { lang: localeNames[hintTarget] })}
+                dismissLabel={t("langHintDismiss")}
+              />
+            </Suspense>
+          )}
         </NextIntlClientProvider>
         <ServiceWorkerRegister />
       </body>
