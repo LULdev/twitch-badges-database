@@ -17,6 +17,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# regenerated render output (npm run shots)
+/docs/screenshots
+
 # env files
 .env
 .env.local

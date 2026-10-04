@@ -1,0 +1,52 @@
+name: Archive backfill retry
+
+# Weekly retry for the owner-history recovery pass (/api/cron/archive). The
+# pass is deadline-bounded (45 s of engine budget per run) and idempotent, so
+# repeated runs walk the catalog forward: snapshots already recovered dedupe
+# away (skippedDuplicate / skippedNotEarlierThanMeasured) and a rerun over a
+# fully covered catalog records "ok", not degraded — capturesFetched is 0
+# there, so the "fetched but recovered nothing" degraded arm never fires.
+#
+# WHY A RETRY EXISTS — measured on 2026-10-04: web.archive.org hung on the CDX
+# index queries (1.7 s, 6.7 s, then > 20 s for the same request), so runs kept
+# marking sources unavailable with nothing recovered. Once the archive
+# responds reliably again this job recovers the remaining history without a
+# human remembering the pass exists.
+#
+# WHAT IT WILL ALSO SETTLE: whether the sources are archived at all. badgebase.de
+# returned zero captures even for its homepage (raw CDX), so that side may be
+# permanently starved; potat.app IS archived (root captures since 2023) and its
+# badge pages are live at potat.app/badges/{set_id}, but whether /badges/* was
+# historically captured is still open. If capturesFound stays 0 across several
+# weekly runs, the feature is proven starved and should be retired, not
+# rescheduled.
+on:
+  schedule:
+    # Mondays, offset minute away from the Vercel crons (06:00/06:30) and the
+    # potat workflow (:07). Weekly cadence: GitHub's queue lag is hours, which
+    # is irrelevant here.
+    - cron: "23 4 * * 1"
+  workflow_dispatch: {}
+
+concurrency:
+  group: archive-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Trigger archive owner-history backfill
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          status="$(curl -s -o response.json -w "%{http_code}" \
+            --max-time 240 \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            "https://twitch-badges-database.vercel.app/api/cron/archive")"
+          echo "HTTP ${status}"
+          cat response.json
+          echo
+          test "$status" = "200"
