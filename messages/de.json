@@ -355,7 +355,9 @@
     "channelNote": "Kanal-spezifische Badges (z. B. deine eigenen Abonnenten-Stufen) werden gezählt, gehören aber nicht zum globalen Katalog.",
     "moreHidden": "+{count} weitere — nach Seltenheit sortiert",
     "transactions": "Letzte Transaktionen",
-    "transactionsNote": "Inklusive Arcade-Runden und Shop-Käufen."
+    "transactionsNote": "Inklusive Arcade-Runden und Shop-Käufen.",
+    "robbedBy": "Bestohlen von {name}",
+    "foiledBy": "Überfall von {name} vereitelt"
   },
   "blog": {
     "title": "Twitch Badge Blog",

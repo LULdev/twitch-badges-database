@@ -355,7 +355,9 @@
     "channelNote": "I badge specifici del canale (es. i tuoi livelli da abbonato) vengono contati ma non fanno parte del catalogo globale.",
     "moreHidden": "+{count} altri — ordinati per rarità",
     "transactions": "Transazioni recenti",
-    "transactionsNote": "Include round arcade e acquisti in negozio."
+    "transactionsNote": "Include round arcade e acquisti in negozio.",
+    "robbedBy": "Derubato da {name}",
+    "foiledBy": "Rapina di {name} sventata"
   },
   "blog": {
     "title": "Blog dei badge Twitch",

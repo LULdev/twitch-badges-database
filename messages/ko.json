@@ -355,7 +355,9 @@
     "channelNote": "채널 전용 배지(예: 내 구독자 등급)는 집계되지만 전역 카탈로그에는 포함되지 않습니다.",
     "moreHidden": "+{count}개 더 — 희귀도순",
     "transactions": "최근 거래",
-    "transactionsNote": "아케이드 라운드와 상점 구매가 포함됩니다."
+    "transactionsNote": "아케이드 라운드와 상점 구매가 포함됩니다.",
+    "robbedBy": "{name}에게 도둑맞음",
+    "foiledBy": "{name}의 도둑질을 막음"
   },
   "blog": {
     "title": "Twitch 배지 블로그",

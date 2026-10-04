@@ -355,7 +355,9 @@
     "channelNote": "Les badges spécifiques à une chaîne (ex. vos propres paliers d'abonné) sont comptés mais ne font pas partie du catalogue global.",
     "moreHidden": "+{count} de plus — triés par rareté",
     "transactions": "Transactions récentes",
-    "transactionsNote": "Inclut les manches d’arcade et les achats en boutique."
+    "transactionsNote": "Inclut les manches d’arcade et les achats en boutique.",
+    "robbedBy": "Dérobé par {name}",
+    "foiledBy": "Vol de {name} déjoué"
   },
   "blog": {
     "title": "Blog des badges Twitch",

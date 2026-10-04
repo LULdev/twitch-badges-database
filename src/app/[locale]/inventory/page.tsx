@@ -150,13 +150,15 @@ export default async function InventoryPage({
         .not("coins_amount", "is", null)
         .neq("coins_amount", 0)
         .order("id", { ascending: false })
-        .limit(30),
+        .limit(120),
     )
       .then((r) => (r.data ?? []) as Array<{ id: number; created_at: string; kind: string; title: string | null; coins_amount: number | string | null }>)
       .catch(() => []),
-    // PostgrestBuilder is only a PromiseLike (no .catch of its own), so both
-    // view reads are lifted into a real Promise first — a network rejection
-    // must degrade to an empty section, not 500 the page.
+    // PostgrestBuilder is only a PromiseLike (no .catch of its own), so the
+    // view reads are lifted into real Promises first — a network rejection
+    // must degrade to an empty section, not 500 the page. Every read in this
+    // wave follows that rule; the three raw builders below are wrapped the
+    // same way.
     Promise.resolve(
       admin
         .from("stats_player_best_rounds")
@@ -171,34 +173,41 @@ export default async function InventoryPage({
     )
       .then((r) => (r.data ?? []) as RecordHistoryEntry[])
       .catch(() => [] as RecordHistoryEntry[]),
-    admin
-      .from("user_items")
-      .select("item_key, quantity")
-      .eq("user_id", user.id)
-      .eq("item_key", "streak_freeze")
-      .maybeSingle(),
-    admin
-      .from("activity_events")
-      .select("created_at")
-      .eq("user_id", user.id)
-      .eq("kind", "streak_freeze")
-      .order("created_at", { ascending: false })
-      .limit(3),
-    admin
-      .from("activity_events")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("kind", "streak_freeze"),
+    Promise.resolve(
+      admin
+        .from("user_items")
+        .select("item_key, quantity")
+        .eq("user_id", user.id)
+        .eq("item_key", "streak_freeze")
+        .maybeSingle(),
+    ).catch(() => ({ data: null })),
+    Promise.resolve(
+      admin
+        .from("activity_events")
+        .select("created_at")
+        .eq("user_id", user.id)
+        .eq("kind", "streak_freeze")
+        .order("created_at", { ascending: false })
+        .limit(3),
+    ).catch(() => ({ data: null })),
+    Promise.resolve(
+      admin
+        .from("activity_events")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("kind", "streak_freeze"),
+    ).catch(() => ({ count: null, data: null })),
     // Arcade rounds: every settled round carries bet/payout — the net is the
-    // transaction. Read wider than 30 because net-less rounds (bet 0,
-    // payout 0) are filtered below; the merge then slices 30 from the union.
+    // transaction. Read 120 deep so the merged top-30 stays correct even when
+    // net-zero rounds (payout === bet, e.g. an odds-priced push) are dense;
+    // the merge then slices 30 from the union.
     Promise.resolve(
       admin
         .from("game_rounds")
         .select("id, game, bet, payout, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(60),
+        .limit(120),
     )
       .then(
         (r) =>
@@ -225,7 +234,11 @@ export default async function InventoryPage({
     // cost, a success takes the loot but leaves the cost. The theft itself has
     // no activity_events row for the victim (the public feed logs it from the
     // thief's perspective only), so this read is what makes the victim's own
-    // transaction list complete. Thief username rides the FK embed.
+    // transaction list complete. Thief username rides the FK embed. Two known
+    // approximations, both warned about at their source when they happen: the
+    // settlement RPC clamps the balance at zero (0015 — unreachable without a
+    // concurrent drain), and a void-delete that itself fails leaves an attempt
+    // row for a movement that never settled (daily.ts warn).
     Promise.resolve(
       admin
         .from("steal_attempts")
@@ -234,7 +247,7 @@ export default async function InventoryPage({
         )
         .eq("victim_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(60),
+        .limit(120),
     )
       // supabase-js infers the to-one embed as an array (it cannot see the FK
       // direction without DB types) while PostgREST actually returns an
@@ -266,12 +279,17 @@ export default async function InventoryPage({
   );
   const guardianRescues = rescuesCountRes.count ?? 0;
 
-  // Merge both sources into one transaction log, newest first, capped at 30.
-  // Reading 60 per source keeps the top-30 correct: any entry in the true
-  // global top-30 is inside each source's own top-60. bigint columns arrive
-  // as PostgREST strings (or numbers, depending on the column) — Number()
-  // both sides. Net-less rounds are noise and dropped; the game title comes
-  // from the games namespace the same way BestRoundsCard resolves it.
+  // Merge the three ledger sources into one transaction log, newest first,
+  // capped at 30. Each source is read 120 rows deep: any entry in the true
+  // global top-30 has at most 29 newer entries in its own source, so it
+  // survives unless more than 90 rows of that source are dropped by the
+  // net-zero filters below — a pathological density, documented rather than
+  // chased, since a zero-net row is not a transaction. bigint columns arrive
+  // as PostgREST strings (or numbers) — Number() both sides. Net-zero rounds
+  // are dropped and the game title comes from the games namespace the same
+  // way BestRoundsCard resolves it; the theft titles are composed here and
+  // therefore localized (unlike the stored feed titles, which were written
+  // once in English by logActivity).
   const tg = await getTranslations("games");
   const roundRows = ((roundsRes ?? []) as Array<{
     id: number;
@@ -298,9 +316,12 @@ export default async function InventoryPage({
     .map((r) => ({
       key: `s-${r.id}`,
       created_at: r.created_at,
+      // "?" rather than an English word: the FK cascade deletes attempt rows
+      // together with their profile, so a missing thief username is
+      // unreachable in practice and the placeholder stays language-neutral.
       title: r.success
-        ? `robbed by ${r.thiefUsername ?? "someone"}`
-        : `foiled a robbery by ${r.thiefUsername ?? "someone"}`,
+        ? t("robbedBy", { name: r.thiefUsername ?? "?" })
+        : t("foiledBy", { name: r.thiefUsername ?? "?" }),
       coins_amount: Number(r.cost) - Number(r.coins),
     }))
     .filter((r) => r.coins_amount !== 0);

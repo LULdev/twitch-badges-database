@@ -59,18 +59,21 @@ feed are generated from that table, so an undocumented change is invisible.
 
 ## Architecture rules
 
-- **Every BadgesCoins movement has exactly one ledger row** in
-  `activity_events.coins_amount` (the public feed, the coin-flow card and the
-  inventory transaction list all read that one table): wheel + daily bonus via
-  `award()`'s feed row, steals via `attemptSteal`'s row (thief perspective —
-  `+loot` or `−cost`), shop purchases via the `item_purchase` row the
-  `purchase_item` RPC writes (migration 0059). The ONE deliberate exception:
-  arcade rounds write no coin row (their `award()` call carries no `coins`
-  field) because the round itself is the record — the inventory list unions
-  `game_rounds` (`payout − bet`) and, for the victim side of thefts,
-  `steal_attempts` (`cost − coins`) instead. When adding a new coin source,
-  write its feed row with `coinsAmount` set — a movement without a ledger row
-  is invisible to every balance history.
+- **BadgesCoins movements write a ledger row** in
+  `activity_events.coins_amount` — the single table the public feed, the
+  coin-flow card and the inventory transaction list all read. Writers: wheel
+  and daily bonus through `award()`'s feed row; steals through `attemptSteal`'s
+  row (gross loot on success — the thief's net is loot − cost, mirrored by the
+  victim-side `steal_attempts` row); purchases through the `item_purchase` row
+  the `purchase_item` RPC writes (0059); the slots-15x and scratch-jackpot
+  `big_win` rows with `coinsAmount: net`. Deliberate exceptions, each covered
+  by a reader instead of a row: ordinary arcade rounds (`bumpCoins(net)`, no
+  `coins` field on their `award()` call — the inventory list unions
+  `game_rounds`, `payout − bet`), the theft VICTIM (no feed row — unioned from
+  `steal_attempts`, `cost − coins`), and admin coin edits (absolute balance
+  through `setUserProgress`, recorded in `admin_audit` only). When adding a new
+  coin source, write its feed row with `coinsAmount` set or add a union leg —
+  a movement with neither is invisible to every balance history.
 - **Service-role client** (`src/lib/supabase/admin.ts`) only in scripts, cron
   routes and server push code. Never import it from client components.
 - **Sync engines live in `src/lib/syncs/`** — scripts and Vercel cron routes

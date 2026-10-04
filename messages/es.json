@@ -355,7 +355,9 @@
     "channelNote": "Las insignias específicas de canal (p. ej., tus propios niveles de suscriptor) se cuentan, pero no forman parte del catálogo global.",
     "moreHidden": "+{count} más — ordenadas por rareza",
     "transactions": "Transacciones recientes",
-    "transactionsNote": "Incluye rondas de arcade y compras en la tienda."
+    "transactionsNote": "Incluye rondas de arcade y compras en la tienda.",
+    "robbedBy": "Robado por {name}",
+    "foiledBy": "Asalto de {name} frustrado"
   },
   "blog": {
     "title": "Blog de insignias de Twitch",

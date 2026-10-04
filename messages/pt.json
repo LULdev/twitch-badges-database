@@ -355,7 +355,9 @@
     "channelNote": "Insígnias específicas de canal (ex.: seus próprios níveis de inscrito) são contadas, mas não fazem parte do catálogo global.",
     "moreHidden": "+{count} mais — ordenadas por raridade",
     "transactions": "Transações recentes",
-    "transactionsNote": "Inclui rodadas de arcade e compras na loja."
+    "transactionsNote": "Inclui rodadas de arcade e compras na loja.",
+    "robbedBy": "Roubado por {name}",
+    "foiledBy": "Assalto de {name} frustrado"
   },
   "blog": {
     "title": "Blog de Insígnias da Twitch",

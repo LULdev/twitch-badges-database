@@ -355,7 +355,9 @@
     "channelNote": "チャンネル固有のバッジ（自分のサブスクライバー段位など）はカウントされますが、グローバルカタログには含まれません。",
     "moreHidden": "ほか{count}個 — レアリティ順",
     "transactions": "最近の取引",
-    "transactionsNote": "アーケードラウンドとショップ購入を含みます。"
+    "transactionsNote": "アーケードラウンドとショップ購入を含みます。",
+    "robbedBy": "{name}に奪われました",
+    "foiledBy": "{name}の強盗を防ぎました"
   },
   "blog": {
     "title": "Twitchバッジブログ",

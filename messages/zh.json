@@ -355,7 +355,9 @@
     "channelNote": "频道专属徽章（例如你自己的订阅等级）会被计数，但不属于全球目录。",
     "moreHidden": "还有 {count} 枚——按稀有度排序",
     "transactions": "最近交易",
-    "transactionsNote": "包含街机回合和商店购买。"
+    "transactionsNote": "包含街机回合和商店购买。",
+    "robbedBy": "被 {name} 盗走",
+    "foiledBy": "击退了 {name} 的盗窃"
   },
   "blog": {
     "title": "Twitch 徽章博客",

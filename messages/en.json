@@ -355,7 +355,9 @@
     "channelNote": "Channel-specific badges (e.g. your own subscriber tiers) are counted but not part of the global catalog.",
     "moreHidden": "+{count} more — sorted by rarity",
     "transactions": "Recent transactions",
-    "transactionsNote": "Includes arcade rounds and shop purchases."
+    "transactionsNote": "Includes arcade rounds and shop purchases.",
+    "robbedBy": "Robbed by {name}",
+    "foiledBy": "Foiled a robbery by {name}"
   },
   "blog": {
     "title": "Twitch Badge Blog",
