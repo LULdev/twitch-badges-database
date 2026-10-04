@@ -133,6 +133,7 @@ export default async function InventoryPage({
     rescuesRes,
     rescuesCountRes,
     roundsRes,
+    stealRows,
   ] = await Promise.all([
     readProgress(user.id).catch(() => null),
     fetchCoinRows(admin, user.id, since).catch(() => []),
@@ -219,6 +220,44 @@ export default async function InventoryPage({
             created_at: string;
           }>,
       ),
+    // The victim side of thefts: every attempt against this viewer moved their
+    // balance by cost - coins — a failed attempt PAYS the victim the attempt
+    // cost, a success takes the loot but leaves the cost. The theft itself has
+    // no activity_events row for the victim (the public feed logs it from the
+    // thief's perspective only), so this read is what makes the victim's own
+    // transaction list complete. Thief username rides the FK embed.
+    Promise.resolve(
+      admin
+        .from("steal_attempts")
+        .select(
+          "id, cost, coins, success, created_at, thief:profiles!steal_attempts_thief_id_fkey(username)",
+        )
+        .eq("victim_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(60),
+    )
+      // supabase-js infers the to-one embed as an array (it cannot see the FK
+      // direction without DB types) while PostgREST actually returns an
+      // object — normalize both shapes here so the merge below stays simple.
+      .then((r) =>
+        ((r.data ?? []) as unknown as Array<{
+          id: number;
+          cost: number | string;
+          coins: number | string;
+          success: boolean;
+          created_at: string;
+          thief: { username: string | null } | { username: string | null }[] | null;
+        }>).map((row) => ({
+          id: row.id,
+          cost: row.cost,
+          coins: row.coins,
+          success: row.success,
+          created_at: row.created_at,
+          thiefUsername:
+            (Array.isArray(row.thief) ? row.thief[0] : row.thief)?.username ?? null,
+        })),
+      )
+      .catch(() => []),
   ]);
   const itemFreezes =
     (itemsRes.data as { quantity: number } | null)?.quantity ?? null;
@@ -248,6 +287,23 @@ export default async function InventoryPage({
       coins_amount: Number(r.payout) - Number(r.bet),
     }))
     .filter((r) => r.coins_amount !== 0);
+  const stealTx = ((stealRows ?? []) as Array<{
+    id: number;
+    cost: number | string;
+    coins: number | string;
+    success: boolean;
+    created_at: string;
+    thiefUsername: string | null;
+  }>)
+    .map((r) => ({
+      key: `s-${r.id}`,
+      created_at: r.created_at,
+      title: r.success
+        ? `robbed by ${r.thiefUsername ?? "someone"}`
+        : `foiled a robbery by ${r.thiefUsername ?? "someone"}`,
+      coins_amount: Number(r.cost) - Number(r.coins),
+    }))
+    .filter((r) => r.coins_amount !== 0);
   const mergedTx: CoinTxRow[] = [
     ...((txRows ?? []) as Array<{ id: number; created_at: string; kind: string; title: string | null; coins_amount: number | string | null }>).map(
       (row) => ({
@@ -258,6 +314,7 @@ export default async function InventoryPage({
       }),
     ),
     ...roundRows,
+    ...stealTx,
   ]
     .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
     .slice(0, 30);
