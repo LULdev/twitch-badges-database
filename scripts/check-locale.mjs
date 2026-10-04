@@ -11,7 +11,7 @@
 // The matrix encodes the documented order (AGENTS.md, Conventions):
 //   NEXT_LOCALE cookie  ->  Accept-Language  ->  country-of-origin  ->  /en
 // Reordering those layers must fail this script.
-import { spawn, execSync } from "node:child_process";
+import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { existsSync } from "node:fs";
 
@@ -111,34 +111,6 @@ function freePort() {
   });
 }
 
-/** Netstat state names are localized (German "ABHÖREN"), so free the port by
- * parsing for the port number only and force-killing every holder found. */
-function freePortForce(port) {
-  try {
-    const lines = execSync("netstat -ano", { encoding: "utf8" });
-    const pids = new Set();
-    for (const line of lines.split("\n")) {
-      if (!line.includes(`:${port} `)) continue;
-      const pid = line.trim().split(/\s+/).pop();
-      if (pid && /^\d+$/.test(pid) && pid !== "0") pids.add(pid);
-    }
-    for (const pid of pids) {
-      const cmd =
-        process.platform === "win32"
-          ? `taskkill /F /PID ${pid}`
-          : `kill -9 ${pid}`;
-      try {
-        execSync(cmd, { stdio: "ignore" });
-      } catch {
-        // already gone
-      }
-    }
-    return pids.size > 0;
-  } catch {
-    return false;
-  }
-}
-
 async function waitForServer(base) {
   for (let i = 0; i < 60; i++) {
     try {
@@ -210,10 +182,23 @@ try {
   );
   exitCode = failed === 0 ? 0 : 1;
 } finally {
-  child.kill();
+  // No subprocess spawning (netstat/taskkill) in the exit path: observed on
+  // Windows, execSync next to the just-killed shell crashed node natively
+  // AFTER `process.exit(0)` was called — silent exit code 1 with all 12
+  // cases green. child.kill() takes the whole tree down (verified via
+  // netstat), and a lingering holder cannot poison the next run anyway
+  // because freePort() picks a fresh port every time.
+  try {
+    child.kill();
+  } catch {
+    // already dead
+  }
   setTimeout(() => {
-    const forced = freePortForce(port);
-    if (forced) console.log(`port ${port} force-freed`);
+    try {
+      child.kill("SIGKILL");
+    } catch {
+      // already dead
+    }
     process.exit(exitCode);
   }, 1200);
 }
