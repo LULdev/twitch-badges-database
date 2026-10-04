@@ -1,0 +1,36 @@
+name: Locale negotiation check
+
+# Regression lock for the three-layer locale negotiation (NEXT_LOCALE cookie
+# -> Accept-Language -> country-of-origin fallback -> /en). Runs only when the
+# files that implement or document it change — the full matrix lives in
+# scripts/check-locale.mjs, which builds nothing itself and expects the
+# production build this workflow performs first.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/proxy.ts"
+      - "src/i18n/**"
+      - "scripts/check-locale.mjs"
+      - ".github/workflows/locale-check.yml"
+  pull_request:
+    paths:
+      - "src/proxy.ts"
+      - "src/i18n/**"
+      - "scripts/check-locale.mjs"
+      - ".github/workflows/locale-check.yml"
+  workflow_dispatch: {}
+
+jobs:
+  locale-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: node scripts/check-locale.mjs

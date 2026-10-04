@@ -40,6 +40,7 @@ Read `README.md` for data sources and setup; read this file before editing.
 
 ```
 npm run dev | build | lint | typecheck
+npm run check:locale    # locale negotiation redirect matrix (needs a build; see Conventions)
 npm run db:apply        # apply pending migrations once (supabase_migrations ledger)
 npm run sync:global | sync:badgebase | sync:potat | sync:archive
 npm run send:push -- "Title" "Body" "/en/badges/slug"

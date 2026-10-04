@@ -23,7 +23,8 @@
     "ideas:verify": "tsx scripts/verify-new-ideas.ts",
     "ideas:import": "tsx scripts/import-new-ideas.ts --write",
     "sync:highlights": "tsx scripts/sync-highlights.ts",
-    "art:export": "tsx scripts/export-game-art.ts"
+    "art:export": "tsx scripts/export-game-art.ts",
+    "check:locale": "node scripts/check-locale.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
