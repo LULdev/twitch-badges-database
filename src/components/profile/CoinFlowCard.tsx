@@ -8,7 +8,7 @@ export interface CoinFlowRow {
 }
 
 /**
- * Paged read of the viewer's feed-logged coin rows for the card window.
+ * Paged read of the viewer's logged coin rows for the card window.
  * PostgREST caps one response at the project's max-rows (1000 by default),
  * so this loops `.range()` pages ordered by the unique `id` until a short
  * page arrives — a heavy account would otherwise get silently truncated
@@ -50,14 +50,14 @@ export function coinFlowSince(): Date {
 }
 
 /**
- * The profile's coin-flow card: earned / spent / net of the feed-logged coin
+ * The profile's coin-flow card: earned / spent / net of the logged coin
  * movements over the last 30 UTC days, plus a signed daily bar strip. The
- * copy is honest about the source — arcade rounds and shop purchases move
- * coins without a feed row, so the note states exactly what is counted.
- * Shared between the profile page and the owner-only block on /stats; the
- * caller supplies the raw rows (fetched with the service-role client —
- * user_id is not anon-readable since the 0040 column grants) and a unique
- * section id.
+ * copy is honest about the source — it counts every ledger row (including
+ * admin corrections, which never reach the public feed) and excludes only
+ * what has no row at all: regular arcade rounds. Shared between the profile
+ * page and the owner-only block on /stats; the caller supplies the raw rows
+ * (fetched with the service-role client — user_id is not anon-readable since
+ * the 0040 column grants) and a unique section id.
  */
 export default async function CoinFlowCard({
   rows,

@@ -137,9 +137,10 @@ export default async function InventoryPage({
   ] = await Promise.all([
     readProgress(user.id).catch(() => null),
     fetchCoinRows(admin, user.id, since).catch(() => []),
-    // Feed-logged coin movements (the coin-flow card's source): daily bonus,
-    // wheel, rain, steals, big wins and — since the purchase RPC writes its
-    // own feed row — shop purchases. Same admin-client split: user_id is not
+    // Logged coin movements (the coin-flow card's source): daily bonus,
+    // wheel, rain, steals, big wins, shop purchases (their RPC writes the
+    // feed row) and admin corrections (ledger rows that never reach the
+    // public feed). Same admin-client split: user_id is not
     // anon-readable (0040). Lifted into a real Promise — PostgrestBuilder is
     // only a PromiseLike without .catch.
     Promise.resolve(
@@ -444,9 +445,10 @@ export default async function InventoryPage({
           who never earned a coin has no row and gets no zero-card. */}
       {progressRow && <CoinFlowCard rows={coinRows} id="inventory-coin-flow" />}
 
-      {/* Recent transactions — the merged log: feed-logged coin movements
-          (daily bonus, wheel, rain, steals, big wins, shop purchases) plus
-          every arcade round that settled in game_rounds, newest first. */}
+      {/* Recent transactions — the merged log: logged coin movements
+          (daily bonus, wheel, rain, steals, big wins, shop purchases, admin
+          corrections) plus every arcade round that settled in game_rounds,
+          newest first. */}
       {mergedTx.length > 0 && (
         <section className="card p-5" aria-labelledby="inventory-transactions">
           <h2

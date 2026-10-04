@@ -68,8 +68,10 @@ async function countStreakSaves(
   return count ?? 0;
 }
 
-/** Feed-logged coin movement in [start, end): gross sum of |coins_amount|
- *  (net would cancel earn against spend and understate the flow). PostgREST
+/** Logged coin movement in [start, end): gross sum of |coins_amount|
+ *  (net would cancel earn against spend and understate the flow). Counts
+ *  every ledger row — including admin corrections, which never reach the
+ *  public feed. PostgREST
  *  cannot aggregate, so the rows are read and reduced — paged defensively
  *  because a single response caps at 1000 rows (the achievements pageAll
  *  doctrine). Volume today is < 100 rows/week for the whole site. */

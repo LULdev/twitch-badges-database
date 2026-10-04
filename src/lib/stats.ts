@@ -619,11 +619,15 @@ export interface CommunityCoinFlowData {
 }
 
 /**
- * Community-wide feed-logged coin flow over the last 30 UTC days, from the
- * public aggregate view stats_coin_flow_daily (0054). Days without movement
- * stay absent — the strip zero-fills. Returns null when the view is missing
- * or the read fails, so /stats renders without the card on an un-migrated
- * database (the safe() doctrine for the stats surfaces).
+ * Community-wide coin flow over the last 30 UTC days, from the public
+ * aggregate view stats_coin_flow_daily (0054; inclusion policy documented on
+ * the view itself by 0060). It counts every ledger row — deliberately
+ * including admin_adjust corrections, which are never broadcast as feed
+ * entries — and excludes only what has no ledger row at all (regular arcade
+ * rounds). Days without movement stay absent — the strip zero-fills. Returns
+ * null when the view is missing or the read fails, so /stats renders without
+ * the card on an un-migrated database (the safe() doctrine for the stats
+ * surfaces).
  */
 export async function getCommunityCoinFlow(): Promise<CommunityCoinFlowData | null> {
   const supabase = await createClient();

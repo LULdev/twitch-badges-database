@@ -618,7 +618,7 @@ export default async function StatsPage({
       {/* Owner-only coin flow — the shared card, same as on the profile. */}
       {viewerId && <CoinFlowCard rows={coinRows} id="stats-coin-flow" />}
 
-      {/* Public aggregate card — everyone's feed-logged coin movement. */}
+      {/* Public aggregate card — everyone's logged coin movement. */}
       {communityCoin && <CommunityCoinFlow data={communityCoin} />}
 
       {/* Record-break leaderboard — whose personal best rose most this period. */}

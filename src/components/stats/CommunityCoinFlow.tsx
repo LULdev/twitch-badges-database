@@ -2,9 +2,11 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { daySeries, type CommunityCoinFlowData } from "@/lib/stats";
 
 /**
- * Public economy card on /stats: the whole community's feed-logged coin
+ * Public economy card on /stats: the whole community's logged coin
  * movement over the last 30 UTC days, from the aggregated view
- * stats_coin_flow_daily (0054 — aggregates only, no personal data). Markup
+ * stats_coin_flow_daily (0054; inclusion policy documented on the view by
+ * 0060 — includes admin corrections, excludes no-ledger-row arcade rounds;
+ * aggregates only, no personal data). Markup
  * mirrors the profile's CoinFlowCard deliberately: same bl-kpi tiles, same
  * coin-flow-bars strip; only the strings and the data source differ.
  */

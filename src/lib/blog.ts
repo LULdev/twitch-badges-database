@@ -170,7 +170,7 @@ export interface ArcadeHighlightsInput {
   } | null;
   /** Streak Freeze saves in the covered day (kind='streak_freeze' rows). */
   streakSaves: number;
-  /** Feed-logged coin movement in the covered day (sum of |coins_amount|). */
+  /** Logged coin movement in the covered day (sum of |coins_amount| ledger rows). */
   coinFlow: number;
 }
 
@@ -195,7 +195,7 @@ export interface ArcadeWeeklyInput {
   } | null;
   /** Streak Freeze saves in the covered week (kind='streak_freeze' rows). */
   streakSaves: number;
-  /** Feed-logged coin movement in the covered week (sum of |coins_amount|). */
+  /** Logged coin movement in the covered week (sum of |coins_amount| ledger rows). */
   coinFlow: number;
 }
 
@@ -232,7 +232,7 @@ export function buildArcadeHighlightsArticle(input: ArcadeHighlightsInput): {
     `## The day in the Badge Arcade`,
     "",
     totalRounds > 0
-      ? `On ${dateLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 13 games`}. Every round was server-authoritative, capped at the house stake, and graded by the same engine that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` The same ledger also recorded **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** spent — ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} bridged through a missed day instead of resetting.` : ""}${input.coinFlow > 0 ? ` The feed logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — feed-logged movements only, since arcade rounds and shop purchases move coins without a feed row.` : ""}`
+      ? `On ${dateLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 13 games`}. Every round was server-authoritative, capped at the house stake, and graded by the same engine that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` The same ledger also recorded **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** spent — ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} bridged through a missed day instead of resetting.` : ""}${input.coinFlow > 0 ? ` The ledger logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — logged movements only, since regular arcade rounds move coins without a ledger entry.` : ""}`
       : `On ${dateLabel} the arcade floors stayed quiet — not a single round was settled. The boards are always open: pick a game on the [arcade overview](/en/games), set a stake between the posted limits, and the next recap could carry your name.`,
     "",
   ];
@@ -275,7 +275,7 @@ export function buildArcadeHighlightsArticle(input: ArcadeHighlightsInput): {
   const title = `Arcade highlights — ${dateLabel}`;
   const excerpt =
     totalRounds > 0
-      ? `${dateLabel} in the Badge Arcade: ${totalRounds.toLocaleString("en-US")} settled rounds, ${top ? `${top.game} on top` : "a quiet board"}${input.biggestWin ? `, and the day's biggest win of +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} spent` : ""}${input.coinFlow > 0 ? `, ${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved through the feed` : ""}.`
+      ? `${dateLabel} in the Badge Arcade: ${totalRounds.toLocaleString("en-US")} settled rounds, ${top ? `${top.game} on top` : "a quiet board"}${input.biggestWin ? `, and the day's biggest win of +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} spent` : ""}${input.coinFlow > 0 ? `, ${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved` : ""}.`
       : `${dateLabel} in the Badge Arcade: a quiet day with no settled rounds — the boards stay open for the next player.`;
 
   return { content, excerpt, title };
@@ -314,7 +314,7 @@ export function buildArcadeWeeklyArticle(
     "## The week in the Badge Arcade",
     "",
     totalRounds > 0
-      ? `From Monday ${startLabel} to Sunday ${endLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 13 games`}${trend ? ` — ${trend}` : ""}. One post per week, computed from the same server-authoritative ledger that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` Across the week, **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** bridged missed days and kept ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} alive.` : ""}${input.coinFlow > 0 ? ` The feed logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — feed-logged movements only, since arcade rounds and shop purchases move coins without a feed row.` : ""}`
+      ? `From Monday ${startLabel} to Sunday ${endLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 13 games`}${trend ? ` — ${trend}` : ""}. One post per week, computed from the same server-authoritative ledger that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` Across the week, **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** bridged missed days and kept ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} alive.` : ""}${input.coinFlow > 0 ? ` The ledger logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — logged movements only, since regular arcade rounds move coins without a ledger entry.` : ""}`
       : `From Monday ${startLabel} to Sunday ${endLabel} the arcade floors stayed completely quiet — not a single settled round in seven days. The boards never close: pick a game on the [arcade overview](/en/games), and next week's recap could open with your name.`,
     "",
   ];
@@ -358,7 +358,7 @@ export function buildArcadeWeeklyArticle(
   const title = `Arcade weekly — ${input.isoWeek}`;
   const excerpt =
     totalRounds > 0
-      ? `Week ${input.isoWeek} (${startLabel}–${endLabel}): ${totalRounds.toLocaleString("en-US")} settled rounds${top ? `, ${top.game} as game of the week` : ""}${input.biggestWin ? `, biggest win +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} bridged missed days` : ""}${input.coinFlow > 0 ? `, ${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved through the feed` : ""}.`
+      ? `Week ${input.isoWeek} (${startLabel}–${endLabel}): ${totalRounds.toLocaleString("en-US")} settled rounds${top ? `, ${top.game} as game of the week` : ""}${input.biggestWin ? `, biggest win +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} bridged missed days` : ""}${input.coinFlow > 0 ? `, ${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved` : ""}.`
       : `Week ${input.isoWeek} (${startLabel}–${endLabel}): a silent week with no settled rounds.`;
 
   return { content, excerpt, title };
