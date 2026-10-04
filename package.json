@@ -24,7 +24,8 @@
     "ideas:import": "tsx scripts/import-new-ideas.ts --write",
     "sync:highlights": "tsx scripts/sync-highlights.ts",
     "art:export": "tsx scripts/export-game-art.ts",
-    "check:locale": "node scripts/check-locale.mjs"
+    "check:locale": "node scripts/check-locale.mjs",
+    "verify": "npm run lint && npm run typecheck && npm run build && npm run check:locale"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

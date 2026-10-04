@@ -47,7 +47,10 @@ npm run send:push -- "Title" "Body" "/en/badges/slug"
 npm run log:change -- <feature|bugfix|data_sync|…> "Title" "Explanation" '{"json":"payload"}'
 ```
 
-Verification ritual: `lint && typecheck && build` before finishing any change.
+Verification ritual: `npm run verify` before finishing any change — one
+chain that runs lint, typecheck, the i18n:check + production build, and
+the locale negotiation matrix (in that order, so each step has what it
+needs).
 
 **Every change and every bug fix gets a changelog entry with a timestamp** —
 `npm run log:change` (or `logChange()` in code) with a one-paragraph
