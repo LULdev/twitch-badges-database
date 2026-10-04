@@ -25,6 +25,7 @@
     "sync:highlights": "tsx scripts/sync-highlights.ts",
     "art:export": "tsx scripts/export-game-art.ts",
     "check:locale": "node scripts/check-locale.mjs",
+    "e2e:steal": "tsx scripts/e2e-steal.ts",
     "verify": "npm run lint && npm run typecheck && npm run build && npm run check:locale"
   },
   "dependencies": {

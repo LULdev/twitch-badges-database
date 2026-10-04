@@ -3,6 +3,7 @@ import type { AdminContext, AdminRole } from "@/lib/admin";
 import { audit } from "@/lib/admin";
 import { AdminNotFoundError, AdminValidationError } from "@/lib/admin-route";
 import { ACH_BY_ID } from "@/lib/gamification/achievements";
+import { logActivity } from "@/lib/gamification/xp";
 
 /**
  * User administration for the ACP. Everything here writes through the service
@@ -354,9 +355,11 @@ export async function setUserProgress(
   const supabase = createAdminClient();
   // The progress row is created on first login; an admin editing a profile
   // that never logged in must still get a row rather than a silent no-op.
+  // `coins` rides the existence read because the ledger row below needs the
+  // PREVIOUS balance: an absolute write is only a "movement" relative to it.
   const { data: existing } = await supabase
     .from("user_progress")
-    .select("user_id")
+    .select("user_id, coins")
     .eq("user_id", id)
     .maybeSingle();
   if (existing) {
@@ -372,6 +375,28 @@ export async function setUserProgress(
     if (error) throw error;
   }
   await audit(ctx, "user.progress", id, patch as Record<string, unknown>);
+
+  // Ledger row for coin edits — the last coin-moving path that was invisible
+  // to every balance history. An absolute write has no inherent delta, so it
+  // is derived from the pre-read (a brand-new row starts from 0, matching the
+  // column default). Zero-net and non-coin edits write nothing. The public
+  // feed excludes this kind (/api/feed) — the adjustment shows in the
+  // affected member's own card and transaction list, not site-wide; the
+  // acting admin stays recorded in admin_audit only.
+  if (patch.coins !== undefined) {
+    const before = Number((existing as { coins?: number } | null)?.coins ?? 0);
+    const after = clamp(patch.coins);
+    const delta = after - before;
+    if (delta !== 0) {
+      await logActivity({
+        userId: id,
+        kind: "admin_adjust",
+        title: "balance adjusted by an admin",
+        coinsAmount: delta,
+        payload: { before, after },
+      });
+    }
+  }
 }
 
 export async function setUserRole(

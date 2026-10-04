@@ -44,7 +44,8 @@ export type FeedKind =
   | "first_login"
   | "streak_freeze"
   | "big_win"
-  | "item_purchase";
+  | "item_purchase"
+  | "admin_adjust";
 
 /* ------------------------------------------------------------------------- *
  * Short-TTL caches for the two reads that every wheel spin and every game

@@ -40,7 +40,9 @@ Read `README.md` for data sources and setup; read this file before editing.
 
 ```
 npm run dev | build | lint | typecheck
+npm run verify          # lint + typecheck + build + locale matrix (the ritual)
 npm run check:locale    # locale negotiation redirect matrix (needs a build; see Conventions)
+npm run e2e:steal       # theft-ledger E2E — manual only: writes real throwaway users, asserts, cleans up
 npm run db:apply        # apply pending migrations once (supabase_migrations ledger)
 npm run sync:global | sync:badgebase | sync:potat | sync:archive
 npm run send:push -- "Title" "Body" "/en/badges/slug"
@@ -65,15 +67,25 @@ feed are generated from that table, so an undocumented change is invisible.
   and daily bonus through `award()`'s feed row; steals through `attemptSteal`'s
   row (gross loot on success — the thief's net is loot − cost, mirrored by the
   victim-side `steal_attempts` row); purchases through the `item_purchase` row
-  the `purchase_item` RPC writes (0059); the slots-15x and scratch-jackpot
-  `big_win` rows with `coinsAmount: net`. Deliberate exceptions, each covered
-  by a reader instead of a row: ordinary arcade rounds (`bumpCoins(net)`, no
-  `coins` field on their `award()` call — the inventory list unions
-  `game_rounds`, `payout − bet`), the theft VICTIM (no feed row — unioned from
-  `steal_attempts`, `cost − coins`), and admin coin edits (absolute balance
-  through `setUserProgress`, recorded in `admin_audit` only). When adding a new
-  coin source, write its feed row with `coinsAmount` set or add a union leg —
-  a movement with neither is invisible to every balance history.
+  the `purchase_item` RPC writes (0059); admin balance edits through
+  `setUserProgress` (`admin_adjust` with the delta derived from the pre-read —
+  the individual row is NEVER broadcast: both `/api/feed` and the SSR `/feed`
+  page exclude the kind, and the achievement activity counter ignores it; it
+  shows in the affected member's own card and list, and — deliberately — in
+  AGGREGATES like `stats_coin_flow_daily` and the recap posts, because those
+  coins are real creation); the slots-15x and
+  scratch-jackpot `big_win` rows with `coinsAmount: net`. Deliberate
+  exceptions, each covered by a reader instead of a row: ordinary arcade rounds
+  (`bumpCoins(net)`, no `coins` field on their `award()` call — the inventory
+  list unions `game_rounds`, `payout − bet`) and the theft VICTIM (no feed row
+  — unioned from `steal_attempts`, `cost − coins`). `steal_attempts` is itself
+  part of the ledger — all-time victim history — so it must NEVER be
+  bulk-pruned like `coin_rain_gate` (whose rows are only consulted for the
+  current day and are pruned after 7); its growth series
+  is the `stealAttempts` field of the daily `cron/global` heartbeat payload.
+  When adding a new coin source, write its feed row with `coinsAmount` set or
+  add a union leg — a movement with neither is invisible to every balance
+  history.
 - **Service-role client** (`src/lib/supabase/admin.ts`) only in scripts, cron
   routes and server push code. Never import it from client components.
 - **Sync engines live in `src/lib/syncs/`** — scripts and Vercel cron routes

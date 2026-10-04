@@ -685,6 +685,10 @@ async function buildStats(userId: string): Promise<AchStats> {
           .from("activity_events")
           .select("kind")
           .eq("user_id", userId)
+          // Admin balance corrections are a ledger row, not feed activity:
+          // counting them would unlock c_feed_first ("appear in the live
+          // activity feed") for a row the feed never shows.
+          .neq("kind", "admin_adjust")
           .order("id")
           .range(from, to),
       ),

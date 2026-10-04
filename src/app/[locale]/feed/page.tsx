@@ -47,6 +47,11 @@ export default async function FeedPage({
     const { data } = await supabase
       .from("activity_events")
       .select("id,username,avatar_url,kind,title,body,xp_amount,coins_amount,created_at")
+      // Same policy as /api/feed: admin balance corrections are a ledger row
+      // for the affected member's own history, never a public broadcast —
+      // without this filter the server-rendered first page would show what
+      // the polling endpoint hides.
+      .neq("kind", "admin_adjust")
       .order("id", { ascending: false })
       .limit(30);
     initialEvents = (data ?? []) as FeedEvent[];

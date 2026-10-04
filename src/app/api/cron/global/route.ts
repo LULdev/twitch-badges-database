@@ -4,6 +4,7 @@ import { runBadgebaseSync } from "@/lib/syncs/badgebase";
 import { runArcadeHighlights } from "@/lib/syncs/arcade-highlights";
 import { pruneHeartbeats, recordHeartbeat, withHeartbeat } from "@/lib/health";
 import { prunedCoinRainGate } from "@/lib/gamification/daily";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 // One 60 s ceiling covers BOTH halves (Hobby allows no more). The engines are
@@ -74,6 +75,24 @@ export async function GET(request: Request) {
   const pruned = await pruneHeartbeats(90).catch(() => 0);
   const prunedRainGate = await prunedCoinRainGate().catch(() => 0);
 
+  // Ledger-growth probe. steal_attempts is the victim-side coin ledger (the
+  // inventory transaction list reads it all-time), NOT gate state like
+  // coin_rain_gate — it must never be bulk-pruned, or victims lose their theft
+  // history. The daily count recorded in this heartbeat's payload is the
+  // growth series to watch for abuse-level spikes; the read fails soft (null)
+  // and can never take the cron down. The client construction sits INSIDE the
+  // promise chain on purpose: createAdminClient() throws synchronously on
+  // missing env, and a bare Promise.resolve(createAdminClient()...) would
+  // evaluate that throw before the .catch exists.
+  const stealAttempts = await Promise.resolve()
+    .then(() =>
+      createAdminClient()
+        .from("steal_attempts")
+        .select("id", { count: "exact", head: true }),
+    )
+    .then((r) => r.count ?? null)
+    .catch(() => null);
+
   // Daily arcade recap post (previous UTC day). Own heartbeat unit so the
   // status page shows it separately; failures degrade the run but never block
   // the catalog sync above, and a quiet day is a recorded skip, not an error.
@@ -121,6 +140,7 @@ export async function GET(request: Request) {
     payload: {
       prunedHeartbeats: pruned,
       prunedRainGate,
+      stealAttempts,
       globalFailed,
       badgebaseFailed,
       badgebaseSkipped,
@@ -149,6 +169,7 @@ export async function GET(request: Request) {
       durationMs,
       pruned,
       prunedRainGate,
+      stealAttempts,
     },
     { status },
   );

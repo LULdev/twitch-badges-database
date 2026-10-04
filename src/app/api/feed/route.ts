@@ -32,6 +32,12 @@ export async function GET(request: Request) {
     // Public endpoint: the internal user id and the raw payload blob are
     // not needed by the feed UI and must not be exposed.
     .select("id,username,avatar_url,kind,title,body,xp_amount,coins_amount,created_at")
+    // Admin balance corrections are a ledger row for the affected member's own
+    // history (coin-flow card, transaction list) — not a site-wide broadcast:
+    // publishing every moderation adjustment would expose interventions the
+    // member it concerns should hear first. admin_audit remains the admin-side
+    // record of who did it.
+    .neq("kind", "admin_adjust")
     .order("id", { ascending: false })
     .limit(limit);
   if (cursor > 0) query = query.lt("id", cursor);
