@@ -351,7 +351,8 @@
     "emptyOwned": "Aún no hay insignias sincronizadas.",
     "emptyMissing": "No falta nada — ¡increíble!",
     "channelNote": "Las insignias específicas de canal (p. ej., tus propios niveles de suscriptor) se cuentan, pero no forman parte del catálogo global.",
-    "moreHidden": "+{count} más — ordenadas por rareza"
+    "moreHidden": "+{count} más — ordenadas por rareza",
+    "transactions": "Transacciones recientes"
   },
   "blog": {
     "title": "Blog de insignias de Twitch",
@@ -1308,7 +1309,7 @@
       "devices": "Dispositivos",
       "browsers": "Navegadores",
       "topPaths": "Páginas más vistas",
-    "recapRefs": "Clics desde resúmenes",
+      "recapRefs": "Clics desde resúmenes",
       "referrers": "Procedencias",
       "locales": "Idiomas",
       "privacy": "Tiempo medio en la página: {avg} s. Contado sin direcciones IP, cookies ni URL de referencia completas."

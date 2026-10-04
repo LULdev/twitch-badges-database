@@ -351,7 +351,8 @@
     "emptyOwned": "Nessun badge sincronizzato.",
     "emptyMissing": "Non manca nulla — incredibile!",
     "channelNote": "I badge specifici del canale (es. i tuoi livelli da abbonato) vengono contati ma non fanno parte del catalogo globale.",
-    "moreHidden": "+{count} altri — ordinati per rarità"
+    "moreHidden": "+{count} altri — ordinati per rarità",
+    "transactions": "Transazioni recenti"
   },
   "blog": {
     "title": "Blog dei badge Twitch",
@@ -1308,7 +1309,7 @@
       "devices": "Dispositivi",
       "browsers": "Browser",
       "topPaths": "Pagine più viste",
-    "recapRefs": "Clic dai recap",
+      "recapRefs": "Clic dai recap",
       "referrers": "Provenienze",
       "locales": "Lingue",
       "privacy": "Tempo medio sulla pagina: {avg} s. Contato senza indirizzi IP, cookie o URL di provenienza completi."

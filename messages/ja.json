@@ -351,7 +351,8 @@
     "emptyOwned": "まだ同期されたバッジはありません。",
     "emptyMissing": "不足なし — 素晴らしい！",
     "channelNote": "チャンネル固有のバッジ（自分のサブスクライバー段位など）はカウントされますが、グローバルカタログには含まれません。",
-    "moreHidden": "ほか{count}個 — レアリティ順"
+    "moreHidden": "ほか{count}個 — レアリティ順",
+    "transactions": "最近の取引"
   },
   "blog": {
     "title": "Twitchバッジブログ",
@@ -1308,7 +1309,7 @@
       "devices": "デバイス",
       "browsers": "ブラウザ",
       "topPaths": "よく見られるページ",
-    "recapRefs": "まとめからのクリック",
+      "recapRefs": "まとめからのクリック",
       "referrers": "参照元",
       "locales": "言語",
       "privacy": "平均滞在時間: {avg} 秒。IPアドレス・Cookie・完全な参照元URLなしで計測しています。"

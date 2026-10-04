@@ -351,7 +351,8 @@
     "emptyOwned": "No badges synced yet.",
     "emptyMissing": "Nothing missing — incredible!",
     "channelNote": "Channel-specific badges (e.g. your own subscriber tiers) are counted but not part of the global catalog.",
-    "moreHidden": "+{count} more — sorted by rarity"
+    "moreHidden": "+{count} more — sorted by rarity",
+    "transactions": "Recent transactions"
   },
   "blog": {
     "title": "Twitch Badge Blog",
@@ -1308,7 +1309,7 @@
       "devices": "Devices",
       "browsers": "Browsers",
       "topPaths": "Most visited pages",
-    "recapRefs": "Recap click-throughs",
+      "recapRefs": "Recap click-throughs",
       "referrers": "Referrers",
       "locales": "Languages",
       "privacy": "Average time on page: {avg} s. Counted without IP addresses, cookies or full referrer URLs."

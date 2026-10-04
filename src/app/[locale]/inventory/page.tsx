@@ -12,6 +12,7 @@ import CoinFlowCard, {
   coinFlowSince,
   fetchCoinRows,
 } from "@/components/profile/CoinFlowCard";
+import Coin from "@/components/Coin";
 import BestRoundsCard, {
   type BestRoundRow,
   type RecordHistoryEntry,
@@ -32,6 +33,15 @@ const SNOW_DOTS = [
   { left: "69%", size: 3, delay: "-7.8s", duration: "10s" },
   { left: "88%", size: 4, delay: "-2.3s", duration: "12s" },
 ] as const;
+
+/** One feed-logged coin movement in the recent-transactions list. */
+interface CoinTxRow {
+  id: number;
+  created_at: string;
+  kind: string;
+  title: string | null;
+  coins_amount: number | null;
+}
 
 export async function generateMetadata({
   params,
@@ -117,6 +127,7 @@ export default async function InventoryPage({
   const [
     progressRow,
     coinRows,
+    txRows,
     bestRows,
     recordHistory,
     itemsRes,
@@ -125,6 +136,23 @@ export default async function InventoryPage({
   ] = await Promise.all([
     readProgress(user.id).catch(() => null),
     fetchCoinRows(admin, user.id, since).catch(() => []),
+    // The last 30 feed-logged coin movements, all-time (no 30-day window):
+    // the transaction log under the coin-flow card. Same admin-client split —
+    // user_id is not anon-readable (0040). `id` is the unique order key;
+    // title/kind ride along from the feed row itself. Lifted into a real
+    // Promise — PostgrestBuilder is only a PromiseLike without .catch.
+    Promise.resolve(
+      admin
+        .from("activity_events")
+        .select("id, created_at, kind, title, coins_amount")
+        .eq("user_id", user.id)
+        .not("coins_amount", "is", null)
+        .neq("coins_amount", 0)
+        .order("id", { ascending: false })
+        .limit(30),
+    )
+      .then((r) => (r.data ?? []) as CoinTxRow[])
+      .catch(() => [] as CoinTxRow[]),
     // PostgrestBuilder is only a PromiseLike (no .catch of its own), so both
     // view reads are lifted into a real Promise first — a network rejection
     // must degrade to an empty section, not 500 the page.
@@ -271,6 +299,52 @@ export default async function InventoryPage({
           owner block of /stats. Gated on a progress row existing: a member
           who never earned a coin has no row and gets no zero-card. */}
       {progressRow && <CoinFlowCard rows={coinRows} id="inventory-coin-flow" />}
+
+      {/* Recent transactions — the last 30 feed-logged coin movements,
+          all-time, newest first. Same source as the coin-flow card above:
+          arcade rounds and shop purchases write no feed row, so they do not
+          appear here either. */}
+      {txRows.length > 0 && (
+        <section className="card p-5" aria-labelledby="inventory-transactions">
+          <h2
+            id="inventory-transactions"
+            className="text-lg font-extrabold tracking-tight"
+          >
+            {t("transactions")}
+          </h2>
+          <ul className="mt-3 divide-y divide-line">
+            {txRows.map((row) => {
+              const amount = row.coins_amount ?? 0;
+              return (
+                <li
+                  key={row.id}
+                  className="flex items-center justify-between gap-3 py-2.5 text-sm"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{row.title}</p>
+                    <p className="text-xs text-muted">
+                      {new Date(row.created_at).toLocaleString(locale, {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
+                    </p>
+                  </div>
+                  <span
+                    dir="ltr"
+                    className={`inline-flex shrink-0 items-center gap-1.5 font-bold ${
+                      amount < 0 ? "text-danger" : "text-success"
+                    }`}
+                  >
+                    {amount < 0 ? "−" : "+"}
+                    {new Intl.NumberFormat(locale).format(Math.abs(amount))}
+                    <Coin size={14} />
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       {/* Best rounds — same owner tile row as the profile's, fed by the
           per-player aggregate view (0055) and the record-break RPC (0056). */}

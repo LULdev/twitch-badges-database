@@ -351,7 +351,8 @@
     "emptyOwned": "Nenhuma insígnia sincronizada ainda.",
     "emptyMissing": "Nada faltando — incrível!",
     "channelNote": "Insígnias específicas de canal (ex.: seus próprios níveis de inscrito) são contadas, mas não fazem parte do catálogo global.",
-    "moreHidden": "+{count} mais — ordenadas por raridade"
+    "moreHidden": "+{count} mais — ordenadas por raridade",
+    "transactions": "Transações recentes"
   },
   "blog": {
     "title": "Blog de Insígnias da Twitch",
@@ -1308,7 +1309,7 @@
       "devices": "Dispositivos",
       "browsers": "Navegadores",
       "topPaths": "Páginas mais vistas",
-    "recapRefs": "Cliques dos resumos",
+      "recapRefs": "Cliques dos resumos",
       "referrers": "Origens",
       "locales": "Idiomas",
       "privacy": "Tempo médio na página: {avg} s. Contado sem endereços IP, cookies ou URLs de referência completas."

@@ -351,7 +351,8 @@
     "emptyOwned": "尚未同步任何徽章。",
     "emptyMissing": "一个不缺——太惊人了！",
     "channelNote": "频道专属徽章（例如你自己的订阅等级）会被计数，但不属于全球目录。",
-    "moreHidden": "还有 {count} 枚——按稀有度排序"
+    "moreHidden": "还有 {count} 枚——按稀有度排序",
+    "transactions": "最近交易"
   },
   "blog": {
     "title": "Twitch 徽章博客",
@@ -1308,7 +1309,7 @@
       "devices": "设备",
       "browsers": "浏览器",
       "topPaths": "访问最多的页面",
-    "recapRefs": "回顾点击",
+      "recapRefs": "回顾点击",
       "referrers": "来源",
       "locales": "语言",
       "privacy": "页面平均停留：{avg} 秒。统计不使用 IP 地址、Cookie 或完整来源网址。"
