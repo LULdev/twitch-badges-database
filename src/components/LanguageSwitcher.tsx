@@ -11,6 +11,7 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { localeNames, routing, type Locale } from "@/i18n/routing";
+import { suppressLangHint } from "@/i18n/lang-hint";
 
 /**
  * Circular flag icon per locale (64×64, transparent corners) from
@@ -125,6 +126,9 @@ export default function LanguageSwitcher() {
     setOpen(false);
     triggerRef.current?.focus();
     if (next === locale) return;
+    // An explicit switch is a made choice: the first-visit language hint chip
+    // must never re-offer a language to someone who just picked one.
+    suppressLangHint();
     startTransition(() => {
       // Preserve the current query string: switching the language used to drop
       // active filters, the page number and the compare selection.

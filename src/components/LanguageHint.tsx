@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
-
-const DISMISS_KEY = "lang-hint-dismissed";
+import { LANG_HINT_DISMISS_KEY, suppressLangHint } from "@/i18n/lang-hint";
 
 /**
  * First-visit language hint. The layout computes the visitor's
@@ -39,7 +38,7 @@ export default function LanguageHint({
   useEffect(() => {
     const id = requestAnimationFrame(() => {
       try {
-        if (localStorage.getItem(DISMISS_KEY) !== "1") setVisible(true);
+        if (localStorage.getItem(LANG_HINT_DISMISS_KEY) !== "1") setVisible(true);
       } catch {
         setVisible(true);
       }
@@ -65,6 +64,9 @@ export default function LanguageHint({
           href={query ? `${barePath}?${query}` : barePath}
           locale={target}
           data-lang-hint-link
+          // Following the switch is an explicit language choice: suppress the
+          // chip everywhere, exactly like the dismiss button does.
+          onClick={suppressLangHint}
           className="chip shrink-0 font-semibold text-accent"
         >
           {langName}
@@ -73,11 +75,7 @@ export default function LanguageHint({
           type="button"
           data-lang-hint-dismiss
           onClick={() => {
-            try {
-              localStorage.setItem(DISMISS_KEY, "1");
-            } catch {
-              // private mode — the chip still hides for this page view
-            }
+            suppressLangHint();
             setVisible(false);
           }}
           aria-label={dismissLabel}
