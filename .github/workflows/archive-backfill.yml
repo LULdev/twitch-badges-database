@@ -13,13 +13,17 @@ name: Archive backfill retry
 # responds reliably again this job recovers the remaining history without a
 # human remembering the pass exists.
 #
-# WHAT IT WILL ALSO SETTLE: whether the sources are archived at all. badgebase.de
-# returned zero captures even for its homepage (raw CDX), so that side may be
-# permanently starved; potat.app IS archived (root captures since 2023) and its
-# badge pages are live at potat.app/badges/{set_id}, but whether /badges/* was
-# historically captured is still open. If capturesFound stays 0 across several
-# weekly runs, the feature is proven starved and should be retired, not
-# rescheduled.
+# WHAT THE SOURCES ACTUALLY HOLD — measured on 2026-10-04 against the live CDX:
+# potat.app/badges/* has ZERO captures, and the pages are 484-byte SPA shells
+# anyway (owner counts are fetched client-side from api.potat.app), so nothing
+# there is parseable regardless. badgebase.de IS archived and its detail pages
+# ARE server-rendered — but its first detail mementos start 2026-09-02, INSIDE
+# the window this site has measured itself since 2025, so the engine's
+# strictly-earlier-than-measured invariant skips every capture that exists
+# today. The only residual yield is a narrow race: a badgebase capture landing
+# between a new badge's page creation and this site's first measurement (hours
+# to days). If Monday runs confirm capturesRecovered stays 0, the feature is
+# proven starved and should be retired rather than rescheduled.
 on:
   schedule:
     # Mondays, offset minute away from the Vercel crons (06:00/06:30) and the
