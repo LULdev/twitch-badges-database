@@ -297,7 +297,14 @@ html {
   }
   .btn-secondary:hover:not(:disabled) {
     transform: translateY(-1px);
-    background-color: var(--surface-2);
+    /* The rest state paints an opaque gradient, so a background-color change
+       would sit behind it and never render. Lift the ramp itself instead. */
+    background-image: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-2) 80%, white) 0%,
+      color-mix(in srgb, var(--surface) 96%, white) 58%,
+      color-mix(in srgb, var(--surface) 90%, black) 100%
+    );
     border-color: var(--line-strong);
     box-shadow:
       0 1px 0 0 color-mix(in srgb, white 13%, transparent) inset,
