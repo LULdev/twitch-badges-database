@@ -105,7 +105,7 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
           <span className={`size-2 rounded-full ${paused ? "bg-muted" : "animate-pulse bg-success"}`} aria-hidden />
           {paused ? t("paused") : t("live")}
         </p>
-        <button type="button" onClick={() => setPaused((prev) => !prev)} className="btn btn-ghost text-xs">
+        <button type="button" onClick={() => setPaused((prev) => !prev)} className="btn btn-ghost btn-sm text-xs">
           {paused ? t("resume") : t("pause")}
         </button>
       </div>

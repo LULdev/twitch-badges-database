@@ -183,7 +183,12 @@ html {
     background-color: var(--surface);
     border: 1px solid var(--line);
     border-radius: var(--radius-card);
-    box-shadow: var(--shadow-card);
+    /* The same lit-top-rim construction the buttons use, at card scale. Cards
+       sit directly beside the pill buttons, so without this they read as a
+       different, older generation of surface. */
+    box-shadow:
+      var(--shadow-card),
+      0 1px 0 0 color-mix(in srgb, white 5%, transparent) inset;
   }
 
   .card-interactive {
@@ -196,7 +201,9 @@ html {
   .card-interactive:hover {
     transform: translateY(-2px);
     border-color: var(--line-strong);
-    box-shadow: var(--shadow-lift);
+    box-shadow:
+      var(--shadow-lift),
+      0 1px 0 0 color-mix(in srgb, white 9%, transparent) inset;
   }
 
   .btn {
@@ -335,6 +342,15 @@ html {
     letter-spacing: 0.01em;
   }
 
+  /* Compact pill for chrome (header, inline toolbars). Exists so the small
+     sizes come from the same family as .btn-lg instead of being typed as
+     padding overrides at each call site. */
+  .btn-sm {
+    border-radius: var(--radius-btn);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
   /* Lift is motion, not decoration — drop it when the reader asks for less. */
   @media (prefers-reduced-motion: reduce) {
     .btn-primary:hover:not(:disabled),
@@ -357,21 +373,30 @@ html {
     letter-spacing: 0.04em;
     color: var(--muted);
     background-color: transparent;
+    /* The chip is a pill at 11px, so it takes the button family's lit rim
+       rather than a full gradient — at this size a gradient would only muddy
+       the label. */
+    box-shadow: 0 1px 0 0 color-mix(in srgb, white 7%, transparent) inset;
     transition:
       background-color 180ms ease-out,
       border-color 180ms ease-out,
-      color 180ms ease-out;
+      color 180ms ease-out,
+      box-shadow 200ms ease-out;
     cursor: pointer;
     white-space: nowrap;
   }
   .chip:hover {
     color: var(--foreground);
     border-color: var(--line-strong);
+    background-color: color-mix(in srgb, var(--surface-2) 70%, transparent);
   }
   .chip-active {
     color: var(--foreground);
     border-color: color-mix(in srgb, var(--accent) 55%, transparent);
     background-color: var(--accent-soft);
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, var(--accent) 26%, transparent) inset,
+      0 2px 6px -4px color-mix(in srgb, var(--accent) 40%, transparent);
   }
   .chip-active:hover {
     color: var(--foreground);

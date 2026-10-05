@@ -42,6 +42,52 @@ async function shoot(page: Page, selector: string, name: string) {
 }
 
 /** Hover / focus / press, driven through real input rather than re-declared CSS. */
+/**
+ * The surfaces that sit beside the buttons — chips, cards, feed rows, header
+ * chrome. These are what made the button family look bolted on: the pills were
+ * raised while everything next to them was flat.
+ */
+const SURFACES = `
+<div id="shot-surfaces" style="position:fixed;inset:0;z-index:2147483647;overflow:auto;background:var(--background);padding:40px;font-family:inherit;">
+  <h2 style="font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px">Neighbouring surfaces</h2>
+  <p style="font-size:12px;color:var(--muted);margin:0 0 26px">Chips, cards and feed rows now share the lit-top-rim construction</p>
+
+  <p style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px">Chips</p>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px">
+    <span class="chip">Common</span>
+    <span class="chip chip-active">Active</span>
+    <span class="chip chip-danger">Expired</span>
+    <span class="chip">Rarity: rare</span>
+    <a class="chip" href="#">Clickable chip</a>
+  </div>
+
+  <p style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px">Cards</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px">
+    <div class="card p-4"><p style="font-size:13px;font-weight:700;margin:0">Static card</p><p style="font-size:12px;color:var(--muted);margin:4px 0 0">Flat surface with a lit rim</p></div>
+    <div class="card card-interactive p-4"><p style="font-size:13px;font-weight:700;margin:0">Interactive card</p><p style="font-size:12px;color:var(--muted);margin:4px 0 0">Lifts 2px on hover</p></div>
+    <div class="card p-4" style="border-color:color-mix(in srgb, var(--accent) 55%, transparent)"><p style="font-size:13px;font-weight:700;margin:0">Accent card</p><p style="font-size:12px;color:var(--muted);margin:4px 0 0">Feed big-win variant</p></div>
+  </div>
+
+  <p style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px">Feed row</p>
+  <ol class="card flex items-start gap-3 p-3.5" style="margin:0 0 28px">
+    <span class="bcoin bcoin-b" style="margin-top:.3125rem"></span>
+    <div class="min-w-0 flex-1">
+      <p style="font-size:14px;margin:0;line-height:1.4"><b>someone</b> hit a big win</p>
+      <p style="font-size:12px;color:var(--muted);margin:2px 0 0">Feed rows are cards — same rim, no separate treatment needed</p>
+    </div>
+  </ol>
+
+  <p style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px">Sizes</p>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+    <button class="btn btn-primary btn-sm">btn-sm</button>
+    <button class="btn btn-primary">default</button>
+    <button class="btn btn-primary btn-lg">btn-lg</button>
+    <button class="btn btn-secondary btn-sm">btn-sm</button>
+    <button class="btn btn-secondary">default</button>
+    <button class="btn btn-secondary btn-lg">btn-lg</button>
+  </div>
+</div>`;
+
 async function shootStates(page: Page) {
   const shell = `#shot-bar{position:fixed;left:40px;top:150px;z-index:2147483647;background:var(--surface);padding:26px 30px;border-radius:var(--radius-card);border:1px solid var(--line)}#shot-bar .row{display:flex;gap:22px;align-items:flex-start;margin-bottom:18px}#shot-bar .cap{font-size:10px;color:var(--muted);text-align:center;margin-top:9px}#shot-bar h2{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 18px}`;
   await page.evaluate(
@@ -112,6 +158,25 @@ async function main() {
   await page.evaluate((html) => document.body.insertAdjacentHTML("beforeend", html), PANEL);
   await page.waitForTimeout(250);
   await shoot(page, "#shot-panel", "15-buttons-light");
+
+  // Neighbouring surfaces: the reason the pills looked bolted on.
+  await page.evaluate(() => document.documentElement.classList.remove("light"));
+  await page.evaluate(() => document.getElementById("shot-panel")?.remove());
+  await page.evaluate((html) => document.body.insertAdjacentHTML("beforeend", html), SURFACES);
+  await page.waitForTimeout(250);
+  await shoot(page, "#shot-surfaces", "16-surfaces-dark");
+  await page.locator("#shot-surfaces .card-interactive").first().hover();
+  await page.waitForTimeout(320);
+  await shoot(page, "#shot-surfaces", "17-surfaces-card-hover");
+  await page.evaluate(() => document.getElementById("shot-surfaces")?.remove());
+
+  // Header chrome: the compact pill and the ghost menu button in situ. Scoped to
+// the sticky banner — badge pages also render a semantic <header> inside the
+// hero, and a bare `header` selector matches both.
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(200);
+  const banner = page.locator("header.sticky").first();
+  if (await banner.count()) await shoot(page, "header.sticky", "18-header-ctas");
 
   await browser.close();
   console.log("done");
