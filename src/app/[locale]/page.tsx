@@ -143,11 +143,8 @@ export default async function HomePage({
               </p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
                 {/* Login is the primary action — the copy above sells it. */}
-                <TwitchLoginButton
-                  label={t("ctaLogin")}
-                  className="btn btn-primary px-6 py-3 text-sm"
-                />
-                <Link href="/badges" className="btn btn-secondary px-6 py-3 text-sm">
+                <TwitchLoginButton label={t("ctaLogin")} className="btn btn-primary btn-lg" />
+                <Link href="/badges" className="btn btn-secondary btn-lg">
                   {t("ctaExplore")}
                 </Link>
               </div>

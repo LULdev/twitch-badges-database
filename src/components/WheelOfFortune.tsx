@@ -382,7 +382,7 @@ export default function WheelOfFortune() {
           onClick={spin}
           disabled={locked}
           aria-disabled={locked}
-          className="btn btn-primary px-10 py-3 text-base"
+          className="btn btn-primary btn-lg text-base"
         >
           {busy ? t("spinning") : usedToday ? t("already") : t("spin")}
         </button>

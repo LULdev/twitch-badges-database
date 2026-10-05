@@ -67,7 +67,7 @@ export default function DailyClaim({ compact = false }: { compact?: boolean }) {
         type="button"
         onClick={claim}
         disabled={state === "busy" || state === "done" || state === "already"}
-        className="btn btn-primary px-8"
+        className="btn btn-primary btn-lg"
       >
         {state === "busy" ? "…" : state === "done" || state === "already" ? `✓ ${t("dailyDone")}` : t("dailyClaim")}
       </button>
