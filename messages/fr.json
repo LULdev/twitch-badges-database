@@ -744,7 +744,7 @@
     "level": "Level",
     "wheelLink": "Roue de la fortune",
     "loginRequired": "Connecte-toi avec Twitch pour jouer — tes BadgesCoins et ton XP t'attendent.",
-    "wallWonWeek": "Les joueurs ont gagné {won} BadgesCoins ici cette semaine.",
+    "wallWonWeek": "Les joueurs ont gagné {won, number} BadgesCoins ici cette semaine.",
     "howToPlay": "Comment jouer",
     "blackjackHint": "Choisissez le score auquel vous vous arrêtez, puis distribuez — battez la main du croupier sans dépasser 21.",
     "coinflipHint": "Choisissez pile ou face et le nombre de lancers de suite que vous osez — chaque lancer double le gain, une erreur perd la manche.",

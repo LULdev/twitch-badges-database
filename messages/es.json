@@ -744,7 +744,7 @@
     "level": "Level",
     "wheelLink": "Ruleta de la fortuna",
     "loginRequired": "Inicia sesión con Twitch para jugar — tus BadgesCoins y XP te esperan.",
-    "wallWonWeek": "Los jugadores han ganado {won} BadgesCoins aquí esta semana.",
+    "wallWonWeek": "Los jugadores han ganado {won, number} BadgesCoins aquí esta semana.",
     "howToPlay": "Cómo se juega",
     "blackjackHint": "Fija la puntuación en la que te plantas y reparte — gana a la mano del crupier sin pasarte de 21.",
     "coinflipHint": "Elige cara o cruz y cuántos lanzamientos seguidos te atreves a acertar — cada lanzamiento extra duplica el pago, un fallo pierde la ronda.",

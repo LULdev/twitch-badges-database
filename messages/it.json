@@ -744,7 +744,7 @@
     "level": "Level",
     "wheelLink": "Ruota della fortuna",
     "loginRequired": "Accedi con Twitch per giocare — i tuoi BadgesCoins e XP ti aspettano.",
-    "wallWonWeek": "I giocatori hanno vinto {won} BadgesCoins qui questa settimana.",
+    "wallWonWeek": "I giocatori hanno vinto {won, number} BadgesCoins qui questa settimana.",
     "howToPlay": "Come si gioca",
     "blackjackHint": "Imposta il punteggio a cui ti fermi e distribuisci — batte la mano del banco senza superare 21.",
     "coinflipHint": "Scegli testa o croce e quanti lanci di fila osi indovinare — ogni lancio in più raddoppia il premio, un errore perde il round.",

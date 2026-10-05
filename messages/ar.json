@@ -744,7 +744,7 @@
     "level": "Level",
     "wheelLink": "عجلة الحظ",
     "loginRequired": "سجّل الدخول عبر Twitch للعب — BadgesCoins وXP في انتظارك.",
-    "wallWonWeek": "ربح اللاعبون {won} من عملات BadgesCoins هنا هذا الأسبوع.",
+    "wallWonWeek": "ربح اللاعبون {won, number} من عملات BadgesCoins هنا هذا الأسبوع.",
     "howToPlay": "كيفية اللعب",
     "blackjackHint": "حدد النقاط التي ستقف عندها ثم وزّع — اهزم يد الموزع دون تجاوز 21.",
     "coinflipHint": "اختر صورة أو كتابة وعدد الرميات المتتالية الذي تجرؤ عليه — كل رمية إضافية تضاعف الربح، وخطأ واحد يخسر الجولة.",

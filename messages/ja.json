@@ -744,7 +744,7 @@
     "level": "Level",
     "wheelLink": "フォーチュンホイール",
     "loginRequired": "Twitchでログインしてプレイ — BadgesCoinsとXPが待っています。",
-    "wallWonWeek": "今週、プレイヤーはここで {won} BadgesCoins を獲得しました。",
+    "wallWonWeek": "今週、プレイヤーはここで {won, number} BadgesCoins を獲得しました。",
     "howToPlay": "遊び方",
     "blackjackHint": "スタンドするスコアを決めてディール — 21を超えずにディーラーの手に勝ちましょう。",
     "coinflipHint": "表か裏か、何連続で当てるかを選択 — 1回追加するごとに配当が2倍、1回外すとそのラウンドは負けです。",

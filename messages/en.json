@@ -744,7 +744,7 @@
     "level": "Level",
     "wheelLink": "Wheel of Fortune",
     "loginRequired": "Log in with Twitch to play — your BadgesCoins and XP are waiting.",
-    "wallWonWeek": "Players have won {won} BadgesCoins here this week.",
+    "wallWonWeek": "Players have won {won, number} BadgesCoins here this week.",
     "howToPlay": "How to play",
     "blackjackHint": "Set the score you stand at, then deal — beat the dealer's hand without going over 21.",
     "coinflipHint": "Pick heads or tails and how many flips in a row you dare call — every extra flip doubles the payout, one miss loses the round.",
