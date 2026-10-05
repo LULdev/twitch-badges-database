@@ -148,7 +148,7 @@ export default async function BlogIndexPage({
           </div>
         )}
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- API route serving XML, not a page */}
-        <a href="/api/blog/rss" className="btn btn-secondary text-xs" title={t("rss")}>
+        <a href="/api/blog/rss" className="btn btn-secondary btn-sm" title={t("rss")}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
             <circle cx="6.5" cy="17.5" r="2.5" />
             <path d="M4 4a16 16 0 0 1 16 16h-3A13 13 0 0 0 4 7z" />
@@ -228,7 +228,7 @@ export default async function BlogIndexPage({
               <p className="mt-2 text-xs text-muted">
                 {t("published", { date: fmtDate(featured.published_at) })}
               </p>
-              <Link href={`/blog/${featured.slug}`} className="btn btn-primary mt-4 text-sm">
+              <Link href={`/blog/${featured.slug}`} className="btn btn-primary mt-4 btn-md">
                 {t("readMore")}
               </Link>
             </div>

@@ -272,7 +272,7 @@ export default function FilterBar({
         {(current.q || params.get("price") || params.get("category") || params.get("rarity") || (!statusLocked && params.get("status"))) && (
           <button
             type="button"
-            className="btn btn-ghost text-xs"
+            className="btn btn-ghost btn-sm"
             onClick={() =>
               navigate({ q: null, price: null, category: null, rarity: null, status: null })
             }

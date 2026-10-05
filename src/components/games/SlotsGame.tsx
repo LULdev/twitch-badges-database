@@ -118,7 +118,7 @@ export default function SlotsGame() {
             type="button"
             disabled={busy || spinning || symbols.length === 0}
             onClick={spin}
-            className="btn btn-primary w-full py-3 text-base"
+            className="btn btn-primary btn-lg w-full"
           >
             {spinning ? t("spinning") : (<span>{t("spin")} (<span className="inline-flex items-center gap-1">{bet.toLocaleString(locale)} <Coin size={14} /></span>)</span>)}
           </button>

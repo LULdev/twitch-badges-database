@@ -104,7 +104,7 @@ export default function AuditPanel({ locale }: { locale: string }) {
                       {entry.payload ? (
                         <button
                           type="button"
-                          className="btn px-2 py-1 text-[0.6875rem]"
+                          className="btn btn-xs"
                           onClick={() => setOpen(open === entry.id ? null : entry.id)}
                         >
                           {open === entry.id ? t("hide") : t("details")}

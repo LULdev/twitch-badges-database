@@ -79,7 +79,7 @@ export default function StealPanel({
       <p className="text-xs text-muted">
         {t("hint", { price: price.toLocaleString(locale), max: maxAmount.toLocaleString(locale) })}
       </p>
-      <button type="button" onClick={attempt} disabled={state === "busy"} className="btn btn-danger w-full text-xs">
+      <button type="button" onClick={attempt} disabled={state === "busy"} className="btn btn-danger btn-sm w-full">
         {state === "busy" ? "…" : t("attempt")}
       </button>
       {result && <p className="text-xs font-semibold text-muted">{result}</p>}

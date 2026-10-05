@@ -91,7 +91,7 @@ export default function QuizGame({ badges }: { badges: QuizBadge[] }) {
                   type="button"
                   onClick={() => answer(option)}
                   disabled={choice !== null}
-                  className={`btn text-sm ${
+                  className={`btn btn-md ${
                     choice === null
                       ? "btn-secondary"
                       : option === round[index].badge.title
@@ -107,7 +107,7 @@ export default function QuizGame({ badges }: { badges: QuizBadge[] }) {
             </div>
           </>
         ) : (
-          <button type="button" onClick={startRound} disabled={busy} className="btn btn-primary w-full">
+          <button type="button" onClick={startRound} disabled={busy} className="btn btn-primary btn-lg w-full">
             {t("start")}
           </button>
         )}

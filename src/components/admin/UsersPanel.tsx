@@ -381,7 +381,7 @@ function UserForm({
           {detail.profile.username}
           <span className="ms-2 text-xs font-normal text-muted">{id}</span>
         </h2>
-        <button type="button" className="btn btn-ghost px-3 py-1.5 text-xs" onClick={onClose}>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>
           {t("close")}
         </button>
       </div>
@@ -480,7 +480,7 @@ function UserForm({
         </div>
         <button
           type="button"
-          className="btn btn-primary px-3 py-1.5 text-xs"
+          className="btn btn-primary btn-sm"
           disabled={busy}
           onClick={() => void act({ action: "update", userId: id, patch: fields }, "saved")}
         >
@@ -517,7 +517,7 @@ function UserForm({
         </div>
         <button
           type="button"
-          className="btn btn-primary px-3 py-1.5 text-xs"
+          className="btn btn-primary btn-sm"
           disabled={busy}
           onClick={() =>
             void act(
@@ -552,7 +552,7 @@ function UserForm({
           </select>
           <button
             type="button"
-            className="btn px-3 py-1.5 text-xs"
+            className="btn btn-sm"
             disabled={busy}
             onClick={() => void act({ action: "role", userId: id, role }, "roleSaved")}
           >
@@ -594,7 +594,7 @@ function UserForm({
           </label>
           <button
             type="button"
-            className="btn px-3 py-1.5 text-xs"
+            className="btn btn-sm"
             disabled={busy}
             onClick={() => {
               // 0 is the explicit "permanent" sentinel (the hint below says so) and
@@ -621,7 +621,7 @@ function UserForm({
           </button>
           <button
             type="button"
-            className="btn btn-ghost px-3 py-1.5 text-xs"
+            className="btn btn-ghost btn-sm"
             disabled={busy}
             onClick={() => void act({ action: "unban", userId: id }, "ban.removed")}
           >
@@ -645,7 +645,7 @@ function UserForm({
                 </span>
                 <button
                   type="button"
-                  className={`btn px-2 py-0.5 text-[0.6875rem] ${has ? "btn-ghost" : "btn-primary"}`}
+                  className={`btn btn-xs ${has ? "btn-ghost" : "btn-primary"}`}
                   disabled={busy}
                   onClick={() =>
                     void act(
@@ -671,7 +671,7 @@ function UserForm({
         <h3 className="text-sm font-bold text-danger">{t("danger.title")}</h3>
         <button
           type="button"
-          className="btn px-3 py-1.5 text-xs text-danger"
+          className="btn btn-sm text-danger"
           disabled={busy}
           onClick={() => {
             if (window.confirm(t("danger.confirm", { username: detail.profile.username }))) {

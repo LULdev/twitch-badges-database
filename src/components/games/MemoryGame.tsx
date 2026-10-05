@@ -124,12 +124,12 @@ export default function MemoryGame() {
           ))}
         </div>
         {!started && cards.length === 0 && (
-          <button type="button" onClick={start} disabled={busy} className="btn btn-primary w-full">
+          <button type="button" onClick={start} disabled={busy} className="btn btn-primary btn-lg w-full">
             {t("start")}
           </button>
         )}
         {!started && cards.length > 0 && (
-          <button type="button" onClick={start} disabled={busy} className="btn btn-secondary w-full">
+          <button type="button" onClick={start} disabled={busy} className="btn btn-secondary btn-lg w-full">
             {t("again")}
           </button>
         )}

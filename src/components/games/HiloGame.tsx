@@ -64,10 +64,10 @@ export default function HiloGame() {
         )}
         <NewBestMoment show={state.record === true} />
         <div className="flex justify-center gap-3">
-          <button type="button" disabled={busy} onClick={() => guess("higher")} className="btn btn-primary px-8">
+          <button type="button" disabled={busy} onClick={() => guess("higher")} className="btn btn-primary btn-lg">
             ▲ {t("higher")}
           </button>
-          <button type="button" disabled={busy} onClick={() => guess("lower")} className="btn btn-secondary px-8">
+          <button type="button" disabled={busy} onClick={() => guess("lower")} className="btn btn-secondary btn-lg">
             ▼ {t("lower")}
           </button>
         </div>

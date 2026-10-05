@@ -132,7 +132,7 @@ export default function NewsletterPanel() {
 
       <button
         type="button"
-        className="btn btn-primary px-3 py-1.5 text-xs"
+        className="btn btn-primary btn-sm"
         onClick={() =>
           setEditing({
             subject: "",
@@ -176,7 +176,7 @@ export default function NewsletterPanel() {
                   <td className="text-end">
                     <button
                       type="button"
-                      className="btn px-2 py-1 text-[0.6875rem]"
+                      className="btn btn-xs"
                       onClick={() =>
                         setEditing({ id: draft.id, subject: draft.subject, body: draft.body, channel: draft.channel })
                       }
@@ -224,7 +224,7 @@ export default function NewsletterPanel() {
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              className="btn btn-primary px-3 py-1.5 text-xs"
+              className="btn btn-primary btn-sm"
               disabled={busy}
               onClick={async () => {
                 if (await post({ action: "save", ...editing }, "saved")) setEditing(null);
@@ -235,7 +235,7 @@ export default function NewsletterPanel() {
             {editing.id !== undefined ? (
               <button
                 type="button"
-                className="btn px-3 py-1.5 text-xs"
+                className="btn btn-sm"
                 disabled={busy}
                 onClick={async () => {
                   if (!window.confirm(t("confirmSend"))) return;
@@ -245,13 +245,13 @@ export default function NewsletterPanel() {
                 {t("send")}
               </button>
             ) : null}
-            <button type="button" className="btn btn-ghost px-3 py-1.5 text-xs" onClick={() => setEditing(null)}>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditing(null)}>
               {t("cancel")}
             </button>
             {editing.id !== undefined ? (
               <button
                 type="button"
-                className="btn px-3 py-1.5 text-xs text-danger"
+                className="btn btn-sm text-danger"
                 disabled={busy}
                 onClick={async () => {
                   if (!window.confirm(t("confirmDelete"))) return;

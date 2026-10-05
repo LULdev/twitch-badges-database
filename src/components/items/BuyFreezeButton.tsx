@@ -66,7 +66,7 @@ export default function BuyFreezeButton({
     <span className="inline-flex flex-col items-center gap-1 sm:items-start">
       <button
         type="button"
-        className="btn btn-primary text-xs"
+        className="btn btn-primary btn-sm"
         onClick={buy}
         disabled={busy || !canAfford}
       >

@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/browser";
 
 export default function TwitchLoginButton({
   label,
-  className = "btn btn-primary btn-lg font-semibold",
+  className = "btn btn-primary btn-lg",
 }: {
   label?: string;
   className?: string;

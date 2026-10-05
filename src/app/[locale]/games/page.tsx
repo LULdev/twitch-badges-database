@@ -146,7 +146,7 @@ export default async function GamesHubPage({
         </div>
         <div className="flex shrink-0 flex-col items-center gap-2">
           <DailyClaim compact />
-          <Link href="/wheel" className="btn btn-primary text-xs">
+          <Link href="/wheel" className="btn btn-primary btn-sm">
             <GameIcon id="wheel" size={14} />
             {t("wheelLink")}
           </Link>
@@ -191,13 +191,13 @@ export default async function GamesHubPage({
         <div className="card flex flex-wrap items-center justify-between gap-3 p-4 text-sm text-muted">
           <span>{t("recapNext", { time: "06:00" })}</span>
           <div className="flex shrink-0 items-center gap-2">
-            <Link href="/blog?tag=arcade" className="btn btn-secondary text-xs shrink-0">
+            <Link href="/blog?tag=arcade" className="btn btn-secondary btn-sm shrink-0">
               {t("recapAll")}
             </Link>
             {latestRecap && (
               <Link
                 href={`/blog/${latestRecap.slug}`}
-                className="btn btn-secondary text-xs shrink-0"
+                className="btn btn-secondary btn-sm shrink-0"
               >
                 {t("recapLatest")}
                 <span className="dir-arrow" aria-hidden="true">→</span>

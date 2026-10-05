@@ -41,7 +41,7 @@ export default function Pagination({
       aria-label={t("page", { page, pages })}
     >
       {page > 1 ? (
-        <Link href={href(page - 1)} className="btn btn-secondary text-xs">
+        <Link href={href(page - 1)} className="btn btn-secondary btn-sm">
           <span className="dir-arrow" aria-hidden>←</span> {t("prev")}
         </Link>
       ) : null}
@@ -52,7 +52,7 @@ export default function Pagination({
           )}
           <Link
             href={href(p)}
-            className={`btn text-xs ${p === page ? "btn-primary" : "btn-ghost"}`}
+            className={`btn btn-sm ${p === page ? "btn-primary" : "btn-ghost"}`}
             aria-current={p === page ? "page" : undefined}
           >
             {p}
@@ -60,7 +60,7 @@ export default function Pagination({
         </span>
       ))}
       {page < pages ? (
-        <Link href={href(page + 1)} className="btn btn-secondary text-xs">
+        <Link href={href(page + 1)} className="btn btn-secondary btn-sm">
           {t("next")} <span className="dir-arrow" aria-hidden>→</span>
         </Link>
       ) : null}

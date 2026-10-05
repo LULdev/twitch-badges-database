@@ -65,7 +65,7 @@ export default function StatusPanel({ locale }: { locale: string }) {
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-sm font-bold">{t("title")}</h2>
-        <button type="button" className="btn px-3 py-1.5 text-xs" onClick={() => void load()} disabled={busy}>
+        <button type="button" className="btn btn-sm" onClick={() => void load()} disabled={busy}>
           {busy ? t("probing") : t("reprobe")}
         </button>
       </div>

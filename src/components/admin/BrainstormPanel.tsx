@@ -96,7 +96,7 @@ export default function BrainstormPanel() {
         </label>
         <button
           type="button"
-          className="btn btn-primary px-3 py-1.5 text-xs"
+          className="btn btn-primary btn-sm"
           onClick={() => setEditing({ category: "profile", title: "", body: "", status: "idea" })}
         >
           {t("new")}
@@ -114,7 +114,7 @@ export default function BrainstormPanel() {
               <div className="flex flex-col items-center gap-0.5">
                 <button
                   type="button"
-                  className="btn px-2 py-0.5 text-[0.6875rem]"
+                  className="btn btn-xs"
                   disabled={busy}
                   aria-label={t("upvote")}
                   onClick={() => void post({ action: "vote", id: idea.id, up: true })}
@@ -124,7 +124,7 @@ export default function BrainstormPanel() {
                 <span className="text-sm font-bold">{idea.votes}</span>
                 <button
                   type="button"
-                  className="btn px-2 py-0.5 text-[0.6875rem]"
+                  className="btn btn-xs"
                   disabled={busy}
                   aria-label={t("downvote")}
                   onClick={() => void post({ action: "vote", id: idea.id, up: false })}
@@ -146,7 +146,7 @@ export default function BrainstormPanel() {
               <div className="flex gap-1">
                 <button
                   type="button"
-                  className="btn px-2 py-1 text-[0.6875rem]"
+                  className="btn btn-xs"
                   onClick={() =>
                     setEditing({ id: idea.id, category: idea.category, title: idea.title, body: idea.body, status: idea.status })
                   }
@@ -155,7 +155,7 @@ export default function BrainstormPanel() {
                 </button>
                 <button
                   type="button"
-                  className="btn px-2 py-1 text-[0.6875rem] text-danger"
+                  className="btn btn-xs text-danger"
                   disabled={busy}
                   onClick={async () => {
                     if (window.confirm(t("confirmDelete"))) await post({ action: "delete", id: idea.id }, "deleted");
@@ -204,7 +204,7 @@ export default function BrainstormPanel() {
           <div className="flex gap-2">
             <button
               type="button"
-              className="btn btn-primary px-3 py-1.5 text-xs"
+              className="btn btn-primary btn-sm"
               disabled={busy}
               onClick={async () => {
                 if (await post({ action: "save", id: editing.id, input: editing }, "saved")) setEditing(null);
@@ -212,7 +212,7 @@ export default function BrainstormPanel() {
             >
               {t("save")}
             </button>
-            <button type="button" className="btn btn-ghost px-3 py-1.5 text-xs" onClick={() => setEditing(null)}>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditing(null)}>
               {t("cancel")}
             </button>
           </div>

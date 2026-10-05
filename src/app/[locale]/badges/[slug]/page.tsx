@@ -398,7 +398,7 @@ export default async function BadgeDetailPage({ params }: PageProps) {
           href={badge.click_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="btn btn-secondary text-xs"
+          className="btn btn-secondary btn-sm"
         >
           {t("openOnTwitch")}
           <span className="dir-arrow" aria-hidden="true">→</span>

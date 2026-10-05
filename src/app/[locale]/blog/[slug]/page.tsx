@@ -257,7 +257,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                 })}
               </span>
             </div>
-            <Link href={`/badges/${badge.slug}`} className="btn btn-primary text-xs">
+            <Link href={`/badges/${badge.slug}`} className="btn btn-primary btn-sm">
               {t("widgetOpen")}
             </Link>
           </div>

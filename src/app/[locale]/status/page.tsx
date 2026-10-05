@@ -330,7 +330,7 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
           <div className="chart-title">{t("incidents")}</div>
           <div className="chart-sub">{t("incidentsSub")}</div>
         </div>
-        <Link href="/changelog?kind=bugfix" className="btn btn-secondary text-xs">
+        <Link href="/changelog?kind=bugfix" className="btn btn-secondary btn-sm">
           {t("viewChangelog")}
         </Link>
       </div>

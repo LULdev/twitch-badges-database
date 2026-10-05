@@ -92,7 +92,7 @@ export default function TowerGame() {
             className="mt-2 w-full accent-[var(--accent)]"
           />
         </label>
-        <button type="button" disabled={busy} onClick={climb} className="btn btn-primary w-full">
+        <button type="button" disabled={busy} onClick={climb} className="btn btn-primary btn-lg w-full">
           {t("climb")}
         </button>
         {last && (

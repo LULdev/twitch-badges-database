@@ -158,7 +158,7 @@ export default function ShootGame() {
         ))}
         {!running && (
           <div className="absolute inset-0 grid place-items-center">
-            <button type="button" onClick={start} disabled={busy} className="btn btn-primary px-8 py-3">
+            <button type="button" onClick={start} disabled={busy} className="btn btn-primary btn-lg">
               {t("start")}
             </button>
           </div>

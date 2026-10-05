@@ -155,7 +155,7 @@ export default function SettingsPanel() {
             </label>
           ))}
         </div>
-        <button type="button" className="btn btn-primary px-3 py-1.5 text-xs" disabled={busy} onClick={() => void save("features", data.features)}>
+        <button type="button" className="btn btn-primary btn-sm" disabled={busy} onClick={() => void save("features", data.features)}>
           {t("save")}
         </button>
       </section>
@@ -189,7 +189,7 @@ export default function SettingsPanel() {
             </label>
           ))}
         </div>
-        <button type="button" className="btn btn-primary px-3 py-1.5 text-xs" disabled={busy} onClick={() => void save("economy", data.economy)}>
+        <button type="button" className="btn btn-primary btn-sm" disabled={busy} onClick={() => void save("economy", data.economy)}>
           {t("save")}
         </button>
       </section>
@@ -292,7 +292,7 @@ export default function SettingsPanel() {
             </tbody>
           </table>
         </div>
-        <button type="button" className="btn btn-primary px-3 py-1.5 text-xs" disabled={busy} onClick={() => void save("games", data.games)}>
+        <button type="button" className="btn btn-primary btn-sm" disabled={busy} onClick={() => void save("games", data.games)}>
           {t("save")}
         </button>
       </section>
@@ -320,7 +320,7 @@ export default function SettingsPanel() {
           </label>
           <button
             type="button"
-            className="btn btn-primary px-3 py-1.5 text-xs"
+            className="btn btn-primary btn-sm"
             disabled={busy}
             onClick={async () => {
               if (await act({ section: "admins", action: "add", username: grantName, role: grantRole })) {
@@ -340,7 +340,7 @@ export default function SettingsPanel() {
               </span>
               <button
                 type="button"
-                className="btn px-2 py-1 text-[0.6875rem] text-danger"
+                className="btn btn-xs text-danger"
                 disabled={busy}
                 onClick={() => void act({ section: "admins", action: "remove", profileId: grant.profileId })}
               >

@@ -40,7 +40,7 @@ export default function BlackjackGame() {
             className="mt-2 w-full accent-[var(--accent)]"
           />
         </label>
-        <button type="button" disabled={busy} onClick={deal} className="btn btn-primary w-full">
+        <button type="button" disabled={busy} onClick={deal} className="btn btn-primary btn-lg w-full">
           {t("deal")}
         </button>
         {last && (

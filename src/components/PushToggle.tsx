@@ -212,10 +212,10 @@ export default function PushToggle() {
               <span className="size-1.5 rounded-full bg-success" aria-hidden />
               {t("enabled")}
             </span>
-            <button type="button" className="btn btn-secondary text-xs" onClick={sendTest}>
+            <button type="button" className="btn btn-secondary btn-sm" onClick={sendTest}>
               {testSent ? t("testSent") : t("test")}
             </button>
-            <button type="button" className="btn btn-ghost text-xs" onClick={disable}>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={disable}>
               {t("disable")}
             </button>
           </>
@@ -226,7 +226,7 @@ export default function PushToggle() {
         ) : (
           <button
             type="button"
-            className="btn btn-primary text-xs"
+            className="btn btn-primary btn-sm"
             onClick={enable}
             disabled={state === "enabling"}
           >

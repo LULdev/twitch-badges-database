@@ -166,7 +166,7 @@ function BlogAdmin({
           {t("search")}
           <input className="input mt-1 w-full" value={query} onChange={(e) => setQuery(e.target.value)} />
         </label>
-        <button type="button" className="btn btn-primary px-3 py-1.5 text-xs" onClick={newPost}>
+        <button type="button" className="btn btn-primary btn-sm" onClick={newPost}>
           {t("new")}
         </button>
       </div>
@@ -198,7 +198,7 @@ function BlogAdmin({
                   <td><span className="chip">{post.status}</span></td>
                   <td className="text-muted">{new Date(post.published_at).toLocaleDateString()}</td>
                   <td className="text-end">
-                    <button type="button" className="btn px-2 py-1 text-[0.6875rem]" onClick={() => void openEditor(post.id)}>
+                    <button type="button" className="btn btn-xs" onClick={() => void openEditor(post.id)}>
                       {t("edit")}
                     </button>
                   </td>
@@ -260,7 +260,7 @@ function BlogAdmin({
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              className="btn btn-primary px-3 py-1.5 text-xs"
+              className="btn btn-primary btn-sm"
               disabled={busy}
               onClick={async () => {
                 if (busy) return;
@@ -294,13 +294,13 @@ function BlogAdmin({
             >
               {t("save")}
             </button>
-            <button type="button" className="btn btn-ghost px-3 py-1.5 text-xs" onClick={() => setEditing(null)}>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditing(null)}>
               {t("cancel")}
             </button>
             {editing.id ? (
               <button
                 type="button"
-                className="btn px-3 py-1.5 text-xs text-danger"
+                className="btn btn-sm text-danger"
                 disabled={busy}
                 onClick={async () => {
                   if (busy) return;
@@ -360,7 +360,7 @@ function ChangelogAdmin({
 
   return (
     <div className="space-y-3">
-      <button type="button" className="btn btn-primary px-3 py-1.5 text-xs" onClick={() => setDraft({ kind: "feature", risk: "low", title: "", body: "", payload: "" })}>
+      <button type="button" className="btn btn-primary btn-sm" onClick={() => setDraft({ kind: "feature", risk: "low", title: "", body: "", payload: "" })}>
         {t("new")}
       </button>
 
@@ -386,7 +386,7 @@ function ChangelogAdmin({
                   <td className="text-end">
                     <button
                       type="button"
-                      className="btn px-2 py-1 text-[0.6875rem]"
+                      className="btn btn-xs"
                       onClick={() =>
                         setDraft({
                           id: entry.id,
@@ -450,7 +450,7 @@ function ChangelogAdmin({
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              className="btn btn-primary px-3 py-1.5 text-xs"
+              className="btn btn-primary btn-sm"
               disabled={busy}
               onClick={async () => {
                 if (busy) return;
@@ -496,13 +496,13 @@ function ChangelogAdmin({
             >
               {t("save")}
             </button>
-            <button type="button" className="btn btn-ghost px-3 py-1.5 text-xs" onClick={() => setDraft(null)}>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setDraft(null)}>
               {t("cancel")}
             </button>
             {draft.id !== undefined ? (
               <button
                 type="button"
-                className="btn px-3 py-1.5 text-xs text-danger"
+                className="btn btn-sm text-danger"
                 disabled={busy}
                 onClick={async () => {
                   if (busy) return;

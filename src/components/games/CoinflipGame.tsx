@@ -63,7 +63,7 @@ export default function CoinflipGame() {
             className="mt-2 w-full accent-[var(--accent)]"
           />
         </label>
-        <button type="button" disabled={busy} onClick={go} className="btn btn-primary w-full">
+        <button type="button" disabled={busy} onClick={go} className="btn btn-primary btn-lg w-full">
           {busy ? "…" : t("flip")}
         </button>
         {flips && (

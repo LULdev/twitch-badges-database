@@ -131,7 +131,7 @@ export default function BadgesPanel() {
           <input type="checkbox" checked={customOnly} onChange={(event) => setCustomOnly(event.target.checked)} />
           {t("customOnly")}
         </label>
-        <button type="button" className="btn btn-primary px-3 py-1.5 text-xs" onClick={newBadge}>
+        <button type="button" className="btn btn-primary btn-sm" onClick={newBadge}>
           {t("new")}
         </button>
       </div>
@@ -166,7 +166,7 @@ export default function BadgesPanel() {
                   <td className="text-end">
                     <button
                       type="button"
-                      className="btn px-2 py-1 text-[0.6875rem]"
+                      className="btn btn-xs"
                       onClick={async () => {
                         editingRequest.current = badge.id;
                         const res = await fetch(`/api/admin/content?resource=badges&id=${badge.id}`);
@@ -251,7 +251,7 @@ export default function BadgesPanel() {
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              className="btn btn-primary px-3 py-1.5 text-xs"
+              className="btn btn-primary btn-sm"
               disabled={busy}
               onClick={async () => {
                 if (busy) return;
@@ -290,13 +290,13 @@ export default function BadgesPanel() {
             >
               {t("save")}
             </button>
-            <button type="button" className="btn btn-ghost px-3 py-1.5 text-xs" onClick={() => setEditing(null)}>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditing(null)}>
               {t("cancel")}
             </button>
             {editing.id ? (
               <button
                 type="button"
-                className="btn px-3 py-1.5 text-xs text-danger"
+                className="btn btn-sm text-danger"
                 disabled={busy}
                 onClick={async () => {
                   if (busy) return;

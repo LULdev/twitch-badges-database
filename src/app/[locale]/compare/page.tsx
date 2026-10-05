@@ -167,7 +167,7 @@ async function CompareResult({
             </dl>
             <Link
               href={`/profile/${user.perfil.login}`}
-              className="btn btn-secondary mt-4 w-full text-xs"
+              className="btn btn-secondary btn-sm mt-4 w-full"
             >
               {user.perfil.displayName}
             </Link>

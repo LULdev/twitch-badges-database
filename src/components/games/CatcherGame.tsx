@@ -188,7 +188,7 @@ export default function CatcherGame() {
         />
         {!running && (
           <div className="absolute inset-0 grid place-items-center bg-background/60">
-            <button type="button" onClick={start} disabled={busy} className="btn btn-primary px-8 py-3">
+            <button type="button" onClick={start} disabled={busy} className="btn btn-primary btn-lg">
               {t("start")}
             </button>
           </div>

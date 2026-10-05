@@ -138,7 +138,7 @@ export default function ScratchGame() {
             {t("newPersonalBest")}
           </p>
         ) : null}
-        <button type="button" disabled={busy} onClick={newCard} className="btn btn-primary w-full">
+        <button type="button" disabled={busy} onClick={newCard} className="btn btn-primary btn-lg w-full">
           {t("newCard")}
         </button>
         <p className="text-center text-xs text-muted">{t("scratchHint")}</p>

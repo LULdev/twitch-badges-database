@@ -59,7 +59,7 @@ export default function SyncPanel() {
             <p className="text-xs text-muted">{t(`${target}.hint`)}</p>
             <button
               type="button"
-              className="btn btn-primary px-3 py-1.5 text-xs"
+              className="btn btn-primary btn-sm"
               disabled={running !== null}
               onClick={() => void run(target)}
             >

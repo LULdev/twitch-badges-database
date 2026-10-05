@@ -193,7 +193,7 @@ export default async function ChangelogPage({
           </div>
         )}
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- API route serving XML, not a page */}
-        <a href="/api/changelog/rss" className="btn btn-secondary text-xs" title={t("rss")}>
+        <a href="/api/changelog/rss" className="btn btn-secondary btn-sm" title={t("rss")}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
             <circle cx="6.5" cy="17.5" r="2.5" />
             <path d="M4 4a16 16 0 0 1 16 16h-3A13 13 0 0 0 4 7z" />
@@ -553,7 +553,7 @@ export default async function ChangelogPage({
             <span>{t("statLatest")}</span>
           </div>
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- API route serving XML, not a page */}
-          <a href="/api/changelog/rss" className="btn btn-secondary text-xs">
+          <a href="/api/changelog/rss" className="btn btn-secondary btn-sm">
             {t("rss")}
           </a>
         </div>

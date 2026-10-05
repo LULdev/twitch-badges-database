@@ -358,6 +358,22 @@ html {
     font-size: 0.75rem;
   }
 
+  /* Densest rung, for admin table rows where a control sits inside a dense
+     grid and needs to read as a chip-like affordance rather than a CTA. */
+  .btn-xs {
+    border-radius: var(--radius-btn);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6875rem;
+  }
+
+  /* The rung between the 0.8125rem base and .btn-lg, so the sizes the app
+     already used (11/12/13/14/15px) each keep their exact step. */
+  .btn-md {
+    border-radius: var(--radius-btn);
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+
   /* Lift is motion, not decoration — drop it when the reader asks for less. */
   @media (prefers-reduced-motion: reduce) {
     .btn-primary:hover:not(:disabled),

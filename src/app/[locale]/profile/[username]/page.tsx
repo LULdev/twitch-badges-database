@@ -596,7 +596,7 @@ export default async function ProfilePage({ params }: PageProps) {
           </div>
           <div className="flex flex-col items-start gap-2 sm:items-end">
             {isOwn ? (
-              <Link href="/account" className="btn btn-secondary text-xs">
+              <Link href="/account" className="btn btn-secondary btn-sm">
                 {t("editProfile")}
               </Link>
             ) : null}
@@ -604,7 +604,7 @@ export default async function ProfilePage({ params }: PageProps) {
               href={`https://www.twitch.tv/${handle}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-ghost text-xs"
+              className="btn btn-ghost btn-sm"
             >
               {t("viewOnTwitch")} ↗
             </a>

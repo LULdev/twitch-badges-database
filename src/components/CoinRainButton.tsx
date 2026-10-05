@@ -56,7 +56,7 @@ export default function CoinRainButton({ profileId }: { profileId: string }) {
       type="button"
       onClick={rain}
       disabled={state === "busy" || state === "done" || state === "again"}
-      className="btn btn-ghost text-xs"
+      className="btn btn-ghost btn-sm"
       title={t("coinRainHint")}
     >
       {state === "done" || state === "again" ? (<><Coin size={13} /> ✓</>) : (<><Coin size={13} /> {t("coinRain")}</>)}

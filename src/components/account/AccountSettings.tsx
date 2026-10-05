@@ -167,7 +167,7 @@ export default function AccountSettings({
           </h2>
           <button
             type="button"
-            className="btn btn-secondary text-xs"
+            className="btn btn-secondary btn-sm"
             onClick={() => setPickerOpen((open) => !open)}
           >
             {pickerOpen ? t("close") : t("chooseBadges")}

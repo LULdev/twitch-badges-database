@@ -49,7 +49,7 @@ export default function ShareButtons({ path, title }: { path: string; title: str
 
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      <button type="button" onClick={copy} className="btn btn-secondary text-xs">
+      <button type="button" onClick={copy} className="btn btn-secondary btn-sm">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
           <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
@@ -60,7 +60,7 @@ export default function ShareButtons({ path, title }: { path: string; title: str
         href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareUrl)}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="btn btn-secondary text-xs"
+        className="btn btn-secondary btn-sm"
         onClick={(event) => {
           if (!shareUrl) event.preventDefault();
         }}
