@@ -1,7 +1,7 @@
 /**
  * i18n gate — exits non-zero, so `npm run build` fails before a bad deploy.
  *
- * Three checks:
+ * Four checks:
  *  A) every `useTranslations("ns")` in a "use client" file ships to the
  *     client: its top-level namespace must be in CLIENT_NAMESPACES
  *     ([locale]/layout.tsx). This is the BadgeReactions bug class: the page
@@ -13,6 +13,8 @@
  *     during `next build`. Log-scraping cannot catch this.
  *  B) every literal translator key resolves in ALL 11 locale catalogs.
  *  C) catalog parity: the flattened key set is identical across locales.
+ *  D) every game id in GAMES carries Title/Desc/Hint in all locales — the
+ *     game pages build those keys dynamically, so Check B cannot see them.
  *
  * Dynamic keys (t(`x.${v}`), t(map[k] ?? "fallback")) are warn-only.
  */
@@ -178,6 +180,39 @@ for (const locale of LOCALES.slice(1)) {
   }
   for (const key of set) {
     if (!reference.has(key)) errors.push(`parity: messages/${locale}.json has extra "${key}"`);
+  }
+}
+
+/* ---------- Check D: every game id carries Title/Desc/Hint in all locales ----------
+ * The game pages build keys dynamically — t(`${game}Title`), t(`${game}Desc`),
+ * t(`${game}Hint`) — which Check B can only warn about. A game added to GAMES
+ * without its copy would render raw key paths on the login wall, so resolve
+ * the registry itself: parse the id fields out of the GAMES array and require
+ * the three keys per game in every locale. */
+const gamesSrc = readFileSync(
+  path.join(ROOT, "src", "lib", "gamification", "games.ts"),
+  "utf8",
+);
+const gamesArrayStart = gamesSrc.indexOf("export const GAMES");
+const gamesArrayEnd = gamesSrc.indexOf("export const GAME_IDS");
+if (gamesArrayStart < 0 || gamesArrayEnd <= gamesArrayStart) {
+  errors.push("games: could not locate the GAMES array in src/lib/gamification/games.ts");
+} else {
+  const gamesSlice = gamesSrc.slice(gamesArrayStart, gamesArrayEnd);
+  const gameIds = [...gamesSlice.matchAll(/\{\s*id:\s*"([a-z0-9-]+)"/g)].map((m) => m[1]);
+  if (gameIds.length === 0) {
+    errors.push("games: could not parse any game ids from the GAMES array — verify manually");
+  }
+  for (const locale of LOCALES) {
+    const catalog = catalogs.get(locale)!;
+    for (const id of gameIds) {
+      for (const suffix of ["Title", "Desc", "Hint"]) {
+        const key = `games.${id}${suffix}`;
+        if (!catalog.has(key)) {
+          errors.push(`games: messages/${locale}.json is missing "${key}" (every game id needs Title/Desc/Hint)`);
+        }
+      }
+    }
   }
 }
 

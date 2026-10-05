@@ -744,6 +744,7 @@
     "level": "Level",
     "wheelLink": "Roleta da fortuna",
     "loginRequired": "Faça login com a Twitch para jogar — seus BadgesCoins e XP esperam por você.",
+    "wallWonWeek": "Os jogadores ganharam {won} BadgesCoins aqui esta semana.",
     "howToPlay": "Como jogar",
     "blackjackHint": "Defina a pontuação em que fica e distribua — vença a mão do dealer sem passar de 21.",
     "coinflipHint": "Escolha cara ou coroa e quantas jogadas seguidas arrisca — cada jogada extra dobra o prêmio, um erro perde a rodada.",

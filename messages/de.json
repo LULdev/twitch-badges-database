@@ -744,6 +744,7 @@
     "level": "Level",
     "wheelLink": "Glücksrad",
     "loginRequired": "Melde dich mit Twitch an zum Spielen — deine BadgesCoins und XP warten.",
+    "wallWonWeek": "Spieler haben hier diese Woche {won} BadgesCoins gewonnen.",
     "howToPlay": "So wird gespielt",
     "blackjackHint": "Lege fest, ab welchem Wert du stehen bleibst, und teile aus — schlage die Hand des Dealers, ohne über 21 zu kommen.",
     "coinflipHint": "Wähle Kopf oder Zahl und wie viele Würfe in Folge du wagst — jeder zusätzliche Wurf verdoppelt die Auszahlung, ein Fehlurteil verliert die Runde.",

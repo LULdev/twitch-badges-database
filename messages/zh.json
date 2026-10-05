@@ -744,6 +744,7 @@
     "level": "Level",
     "wheelLink": "命运转盘",
     "loginRequired": "使用 Twitch 登录即可游玩——你的 BadgesCoins 和 XP 正等着你。",
+    "wallWonWeek": "本周玩家在这里共赢得 {won} 枚 BadgesCoins。",
     "howToPlay": "玩法说明",
     "blackjackHint": "设定停牌点数后发牌——在不爆牌的前提下击败庄家的手牌。",
     "coinflipHint": "选择正面或反面，以及敢连中多少次——每多猜一次奖励翻倍，猜错一次即输掉该轮。",

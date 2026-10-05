@@ -1,0 +1,57 @@
+name: Game render check
+
+# Weekly pixels-check of the authenticated game boards. The boards live behind
+# the login gate, so no anonymous monitor can see them break; this workflow
+# seeds a throwaway Supabase user, renders Hilo/Slots/Blackjack on production
+# with a real session cookie, asserts the GameAction CTAs, and deletes the
+# user again (profiles and progress rows cascade from auth.users).
+#
+# Weekly, not hourly: the run costs a Playwright install plus three page
+# loads, and game UI breaks are deploy-driven, not drift-driven. Offset minute
+# (never :00/:30) per the house convention — GitHub's scheduled-run queue lags
+# and coalesces; see potat-sync.yml for the measured history. workflow_dispatch
+# keeps it runnable by hand right after a games-section deploy.
+on:
+  schedule:
+    - cron: "23 6 * * 1"
+  workflow_dispatch: {}
+
+concurrency:
+  group: render-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Seed throwaway user
+        run: node scripts/game-render-check.mjs seed
+      - name: Render the authenticated boards
+        run: node scripts/game-render-check.mjs check
+      - name: Delete throwaway user
+        if: always()
+        run: |
+          if [ -f .render-session.json ]; then
+            node scripts/game-render-check.mjs cleanup
+          else
+            echo "no seeded session present — nothing to clean up"
+          fi
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-check-screenshots
+          path: docs/screenshots/*.png
+          if-no-files-found: ignore

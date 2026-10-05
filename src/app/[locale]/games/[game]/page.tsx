@@ -129,6 +129,23 @@ export default async function GamePage({ params }: PageProps) {
   // Theme-aware medal tints — the .rank-row podium tokens (dark + light).
   const podiumColors = ["var(--rank-gold)", "var(--rank-silver)", "var(--rank-bronze)"];
 
+  // Social proof for the login wall: what players have won on THIS game over
+  // the last 7 days. null (not 0) on failure so a dead view hides the line
+  // instead of claiming nobody won anything.
+  let wonWeek: number | null = null;
+  {
+    const supabase = await createClient();
+    try {
+      const { data } = await supabase
+        .from("stats_game_wins_week")
+        .select("won_week")
+        .eq("game", game)
+        .maybeSingle();
+      wonWeek = Number((data as { won_week: string | number } | null)?.won_week ?? 0);
+    } catch {
+      wonWeek = null;
+    }
+  }
   // Session read moved above the early returns so the podium card can greet
   // the viewer in every state; authUserId() only reads the session cookie.
   const userId = await authUserId();
@@ -303,6 +320,11 @@ export default async function GamePage({ params }: PageProps) {
         <div className="card p-6 text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-muted">{t("howToPlay")}</p>
           <p className="mx-auto mt-2 max-w-md text-sm">{t(`${game}Hint`)}</p>
+          {wonWeek !== null && wonWeek > 0 ? (
+            <p className="mx-auto mt-4 inline-flex max-w-full items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-3 py-1 text-xs font-semibold text-success">
+              <span className="min-w-0">{t("wallWonWeek", { won: wonWeek })}</span>
+            </p>
+          ) : null}
           <p className="mt-5 text-sm text-muted">{t("loginRequired")}</p>
           <div className="mt-6">
             <TwitchLoginButton />
