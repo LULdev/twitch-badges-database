@@ -301,7 +301,9 @@ export default async function GamePage({ params }: PageProps) {
       <div className="mx-auto max-w-2xl space-y-6">
         {hero()}
         <div className="card p-6 text-center">
-          <p className="text-sm text-muted">{t("loginRequired")}</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted">{t("howToPlay")}</p>
+          <p className="mx-auto mt-2 max-w-md text-sm">{t(`${game}Hint`)}</p>
+          <p className="mt-5 text-sm text-muted">{t("loginRequired")}</p>
           <div className="mt-6">
             <TwitchLoginButton />
           </div>
