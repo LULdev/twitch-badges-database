@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useGame, BetBar, GameError, RoundOutcome } from "./useGame";
+import { useGame, BetBar, GameError, GameAction, RoundOutcome } from "./useGame";
 
 interface Card {
   key: number;
@@ -124,14 +124,14 @@ export default function MemoryGame() {
           ))}
         </div>
         {!started && cards.length === 0 && (
-          <button type="button" onClick={start} disabled={busy} className="btn btn-primary btn-lg w-full">
+          <GameAction onClick={start} disabled={busy}>
             {t("start")}
-          </button>
+          </GameAction>
         )}
         {!started && cards.length > 0 && (
-          <button type="button" onClick={start} disabled={busy} className="btn btn-secondary btn-lg w-full">
+          <GameAction variant="secondary" onClick={start} disabled={busy}>
             {t("again")}
-          </button>
+          </GameAction>
         )}
         {started && (
           <p className="text-center text-xs text-muted">

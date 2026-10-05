@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useGame, BetBar, GameError, RoundOutcome } from "./useGame";
+import { useGame, BetBar, GameError, GameAction, RoundOutcome } from "./useGame";
 
 export interface QuizBadge {
   slug: string;
@@ -107,9 +107,9 @@ export default function QuizGame({ badges }: { badges: QuizBadge[] }) {
             </div>
           </>
         ) : (
-          <button type="button" onClick={startRound} disabled={busy} className="btn btn-primary btn-lg w-full">
+          <GameAction onClick={startRound} disabled={busy}>
             {t("start")}
-          </button>
+          </GameAction>
         )}
       </div>
     </div>

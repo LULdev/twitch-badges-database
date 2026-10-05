@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useLocale } from "next-intl";
-import { useGame, BetBar, GameError, NewBestMoment } from "./useGame";
+import { useGame, BetBar, GameError, GameAction, NewBestMoment } from "./useGame";
 import Coin from "@/components/Coin";
 
 export default function TowerGame() {
@@ -92,9 +92,9 @@ export default function TowerGame() {
             className="mt-2 w-full accent-[var(--accent)]"
           />
         </label>
-        <button type="button" disabled={busy} onClick={climb} className="btn btn-primary btn-lg w-full">
+        <GameAction disabled={busy} onClick={climb}>
           {t("climb")}
-        </button>
+        </GameAction>
         {last && (
           <p className={`text-center text-lg font-extrabold ${last.survived ? "text-success" : "text-danger"}`}>
             {last.survived ? t("youWin") : t("crashed")} (<span className="inline-flex items-center gap-1">{last.payout.toLocaleString(locale)} <Coin size={14} /></span>)

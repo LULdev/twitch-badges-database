@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, GameAction } from "./useGame";
 import Coin from "@/components/Coin";
 import CeremonyCoin from "@/components/items/CeremonyCoin";
 
@@ -114,14 +114,12 @@ export default function SlotsGame() {
           )}
         </div>
         <div className="border-t border-line p-4">
-          <button
-            type="button"
+          <GameAction
             disabled={busy || spinning || symbols.length === 0}
             onClick={spin}
-            className="btn btn-primary btn-lg w-full"
           >
             {spinning ? t("spinning") : (<span>{t("spin")} (<span className="inline-flex items-center gap-1">{bet.toLocaleString(locale)} <Coin size={14} /></span>)</span>)}
-          </button>
+          </GameAction>
           {lastWin && (
             <>
               <p className={`mt-3 text-center text-lg font-extrabold ${lastWin.payout > lastWin.bet ? "text-success" : "text-muted"}`}>

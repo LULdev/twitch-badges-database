@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGame, BetBar, GameError, NewBestMoment } from "./useGame";
+import { useGame, BetBar, GameError, GameAction, NewBestMoment } from "./useGame";
 
 export default function BlackjackGame() {
   const { bet, setBet, busy, error, balance, play, t } = useGame("blackjack");
@@ -40,9 +40,9 @@ export default function BlackjackGame() {
             className="mt-2 w-full accent-[var(--accent)]"
           />
         </label>
-        <button type="button" disabled={busy} onClick={deal} className="btn btn-primary btn-lg w-full">
+        <GameAction disabled={busy} onClick={deal}>
           {t("deal")}
-        </button>
+        </GameAction>
         {last && (
           <div className="grid grid-cols-2 gap-4 text-center text-sm">
             <div>

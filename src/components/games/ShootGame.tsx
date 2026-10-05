@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useGame, BetBar, GameError, RoundOutcome } from "./useGame";
+import { useGame, BetBar, GameError, GameAction, RoundOutcome } from "./useGame";
 
 interface Target {
   id: number;
@@ -158,9 +158,9 @@ export default function ShootGame() {
         ))}
         {!running && (
           <div className="absolute inset-0 grid place-items-center">
-            <button type="button" onClick={start} disabled={busy} className="btn btn-primary btn-lg">
+            <GameAction full={false} onClick={start} disabled={busy}>
               {t("start")}
-            </button>
+            </GameAction>
           </div>
         )}
         {running && (

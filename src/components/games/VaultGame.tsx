@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useGame, BetBar, GameError, RoundOutcome } from "./useGame";
+import { useGame, BetBar, GameError, GameAction, RoundOutcome } from "./useGame";
 
 /** Crack the Vault: stop three rotating needles inside the green zone. */
 export default function VaultGame() {
@@ -104,13 +104,13 @@ export default function VaultGame() {
           ))}
         </div>
         {phase === "idle" && (
-          <button type="button" onClick={start} disabled={busy} className="btn btn-primary btn-lg w-full">{t("start")}</button>
+          <GameAction onClick={start} disabled={busy}>{t("start")}</GameAction>
         )}
         {dialIndex >= 0 && phase !== "done" && (
-          <button type="button" onClick={stop} className="btn btn-primary btn-lg w-full">{t("stop")}</button>
+          <GameAction onClick={stop}>{t("stop")}</GameAction>
         )}
         {phase === "done" && (
-          <button type="button" onClick={start} disabled={busy} className="btn btn-secondary btn-lg w-full">{t("again")}</button>
+          <GameAction variant="secondary" onClick={start} disabled={busy}>{t("again")}</GameAction>
         )}
         <p className="text-center text-xs text-muted">{t("vaultHint")}</p>
       </div>

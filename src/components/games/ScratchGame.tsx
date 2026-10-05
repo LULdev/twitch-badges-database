@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
-import { useGame, BetBar, GameError } from "./useGame";
+import { useGame, BetBar, GameError, GameAction } from "./useGame";
 import Coin from "@/components/Coin";
 import CeremonyCoin from "@/components/items/CeremonyCoin";
 
@@ -138,9 +138,9 @@ export default function ScratchGame() {
             {t("newPersonalBest")}
           </p>
         ) : null}
-        <button type="button" disabled={busy} onClick={newCard} className="btn btn-primary btn-lg w-full">
+        <GameAction disabled={busy} onClick={newCard}>
           {t("newCard")}
-        </button>
+        </GameAction>
         <p className="text-center text-xs text-muted">{t("scratchHint")}</p>
       </div>
     </div>

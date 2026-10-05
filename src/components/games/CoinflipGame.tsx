@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useLocale } from "next-intl";
-import { useGame, BetBar, GameError, NewBestMoment } from "./useGame";
+import { useGame, BetBar, GameError, GameAction, NewBestMoment } from "./useGame";
 
 export default function CoinflipGame() {
   const { bet, setBet, busy, error, balance, play, t } = useGame("coinflip");
@@ -63,9 +63,9 @@ export default function CoinflipGame() {
             className="mt-2 w-full accent-[var(--accent)]"
           />
         </label>
-        <button type="button" disabled={busy} onClick={go} className="btn btn-primary btn-lg w-full">
+        <GameAction disabled={busy} onClick={go}>
           {busy ? "…" : t("flip")}
-        </button>
+        </GameAction>
         {flips && (
           <div className="flex flex-wrap justify-center gap-2">
             {flips.map((flip, index) => (

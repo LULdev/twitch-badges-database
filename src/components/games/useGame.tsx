@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Coin from "@/components/Coin";
 
@@ -151,6 +151,42 @@ export function BetBar({
         </span>
       )}
     </div>
+  );
+}
+
+/**
+ * A game's primary action (Start / Spin / Deal / Flip / Stop / Again). Every
+ * game renders this same shape - a large pill, full-width where the game sits
+ * in a column, disabled while a round is in flight - so the size and the busy
+ * guard live here instead of being retyped per game. Secondary (Again) is the
+ * only variant the games use; anything else is a different affordance (Quiz's
+ * answer chips, Roulette's colored picks) and stays with its game.
+ */
+export function GameAction({
+  onClick,
+  disabled,
+  variant = "primary",
+  full = true,
+  className = "",
+  children,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  variant?: "primary" | "secondary";
+  full?: boolean;
+  className?: string;
+  children: ReactNode;
+}) {
+  const tone = variant === "secondary" ? "btn-secondary" : "btn-primary";
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`btn ${tone} btn-lg${full ? " w-full" : ""}${className ? ` ${className}` : ""}`}
+    >
+      {children}
+    </button>
   );
 }
 

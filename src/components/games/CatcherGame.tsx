@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useGame, BetBar, GameError, RoundOutcome } from "./useGame";
+import { useGame, BetBar, GameError, GameAction, RoundOutcome } from "./useGame";
 
 interface Falling {
   id: number;
@@ -188,9 +188,9 @@ export default function CatcherGame() {
         />
         {!running && (
           <div className="absolute inset-0 grid place-items-center bg-background/60">
-            <button type="button" onClick={start} disabled={busy} className="btn btn-primary btn-lg">
+            <GameAction full={false} onClick={start} disabled={busy}>
               {t("start")}
-            </button>
+            </GameAction>
           </div>
         )}
         {running && (

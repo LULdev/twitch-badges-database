@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGame, BetBar, GameError, NewBestMoment } from "./useGame";
+import { useGame, BetBar, GameError, GameAction, NewBestMoment } from "./useGame";
 
 export default function HiloGame() {
   const { bet, setBet, busy, error, balance, play, t } = useGame("hilo");
@@ -64,12 +64,12 @@ export default function HiloGame() {
         )}
         <NewBestMoment show={state.record === true} />
         <div className="flex justify-center gap-3">
-          <button type="button" disabled={busy} onClick={() => guess("higher")} className="btn btn-primary btn-lg">
+          <GameAction full={false} disabled={busy} onClick={() => guess("higher")}>
             ▲ {t("higher")}
-          </button>
-          <button type="button" disabled={busy} onClick={() => guess("lower")} className="btn btn-secondary btn-lg">
+          </GameAction>
+          <GameAction full={false} variant="secondary" disabled={busy} onClick={() => guess("lower")}>
             ▼ {t("lower")}
-          </button>
+          </GameAction>
         </div>
         <p className="text-xs text-muted">{t("hiloHint")}</p>
       </div>
