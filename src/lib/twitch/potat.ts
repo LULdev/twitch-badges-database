@@ -40,7 +40,14 @@ async function potatFetch(path: string, revalidate = 0): Promise<Response> {
   });
   if (res.status === 429) {
     const retryAfter = Number(res.headers.get("retry-after") ?? "60");
-    if (Number.isFinite(retryAfter) && retryAfter > 0 && retryAfter <= 65) {
+    // potat's documented backoff is `Retry-After: 60`. The sync runs on a 60 s
+    // serverless ceiling (cron routes set maxDuration = 60), so sleeping the
+    // full value burns the budget and the process dies mid-sleep — no summary,
+    // no heartbeat, no changelog row, and the retry never runs. A SHORT
+    // backoff (a few seconds) fits; anything longer fails fast instead, and the
+    // caller's catch (distributionResult ok:false) degrades the run to a
+    // "rate limited" heartbeat rather than a silent timeout.
+    if (Number.isFinite(retryAfter) && retryAfter > 0 && retryAfter <= 8) {
       await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000));
       // The retry can be rate limited again (or fail otherwise) — its status
       // must be checked, or the caller parses an error body as data.

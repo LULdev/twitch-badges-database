@@ -376,16 +376,30 @@ export async function runBadgebaseSync(): Promise<BadgebaseSyncSummary> {
     // Merge onto whatever pass 1 already decided for this row, so the status is
     // computed from the values the row will actually carry.
     const base = updates.get(key) ?? row;
+    // A previously confirmed row keeps its confirmation as long as its claim
+    // window still covers now — the listing can miss a card to a parse blip or
+    // a markup tweak without the badge having ended. resolveStatus with the
+    // flag set yields "active"/"upcoming" for any window that is not provably
+    // over, and "expired" is the only state a confirmed row is allowed to
+    // demote into (resolveStatus returns it for a flag-carrying row that has
+    // never had a window at all, or whose end has passed).
+    const confirmedStillLive =
+      (base.is_confirmed_active as boolean) &&
+      (base.end_date as string | null) !== null &&
+      new Date(base.end_date as string).getTime() >= now.getTime();
     const nextStatus = resolveStatus(
       {
         start_date: base.start_date as string | null,
         end_date: base.end_date as string | null,
-        is_confirmed_active: false,
+        is_confirmed_active: confirmedStillLive,
       },
       now,
     );
-    if (base.status !== nextStatus || (base.is_confirmed_active as boolean)) {
-      updates.set(key, strip({ ...base, is_confirmed_active: false, status: nextStatus }));
+    if (base.status !== nextStatus || (base.is_confirmed_active as boolean) !== confirmedStillLive) {
+      updates.set(
+        key,
+        strip({ ...base, is_confirmed_active: confirmedStillLive, status: nextStatus }),
+      );
       if (nextStatus === "expired" && row.status !== "expired") demotedToExpired += 1;
     }
   }

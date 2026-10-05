@@ -81,7 +81,7 @@ export function useGame(gameId: string) {
     [bet, gameId, t],
   );
 
-  return { balance, bet, setBet, busy, error, last, play, refresh, t };
+  return { balance, bet, setBet, busy, error, last, play, t };
 }
 
 export function BetBar({

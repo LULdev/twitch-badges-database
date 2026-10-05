@@ -239,6 +239,13 @@ export async function requireAdmin(options?: {
   const role = await viewerRole();
   if (role) {
     const userId = await authUserId();
+    // A ban must outrank the role: banning writes the bans row but never the
+    // role, so without this check a banned staff member keeps the full panel
+    // until their session ends (and a moderator could lift their own ban via
+    // the users tab, which is exactly why the ladder there is not self-able).
+    if (await isUserBanned(userId!)) {
+      throw new AdminGateError(403, "banned");
+    }
     const supabase = createAdminClient();
     const { data } = await supabase
       .from("profiles")

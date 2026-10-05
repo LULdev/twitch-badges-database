@@ -287,6 +287,17 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
   rarityUpdated = finalRows.length;
   statusSweeps = finalRows.filter((row) => statusSweepIds.has(String(row.id))).length;
 
+  // The same collapse must apply to the time-series points: when one catalog
+  // row resolves through several distribution entries (byUuid fallback, or the
+  // feed repeating a badge within a page window), the loop pushes one statRows
+  // entry per match. Writing both creates two badge_stats rows with the same
+  // polled_at, and badge_momentum orders by polled_at with no tiebreaker — so
+  // which duplicate the rarity read lands on is index order, and the chart gets
+  // a double-counted point. One point per badge per run.
+  const statByKey = new Map<string, Record<string, unknown>>();
+  for (const row of statRows) statByKey.set(String(row.badge_id), row);
+  const finalStatRows = [...statByKey.values()];
+
   // PostgREST derives one column list from the union of the batch's keys, so a
   // payload whose rows disagree on shape is not "mostly fine": the missing keys
   // are sent as NULL and then written over the live row. A single unequal shape
@@ -313,7 +324,7 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
       if (error) throw error;
     }
 
-    for (const batch of chunk(statRows, 200)) {
+    for (const batch of chunk(finalStatRows, 200)) {
       const { error } = await supabase.from("badge_stats").insert(batch);
       if (error) throw error;
       statsInserted += batch.length;

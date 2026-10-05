@@ -147,12 +147,30 @@ export async function syncUserInventory(
       });
     }
     if (addedBadges.length > 0) {
-      await award(userId, {
-        xp: addedBadges.length * 1000,
-        coins: addedBadges.length * 500,
-        source: "badge_claims",
-        skipAchievements: false,
-      });
+      try {
+        await award(userId, {
+          xp: addedBadges.length * 1000,
+          coins: addedBadges.length * 500,
+          source: "badge_claims",
+          skipAchievements: false,
+        });
+      } catch (error) {
+        // The claim rows above are the anti-double-pay guard: a retry finds the
+        // badges already in badge_unlock_rewards and pays nothing. If the award
+        // itself fails after the rows committed, the reward is gone unless the
+        // guard rows are rolled back too — delete exactly the rows we inserted,
+        // scoped to this claim, so the caller's retry both re-claims and re-pays.
+        const supabase = createAdminClient();
+        const { error: rollbackError } = await supabase
+          .from("badge_unlock_rewards")
+          .delete()
+          .eq("user_id", userId)
+          .in("badge_id", addedBadges.map((b) => String(b.id)));
+        if (rollbackError) {
+          console.warn("[inventory] reward rollback failed for", userId, rollbackError.message);
+        }
+        throw error;
+      }
     }
   }
 

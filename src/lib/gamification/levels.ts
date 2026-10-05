@@ -16,12 +16,6 @@ export function xpToAdvance(level: number): number {
   return 100 + (Math.max(1, Math.min(100, level)) - 1) * 50;
 }
 
-export function totalXpForLevel(level: number): number {
-  let total = 0;
-  for (let l = 1; l < level; l += 1) total += xpToAdvance(l);
-  return total;
-}
-
 export function levelFromXp(xp: number): LevelInfo {
   let level = 1;
   let remaining = Math.max(0, Math.floor(xp));

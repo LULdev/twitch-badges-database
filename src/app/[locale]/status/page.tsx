@@ -55,15 +55,16 @@ function resolveLayout(value: unknown): StatusLayout {
 interface ScheduleEntry {
   /** Heartbeat source id this schedule drives. */
   source: string;
-  /** UTC hour/minute of the daily run, or the 15-minute grid for potat. */
+  /** UTC hour/minute of the daily Vercel cron, or the hour+minute of an
+ *  every-hour GitHub Actions cron (potat: hourly at :07, AGENTS.md). */
   daily?: [number, number];
-  every15?: boolean;
+  hourly?: number;
 }
 const SCHEDULE: ScheduleEntry[] = [
   { source: "cron/global", daily: [6, 0] },
   { source: "cron/badgebase", daily: [6, 5] },
   { source: "cron/potat", daily: [6, 30] },
-  { source: "cron/potat", every15: true },
+  { source: "cron/potat", hourly: 7 },
 ];
 
 /** The sync/* heartbeat sources fire when their cron counterpart runs. */
@@ -74,14 +75,12 @@ const SCHEDULE_ALIAS: Record<string, string> = {
 };
 
 function nextRunMs(entry: ScheduleEntry, now: Date): number {
-  if (entry.every15) {
-    // GitHub Actions fires at :07/:22/:37/:52 to dodge the Vercel crons.
-    const next = [7, 22, 37, 52].find((o) => o > now.getUTCMinutes());
+  if (entry.hourly !== undefined) {
+    // Every-hour GitHub Actions cron at this UTC minute (potat: :07).
     const candidate = new Date(now);
-    if (next !== undefined) {
-      candidate.setUTCMinutes(next, 0, 0);
-    } else {
-      candidate.setUTCHours(now.getUTCHours() + 1, 7, 0, 0);
+    candidate.setUTCMinutes(entry.hourly, 0, 0);
+    if (candidate.getTime() <= now.getTime()) {
+      candidate.setUTCHours(candidate.getUTCHours() + 1);
     }
     return candidate.getTime() - now.getTime();
   }
@@ -134,6 +133,16 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
   const ts = await getTranslations("stats");
   const tc = await getTranslations("changelog");
   const layout = resolveLayout(sp.layout);
+  // `toFixed(1)` always emits "." and would show "12.3%" in locales whose
+  // separator is "," — format through Intl like the /stats page does.
+  const decimal1 = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  const decimal2 = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   const [uptime, syncFeedRaw, bugfixes] = await Promise.all([
     getUptimeSnapshot().catch(() => null),
@@ -380,11 +389,11 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
           <li key={i} className="flex items-baseline justify-between gap-3">
             <span className="text-muted">
               {sourceLabel(entry.source)}
-              {entry.every15 ? ` · 15′` : ""}
+              {entry.hourly !== undefined ? ` · 60′` : ""}
             </span>
             <span className="wire-mono text-[0.625rem] text-muted tabular-nums">
-              {entry.every15
-                ? ":07 :22 :37 :52"
+              {entry.hourly !== undefined
+                ? `:${String(entry.hourly).padStart(2, "0")}`
                 : `${String(entry.daily![0]).padStart(2, "0")}:${String(entry.daily![1]).padStart(2, "0")} UTC`}
               {" → "}
               {t("in", { time: msLabel(nextRunMs(entry, now)) })}
@@ -409,7 +418,7 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
           <dd className="text-end tabular-nums">{relTime(src.last_at)}</dd>
           <dt className="text-muted">{t("duration")}</dt>
           <dd className="text-end tabular-nums">
-            {src.last_ms == null ? "—" : `${(src.last_ms / 1000).toFixed(1)}s`}
+            {src.last_ms == null ? "—" : `${decimal1.format(src.last_ms / 1000)}s`}
           </dd>
           <dt className="text-muted">{t("rate24h")}</dt>
           <dd className="text-end tabular-nums">
@@ -524,7 +533,7 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
                   entry.payload?.allDetailsFailed === true;
                 const duration =
                   src && src.last_ms && src.last_ms > 0
-                    ? ` · ${(src.last_ms / 1000).toFixed(1)}s`
+                    ? ` · ${decimal1.format(src.last_ms / 1000)}s`
                     : "";
                 return (
                 <Reveal key={entry.id} delay={Math.min(i, 8) * 40}>
@@ -604,7 +613,7 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
           <b className="tabular-nums">
             {uptime?.availability30d == null
               ? "—"
-              : `${uptime.availability30d.toFixed(2)}%`}
+              : `${decimal2.format(uptime.availability30d)}%`}
           </b>{" "}
           · {t("heartbeat")} {relTime(uptime?.lastHeartbeat ?? null)}
         </p>
@@ -667,10 +676,10 @@ export default async function StatusPage({ params, searchParams }: PageProps) {
         </div>
       </header>
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6" aria-label={t("availability")}>
-        <div className="bl-kpi"><b>{uptime?.availability24h == null ? "—" : `${uptime.availability24h.toFixed(1)}%`}</b><span>24h</span></div>
-        <div className="bl-kpi"><b>{uptime?.availability7d == null ? "—" : `${uptime.availability7d.toFixed(1)}%`}</b><span>7d</span></div>
-        <div className="bl-kpi"><b>{uptime?.availability30d == null ? "—" : `${uptime.availability30d.toFixed(1)}%`}</b><span>30d</span></div>
-        <div className="bl-kpi"><b>{uptime?.availabilityAll == null ? "—" : `${uptime.availabilityAll.toFixed(1)}%`}</b><span>{ts("total")}</span></div>
+        <div className="bl-kpi"><b>{uptime?.availability24h == null ? "—" : `${decimal1.format(uptime.availability24h)}%`}</b><span>24h</span></div>
+        <div className="bl-kpi"><b>{uptime?.availability7d == null ? "—" : `${decimal1.format(uptime.availability7d)}%`}</b><span>7d</span></div>
+        <div className="bl-kpi"><b>{uptime?.availability30d == null ? "—" : `${decimal1.format(uptime.availability30d)}%`}</b><span>30d</span></div>
+        <div className="bl-kpi"><b>{uptime?.availabilityAll == null ? "—" : `${decimal1.format(uptime.availabilityAll)}%`}</b><span>{ts("total")}</span></div>
         <div className="bl-kpi"><b>{pipelineSources(uptime?.sources ?? []).reduce((n, s) => n + s.checks_24h, 0).toLocaleString(locale)}</b><span>{t("checks24h")}</span></div>
         <div className="bl-kpi"><b className="text-sm">{relTime(uptime?.lastHeartbeat ?? null)}</b><span>{t("heartbeat")}</span></div>
       </section>

@@ -62,6 +62,11 @@ function sessionNeedsRefresh(request: NextRequest): boolean {
     if (!raw) return true;
     // The cookie value is the JSON session, URI-encoded and/or base64-encoded
     // depending on the ssr version — try the common decodings in order.
+    //
+    // @supabase/ssr >=0.12 defaults cookieEncoding to "base64url" and writes
+    // `base64-` + base64url(JSON.stringify(session)) (chunked across `.0/.1/…`
+    // parts, which were already re-joined above). The JSON-only fallback exists
+    // for sessions set by older versions or by this repo's own tooling.
     let decoded = "";
     try {
       decoded = decodeURIComponent(raw);
@@ -69,12 +74,18 @@ function sessionNeedsRefresh(request: NextRequest): boolean {
       decoded = raw;
     }
     let session: { access_token?: string } | null = null;
-    try {
-      session = JSON.parse(decoded);
-    } catch {
+    if (decoded.startsWith("base64-")) {
+      // base64url alphabet: strip the marker, undo - _ to + / (padding is
+      // absent from base64url, so the decode accepts the unpadded string).
       try {
-        const b64 = decoded.replace(/-/g, "+").replace(/_/g, "/");
-        session = JSON.parse(atob(b64));
+        const b64 = decoded.slice("base64-".length).replace(/-/g, "+").replace(/_/g, "/");
+        session = JSON.parse(Buffer.from(b64, "base64").toString("utf8"));
+      } catch {
+        return true; // unknown encoding — do the network call
+      }
+    } else {
+      try {
+        session = JSON.parse(decoded);
       } catch {
         return true; // unknown encoding — do the network call
       }

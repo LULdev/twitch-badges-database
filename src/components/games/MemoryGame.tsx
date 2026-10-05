@@ -18,6 +18,7 @@ export default function MemoryGame() {
   const [busyCards, setBusyCards] = useState(false);
   const [misses, setMisses] = useState(0);
   const [started, setStarted] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
   const startTime = useRef(0);
   const firstPick = useRef<number | null>(null);
   const flipTimer = useRef<number | null>(null);
@@ -34,6 +35,14 @@ export default function MemoryGame() {
     const data = await fetch("/api/games/symbols").then((res) => res.json()).catch(() => null);
     const symbols: Array<{ id: string; image: string | null }> = (data?.symbols ?? [])
       ;
+    // A failed symbols fetch returns []. Starting anyway leaves an empty board
+    // with both action buttons hidden (started=true, cards.length===0), so the
+    // player can only reload — surface the failure and stay on Start instead.
+    if (symbols.length < 6) {
+      setFailed(t("deckFailed"));
+      return;
+    }
+    setFailed(null);
     const picked = symbols.slice(0, 6);
     const deck = [...picked, ...picked]
       .map((symbol, index) => ({
@@ -124,9 +133,12 @@ export default function MemoryGame() {
           ))}
         </div>
         {!started && cards.length === 0 && (
-          <GameAction onClick={start} disabled={busy}>
-            {t("start")}
-          </GameAction>
+          <>
+            <GameAction onClick={start} disabled={busy}>
+              {t("start")}
+            </GameAction>
+            {failed ? <p className="text-center text-sm text-danger">{failed}</p> : null}
+          </>
         )}
         {!started && cards.length > 0 && (
           <GameAction variant="secondary" onClick={start} disabled={busy}>

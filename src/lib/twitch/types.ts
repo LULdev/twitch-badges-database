@@ -66,18 +66,6 @@ export interface PotatOwnedUser {
   bestName: string;
 }
 
-export interface FeedBadge {
-  sourceId: number | null;
-  slug: string | null;
-  name: string;
-  imageUrl: string;
-  category: string | null;
-  isPaid: boolean | null;
-  requirements: string;
-  link: string;
-  pubDate: string | null;
-}
-
 export interface FeedBadgeDetail {
   startDate: string | null;
   endDate: string | null;
@@ -105,20 +93,6 @@ export function extractBadgeUuid(url: string | null | undefined): string | null 
   if (!url) return null;
   const match = BADGE_UUID.exec(url);
   return match ? match[1] : null;
-}
-
-export function badgeStatus(
-  badge: { start_date: string | null; end_date: string | null },
-  now: Date = new Date(),
-): Exclude<BadgeStatus, "removed"> {
-  if (badge.end_date && new Date(badge.end_date).getTime() < now.getTime())
-    return "expired";
-  if (
-    badge.start_date &&
-    new Date(badge.start_date).getTime() > now.getTime()
-  )
-    return "upcoming";
-  return "active";
 }
 
 /**

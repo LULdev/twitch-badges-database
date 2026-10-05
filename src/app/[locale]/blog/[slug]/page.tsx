@@ -253,7 +253,12 @@ export default async function BlogPostPage({ params }: PageProps) {
               <RarityChip tier={badge.rarity_tier} score={badge.rarity_score} />
               <span className="text-xs text-muted">
                 {t("widgetOwners", {
-                  count: (badge.owner_count ?? 0).toLocaleString(locale),
+                  // An un-polled badge (first hour after a drop) has no count
+                  // yet — 0 would claim nobody owns it, so render "—" like the
+                  // badge detail page does for the same null.
+                  count: badge.owner_count != null
+                    ? badge.owner_count.toLocaleString(locale)
+                    : "—",
                 })}
               </span>
             </div>

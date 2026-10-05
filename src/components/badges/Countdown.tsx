@@ -53,10 +53,12 @@ export default function Countdown({
 
   const { days, hours, minutes, seconds, total } = diffParts(targetMs, now);
 
-  if (mode === "expires" && total === 0) {
-    return (
-      <span className="chip border-danger/40 text-danger">{t("expired")}</span>
-    );
+  if (total === 0) {
+    // For a starts-countdown reaching zero there is no "keep counting" —
+    // the window is open. "Live now" keeps the claim moment legible where a
+    // row of stuck 00:00:00 digits previously read as a broken counter.
+    if (mode === "expires") return <span className="chip border-danger/40 text-danger">{t("expired")}</span>;
+    return <span className="chip border-success/40 text-success">{t("live")}</span>;
   }
 
   const valueClass = size === "lg" ? "text-xl" : "text-[0.9375rem]";

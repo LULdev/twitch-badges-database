@@ -15,6 +15,9 @@ export default function HiloGame() {
     won?: boolean;
     tie?: boolean;
     record?: boolean;
+    // A genuine refund from the server (score at the edge: the chosen side has
+    // no winning value). Not a loss — the stake came back.
+    impossible?: boolean;
   }>({ currentScore: null });
 
   async function guess(choice: "higher" | "lower") {
@@ -31,12 +34,14 @@ export default function HiloGame() {
       actual: string;
       won: boolean;
       tie?: boolean;
+      impossible?: boolean;
     };
     setState({
       currentScore: r.nextScore,
       actual: r.actual,
       won: r.won,
       tie: r.tie,
+      impossible: r.impossible === true,
       record: result.result.newPersonalBest === true,
     });
   }
@@ -55,10 +60,16 @@ export default function HiloGame() {
         {state.actual && (
           <p
             className={`text-sm font-bold ${
-              state.tie ? "text-warning" : state.won ? "text-success" : "text-danger"
+              state.impossible ? "text-warning" : state.tie ? "text-warning" : state.won ? "text-success" : "text-danger"
             }`}
           >
-            {state.tie ? t("tie") : state.won ? t("youWin") : t("youLose")}{" "}
+            {state.impossible
+              ? t("refunded")
+              : state.tie
+                ? t("tie")
+                : state.won
+                  ? t("youWin")
+                  : t("youLose")}{" "}
             ({state.actual === "higher" ? t("higher") : state.actual === "lower" ? t("lower") : t("tie")})
           </p>
         )}

@@ -20,6 +20,7 @@ export interface AchStats {
     best_login_streak: number; games_played: number; games_won: number;
     coins_won: number; coins_lost: number; wheel_spins: number;
     steals_successful: number; steals_failed: number; times_robbed: number;
+    /** Day-resolved game XP: 0 on a new UTC day regardless of the raw counter. */
     game_xp_today: number; achievements_points: number;
     best_game_streak: number;
   };
@@ -527,16 +528,51 @@ export async function evaluateAchievements(userId: string): Promise<string[]> {
       payload: { achievement: ach.id, category: ach.category },
     });
 
-    // Reward without re-triggering evaluation (prevents recursion).
-    await award(
-      userId,
-      {
-        xp: ach.xp,
-        coins: ach.coins,
-        source: `achievement:${ach.id}`,
-        skipAchievements: true,
-      },
-    ).catch(() => undefined);
+    // Reward without re-triggering evaluation (prevents recursion). A failure
+    // here must not be swallowed as "paid": the unlock row above means this id
+    // never comes around again, so the XP/coins would be lost forever. Roll the
+    // unlock back so the next evaluation retries it; the 23505-detected
+    // parallel-run case (which actually paid) is the only path that must NOT
+    // roll back, and it never reaches here — that branch `continue`s at the
+    // insert error instead.
+    try {
+      await award(
+        userId,
+        {
+          xp: ach.xp,
+          coins: ach.coins,
+          source: `achievement:${ach.id}`,
+          skipAchievements: true,
+        },
+      );
+    } catch (awardError) {
+      // Delete first, then reverse the points on a separate best effort: if the
+      // delete failed too, leaving the points bump untouched keeps the row and
+      // the points consistent (both committed), and the next evaluation skips
+      // the id — the points are correct even though XP/coins were lost. Rolling
+      // points back while the row survives would double-pay points on retry.
+      const { error: undoUnlock } = await supabase
+        .from("user_achievements")
+        .delete()
+        .eq("user_id", userId)
+        .eq("achievement_id", id);
+      if (!undoUnlock) {
+        await supabase.rpc("bump_counters", {
+          p_user_id: userId,
+          p_deltas: { achievements_points: -ach.points },
+        });
+      } else {
+        console.warn("[achievements] rollback failed for", ach.id, undoUnlock.message);
+      }
+      console.warn(
+        "[achievements] reward failed for",
+        ach.id,
+        undoUnlock
+          ? "— unlock row kept (points consistent, XP/coins lost)"
+          : "— unlock rolled back, next evaluation retries",
+        awardError,
+      );
+    }
   }
 
   // ---- WHERE THE WATERMARK IS BUMPED -----------------------------------
@@ -806,7 +842,13 @@ async function buildStats(userId: string): Promise<AchStats> {
       coins_won: progress.coins_won, coins_lost: progress.coins_lost,
       wheel_spins: progress.wheel_spins, steals_successful: progress.steals_successful,
       steals_failed: progress.steals_failed, times_robbed: progress.times_robbed,
-      game_xp_today: progress.game_xp_today, achievements_points: progress.achievements_points,
+      game_xp_today:
+        // The 100-XP counter is lazily reset in SQL (case when game_xp_day =
+        // p_today then game_xp_today else 0 end); mirror it here or Cap
+        // Crasher unlocks off yesterday's tally on the first evaluation of a
+        // new day, before any round was played.
+        progress.game_xp_day === todayStr ? progress.game_xp_today : 0,
+      achievements_points: progress.achievements_points,
     },
     badgesOwned: badges.length,
     activeOwned: badges.filter((b) => b.status === "active").length,

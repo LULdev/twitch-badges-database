@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Coin from "@/components/Coin";
 
 /**
@@ -24,6 +24,7 @@ export default function BuyFreezeButton({
 }) {
   const t = useTranslations("profile");
   const te = useTranslations("errors");
+  const locale = useLocale();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +73,7 @@ export default function BuyFreezeButton({
       >
         {busy ? "…" : t("buyFreeze")}
         <span className="inline-flex items-center gap-1 tabular-nums">
-          {price.toLocaleString("en-US")} <Coin size={12} />
+          {price.toLocaleString(locale)} <Coin size={12} />
         </span>
       </button>
       {!canAfford && !error ? (

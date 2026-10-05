@@ -26,6 +26,8 @@ export interface ProgressRow {
   game_streak: number;
   best_game_streak: number;
   game_streak_last: string | null;
+  /** Exactly-once starter-item grant (0049) — owned by grant_starter_items. */
+  starter_freezes_granted: boolean;
 }
 
 export type FeedKind =
@@ -434,6 +436,11 @@ export async function award(
     game_streak: _gameStreak,
     best_game_streak: _bestGameStreak,
     game_streak_last: _gameStreakLast,
+    // 0049's grant_starter_items owns this column compare-and-set. getProgress
+    // reads it via select("*"), and without the exclusion every award would
+    // write the stale pre-grant false back over the RPC's true — re-arming the
+    // exactly-once predicate and minting another +2 Streak Freezes per round.
+    starter_freezes_granted: _starterFreezes,
     ...rest
   } = current;
   void _xp;
@@ -456,6 +463,7 @@ export async function award(
   void _gameStreak;
   void _bestGameStreak;
   void _gameStreakLast;
+  void _starterFreezes;
 
   const patch: Record<string, unknown> = {
     ...rest,

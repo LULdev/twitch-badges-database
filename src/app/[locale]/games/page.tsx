@@ -164,9 +164,8 @@ export default async function GamesHubPage({
             {t("bigWinsTitle")}
           </span>
           {ticker.map((win) => (
-            <Link
+            <span
               key={win.id}
-              href={`/games/${win.game ?? ""}`}
               className="group flex items-center gap-2"
             >
               <span
@@ -174,7 +173,13 @@ export default async function GamesHubPage({
                 style={{ background: GAME_COLORS[win.game ?? ""] ?? "var(--accent)" }}
                 aria-hidden
               />
-              <span className="font-bold group-hover:text-accent">{win.username}</span>
+              {win.game ? (
+                <Link href={`/games/${win.game}`} className="font-bold group-hover:text-accent">
+                  {win.username}
+                </Link>
+              ) : (
+                <span className="font-bold">{win.username}</span>
+              )}
               {win.game && <span className="text-xs text-muted">{t(`${win.game}Title`)}</span>}
               <span
                 dir="ltr"
@@ -182,7 +187,7 @@ export default async function GamesHubPage({
               >
                 +{(win.coins_amount ?? 0).toLocaleString(locale)} <Coin size={12} />
               </span>
-            </Link>
+            </span>
           ))}
         </div>
       )}
