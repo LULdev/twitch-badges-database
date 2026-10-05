@@ -1532,7 +1532,6 @@
     "stepCurated": "Twitch の条件: {how}",
     "stepWatchOpen": "Twitch の Drops インベントリを開きます — キャンペーンの進捗と解除情况はそこに表示されます。",
     "stepWatchFind": "参加対象の配信を探します。キャンペーン参加チャンネルにはチャットに進捗バナーが出ます。",
-    "stepWatchTime": "参加チャンネルで {time} 視聴します。カウントは対象配信でのみ進みます。",
     "stepWatchTimeUnknown": "キャンペーンページの記載時間だけ、参加チャンネルを視聴してください。Twitch はバッジ自体に所要時間を明記していません。",
     "stepSubPick": "キャンペーンの対象チャンネルを選びます。通常は配信者1人或カテゴリ1つです。",
     "stepSubStart": "そのチャンネルにサブスクするか Prime を使います。ギフトサブスクも同じバッジの要素です。",
@@ -1540,7 +1539,7 @@
     "stepGiftFind": "キャンペーンのカテゴリ内で参加対象の配信者を探します。",
     "stepGiftBuy": "その配信者のページからサブスクをギフトします。ギフトする側にサブスクは不要です。",
     "stepGiftClaim": "ギフトが確定すると、Twitch はギフトした側のアカウントにバッジを付与します。",
-    "stepBitsCheer": "任意のチャンネルで {amount} ビットを投げます。",
+    "stepBitsCheer": "任意のチャンネルで {amount, number} ビットを投げます。",
     "stepBitsSend": "チャットの下のビットメニューで段階を選ぶか、任意の金額を入力します。",
     "stepBitsClaim": "応援バッジは自動的にアカウントに付与されます。",
     "stepHypeRide": "ハイプトレイン実施中にチャンネルへ入ります。",
@@ -1589,6 +1588,8 @@
     "linkBadgeSettings": "バッジ設定",
     "linkOfficialSource": "このバッジの Twitch 公式ページ",
     "linkAnnualRecap": "Twitch 年間まとめ",
-    "fromCurated": "Twitch 公式の原文"
+    "fromCurated": "Twitch 公式の原文",
+    "stepWatchTimeHours": "参加チャンネルで {amount, plural, other {# 時間}} 視聴します。カウントは対象配信でのみ進みます。",
+    "stepWatchTimeMinutes": "参加チャンネルで {amount, plural, other {# 分}} 視聴します。カウントは対象配信でのみ進みます。"
   }
 }

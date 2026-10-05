@@ -1532,7 +1532,6 @@
     "stepCurated": "Twitch 的要求：{how}",
     "stepWatchOpen": "打开 Twitch 的掉落库存（Drops inventory）——活动进度和已解锁的徽章都显示在那里。",
     "stepWatchFind": "找到参与活动的直播。参与活动的频道会在聊天中显示进度横幅。",
-    "stepWatchTime": "在参与频道观看 {time}。只有符合条件的直播才会累计进度。",
     "stepWatchTimeUnknown": "按活动页面标注的时长观看参与频道——Twitch 并未在徽章本身上写明固定时长。",
     "stepSubPick": "选择本次活动覆盖的频道，通常是一个主播或一个分类。",
     "stepSubStart": "订阅其中一个频道或使用 Prime。赠送的订阅同样计入该徽章。",
@@ -1540,7 +1539,7 @@
     "stepGiftFind": "在活动分类中找到参与活动的主播。",
     "stepGiftBuy": "在主播页面为其赠送订阅。赠送方自己不需要订阅。",
     "stepGiftClaim": "赠送到账后，Twitch 会把徽章发给赠送方的账号。",
-    "stepBitsCheer": "在任意频道打赏 {amount} 积分。",
+    "stepBitsCheer": "在任意频道打赏 {amount, number} 积分。",
     "stepBitsSend": "在聊天框下方的积分菜单中选择对应档位，也可以直接输入自定义金额。",
     "stepBitsClaim": "打赏徽章会自动绑定到你的账号。",
     "stepHypeRide": "在 hype 列车运行时进入某个频道。",
@@ -1589,6 +1588,8 @@
     "linkBadgeSettings": "你的徽章设置",
     "linkOfficialSource": "该徽章的 Twitch 官方页面",
     "linkAnnualRecap": "Twitch 年度总结",
-    "fromCurated": "Twitch 官方原文"
+    "fromCurated": "Twitch 官方原文",
+    "stepWatchTimeHours": "在参与频道观看 {amount, plural, other {# 小时}}。只有符合条件的直播才会累计进度。",
+    "stepWatchTimeMinutes": "在参与频道观看 {amount, plural, other {# 分钟}}。只有符合条件的直播才会累计进度。"
   }
 }

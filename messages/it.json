@@ -1532,7 +1532,6 @@
     "stepCurated": "Requisito di Twitch: {how}",
     "stepWatchOpen": "Apri il tuo inventario Drops su Twitch: è lì che compaiono i progressi e gli sblocchi delle campagne.",
     "stepWatchFind": "Trova una trasmissione partecipante. I canali di campagna mostrano un banner di avanzamento in chat.",
-    "stepWatchTime": "Guarda per {time} su un canale partecipante. Il contatore avanza solo su trasmissioni idonee.",
     "stepWatchTimeUnknown": "Guarda il canale partecipante per il tempo indicato nella pagina della campagna: Twitch non fissa una durata sul badge stesso.",
     "stepSubPick": "Scegli il canale o i canali coperti dalla campagna, di solito uno streamer o una categoria.",
     "stepSubStart": "Abbonati o usa Prime. Gli abbonamenti regalati contano per lo stesso badge.",
@@ -1540,7 +1539,7 @@
     "stepGiftFind": "Trova uno streamer partecipante nella categoria della campagna.",
     "stepGiftBuy": "Regala un abbonamento a quello streamer dalla sua pagina. L'account che regala non deve avere un abbonamento.",
     "stepGiftClaim": "Twitch assegna il badge all'account che ha regalato l'abbonamento.",
-    "stepBitsCheer": "Invia {amount} Bit in qualsiasi canale.",
+    "stepBitsCheer": "Invia {amount, number} Bit in qualsiasi canale.",
     "stepBitsSend": "Scegli il livello nel menu Bit sotto la chat, oppure digita un importo personalizzato.",
     "stepBitsClaim": "Il badge cheer viene aggiunto automaticamente al tuo account.",
     "stepHypeRide": "Entra in un canale mentre è in corso un Hype Train.",
@@ -1589,6 +1588,8 @@
     "linkBadgeSettings": "Le tue impostazioni badge",
     "linkOfficialSource": "Pagina Twitch ufficiale di questo badge",
     "linkAnnualRecap": "Retrospettiva annuale di Twitch",
-    "fromCurated": "Testo originale di Twitch"
+    "fromCurated": "Testo originale di Twitch",
+    "stepWatchTimeHours": "Guarda per {amount, plural, one {# ora} other {# ore}} su un canale partecipante. Il contatore avanza solo su trasmissioni idonee.",
+    "stepWatchTimeMinutes": "Guarda per {amount, plural, one {# minuto} other {# minuti}} su un canale partecipante. Il contatore avanza solo su trasmissioni idonee."
   }
 }

@@ -1,4 +1,5 @@
-import type { HowToGuide } from "@/lib/badges/how-to-get";
+import type { ReactNode } from "react";
+import { isTwitchUrl, type HowToGuide } from "@/lib/badges/how-to-get";
 
 /**
  * The per-badge "how to get it" guide.
@@ -31,7 +32,47 @@ export default function HowToGet({
   guide: HowToGuide;
   labels: HowToGetLabels;
 }) {
-  const listId = "how-to-steps";
+  /**
+
+  /**
+   * Render a step's text, turning any URL Twitch itself wrote into a live link.
+   *
+   * The 51 curated `how_to_earn` rows are Twitch's own wording and frequently
+   * carry the campaign URL inline ("Open the badge campaign:
+   * https://www.twitch.tv/directory/category/…"), which rendered as dead text.
+   * Only twitch.tv hosts are linkified — the sync pipeline supplies this text,
+   * so an arbitrary host must never become an anchor we vouch for.
+   */
+  const renderStepText = (text: string) => {
+    if (!text.includes("http")) return text;
+    const parts: ReactNode[] = [];
+    const pattern = /https?:\/\/[^\s,;)]+/g;
+    let last = 0;
+    let match: RegExpExecArray | null;
+    let key = 0;
+    while ((match = pattern.exec(text)) !== null) {
+      const raw = match[0];
+      if (match.index > last) parts.push(text.slice(last, match.index));
+      if (isTwitchUrl(raw)) {
+        parts.push(
+          <a
+            key={`u${key++}`}
+            href={raw}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            className="break-all text-accent hover:underline"
+          >
+            {raw.replace(/^https?:\/\//, "")}
+          </a>,
+        );
+      } else {
+        parts.push(raw);
+      }
+      last = match.index + raw.length;
+    }
+    if (last < text.length) parts.push(text.slice(last));
+    return parts;
+  };
 
   return (
     <section className="card p-6" aria-labelledby="bd-howto">
@@ -57,7 +98,7 @@ export default function HowToGet({
       <h3 className="mt-5 text-xs font-bold uppercase tracking-[0.08em] text-muted">
         {labels.stepsTitle}
       </h3>
-      <ol className="mt-3 space-y-3" aria-labelledby={listId}>
+      <ol className="mt-3 space-y-3">
         {guide.steps.map((step, index) => (
           <li key={index} className="flex gap-3 text-sm leading-relaxed">
             <span
@@ -66,7 +107,9 @@ export default function HowToGet({
             >
               {index + 1}
             </span>
-            <span className="min-w-0 text-foreground">{step.text}</span>
+            <span className="min-w-0 text-foreground">
+              {renderStepText(step.text)}
+            </span>
           </li>
         ))}
       </ol>

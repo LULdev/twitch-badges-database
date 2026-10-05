@@ -181,13 +181,9 @@ function subMonths(badge: BadgeRow): number | null {
 }
 
 /** Say a minute count the way a reader would ("90 minutes", "1.5 hours"). */
-function humaniseMinutes(minutes: number): string {
-  if (minutes >= 120 && minutes % 60 === 0) {
-    const hours = minutes / 60;
-    return `${hours} ${hours === 1 ? "hour" : "hours"}`;
-  }
-  if (minutes >= 120) return `${(minutes / 60).toFixed(1)} hours`;
-  return `${minutes} minutes`;
+function splitMinutes(minutes: number): { amount: number; key: "stepWatchTimeHours" | "stepWatchTimeMinutes" } {
+  if (minutes >= 120) return { amount: minutes / 60, key: "stepWatchTimeHours" };
+  return { amount: minutes, key: "stepWatchTimeMinutes" };
 }
 
 /* ------------------------------------------------------------------ */
@@ -325,7 +321,12 @@ export function buildHowToGet(badge: BadgeRow, ctx: HowToContext): HowToGuide {
       pushStep("stepWatchOpen", undefined, L.dropsInventory);
       pushStep("stepWatchFind", undefined, L.directory);
       if (minutes === null) pushStep("stepWatchTimeUnknown");
-      else pushStep("stepWatchTime", { time: humaniseMinutes(minutes) });
+      else {
+        const { amount, key } = splitMinutes(minutes);
+        // The amount stays a NUMBER so next-intl formats it with the page
+        // locale (de prints 10.000, not 10,000) and applies the plural rule.
+        pushStep(key, { amount });
+      }
       pushLink("linkDropsInventory", L.dropsInventory);
       pushLink("linkBrowseDirectory", L.directory);
       break;
@@ -350,7 +351,8 @@ export function buildHowToGet(badge: BadgeRow, ctx: HowToContext): HowToGuide {
 
     case "bits":
       if (bits === null) pushStep("stepBitsCheer");
-      else pushStep("stepBitsCheer", { amount: bits.toLocaleString("en-US") });
+      // Raw number, never pre-formatted: the page locale formats it.
+      else pushStep("stepBitsCheer", { amount: bits });
       pushStep("stepBitsSend");
       pushStep("stepBitsClaim");
       pushLink("linkGetBits", L.bits);
@@ -445,15 +447,18 @@ export function buildHowToGet(badge: BadgeRow, ctx: HowToContext): HowToGuide {
   }
 
   // Universal tail: the badge is invisible in chat until it is switched on.
-  // Not offered on the routes that are not procedures — pointing a reader who
-  // cannot earn the badge at the settings page would be a dead end.
-  if (
-    route.method !== "internal" &&
-    route.method !== "unknown" &&
-    route.method !== "leader"
-  ) {
-    pushStep("stepEnable", undefined, L.badgeSettings);
-    pushLink("linkBadgeSettings", L.badgeSettings);
+  // Offered on EVERY route including the non-procedural ones — a reader who
+  // already holds an unobtainable or undocumented badge still has to turn it
+  // on, and every badge page is required to carry a live Twitch destination.
+  pushStep("stepEnable", undefined, L.badgeSettings);
+  pushLink("linkBadgeSettings", L.badgeSettings);
+
+  // The unknown route has no procedure to point at, so it gets the two places a
+  // reader can actually go looking: the directory and the Drops inventory. They
+  // are generic on purpose — a fabricated campaign link would be worse than none.
+  if (route.method === "unknown") {
+    pushLink("linkBrowseDirectory", L.directory);
+    pushLink("linkDropsInventory", L.dropsInventory);
   }
 
   // The badge's own Twitch destination, when it has a trustworthy one.

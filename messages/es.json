@@ -1532,7 +1532,6 @@
     "stepCurated": "Requisito de Twitch: {how}",
     "stepWatchOpen": "Abre tu inventario de Drops en Twitch: ahí aparecen el progreso y las desbloqueos de las campañas.",
     "stepWatchFind": "Busca una emisión participante. Los canales de campaña muestran un banner de progreso en el chat.",
-    "stepWatchTime": "Mira {time} en un canal participante. El contador solo avanza en emisiones elegibles.",
     "stepWatchTimeUnknown": "Mira el canal participante durante el tiempo que indique la página de la campaña: Twitch no fija una duración en el propio badge.",
     "stepSubPick": "Elige el canal o los canales que cubre la campaña: normalmente un streamer o una categoría.",
     "stepSubStart": "Suscríbete o usa Prime. Las suscripciones regaladas cuentan para el mismo badge.",
@@ -1540,7 +1539,7 @@
     "stepGiftFind": "Busca un streamer participante en la categoría de la campaña.",
     "stepGiftBuy": "Regala una suscripción a ese streamer desde su página. La cuenta que regala no necesita suscripción propia.",
     "stepGiftClaim": "Twitch concede el badge a la cuenta que regala la suscripción.",
-    "stepBitsCheer": "Envía {amount} Bits en cualquier canal.",
+    "stepBitsCheer": "Envía {amount, number} Bits en cualquier canal.",
     "stepBitsSend": "Elige el nivel en el menú de Bits bajo el chat, o escribe una cantidad personalizada.",
     "stepBitsClaim": "El badge de cheer se añade automáticamente a tu cuenta.",
     "stepHypeRide": "Entra en un canal mientras hay un Hype Train en marcha.",
@@ -1589,6 +1588,8 @@
     "linkBadgeSettings": "Tus ajustes de badges",
     "linkOfficialSource": "Página oficial de este badge en Twitch",
     "linkAnnualRecap": "Resumen anual de Twitch",
-    "fromCurated": "Texto original de Twitch"
+    "fromCurated": "Texto original de Twitch",
+    "stepWatchTimeHours": "Mira {amount, plural, one {# hora} other {# horas}} en un canal participante. El contador solo avanza en emisiones elegibles.",
+    "stepWatchTimeMinutes": "Mira {amount, plural, one {# minuto} other {# minutos}} en un canal participante. El contador solo avanza en emisiones elegibles."
   }
 }

@@ -1532,7 +1532,6 @@
     "stepCurated": "Condition de Twitch : {how}",
     "stepWatchOpen": "Ouvrez votre inventaire Drops sur Twitch — c'est là que s'affichent la progression et les déblocages.",
     "stepWatchFind": "Trouvez un flux participant. Les chaînes de campagne affichent une bannière de progression dans le chat.",
-    "stepWatchTime": "Regardez {time} sur une chaîne participante. Le compteur n'avance que sur les flux éligibles.",
     "stepWatchTimeUnknown": "Regardez la chaîne participante pendant la durée indiquée sur la page de campagne — Twitch n'indique aucune durée fixe sur le badge lui-même.",
     "stepSubPick": "Choisissez la ou les chaînes couvertes par la campagne — généralement un streamer ou une catégorie.",
     "stepSubStart": "Abonnez-vous ou utilisez Prime. Les abonnements offerts comptent pour le même badge.",
@@ -1540,7 +1539,7 @@
     "stepGiftFind": "Trouvez un streamer participant dans la catégorie de la campagne.",
     "stepGiftBuy": "Offrez un abonnement à ce streamer depuis sa page. Le compte qui offre n'a pas besoin d'abonnement.",
     "stepGiftClaim": "Twitch accorde le badge au compte qui a offert l'abonnement.",
-    "stepBitsCheer": "Envoyez {amount} Bits dans n'importe quelle chaîne.",
+    "stepBitsCheer": "Envoyez {amount, number} Bits dans n'importe quelle chaîne.",
     "stepBitsSend": "Choisissez le palier dans le menu Bits sous la zone de chat, ou saisissez un montant personnalisé.",
     "stepBitsClaim": "Le badge de cheer est rattaché automatiquement à votre compte.",
     "stepHypeRide": "Rejoignez une chaîne pendant qu'un Hype Train est en cours.",
@@ -1589,6 +1588,8 @@
     "linkBadgeSettings": "Vos paramètres de badges",
     "linkOfficialSource": "Page Twitch officielle de ce badge",
     "linkAnnualRecap": "Rétrospective annuelle Twitch",
-    "fromCurated": "Formulation d'origine Twitch"
+    "fromCurated": "Formulation d'origine Twitch",
+    "stepWatchTimeHours": "Regardez {amount, plural, one {# heure} other {# heures}} sur une chaîne participante. Le compteur n'avance que sur les flux éligibles.",
+    "stepWatchTimeMinutes": "Regardez {amount, plural, one {# minute} other {# minutes}} sur une chaîne participante. Le compteur n'avance que sur les flux éligibles."
   }
 }

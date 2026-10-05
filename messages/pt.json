@@ -1532,7 +1532,6 @@
     "stepCurated": "Requisito da Twitch: {how}",
     "stepWatchOpen": "Abre o teu inventário de Drops na Twitch — é aí que aparecem o progresso e as desbloqueios das campanhas.",
     "stepWatchFind": "Procura uma transmissão participante. Os canais de campanha mostram uma faixa de progresso na chat.",
-    "stepWatchTime": "Vê {time} num canal participante. O contador só avança em transmissões elegíveis.",
     "stepWatchTimeUnknown": "Vê o canal participante durante o tempo indicado na página da campanha — a Twitch não indica uma duração fixa no próprio badge.",
     "stepSubPick": "Escolhe o canal ou os canais abrangidos pela campanha — normalmente um streamer ou uma categoria.",
     "stepSubStart": "Subscreve ou usa o Prime. As subscrições oferecidas contam para o mesmo badge.",
@@ -1540,7 +1539,7 @@
     "stepGiftFind": "Procura um streamer participante na categoria da campanha.",
     "stepGiftBuy": "Oferece uma subscrição a esse streamer a partir da página dele. A conta que oferece não precisa de subscrição própria.",
     "stepGiftClaim": "A Twitch atribui o badge à conta que ofereceu a subscrição.",
-    "stepBitsCheer": "Envia {amount} Bits em qualquer canal.",
+    "stepBitsCheer": "Envia {amount, number} Bits em qualquer canal.",
     "stepBitsSend": "Escolhe o nível no menu de Bits por baixo da chat, ou escreve um valor personalizado.",
     "stepBitsClaim": "O badge de cheer é associado automaticamente à tua conta.",
     "stepHypeRide": "Entra num canal enquanto está a decorrer um Hype Train.",
@@ -1589,6 +1588,8 @@
     "linkBadgeSettings": "As tuas definições de badges",
     "linkOfficialSource": "Página oficial deste badge na Twitch",
     "linkAnnualRecap": "Retrospectiva Anual da Twitch",
-    "fromCurated": "Texto original da Twitch"
+    "fromCurated": "Texto original da Twitch",
+    "stepWatchTimeHours": "Vê {amount, plural, one {# hora} other {# horas}} num canal participante. O contador só avança em transmissões elegíveis.",
+    "stepWatchTimeMinutes": "Vê {amount, plural, one {# minuto} other {# minutos}} num canal participante. O contador só avança em transmissões elegíveis."
   }
 }

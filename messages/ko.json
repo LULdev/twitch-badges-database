@@ -1532,7 +1532,6 @@
     "stepCurated": "Twitch 조건: {how}",
     "stepWatchOpen": "Twitch의 Drops 인벤토리를 여세요. 캠페인 진행률과 해제 여기가 표시됩니다.",
     "stepWatchFind": "참여 방송을 찾으세요. 캠페인 채널에는 채팅에 진행 배너가 표시됩니다.",
-    "stepWatchTime": "참여 채널에서 {time} 시청하세요. 카운터는 대상 방송에서만 올라갑니다.",
     "stepWatchTimeUnknown": "캠페인 페이지에 적힌 시간만큼 참여 채널을 시청하세요. Twitch는 배지 자체에 고정 시간을 표기하지 않습니다.",
     "stepSubPick": "이번 캠페인이 다루는 채널을 고르세요. 대부분 스트리머 한 명이나 카테고리 하나입니다.",
     "stepSubStart": "해당 채널에 구독하거나 Prime을 사용하세요. 선물 구독도 같은 배지에 포함됩니다.",
@@ -1540,7 +1539,7 @@
     "stepGiftFind": "캠페인 카테고리에서 참여 스트리머를 찾으세요.",
     "stepGiftBuy": "해당 스트리머 페이지에서 구독을 선물하세요. 선물하는 계정은 구독하지 않아도 됩니다.",
     "stepGiftClaim": "선물이 전달되면 Twitch는 선물한 계정에 배지를 지급합니다.",
-    "stepBitsCheer": "아무 채널에서 {amount} 비트를 응원하세요.",
+    "stepBitsCheer": "아무 채널에서 {amount, number} 비트를 응원하세요.",
     "stepBitsSend": "채팅창 아래 비트 메뉴에서 단계를 고르거나 직접 금액을 입력하세요.",
     "stepBitsClaim": "응원 배지는 계정에 자동으로 연결됩니다.",
     "stepHypeRide": "하이프 트레인이 진행 중일 때 채널에 들어가세요.",
@@ -1589,6 +1588,8 @@
     "linkBadgeSettings": "내 배지 설정",
     "linkOfficialSource": "이 배지의 Twitch 공식 페이지",
     "linkAnnualRecap": "Twitch 연간 결산",
-    "fromCurated": "Twitch 공식 문구"
+    "fromCurated": "Twitch 공식 문구",
+    "stepWatchTimeHours": "참여 채널에서 {amount, plural, other {# 시간}} 시청하세요. 카운터는 대상 방송에서만 올라갑니다.",
+    "stepWatchTimeMinutes": "참여 채널에서 {amount, plural, other {#분}} 시청하세요. 카운터는 대상 방송에서만 올라갑니다."
   }
 }

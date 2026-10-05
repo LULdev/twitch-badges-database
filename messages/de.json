@@ -1532,7 +1532,6 @@
     "stepCurated": "Twitch' Voraussetzung: {how}",
     "stepWatchOpen": "Öffne dein Drops-Inventar auf Twitch — dort werden Kampagnenfortschritt und Freischaltungen angezeigt.",
     "stepWatchFind": "Suche einen teilnehmenden Stream. Kampagnen-Kanäle zeigen einen Fortschrittsbanner im Chat.",
-    "stepWatchTime": "Sieh dir auf einem teilnehmenden Kanal {time} an. Der Zähler läuft nur auf geeigneten Streams.",
     "stepWatchTimeUnknown": "Sieh dir den teilnehmenden Kanal so lange an, wie es auf der Kampagnenseite steht — Twitch nennt am Badge selbst keine feste Dauer.",
     "stepSubPick": "Wähle den Kanal oder die Kanäle dieser Kampagne — meist ein Streamer oder eine Kategorie.",
     "stepSubStart": "Abonniere einen davon oder nutze Prime. Verschenkte Abos zählen zum selben Badge.",
@@ -1540,7 +1539,7 @@
     "stepGiftFind": "Suche einen teilnehmenden Streamer in der Kategorie der Kampagne.",
     "stepGiftBuy": "Verschenke auf seiner Seite ein Abo an diesen Streamer. Das verschenkende Konto braucht kein eigenes Abo.",
     "stepGiftClaim": "Twitch vergibt das Badge an das verschenkende Konto, sobald das Geschenk ankommt.",
-    "stepBitsCheer": "Feuere {amount} Bits in einem beliebigen Kanal an.",
+    "stepBitsCheer": "Feuere {amount, number} Bits in einem beliebigen Kanal an.",
     "stepBitsSend": "Wähle im Bits-Menü unter der Chatbox den passenden Betrag oder tippe einen eigenen ein.",
     "stepBitsClaim": "Das Cheer-Badge wird automatisch deinem Konto zugeordnet.",
     "stepHypeRide": "Schau in einen Kanal, während ein Hype Train läuft.",
@@ -1589,6 +1588,8 @@
     "linkBadgeSettings": "Deine Badge-Einstellungen",
     "linkOfficialSource": "Offizielle Twitch-Seite zu diesem Badge",
     "linkAnnualRecap": "Twitch-Jahresrückblick",
-    "fromCurated": "Twitch’e eigene Formulierung"
+    "fromCurated": "Twitch’e eigene Formulierung",
+    "stepWatchTimeHours": "Sieh dir auf einem teilnehmenden Kanal {amount, plural, one {# Stunde} other {# Stunden}} an. Der Zähler läuft nur auf geeigneten Streams.",
+    "stepWatchTimeMinutes": "Sieh dir auf einem teilnehmenden Kanal {amount, plural, one {# Minute} other {# Minuten}} an. Der Zähler läuft nur auf geeigneten Streams."
   }
 }

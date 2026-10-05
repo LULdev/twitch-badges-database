@@ -1532,7 +1532,6 @@
     "stepCurated": "Twitch's own requirement: {how}",
     "stepWatchOpen": "Open your Drops inventory on Twitch — that is where campaign progress and unlocks show up.",
     "stepWatchFind": "Find a participating stream. Campaign channels carry a progress banner in chat.",
-    "stepWatchTime": "Watch for {time} on a participating channel. The counter only advances on eligible streams.",
     "stepWatchTimeUnknown": "Watch the participating channel for as long as the campaign page lists — Twitch states no fixed duration on the badge itself.",
     "stepSubPick": "Pick the channel or channels this campaign covers — usually one streamer or a category.",
     "stepSubStart": "Subscribe or Prime to one of them. Gifted subs count toward the same badge.",
@@ -1540,7 +1539,7 @@
     "stepGiftFind": "Find a participating streamer in the campaign's category.",
     "stepGiftBuy": "Gift a subscription to that streamer from their page. The gifting account does not need a subscription of its own.",
     "stepGiftClaim": "Twitch grants the badge to the gifting account once the gift lands.",
-    "stepBitsCheer": "Cheer {amount} Bits in any channel.",
+    "stepBitsCheer": "Cheer {amount, number} Bits in any channel.",
     "stepBitsSend": "Pick the tier in the Bits menu under the chat box, or type in a custom amount.",
     "stepBitsClaim": "The cheer badge is attached to your account automatically.",
     "stepHypeRide": "Join a channel while a Hype Train is running.",
@@ -1589,6 +1588,8 @@
     "linkBadgeSettings": "Your badge settings",
     "linkOfficialSource": "Official Twitch page for this badge",
     "linkAnnualRecap": "Twitch Year in Review",
-    "fromCurated": "Twitch’s own wording"
+    "fromCurated": "Twitch’s own wording",
+    "stepWatchTimeHours": "Watch for {amount, plural, one {# hour} other {# hours}} on a participating channel. The counter only advances on eligible streams.",
+    "stepWatchTimeMinutes": "Watch for {amount, plural, one {# minute} other {# minutes}} on a participating channel. The counter only advances on eligible streams."
   }
 }
