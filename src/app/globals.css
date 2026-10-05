@@ -24,6 +24,12 @@
   --accent: #a970ff;
   --accent-ink: #ffffff;
   --accent-soft: rgba(169, 112, 255, 0.13);
+  /* Premium button surface. Deliberately a touch deeper than --accent: white on
+     #a970ff is only 3.26:1, which fails WCAG AA for the 13px label these
+     buttons carry. #8e50f4 measures 4.56:1 and still reads as the same violet,
+     so the fill keeps the reference hue and gains accessible contrast. The
+     glow ring stays at full --accent, which is where the brightness belongs. */
+  --accent-deep: #8e50f4;
 
   --success: #34d399;
   --warning: #fbbf24;
@@ -39,6 +45,9 @@
   --radius-input: 10px;
   --radius-card: 14px;
   --radius-panel: 18px;
+  /* Buttons are pill-shaped by default; the profile's radius flags below
+     override this so "Sharp" still yields square buttons. */
+  --radius-btn: 999px;
 
   /* Leaderboard podium. The sparkle glyphs on rarity/level/coin badges share
      these so both themes stay legible against their own surface. */
@@ -65,6 +74,7 @@
   --accent: #7c3aed;
   --accent-ink: #ffffff;
   --accent-soft: rgba(124, 58, 237, 0.09);
+  --accent-deep: #6d28d9;
 
   --success: #059669;
   --warning: #d97706;
@@ -204,6 +214,8 @@ html {
       border-color 180ms ease-out,
       color 180ms ease-out,
       opacity 180ms ease-out,
+      box-shadow 220ms ease-out,
+      transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
       filter 180ms ease-out;
     cursor: pointer;
   }
@@ -211,14 +223,53 @@ html {
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  /* Premium treatment, matched to the reference design:
+     full-pill radius, a raised violet body, a soft outer bloom and a 1px
+     lighter rim along the top edge. The rim is what sells the "lit from above"
+     read — a flat fill plus a shadow alone still looks like a web button. */
   .btn-primary {
-    background-color: var(--accent);
+    position: relative;
+    border-radius: var(--radius-btn);
+    /* Nearly flat, like the reference: just enough top-light and bottom-shade
+       to read as a raised surface. A strong gradient reads as glass, not as the
+       solid violet the design actually uses. */
+    background-image: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent-deep) 95%, white) 0%,
+      var(--accent-deep) 60%,
+      color-mix(in srgb, var(--accent-deep) 97%, black) 100%
+    );
     color: var(--accent-ink);
-    border: 1px solid transparent;
+    border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+    /* A 1px lit rim along the top edge plus a short, tight drop. The reference
+       has no real bloom — measured violet bleed 4px below the button is ~6/255,
+       so a wide glow would overshoot the design by a wide margin. */
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 22%, transparent) inset,
+      0 -1px 0 0 color-mix(in srgb, black 12%, transparent) inset,
+      0 2px 6px -4px color-mix(in srgb, var(--accent) 32%, transparent);
   }
   .btn-primary:hover:not(:disabled) {
-    filter: brightness(1.08);
+    transform: translateY(-1px);
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 28%, transparent) inset,
+      0 -1px 0 0 color-mix(in srgb, black 12%, transparent) inset,
+      0 5px 11px -5px color-mix(in srgb, var(--accent) 50%, transparent);
   }
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 16%, transparent) inset,
+      0 2px 5px -3px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  /* Keyboard focus needs to out-rank the glow, so it is drawn as an offset
+     ring rather than a border change the gradient would swallow. */
+  .btn-primary:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 80%, white);
+    outline-offset: 3px;
+  }
+
   .btn-secondary {
     background-color: var(--surface);
     color: var(--foreground);
@@ -244,6 +295,23 @@ html {
   }
   .btn-danger:hover:not(:disabled) {
     background-color: color-mix(in srgb, var(--danger) 12%, transparent);
+  }
+
+  /* Large CTA pill. Height and padding follow the reference proportions
+     (54px tall at a 3.4:1 width-to-height ratio). */
+  .btn-lg {
+    border-radius: var(--radius-btn);
+    padding: 0.875rem 1.75rem;
+    font-size: 0.9375rem;
+    letter-spacing: 0.01em;
+  }
+
+  /* Lift is motion, not decoration — drop it when the reader asks for less. */
+  @media (prefers-reduced-motion: reduce) {
+    .btn-primary:hover:not(:disabled),
+    .btn-primary:active:not(:disabled) {
+      transform: none;
+    }
   }
 
   .chip {
@@ -1963,8 +2031,8 @@ html {
 .pf-cards-outline .card { background: transparent; border: 1px solid var(--line-strong); box-shadow: none; }
 
 /* Radius */
-.pf-radius-sharp { --radius-input: 2px; --radius-card: 4px; --radius-panel: 6px; }
-.pf-radius-round { --radius-input: 999px; --radius-card: 22px; --radius-panel: 28px; }
+.pf-radius-sharp { --radius-input: 2px; --radius-card: 4px; --radius-panel: 6px; --radius-btn: 6px; }
+.pf-radius-round { --radius-input: 999px; --radius-card: 22px; --radius-panel: 28px; --radius-btn: 999px; }
 
 /* Avatar frames */
 .pf-avatar-ring   { box-shadow: 0 0 0 3px var(--pf-accent, var(--accent)); }
