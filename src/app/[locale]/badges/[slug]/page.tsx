@@ -25,6 +25,8 @@ import MarketMap from "@/components/badges/MarketMap";
 import { StatusChip } from "@/components/badges/BadgeCard";
 import { jsonLdScript } from "@/lib/jsonld";
 import { buildBadgeFaq } from "@/lib/badges/faq";
+import { buildHowToGet } from "@/lib/badges/how-to-get";
+import HowToGet from "@/components/badges/HowToGet";
 import BadgeGrid from "@/components/badges/BadgeGrid";
 import OwnersChart from "@/components/charts/OwnersChart";
 import ShareButtons from "@/components/ShareButtons";
@@ -122,9 +124,10 @@ const COMPONENT_COLOR: Record<RarityComponentKey, string> = {
 export default async function BadgeDetailPage({ params }: PageProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
-  const [t, tFaq, tcd, tc] = await Promise.all([
+  const [t, tFaq, tHow, tcd, tc] = await Promise.all([
     getTranslations("badges"),
     getTranslations("badgeFaq"),
+    getTranslations("badgeHowTo"),
     getTranslations("countdown"),
     getTranslations("common"),
   ]);
@@ -264,6 +267,14 @@ export default async function BadgeDetailPage({ params }: PageProps) {
     t: tFaq,
     liveUserCount: live?.userCount ?? null,
     livePercentage: live?.percentage ?? null,
+  });
+
+  // The per-badge acquisition guide. Built from the badge's own row (see
+  // lib/badges/how-to-get.ts) so no badge renders a generic paragraph, and so
+  // the steps it prints are the steps its JSON-LD declares.
+  const howTo = buildHowToGet(badge, {
+    t: tHow,
+    pageUrl: `${siteUrl()}/${locale}/badges/${badge.slug}`,
   });
 
   /** The owner's trajectory, in words (see OwnersChart for the curve). */
@@ -440,14 +451,17 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   );
 
   const acquisitionSection = (
-    <section className="card p-6" aria-labelledby="bd-earn">
-      <h2 id="bd-earn" className="text-sm font-bold uppercase tracking-[0.08em] text-muted">
-        {t("howToEarn")}
-      </h2>
-      <p className="mt-3 text-sm leading-relaxed">
-        {badge.how_to_earn ?? badge.description ?? t("howToEarnUnknown")}
-      </p>
-    </section>
+    <HowToGet
+      guide={howTo}
+      labels={{
+        title: tHow("title", { title: badge.title }),
+        intro: howTo.intro,
+        methodLabel: howTo.methodLabel,
+        stepsTitle: tHow("stepsTitle"),
+        linksTitle: tHow("linksTitle"),
+        fromCurated: tHow("fromCurated"),
+      }}
+    />
   );
 
   const momentumChip = (
@@ -814,6 +828,16 @@ export default async function BadgeDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(faq.jsonLd) }}
       />
+      {/* The HowTo is emitted only when `howTo.jsonLd` exists — an
+          unobtainable badge (staff tenure, leaderboard placement) or one whose
+          unlock method Twitch never published gets no schema at all, because a
+          HowTo with invented steps is worse than no HowTo. */}
+      {howTo.jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(howTo.jsonLd) }}
+        />
+      )}
     </>
   );
 
