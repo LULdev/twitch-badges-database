@@ -79,11 +79,40 @@ export async function playGame(
   gameId: string,
   bet: number,
   input: PlayInput = {},
+  nonce?: string,
 ): Promise<PlayResult> {
   const meta = GAMES.find((g) => g.id === gameId);
   if (!meta) return fail("Unknown game.");
 
   const supabase = createAdminClient();
+
+  // Idempotent retry (0063): a request can settle the round and then lose the
+  // response (serverless kill, client timeout). The retry carries the same
+  // nonce; the (user_id, client_nonce) index guarantees exactly one settle,
+  // so a row here means "this round has already happened" — replay it instead
+  // of charging the bet a second time. Deliberately before EVERY gate: the
+  // round already settled, so today's flood window, balance or switches can
+  // not change its verdict; the only honest answer is the committed one.
+  if (nonce) {
+    const { data: settled } = await supabase
+      .from("game_rounds")
+      .select("bet,payout,won,result")
+      .eq("user_id", userId)
+      .eq("client_nonce", nonce)
+      .maybeSingle();
+    if (settled) {
+      const progress = await getProgress(userId).catch(() => null);
+      return {
+        ok: true,
+        bet: Number(settled.bet),
+        payout: Number(settled.payout),
+        won: Boolean(settled.won),
+        balance: progress?.coins ?? 0,
+        result: (settled.result as Record<string, unknown>) ?? {},
+      };
+    }
+  }
+
   // `resolveGame` must not see a fractional or non-finite stake: the bet-bounds
   // gate below no longer runs before it, so the resolver is handed a sanitised
   // value up front rather than `Math.floor(bet)` after the fact.
@@ -209,10 +238,36 @@ export async function playGame(
       payout,
       won,
       result,
+      ...(nonce ? { client_nonce: nonce } : {}),
     })
     .select("id")
     .maybeSingle();
-  if (roundError) throw roundError;
+  if (roundError) {
+    // 23505 on (user_id, client_nonce): a parallel retry settled the same
+    // nonce between our lookup and this insert. Its round is authoritative —
+    // replay it, the mirror of the top-of-function idempotent path, instead of
+    // 500ing a round the player has already paid for.
+    if (nonce && String(roundError.code) === "23505") {
+      const { data: raced } = await supabase
+        .from("game_rounds")
+        .select("bet,payout,won,result")
+        .eq("user_id", userId)
+        .eq("client_nonce", nonce)
+        .maybeSingle();
+      if (raced) {
+        const progress = await getProgress(userId).catch(() => null);
+        return {
+          ok: true,
+          bet: Number(raced.bet),
+          payout: Number(raced.payout),
+          won: Boolean(raced.won),
+          balance: progress?.coins ?? 0,
+          result: (raced.result as Record<string, unknown>) ?? {},
+        };
+      }
+    }
+    throw roundError;
+  }
 
   // The 1/s flood check above reads the newest existing round and this insert
   // happens after it, so two requests fired in parallel both passed. Re-reading

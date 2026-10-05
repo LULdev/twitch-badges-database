@@ -83,6 +83,26 @@ if (mode === "seed") {
   await page.screenshot({ path: "docs/screenshots/21-blackjack-authenticated.png", fullPage: true });
   console.log("blackjack: deal button", JSON.stringify(dealBtn ?? null));
 
+  // Memory: the board was stranded by a failed deck fetch (both action buttons
+  // hidden once started-with-no-cards) — the Start pill must be present and the
+  // "again" state must not render without cards.
+  await page.goto(`${base}/en/games/memory`, { waitUntil: "networkidle" });
+  const mem = await page.$$eval(".btn-lg", (els) => els.map((e) => ({ c: e.className, t: e.textContent.trim() })));
+  const memStart = mem.find((b) => b.c.includes("btn-primary") && b.c.includes("w-full"));
+  const memAgain = mem.find((b) => b.c.includes("btn-secondary"));
+  if (!memStart || !/Start/i.test(memStart.t)) failures.push(`memory start: ${JSON.stringify(mem)}`);
+  if (memAgain) failures.push(`memory again rendered before a deck was dealt: ${JSON.stringify(memAgain)}`);
+  await page.screenshot({ path: "docs/screenshots/22-memory-authenticated.png", fullPage: true });
+  console.log("memory: start", JSON.stringify(memStart ?? null), "| again (must be absent)", memAgain ?? "none");
+
+  // Tower: primary Climb pill, full-width.
+  await page.goto(`${base}/en/games/tower`, { waitUntil: "networkidle" });
+  const tw = await page.$$eval(".btn-lg", (els) => els.map((e) => ({ c: e.className, t: e.textContent.trim() })));
+  const climbBtn = tw.find((b) => b.c.includes("btn-primary") && b.c.includes("w-full"));
+  if (!climbBtn || !/Climb/i.test(climbBtn.t)) failures.push(`tower climb: ${JSON.stringify(tw)}`);
+  await page.screenshot({ path: "docs/screenshots/23-tower-authenticated.png", fullPage: true });
+  console.log("tower: climb button", JSON.stringify(climbBtn ?? null));
+
   // The wall itself renders for logged-out users — run post-deploy ("wall" mode).
   await browser.close();
   if (failures.length) {

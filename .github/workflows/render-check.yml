@@ -48,8 +48,12 @@ jobs:
           else
             echo "no seeded session present — nothing to clean up"
           fi
-      - name: Upload screenshots on failure
-        if: failure()
+      - name: Upload screenshots
+        # Always, not only on failure: the game boards sit behind the login
+        # gate, so these renders are the only eyes-on record of the boards the
+        # way players see them. A passing run's screenshots make layout drift
+        # (padding, overlap, RTL) visible before it is reported as a bug.
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: render-check-screenshots

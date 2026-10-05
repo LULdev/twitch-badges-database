@@ -26,6 +26,14 @@ export function useGame(gameId: string) {
   // same commit, before `busy` has re-rendered (Vault's "again" did exactly this),
   // so the guard has to be synchronous.
   const inFlight = useRef(false);
+  // Idempotency nonce (0063): one token per play INTENT. It is minted on the
+  // first attempt and kept while the round's fate is unknown — a network error
+  // replies "unknown", so the next click sends the same token and the server
+  // replays the committed round instead of charging the bet twice. A definitive
+  // server answer (won or rejected) clears it, so the next click is a fresh
+  // round. crypto.randomUUID is fine: the game pages are force-dynamic and the
+  // sessions that reach this code path are authenticated.
+  const intentNonce = useRef<string | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -50,13 +58,19 @@ export function useGame(gameId: string) {
       inFlight.current = true;
       setBusy(true);
       setError(null);
+      intentNonce.current ??= crypto.randomUUID();
+      const nonce = intentNonce.current;
       try {
         const res = await fetch("/api/games/play", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ game: gameId, bet, input }),
+          body: JSON.stringify({ game: gameId, bet, input, nonce }),
         });
         const data = (await res.json()) as PlayResponse;
+        // The server answered — whatever it said, this intent is over. A tossed
+        // replay returns ok:true with the committed round, so the retry path
+        // clears here too and the NEXT click is a genuinely new round.
+        intentNonce.current = null;
         if (!data.ok) {
           setError(t("roundFailed"));
           // A rejected round must not leave the PREVIOUS round's verdict on

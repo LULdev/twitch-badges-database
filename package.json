@@ -27,7 +27,10 @@
     "check:locale": "node scripts/check-locale.mjs",
     "e2e:steal": "tsx scripts/e2e-steal.ts",
     "verify": "npm run lint && npm run typecheck && npm run build && npm run check:locale",
-    "shots:buttons": "tsx scripts/shots-buttons.ts"
+    "shots:buttons": "tsx scripts/shots-buttons.ts",
+    "health:check": "tsx scripts/code-health.ts",
+    "health:refresh": "tsx scripts/code-health.ts --refresh",
+    "shots:games": "node scripts/game-render-check.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

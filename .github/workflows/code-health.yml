@@ -1,0 +1,30 @@
+name: Code health
+
+# Weekly dead-code gate. The 20-agent sweep (2026-10-05) found ~150 dead
+# exports/keys/deps; this check turns "does new dead code exist" into a CI
+# question. New findings FAIL the run; the committed allowlist
+# (scripts/code-health.allowlist.json) pins what was already known, so graph
+# only grows when the codebase actually acquires new dead weight. Offset
+# minute (never :00/:30) per the house convention — see potat-sync.yml.
+on:
+  schedule:
+    - cron: "23 3 * * 1"
+  workflow_dispatch: {}
+
+concurrency:
+  group: code-health
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Scan for new dead code
+        run: npm run health:check

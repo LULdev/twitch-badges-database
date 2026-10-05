@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   }
 
   const body = (await request.json().catch(() => null)) as
-    | { game?: string; bet?: number; input?: PlayInput }
+    | { game?: string; bet?: number; input?: PlayInput; nonce?: string }
     | null;
   if (!body?.game || typeof body.bet !== "number") {
     return Response.json({ error: "invalid payload" }, { status: 400 });
@@ -24,6 +24,13 @@ export async function POST(request: Request) {
   if (!Number.isFinite(body.bet) || body.bet <= 0) {
     return Response.json({ error: "invalid bet" }, { status: 400 });
   }
-  const result = await playGame(userId, body.game, body.bet, body.input ?? {});
+  // Idempotency nonce (0063): a settled round replays under the same nonce, so
+  // a client retry after a lost response cannot double-charge. Sanitised to a
+  // plain short token — the game library only matches exact equality on it.
+  const nonce =
+    typeof body.nonce === "string" && body.nonce.length > 0 && body.nonce.length <= 64
+      ? body.nonce
+      : undefined;
+  const result = await playGame(userId, body.game, body.bet, body.input ?? {}, nonce);
   return Response.json(result, { status: result.ok ? 200 : 400 });
 }

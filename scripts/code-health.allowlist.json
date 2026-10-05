@@ -1,0 +1,250 @@
+{
+  "exports": [
+    "generateStaticParams",
+    "OwnedBadgeOption",
+    "BadgeImageSource",
+    "HowToGetLabels",
+    "MarketMapPeer",
+    "MarketMapSelf",
+    "MarketMapLabels",
+    "RadarAxisKey",
+    "RarityRadarComponents",
+    "RarityRadarLabels",
+    "RiskBars",
+    "OwnersChartPoint",
+    "CoinVariant",
+    "QuizBadge",
+    "PlayResponse",
+    "HeaderFeatures",
+    "HourBucket",
+    "DistributionRow",
+    "HistogramBucket",
+    "TrendPoint",
+    "CalendarCell",
+    "IDEA_CATEGORIES",
+    "IDEA_STATUSES",
+    "IdeaStatus",
+    "slugify",
+    "CHANGELOG_KINDS",
+    "CHANGELOG_RISKS",
+    "CUSTOM_BADGE_CATEGORIES",
+    "NewsletterDraft",
+    "AdminActionResult",
+    "EDITABLE_PROFILE_FIELDS",
+    "EditableProfileField",
+    "AdminUserRow",
+    "ListUsersOptions",
+    "ROLE_RANK",
+    "adminOrNull",
+    "getSetting",
+    "PlayerGate",
+    "AnalyticsSummary",
+    "AnalyticsDailyRow",
+    "AnalyticsCountRow",
+    "AnalyticsClientRow",
+    "FaqTranslate",
+    "FaqContext",
+    "FaqItem",
+    "HowToMethod",
+    "HowToStep",
+    "HowToLink",
+    "HowToTranslate",
+    "HowToContext",
+    "AutoPostBadgeInfo",
+    "DropPostContext",
+    "ArcadeHighlightsInput",
+    "ArcadeWeeklyInput",
+    "FeaturePostInput",
+    "ChangelogKind",
+    "ChangelogRisk",
+    "ChangelogEntry",
+    "AchStats",
+    "StealErrorCode",
+    "STEAL_DEFAULTS",
+    "GameMeta",
+    "PlayResult",
+    "SlotSymbol",
+    "BuyResult",
+    "xpToAdvance",
+    "LevelTheme",
+    "WheelSlot",
+    "WHEEL_SLOTS",
+    "ProgressRow",
+    "AwardOptions",
+    "AwardResult",
+    "HeartbeatSource",
+    "HeartbeatStatus",
+    "HeartbeatEntry",
+    "InventorySyncResult",
+    "MarkdownHeading",
+    "PushPayload",
+    "PushResult",
+    "NotificationRow",
+    "CollectorStatsRow",
+    "SORT_KEYS",
+    "ListResult",
+    "StatsPoint",
+    "OwnerSeriesPoint",
+    "FirstArchivedPoint",
+    "PROFILE_PUBLIC_COLUMNS",
+    "InventoryItem",
+    "RarityInput",
+    "RarityResult",
+    "tierOf",
+    "absoluteUrl",
+    "GamesSettings",
+    "FeatureSettings",
+    "gameRules",
+    "ServiceStatus",
+    "GamificationStats",
+    "LevelRow",
+    "TopPlayer",
+    "GameStat",
+    "BiggestWin",
+    "DailyXpRow",
+    "ActivityKindRow",
+    "AchievementStat",
+    "StealStats",
+    "WheelStats",
+    "ClaimStats",
+    "TrafficStats",
+    "SystemStats",
+    "DailyCountRow",
+    "UptimeDailyRow",
+    "UptimeHourlyRow",
+    "ArcadeHighlightsSummary",
+    "ArchiveBackfillOptions",
+    "ArchiveBackfillSummary",
+    "BadgebaseSyncSummary",
+    "GlobalSyncSummary",
+    "PotatSyncSummary",
+    "fetchDistributionPage",
+    "BadgesBlogRankingEntry",
+    "PotatUserProfile",
+    "PotatBadgeLive",
+    "CaptureQuery"
+  ],
+  "i18n": [
+    {
+      "namespace": "common",
+      "key": "filters"
+    },
+    {
+      "namespace": "common",
+      "key": "activeUsers"
+    },
+    {
+      "namespace": "common",
+      "key": "apply"
+    },
+    {
+      "namespace": "badges",
+      "key": "activeCount"
+    },
+    {
+      "namespace": "badges",
+      "key": "channelBadge"
+    },
+    {
+      "namespace": "badges",
+      "key": "ends"
+    },
+    {
+      "namespace": "badges",
+      "key": "firstSeen"
+    },
+    {
+      "namespace": "badges",
+      "key": "howToEarnUnknown"
+    },
+    {
+      "namespace": "badges",
+      "key": "ownerCount"
+    },
+    {
+      "namespace": "badges",
+      "key": "rarityScore"
+    },
+    {
+      "namespace": "badges",
+      "key": "released"
+    },
+    {
+      "namespace": "badges",
+      "key": "started"
+    },
+    {
+      "namespace": "badges",
+      "key": "ownersHeadline"
+    },
+    {
+      "namespace": "badges",
+      "key": "trendFlat"
+    },
+    {
+      "namespace": "badges",
+      "key": "trendGrowing"
+    },
+    {
+      "namespace": "badges",
+      "key": "trendShrinking"
+    },
+    {
+      "namespace": "badges",
+      "key": "reactions"
+    },
+    {
+      "namespace": "compare",
+      "key": "neither"
+    },
+    {
+      "namespace": "blog",
+      "key": "reactions"
+    },
+    {
+      "namespace": "errors",
+      "key": "dbError"
+    },
+    {
+      "namespace": "customizer",
+      "key": "options"
+    },
+    {
+      "namespace": "admin",
+      "key": "gate"
+    },
+    {
+      "namespace": "admin",
+      "key": "dashboard"
+    },
+    {
+      "namespace": "admin",
+      "key": "tabs"
+    },
+    {
+      "namespace": "badgeFaq",
+      "key": "tierUncommon"
+    },
+    {
+      "namespace": "badgeFaq",
+      "key": "tierRare"
+    },
+    {
+      "namespace": "badgeFaq",
+      "key": "tierEpic"
+    },
+    {
+      "namespace": "badgeFaq",
+      "key": "tierLegendary"
+    },
+    {
+      "namespace": "badgeFaq",
+      "key": "tierMythic"
+    },
+    {
+      "namespace": "badgeHowTo",
+      "key": "methodLabel"
+    }
+  ],
+  "deps": []
+}
