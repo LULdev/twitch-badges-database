@@ -25,6 +25,12 @@ import { BetBar, GameError, RoundOutcome, useGame } from "./useGame";
 
 const BEST_KEY = "pingu-throw-best";
 
+// Seconds of dive time before which a swing tap cannot reach the penguin
+// (the club geometry whiffs it). Taps earlier than this are buffered and
+// fired at the moment — measured on the sim curve, real contact starts at
+// ~1.40 s (12.6 m, steep) and peaks at ~1.65 s (375 m).
+const SWING_GRACE_AT = 1.4;
+
 type Hud = {
   phase: Sim["phase"];
   meters: number;
@@ -90,6 +96,7 @@ export default function PinguGame() {
   // Tap timing for the server replay, in sim seconds (snapped to 1/120).
   const clickAtRef = useRef<number | null>(null);
   const submittingRef = useRef(false);
+  const pendingEarlySwing = useRef(false);
   const [hud, setHud] = useState<Hud>({
     phase: "ready",
     meters: 0,
@@ -195,12 +202,32 @@ export default function PinguGame() {
       }
     };
 
+    const fireSwing = () => {
+      // The swing IS the bet placement: capture the sim's own clock (already
+      // on the 1/120 grid) so the server replay lands on the same step the
+      // player saw.
+      clickAtRef.current = Math.round(sim.time * 120) / 120;
+      onEvents(tap(sim));
+      publish(true);
+    };
+
     const act = () => {
-      // The dive→swing tap IS the bet placement: capture the sim's own clock
-      // (already on the 1/120 grid) so the server replay lands on the same
-      // step the player saw.
-      if (sim.phase === "dive") clickAtRef.current = Math.round(sim.time * 120) / 120;
       if (sim.phase === "ready") newBestLatch = false;
+      if (sim.phase === "dive" && sim.time < SWING_GRACE_AT) {
+        // Input buffering: a tap while the penguin is still above the club's
+        // reach would whiff on geometry alone (0.46 m faceplant), punishing
+        // eager players for timing they cannot see. Hold the tap and fire the
+        // swing the moment the dive reaches the earliest hittable height —
+        // clickAt records the EFFECTIVE swing time, so the server replay
+        // matches what the player watched. Late taps (penguin grounded) stay
+        // honest whiffs.
+        pendingEarlySwing.current = true;
+        return;
+      }
+      if (sim.phase === "dive") {
+        fireSwing();
+        return;
+      }
       onEvents(tap(sim));
       publish(true);
     };
@@ -247,6 +274,16 @@ export default function PinguGame() {
         }
         const ctx = canvas.getContext("2d");
         if (ctx) {
+          // Fire a buffered early tap at the earliest hittable height: the
+          // swing starts on the same 1/120 step the player's meter shows.
+          if (
+            pendingEarlySwing.current &&
+            sim.phase === "dive" &&
+            sim.time >= SWING_GRACE_AT
+          ) {
+            pendingEarlySwing.current = false;
+            fireSwing();
+          }
           juice.current.hitstop = Math.max(0, juice.current.hitstop - dt);
           if (juice.current.hitstop <= 0) {
             acc += dt;

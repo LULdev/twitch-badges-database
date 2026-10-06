@@ -90,6 +90,28 @@ async function main() {
     );
   }
 
+  // Pingu's whiff FLOOR, not ceiling: a round whose timing is so far off that
+  // the club never touches (late tap, penguin already grounded) must stay
+  // near-zero EV — spam-swinging must never become a strategy. The
+  // perfect-timing case above (0.9653) is the ceiling; this asserts the
+  // floor, so the verdict is inverted: too HIGH means the whiff broke.
+  {
+    const WHIFF = { clickAtMs: 1850 };
+    const sample = 50_000;
+    let total = 0;
+    for (let i = 0; i < sample; i += 1) {
+      const outcome = await resolveGame("00000000-0000-0000-0000-000000000000", "pingu", BET, WHIFF, stub);
+      total += outcome.payout;
+    }
+    const ratio = total / (sample * BET);
+    const ok = ratio < 0.2;
+    if (!ok) failures += 1;
+    console.log(
+      `${"pingu whiff".padEnd(11)} ${String(sample).padStart(8)} ${ratio.toFixed(4).padStart(15)}  ` +
+        `${ok ? "ok (floor holds)" : "FAIL: whiff EV too high"}`,
+    );
+  }
+
   console.log(
     `\nworst game: ${worst.game} at ${worst.ratio.toFixed(4)} — ` +
       (failures === 0
