@@ -730,6 +730,7 @@
     "level": "Level",
     "wheelLink": "Roue de la fortune",
     "loginRequired": "Connecte-toi avec Twitch pour jouer — tes BadgesCoins et ton XP t'attendent.",
+    "throwsShort": "{n, plural, one {# lancer} other {# lancers}}",
     "bestShort": "Record : {best} m",
     "mute": "Couper le son",
     "unmute": "Activer le son",

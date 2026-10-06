@@ -91,15 +91,18 @@ export default async function GamePage({ params }: PageProps) {
     username: string;
     bet: number | null;
     payout: number | null;
+    meters: number | null;
   }> = [];
   // The all-time podium is a second ordering of the same view — the top
   // payouts may all be older than the recent-8 list. Newest-first breaks
-  // payout ties; both reads stay anonymous and ride the same view.
+  // payout ties; both reads stay anonymous and ride the same view. meters is
+  // pingu-only (payload-projected) and renders as a distance badge when set.
   let topWins: Array<{
     id: number;
     created_at: string;
     username: string;
     payout: number | null;
+    meters: number | null;
   }> = [];
   {
     const supabase = await createClient();
@@ -107,13 +110,13 @@ export default async function GamePage({ params }: PageProps) {
       const [recentRes, podiumRes] = await Promise.all([
         supabase
           .from("stats_game_big_wins")
-          .select("id,created_at,username,bet,payout")
+          .select("id,created_at,username,bet,payout,meters")
           .eq("game", game)
           .order("created_at", { ascending: false })
           .limit(8),
         supabase
           .from("stats_game_big_wins")
-          .select("id,created_at,username,payout")
+          .select("id,created_at,username,payout,meters")
           .eq("game", game)
           .order("payout", { ascending: false })
           .order("created_at", { ascending: false })
@@ -254,6 +257,11 @@ export default async function GamePage({ params }: PageProps) {
                 className="ml-auto inline-flex shrink-0 items-center gap-1 text-xs font-bold tabular-nums"
                 style={{ color: podiumColors[index] }}
               >
+                {entry.meters != null && (
+                  <span className="text-[0.625rem] font-semibold opacity-80">
+                    {Number(entry.meters).toLocaleString(locale)} m ·
+                  </span>
+                )}
                 {(entry.payout ?? 0).toLocaleString(locale)} <Coin size={11} />
               </span>
             </div>
@@ -290,6 +298,11 @@ export default async function GamePage({ params }: PageProps) {
                 <span className="inline-flex items-center gap-1 font-bold text-success">
                   {win.payout?.toLocaleString(locale) ?? "–"} <Coin size={11} />
                 </span>
+                {win.meters != null && (
+                  <span className="font-semibold text-foreground/80">
+                    · {Number(win.meters).toLocaleString(locale)} m
+                  </span>
+                )}
               </span>
               <time dateTime={win.created_at} className="ms-auto text-xs text-muted">
                 {winsDate.format(new Date(win.created_at))}

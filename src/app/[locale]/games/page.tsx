@@ -108,13 +108,14 @@ export default async function GamesHubPage({
     username: string;
     coins_amount: number | null;
     game: string | null;
+    meters: number | null;
   }> = [];
   {
     const supabase = await createClient();
     try {
       const { data } = await supabase
         .from("stats_game_big_wins")
-        .select("id,created_at,username,coins_amount,game")
+        .select("id,created_at,username,coins_amount,game,meters")
         .order("created_at", { ascending: false })
         .limit(3);
       ticker = (data ?? []) as typeof ticker;
@@ -186,6 +187,11 @@ export default async function GamesHubPage({
                 className="inline-flex items-center gap-1 font-bold text-success tabular-nums"
               >
                 +{(win.coins_amount ?? 0).toLocaleString(locale)} <Coin size={12} />
+                {win.meters != null && (
+                  <span className="text-[0.625rem] font-semibold text-muted">
+                    {Number(win.meters).toLocaleString(locale)} m
+                  </span>
+                )}
               </span>
             </span>
           ))}

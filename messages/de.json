@@ -730,6 +730,7 @@
     "level": "Level",
     "wheelLink": "Glücksrad",
     "loginRequired": "Melde dich mit Twitch an zum Spielen — deine BadgesCoins und XP warten.",
+    "throwsShort": "{n, plural, one {# Wurf} other {# Würfe}}",
     "bestShort": "Rekord: {best} m",
     "mute": "Ton aus",
     "unmute": "Ton an",

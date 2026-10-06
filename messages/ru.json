@@ -730,6 +730,7 @@
     "level": "Level",
     "wheelLink": "Колесо фортуны",
     "loginRequired": "Войдите через Twitch, чтобы играть — ваши BadgesCoins и XP ждут.",
+    "throwsShort": "{n, plural, one {# бросок} few {# броска} many {# бросков} other {# броска}}",
     "bestShort": "Рекорд: {best} м",
     "mute": "Выключить звук",
     "unmute": "Включить звук",

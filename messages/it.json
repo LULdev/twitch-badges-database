@@ -730,6 +730,7 @@
     "level": "Level",
     "wheelLink": "Ruota della fortuna",
     "loginRequired": "Accedi con Twitch per giocare — i tuoi BadgesCoins e XP ti aspettano.",
+    "throwsShort": "{n, plural, one {# lancio} other {# lanci}}",
     "bestShort": "Record: {best} m",
     "mute": "Silenzia",
     "unmute": "Riattiva l'audio",

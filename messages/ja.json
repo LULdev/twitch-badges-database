@@ -730,6 +730,7 @@
     "level": "Level",
     "wheelLink": "フォーチュンホイール",
     "loginRequired": "Twitchでログインしてプレイ — BadgesCoinsとXPが待っています。",
+    "throwsShort": "{n} 投",
     "bestShort": "最高：{best} m",
     "mute": "ミュート",
     "unmute": "ミュート解除",

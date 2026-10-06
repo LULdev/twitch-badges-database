@@ -730,6 +730,7 @@
     "level": "Level",
     "wheelLink": "عجلة الحظ",
     "loginRequired": "سجّل الدخول عبر Twitch للعب — BadgesCoins وXP في انتظارك.",
+    "throwsShort": "{n, plural, one {رمية واحدة} two {رميتان} few {# رميات} many {# رمية} other {# رمية}}",
     "bestShort": "الأفضل: {best} م",
     "mute": "كتم الصوت",
     "unmute": "تشغيل الصوت",

@@ -35,6 +35,7 @@ type Hud = {
   phase: Sim["phase"];
   meters: number;
   best: number;
+  throws: number;
   rank: number;
   muted: boolean;
   ready: boolean;
@@ -101,6 +102,7 @@ export default function PinguGame() {
     phase: "ready",
     meters: 0,
     best: 0,
+    throws: 0,
     rank: 1,
     muted: false,
     ready: false,
@@ -128,6 +130,7 @@ export default function PinguGame() {
           h.phase === sim.phase &&
           Math.abs(h.meters - sim.meters) < 0.05 &&
           h.best === bestRef.current &&
+          h.throws === sim.throws &&
           h.rank === rank &&
           h.muted === (audioRef.current?.muted() ?? false)
         ) {
@@ -138,6 +141,7 @@ export default function PinguGame() {
           phase: sim.phase,
           meters: sim.meters,
           best: bestRef.current,
+          throws: sim.throws,
           rank,
           muted: audioRef.current?.muted() ?? false,
           ready: true,
@@ -379,6 +383,9 @@ export default function PinguGame() {
             <span className="chip bg-background/70">{hud.meters.toFixed(1)} m</span>
             {hud.best > 8 && (
               <span className="chip bg-background/70">{tt("bestShort", { best: Math.round(hud.best) })}</span>
+            )}
+            {hud.throws > 0 && (
+              <span className="chip bg-background/70">{tt("throwsShort", { n: hud.throws })}</span>
             )}
           </div>
           {rankLabel && (

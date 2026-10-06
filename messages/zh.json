@@ -730,6 +730,7 @@
     "level": "Level",
     "wheelLink": "命运转盘",
     "loginRequired": "使用 Twitch 登录即可游玩——你的 BadgesCoins 和 XP 正等着你。",
+    "throwsShort": "{n} 次投掷",
     "bestShort": "纪录：{best} 米",
     "mute": "静音",
     "unmute": "取消静音",

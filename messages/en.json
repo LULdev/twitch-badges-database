@@ -730,6 +730,7 @@
     "level": "Level",
     "wheelLink": "Wheel of Fortune",
     "loginRequired": "Log in with Twitch to play — your BadgesCoins and XP are waiting.",
+    "throwsShort": "{n, plural, one {# throw} other {# throws}}",
     "bestShort": "Best: {best} m",
     "mute": "Mute sound",
     "unmute": "Unmute sound",

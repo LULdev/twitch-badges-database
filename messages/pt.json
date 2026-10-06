@@ -730,6 +730,7 @@
     "level": "Level",
     "wheelLink": "Roleta da fortuna",
     "loginRequired": "Faça login com a Twitch para jogar — seus BadgesCoins e XP esperam por você.",
+    "throwsShort": "{n, plural, one {# arremesso} other {# arremessos}}",
     "bestShort": "Recorde: {best} m",
     "mute": "Silenciar",
     "unmute": "Ativar som",
