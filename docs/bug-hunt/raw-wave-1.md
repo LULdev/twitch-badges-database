@@ -1,0 +1,73 @@
+# Bug Hunt — raw findings, Wave 1 (correctness lens) — 2026-10-06
+
+## Chain 1 — API routes (5)
+1. src/app/api/badges/react/route.ts:46-48 (+ blog/react:47-49) — [P2] DELETE leg discards `{error}` and always answers ok:true/removed:true — transient DB error reports a removal that never happened; no 23505-race handling like INSERT leg. Fix: check error like insert path. (verified)
+2. src/app/api/admin/users/route.ts:29-32 + admin/content:33-36 — [P3] `num()` fallback unreachable: absent `?limit=` → Number(null)=0, page size collapses to 1 (masked because panels always send limit). Mirror admin/ideas num(). (verified)
+3. src/app/api/admin/content/route.ts:86-88 (+ newsletter:36-39, ideas:43-45) — [P3] `Number.isFinite(Number(id))` passes for `id:""` → falsy 0 → upsert creates DUPLICATE row instead of edit. Reject empty-string id. (verified)
+4. src/app/api/feed/route.ts:34 + FeedList.tsx:9,163-166 — [P3] `coins_amount` bigint → STRING in JSON; `FeedEvent.coins_amount: number` lies; toLocaleString on string is a no-op → amounts ≥1000 unformatted. Normalize with Number(). (verified)
+5. src/app/api/inventory/sync/route.ts:58-91 — [P3] fallback claims window BEFORE work, claim never released on throw path → failed sync locks member out 60s; retryAfterSeconds computed from claimer ts. Release claim in catch. (likely)
+
+## Chain 2 — Game logic (6)
+1. src/lib/gamification/games.ts:441 — [P3] pingu jackpot-alert gate missing `bet > 0` (all 5 siblings have it) → bet-0 free round can broadcast jackpot push with 0 coins. Add bet>0. (verified)
+2. src/lib/gamification/games.ts:116,270 — [P2] idempotent replay paths return `balance: progress?.coins ?? 0` — bigint STRING violates PlayResult.balance:number → useGame stores string. Number() it. (verified)
+3. src/lib/gamification/games.ts:342-357 — [P3] bumpCoins-failure void deletes round AFTER bump_counters committed → lifetime counters permanently disagree with game_rounds. Reorder or compensate. (verified)
+4. src/lib/gamification/games.ts:648-682 (weights 1076-1077) — [P2] slots RTP ~0.165 (4M-spin sim), ~6x below every other game; 5-of-a-kind pays only 3×stake. Likely missing ×5 in per-line stake or mult table. (verified math)
+5. src/lib/gamification/xp.ts:389,405 — [P3] fallback `current.coins + coinsAwarded` string-concatenates ("100"+0→"1000") when RPC row absent; poisons 2s cache. Number() wraps. (verified)
+6. src/components/games/PinguGame.tsx:152-162 — [P3] submit() fires void play() without single-flight check → in-flight second throw silently dropped, UI desyncs. (verified)
+
+## Chain 3 — Economy core (4)
+1. src/lib/gamification/achievements.ts:267 — [P2] s_broke checks `s.progress.coins === 0` vs bigint STRING → never unlockable. Number() coerce. (verified)
+2. src/lib/gamification/achievements.ts:276 — [P2] s_lucky_777 `coins === 777` same string trap → permanently un-unlockable. (verified)
+3. src/app/api/progress/route.ts:31 — [P2] returns `coins` as bigint STRING; useGame only accepts typeof number → balance chip hidden until first round. Number() it. (verified)
+4. src/lib/gamification/xp.ts:385-389,401-406 — [P3] same string-concat fallbacks as chain2#5. (verified)
+
+## Chain 4 — Catalog & badges (6)
+1. src/lib/queries.ts:612-628 — [P2] loadHomeData endingSoon/upcoming/newest/rarest queries missing `.order("id")` tiebreak (471 rows share first_seen_at etc.) → home sections shuffle/arbitrary. Add tiebreak. (verified)
+2. src/lib/queries.ts:1026,1037 — [P2] getRarestBadges/getMostOwnedBadges no id tiebreak → leaderboard top-10 nondeterministic. (verified)
+3. src/lib/queries.ts:977 — [P3] loadSiteStats newestRes same missing tiebreak. (verified)
+4. src/app/[locale]/badges/[slug]/page.tsx:360 — [P2] JSON-LD offers.availability hardcoded InStock for all statuses. Map status→availability. (verified)
+5. src/app/[locale]/badges/[slug]/page.tsx:388-390 — [P3] "Confirmed active" chip contradicts "Upcoming" (chip needs status==="active" guard). (verified)
+6. src/components/badges/BadgeReactions.tsx:35-36 — [P3] busy guard silently drops second reaction click. (verified)
+
+## Chain 5 — Syncs & external services (6)
+1. src/lib/syncs/potat.ts:205-207 — [P2] valuesChanged compares numbers vs bigint-strings → always true → every hourly run rewrites rows + appends stats points; lastOld throttle dead code. Number() coerce. (verified)
+2. src/lib/syncs/potat.ts:137-140 + rarity.ts:107-109 — [P1] badge_momentum.growth_24h int8 → string; Number.isFinite("42") false → momentumOf always 0.5 → TBRI momentum term permanently inert; all rarity scores wrong. Number() when building growthByBadge. (verified)
+3. src/lib/syncs/global.ts:342 — [P2] isInitialSeed counts ANY rows incl. badgebase/custom/removed → badgebase running first defeats seed detection → ~500 blog posts + push blast. Base check on provider-sourced live rows. (verified)
+4. src/lib/syncs/potat.ts:168-171 — [P2] per-row owners-miss → null totalOwners → NULL written over stored owner_count + null stats point. `?? badge.owner_count`. (likely)
+5. src/lib/syncs/global.ts:272-286,531-556 — [P3] status-deleted rows fall into removal sweep → badge_events FK violation fails whole batch → spurious run failure. Filter deleted ids. (verified, conditional)
+6. src/lib/syncs/badgebase.ts:140-142 — [P3] incident guard only when confirmedExists>0 → first run after deploy can mass-demote to expired. Guard empty live parse too. (verified)
+
+## Chain 6 — SQL & migrations (4)
+1. supabase/migrations/0047:62 (+0049:58,132; 0053:65; 0059:89) — [P1] post-0041 `revoke ... from anon, authenticated` does NOT remove default PUBLIC EXECUTE → game_streak_gate, grant_starter_items, purchase_item (SECURITY DEFINER) callable by ANY anon holder → purchase_item can drain any member's coins / mint items at price 0; streak gate manipulation. Fix: `revoke all on function ... from public`. (verified via ACL doctrine 0032:20/0034:56/0041:184-187)
+2. supabase/migrations/0001:179 — [P3] handle_new_user username-suffix loop is check-then-insert → concurrent signup 23505 aborts auth insert. Catch+re-loop. (no — standard semantics)
+3. supabase/migrations/0030:83-89 (+0046:12-13, 0047:14-16) — [P3] add constraint without drop-if-exists → replay aborts 42710, blocks later migrations. (verified)
+4. supabase/migrations/0041_* ×2 — [P3] duplicate numeric prefix 0041 (two files) → tooling reordering risk. (verified)
+
+## Chain 7 — Client components (6; 1 withdrawn)
+1. src/components/admin/NewsletterPanel.tsx:67-93 — [P2] post() missing in-flight guard → double-click dispatches mass email+push twice. busyRef like UsersPanel. (verified)
+2. src/components/StealPanel.tsx:26-65 — [P3] attempt() no same-tick guard → second fetch overwrites success result with failure → heist renders as failed. (verified)
+3. src/components/admin/UsersPanel.tsx:270-271,279,394 — [P3] locale-less formatting (formatCompact default en, toLocaleDateString browser locale) — only locale-less caller; AdminShell doesn't pass locale. (verified)
+4. src/components/badges/FilterBar.tsx:120-122 — [P3] `?price=` lacks foreign-value treatment unlike status/category/rarity → select shows "All" while URL filters. (verified)
+5. src/components/badges/Countdown.tsx:37-45 — [P3] 1s interval never cleared once total===0 → every elapsed countdown re-renders 60×/min forever. (verified)
+6. (withdrawn — ClaimBar false lead, agent re-read confirmed ordering sound)
+
+## Chain 8 — Stats dashboard (5)
+1. src/lib/stats.ts:451-455 — [P1] steals/wheel/claims/traffic/system view rows passed raw — all bigint → strings → CountUp Number.isFinite fails → CoinsStolen, WheelSpins, BadgeClaims, TurboWins, CoinRains, 5 traffic KPIs, System tile grid all render 0. num() mapping needed. (verified)
+2. src/app/[locale]/stats/page.tsx:571-604 — [P1] visitors KPIs identical: analytics summary bigint strings → online_now/total_hits/24h/7d/30d show 0. (verified)
+3. src/components/stats/AvailabilityStrip.tsx:28-39 — [P3] off-by-one: loop starts index 47 → oldest bucket dropped; caption says −48h. (verified)
+4. src/app/[locale]/stats/page.tsx:553-555 — [P3] All-time availability % (pipeline-only) paired with checks hint summing ALL sources incl. per-minute web probe → mismatched populations. (verified)
+5. src/components/stats/CountUp.tsx:35-55 — [P3] no prefers-reduced-motion gate (CSS respects it, JS rAF doesn't). (verified)
+
+## Chain 9 — Pages & i18n (3)
+1. src/app/[locale]/account/page.tsx:73-75 — [P2] steal fallbacks hardcoded 100/250 instead of getEconomy(); ProfileCustomizer persists stealPrice/stealMax on every save → silently overrides admin economy. (verified)
+2. src/components/LanguageSwitcher.tsx:128-131 — [P3] select() early-returns before suppressLangHint() → choosing CURRENT locale leaves geo hint chip alive. (verified)
+3. src/app/[locale]/inventory/page.tsx:352 — [P3] hardcoded English alt text "avatar". (verified)
+
+## Chain 10 — Infra, scripts & libs (5)
+1. scripts/send-push.ts:2-5 — [P3] only script violating CJS rule: static imports of @/lib/env + @/lib/push hoisted above config(); works only because env reads are lazy today. Dynamic imports. (verified)
+2. .gitignore:37 — [P3] `.env*` also ignores `.env.example` → no env template tracked. (verified)
+3. scripts/game-render-check.mjs:10 + verify-round-nonce.mjs:18 — [P3] write live auth session (tokens+password) to .render-session.json/.round-nonce-state.json — NOT gitignored → plain git add commits valid session. (verified via check-ignore)
+4. Repo root — [P3] committed scratch artifacts (.tmp-verify-trans.mjs, _tmp-badge-snapshot.json, _tmp-ideas.json) tracked in git. (verified)
+5. package.json:64-65 — [P3] stray duplicate root-level build/i18n:check keys outside scripts object. (verified)
+
+WAVE 1 TOTAL: 49 findings (P1×3, P2×13, P3×33) — one false lead withdrawn in-flight.
