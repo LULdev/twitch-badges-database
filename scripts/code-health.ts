@@ -88,23 +88,36 @@ const i18nKeys: Array<{ namespace: string; key: string }> = [];
 {
   const srcJoined = files.filter((f) => f.includes(`${path.sep}src${path.sep}`) || f.includes(`${path.sep}src`)).map(read).join("\n");
   // Dynamic key families the literal scan cannot see: t(`${game.id}Desc`),
-  // t(`${role}Hint`), t(`tier${n}`), t(map[k] ?? "x"), t(`key${v}`). A key
-  // whose TAIL (last camelCase word, e.g. "Desc", "Hint", "Title", "A") matches
-  // a dynamic template fragment in source is reachable. Collect the suffixes
-  // next-intl templates build: `...${...}Suffix` forms.
-  const dynamicTails = new Set<string>();
-  for (const m of srcJoined.matchAll(/`[^`]*\$\{[^}]+\}([A-Za-z_$][\w$]*)`/g)) {
-    dynamicTails.add(m[1]);
+  // t(`rank${n}`), t(`tier${n}`), t(map[k] ?? "x"). For every template literal
+  // handed to a translator call, collect its STATIC segments; a key is
+  // reachable when the segments appear in the key in order (so `rank${x}`
+  // covers rank1..rankN, `${x}Desc` covers every ...Desc, `tier${x}` covers
+  // tierUncommon/tierRare/...). Exact literals are already handled above.
+  const familyTemplates: string[][] = [];
+  // `t(`...${x}...`)` plus an optional TypeScript cast between the template
+  // and the closing paren (tt(`rank${n}` as Parameters<typeof tt>[0])).
+  for (const m of srcJoined.matchAll(/\bt[A-Za-z]*\(\s*`([^`]{0,80})`(?:\s+as\s+[^)]*)?\)/g)) {
+    const segs = m[1].split(/\$\{[^}]*\}/).filter((s) => s.length > 0);
+    if (segs.length > 0) familyTemplates.push(segs);
   }
+  const keyMatchesFamily = (key: string) =>
+    familyTemplates.some((segs) => {
+      let at = 0;
+      for (const seg of segs) {
+        at = key.indexOf(seg, at);
+        if (at < 0) return false;
+        at += seg.length;
+      }
+      return true;
+    });
   for (const [ns, members] of Object.entries(enCatalog)) {
     if (!members || typeof members !== "object") continue;
     for (const key of Object.keys(members)) {
       // Literal use: `t("key")` / t('key') / t(`key`) — exact quoted name.
       const literalRe = new RegExp(`["'\`]${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["'\`]`);
       if (literalRe.test(srcJoined)) continue;
-      // Dynamic-family use: the key's tail is built from a template fragment.
-      const tail = key.match(/[A-Z][a-z0-9]*$/)?.[0] ?? key;
-      if (dynamicTails.has(tail)) continue;
+      // Dynamic-family use: the key is built from a template fragment.
+      if (keyMatchesFamily(key)) continue;
       i18nKeys.push({ namespace: ns, key });
     }
   }

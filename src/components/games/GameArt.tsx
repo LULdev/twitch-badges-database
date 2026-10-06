@@ -26,6 +26,7 @@ export const GAME_COLORS: Record<string, string> = {
   scratch: "#fb923c",
   tower: "#818cf8",
   catcher: "#a3e635",
+  pingu: "#7dd3fc",
 };
 
 const ART: Record<string, ReactNode> = {
@@ -182,6 +183,21 @@ const ART: Record<string, ReactNode> = {
       <circle cx="34" cy="34" r="8" />
       <path d="M37 27q4-5 9-4" />
       <path d="M48 20l3 3M51 20l-3 3M49 18v6" opacity="0.7" />
+    </>
+  ),
+  /* Pingu Throw — cliff, flight arc, penguin mid-air over the distance line */
+  pingu: (
+    <>
+      <path d="M14 22v56h22V22z" strokeWidth="4" />
+      <path d="M14 22h22M14 78h26" strokeWidth="4" />
+      <path d="M36 30q22-14 44-10" opacity="0.6" />
+      <path d="M52 26q16-8 30-6" opacity="0.35" />
+      <ellipse cx="76" cy="52" rx="12" ry="15" />
+      <circle cx="80" cy="44" r="2.5" fill="currentColor" stroke="none" />
+      <path d="M88 45l6 3-6 3" strokeWidth="3.5" />
+      <path d="M64 52l-8 4M88 58l7 5" opacity="0.7" />
+      <path d="M30 84h76" strokeDasharray="4 6" opacity="0.45" />
+      <path d="M58 88v-4M84 88v-4" opacity="0.5" />
     </>
   ),
   /* fallback — neutral badge orbit */

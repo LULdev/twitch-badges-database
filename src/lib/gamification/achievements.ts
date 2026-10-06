@@ -94,7 +94,7 @@ const SPECIAL: Ctor = (id, title, description, check, xp = 2500, coins = 1000) =
 
 const GAME_IDS = [
   "rps", "slots", "shoot", "memory", "quiz", "coinflip", "hilo",
-  "roulette", "blackjack", "vault", "scratch", "tower", "catcher",
+  "roulette", "blackjack", "vault", "scratch", "tower", "catcher", "pingu",
 ];
 
 /** The showcase has six slots (`showcase_slots` is capped at 6 when written). */
@@ -159,6 +159,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   COMMON("c_daily_claim_100", "Loyalty Program", "Claim 100 daily login bonuses.", (s) => s.dailyCount >= 100, 500, 500),
   COMMON("c_rps_first", "Rock Solid", "Play Rock-Paper-Scissors.", (s) => (s.gamesByType["rps"]?.played ?? 0) >= 1),
   COMMON("c_slots_first", "Reel Curious", "Play Badges of Ra.", (s) => (s.gamesByType["slots"]?.played ?? 0) >= 1),
+  COMMON("c_pingu_first", "First Flight", "Send the penguin flying in Pingu Throw.", (s) => (s.gamesByType["pingu"]?.played ?? 0) >= 1),
   COMMON("c_quiz_first", "Quiz Time", "Play Badge Quiz.", (s) => (s.gamesByType["quiz"]?.played ?? 0) >= 1),
   COMMON("c_steal_first", "First Heist", "Attempt your first coin steal.", (s) => s.progress.steals_successful + s.progress.steals_failed >= 1),
   COMMON("c_robbed_first", "It Happens", "Someone tried to steal from you.", (s) => s.progress.times_robbed >= 1),
@@ -280,6 +281,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   SPECIAL("s_wheel_misfortune", "Wheel of Misfortune", "Spin 20 times without ever winning more than 100 XP.", (s) => s.progress.wheel_spins >= 20 && s.wheelBest <= 100, 300, 300),
   SPECIAL("s_sniper", "Sniper", "Steal 200+ coins in a single successful heist.", (s) => s.bestStealAmount >= 200),
   SPECIAL("s_slots_jackpot", "Ra's Jackpot", "Win 5,000+ coins in a single Badges of Ra spin.", (s) => s.recentResults.some((r) => r.game === "slots" && r.payout >= 5000)),
+  SPECIAL("s_pingu_jackpot", "Crown of the Ice", "Hit the 10x Pingu Throw jackpot.", (s) => hasFlag(s, "pingu", "jackpot")),
   SPECIAL("s_birthday", "Badge Birthday", "Log in on your Twitch account's creation anniversary.", (s) => s.twitchBirthday, 1000, 1000),
   // The old check accepted ANY three wins among the last 60 rounds — the same
   // game a week apart satisfied "different games within 10 minutes". The wins
@@ -709,7 +711,7 @@ async function buildStats(userId: string): Promise<AchStats> {
         .order("coins", { ascending: false })
         .limit(3),
       // All-time big-win podium per game: the global top-100 payouts contain
-      // every game's top-3 (13 games × 3 places = 39 ≤ 100), so ONE ordered
+      // every game's top-3 (14 games × 3 places = 42 ≤ 100), so ONE ordered
       // read answers "is this username on ANY podium". Rows arrive payout desc.
       supabase
         .from("stats_game_big_wins")

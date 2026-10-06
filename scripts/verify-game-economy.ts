@@ -54,6 +54,11 @@ async function main() {
     scratch: {},
     tower: { cashoutAt: 1 },
     catcher: { caught: 400, missed: 0 },
+    // Pingu's forged payload is the perfect tap timing (the sweet-spot hit at
+    // ~1.65 s of fall, the measured sweet spot): the server replays it at the physics ceiling (~375 m)
+    // every round, so distance alone must NOT raise EV over 1 — distance only
+    // raises the win chance, and the 10x jackpot is a 1% roll.
+    pingu: { clickAtMs: 1650 },
   };
 
   let worst = { game: "", ratio: 0 };

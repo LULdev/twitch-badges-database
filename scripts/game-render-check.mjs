@@ -103,6 +103,16 @@ if (mode === "seed") {
   await page.screenshot({ path: "docs/screenshots/23-tower-authenticated.png", fullPage: true });
   console.log("tower: climb button", JSON.stringify(climbBtn ?? null));
 
+  // Pingu: a canvas board, not buttons — the canvas must exist and paint the
+  // meters chip once sprites are loaded ("0.0 m" HUD).
+  await page.goto(`${base}/en/games/pingu`, { waitUntil: "networkidle" });
+  const pinguCanvas = await page.$$("canvas");
+  const pinguHud = await page.getByText(/^\d+(\.\d+)? m$/).first().isVisible().catch(() => false);
+  if (pinguCanvas.length === 0) failures.push("pingu: no canvas rendered");
+  if (!pinguHud) failures.push("pingu: meters HUD not visible");
+  await page.screenshot({ path: "docs/screenshots/24-pingu-authenticated.png", fullPage: true });
+  console.log("pingu: canvas", pinguCanvas.length, "| meters HUD", pinguHud);
+
   // The wall itself renders for logged-out users — run post-deploy ("wall" mode).
   await browser.close();
   if (failures.length) {

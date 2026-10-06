@@ -14,6 +14,7 @@ const FAQ_KEYS = [
   "turbo",
   "badges",
   "games",
+  "pingu",
   "fair",
   "streakFreeze",
   "achievements",

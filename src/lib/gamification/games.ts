@@ -4,6 +4,7 @@ import { evaluateAchievements } from "./achievements";
 import { getEconomy, getFeatures, getGames } from "@/lib/settings";
 import { after } from "next/server";
 import { recordNotification, sendPushToAll } from "@/lib/push";
+import { simulateThrow } from "@/lib/games/pingu-sim";
 
 /**
  * The arcade: 13 badge-themed games, all server-authoritative.
@@ -33,6 +34,7 @@ export const GAMES: GameMeta[] = [
   { id: "scratch", title: "Scratch the Badge", type: "luck", minBet: 10, maxBet: 1000 },
   { id: "tower", title: "Tower of Badges", type: "luck", minBet: 10, maxBet: 2000 },
   { id: "catcher", title: "Drops Catcher", type: "skill", minBet: 10, maxBet: 2000 },
+  { id: "pingu", title: "Pingu Throw", type: "skill", minBet: 10, maxBet: 2000 },
 ];
 
 export const GAME_IDS = GAMES.map((g) => g.id);
@@ -51,6 +53,10 @@ export interface PlayInput {
   cashoutAt?: number;
   target?: number;
   stopAt?: number;
+  /** Pingu Throw: ms between the dive tap and the swing tap. The server
+   * replays the throw from this alone — the physics is deterministic, so the
+   * client never gets to state its own score. */
+  clickAtMs?: number;
 }
 
 export interface PlayResult {
@@ -400,6 +406,20 @@ export async function playGame(
       }),
     );
   }
+  // Pingu: the only payout above 5x is the 10x jackpot roll, so the feed gate
+  // and the alert gate collapse onto one flag — the meters ride the payload
+  // for the ticker label and the podium.
+  if (gameId === "pingu" && bet > 0 && result.jackpot === true) {
+    afterResponse(() =>
+      logActivity({
+        userId,
+        kind: "big_win",
+        title: "launched a penguin into the 10x jackpot",
+        coinsAmount: net,
+        payload: { game: gameId, bet, payout, meters: result.meters },
+      }),
+    );
+  }
 
   // Jackpot alert: a rare win is a broadcast moment. Fires after the round
   // settled, inside afterResponse; the alert task fetches the winner's
@@ -414,6 +434,11 @@ export async function playGame(
     );
   }
   if (gameId === "scratch" && bet > 0 && result.jackpot === true) {
+    afterResponse(() =>
+      sendJackpotAlert(supabase, userId, gameId, `Jackpot on ${meta.title}!`, net),
+    );
+  }
+  if (gameId === "pingu" && result.jackpot === true) {
     afterResponse(() =>
       sendJackpotAlert(supabase, userId, gameId, `Jackpot on ${meta.title}!`, net),
     );
@@ -904,6 +929,52 @@ export async function resolveGame(
           chance: Number(outcome.chance.toFixed(3)),
           won: outcome.won,
           hundred: outcome.won && caught >= 100,
+        },
+      };
+    }
+
+    case "pingu": {
+      // The throw is REPLAYED on the server: the client reports only the tap
+      // timing (ms between dive and swing), the deterministic sim derives the
+      // flight — the client never states its own score. Timing is still fully
+      // client-controlled (a macro can hit the ~1650 ms sweet spot every
+      // round), so the payout stays CHANCE-based like every skill game:
+      // distance raises the odds, never the multiplier directly. A whiff
+      // (club never touched) drops to near-floor odds; a real hit earns from
+      // 16% up to the 44% cap. Jackpot: a 10x roll at 320 m+ (the physics
+      // ceiling is ~375 m), replacing the 2x path when it fires — a perfect
+      // timing bot lands at EV ≈ 0.97, worst in the arcade but under 1.
+      const clickAtMs = clampInt(input.clickAtMs, 0, 28_000);
+      const report = simulateThrow(clickAtMs / 1000);
+      const meters = Math.round(report.meters * 10) / 10;
+      const ratio = Math.max(0, Math.min(1, (meters - 8) / (360 - 8)));
+      const jackpot = report.hit && meters >= 320 && Math.random() < 0.01;
+      let payout: number;
+      let won: boolean;
+      let chance: number;
+      if (jackpot) {
+        payout = bet * 10;
+        won = true;
+        chance = 0.01;
+      } else {
+        const base = report.hit ? 0.16 : 0.05;
+        chance = Math.min(0.44, base + ratio * 0.28);
+        won = Math.random() < chance;
+        payout = won ? bet * 2 : 0;
+      }
+      return {
+        payout,
+        result: {
+          meters,
+          deg: Number(report.launchDeg.toFixed(1)),
+          power: Number(report.power.toFixed(3)),
+          bounces: report.bounces,
+          hit: report.hit,
+          ratio: Number(ratio.toFixed(3)),
+          chance: Number(chance.toFixed(3)),
+          won,
+          jackpot,
+          perfect: won && meters >= 320,
         },
       };
     }
