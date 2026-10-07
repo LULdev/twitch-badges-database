@@ -231,7 +231,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   CREATIVE("k_robin_hood", "Robin Hood", "Successfully steal, then gamble away 1,000+ coins.", (s) => s.progress.steals_successful >= 1 && s.progress.coins_lost >= 1000),
   CREATIVE("k_ghost", "Ghost Login", "Keep a 10-day streak with fewer games than login days.", (s) => s.progress.login_streak >= 10 && s.progress.games_played < s.progress.login_streak),
   CREATIVE("k_gambler_1000", "Thousand Bets", "Play 1,000 rounds total.", (s) => s.progress.games_played >= 1000, 1000, 500),
-  CREATIVE("k_comeback", "Comeback Kid", "Recover from 500+ coins lost to net positive.", (s) => s.progress.coins_lost >= 500 && s.progress.coins_won > s.progress.coins_lost),
+  CREATIVE("k_comeback", "Comeback Kid", "Recover from 500+ coins lost to net positive.", (s) => s.progress.coins_lost >= 500 && Number(s.progress.coins_won) > Number(s.progress.coins_lost)),
   // `scatter` is the column COUNT (0-5) and hasFlag tests truthiness, so a single
   // scatter column unlocked a "3+" achievement. `scatterHit` is `scatter >= 3`,
   // computed by the resolver and until now read by nothing.
@@ -264,7 +264,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   // The ranking alone is not enough: with fewer coin holders than places, a
   // 0-coin member was "top 3" by default. The floor keeps the claim honest.
   SPECIAL("s_top_percent", "The 1%", "Be among the top 3 coin holders.", (s) => s.userCount >= 20 && s.isTopCoinHolder && s.progress.coins > 0),
-  SPECIAL("s_broke", "Rock Bottom", "Hit exactly 0 coins after playing 10+ games.", (s) => s.progress.coins === 0 && s.progress.games_played >= 10, 500, 250),
+  SPECIAL("s_broke", "Rock Bottom", "Hit exactly 0 coins after playing 10+ games.", (s) => Number(s.progress.coins) === 0 && s.progress.games_played >= 10, 500, 250),
   SPECIAL("s_lazy_week", "Zen Week", "Keep a 7-day login streak with fewer than 7 games played.", (s) => s.progress.login_streak >= 7 && s.progress.games_played < 7),
   SPECIAL("s_generous", "Charitable", "Pay 1,000+ coins in failed steal attempts.", (s) => s.stealCostPaid >= 1000, 750, 0),
   SPECIAL("s_archivist", "Archivist", "Own 25 expired badges.", (s) => s.expiredOwned >= 25),
@@ -273,7 +273,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   // among the first 100. It stops being earnable once the site grows past that.
   SPECIAL("s_pioneer", "Pioneer", "Be among the first 100 users.", (s) => s.userCount <= 100),
   SPECIAL("s_full_house", "Full House", "Play 10+ rounds of every game.", (s) => GAME_IDS.every((g) => (s.gamesByType[g]?.played ?? 0) >= 10), 1500, 1500),
-  SPECIAL("s_lucky_777", "Lucky Sevens", "Hold exactly 777 coins.", (s) => s.progress.coins === 777, 777, 77),
+  SPECIAL("s_lucky_777", "Lucky Sevens", "Hold exactly 777 coins.", (s) => Number(s.progress.coins) === 777, 777, 77),
   SPECIAL("s_level_42", "Answer to Everything", "Reach level 42.", (s) => s.progress.level >= 42, 420, 420),
   SPECIAL("s_level_69", "Nice", "Reach level 69.", (s) => s.progress.level >= 69, 690, 690),
   SPECIAL("s_daily_cap", "Cap Crasher", "Hit the 100 XP daily game cap.", (s) => s.progress.game_xp_today >= 100),
@@ -880,7 +880,7 @@ async function buildStats(userId: string): Promise<AchStats> {
     // The share link IS the profile URL, so the visits a collector received are
     // the closest real signal to "visits through your link".
     defendedCount: againstMe.filter((s) => !s.success).length,
-    stealCostPaid: mySteals.filter((s) => !s.success).reduce((sum, s) => sum + s.cost, 0),
+    stealCostPaid: mySteals.filter((s) => !s.success).reduce((sum, s) => sum + Number(s.cost), 0),
     bestStealAmount: Math.max(0, ...mySteals.filter((s) => s.success).map((s) => s.coins)),
     reactionsGiven: reactRes.count ?? 0,
     profilesVisited: new Set(

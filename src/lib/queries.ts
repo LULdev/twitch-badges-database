@@ -432,7 +432,13 @@ export async function getBadgeMomentum(badgeId: string): Promise<BadgeMomentum |
     .maybeSingle();
   if (!data) return null;
   const row = data as { active_count: number | null; growth_24h: number | null };
-  return { activeCount: row.active_count, growth24h: row.growth_24h };
+  // Both columns derive from int8 counts, so PostgREST serves them as
+  // strings; the MomentumReadout guard (Number.isFinite) rejects those and
+  // rendered the chip "—"/flat for every badge. Coerce here (null stays null
+  // — "no momentum data", not 0 growth).
+  const activeCount = row.active_count == null ? null : Number(row.active_count);
+  const growth24h = row.growth_24h == null ? null : Number(row.growth_24h);
+  return { activeCount, growth24h };
 }
 
 /**
@@ -794,7 +800,13 @@ export async function getRecapClicks7d(): Promise<number | null> {
     .from("stats_analytics_recap_week")
     .select("clicks_7d")
     .maybeSingle();
-  return (data as { clicks_7d?: number } | null)?.clicks_7d ?? null;
+  // clicks_7d is count(*)::bigint, so PostgREST answers with a string; the
+  // blog recap KPI calls toLocaleString on it, which is a no-op on a string.
+  // Normalize here and keep the declared number|null contract.
+  const raw = (data as { clicks_7d?: number | string | null } | null)?.clicks_7d;
+  if (raw === null || raw === undefined) return null;
+  const clicks = Number(raw);
+  return Number.isFinite(clicks) ? clicks : null;
 }
 
 /**

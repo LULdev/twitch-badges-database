@@ -11,15 +11,17 @@ import { Link } from "@/i18n/navigation";
  * 1,2 Mio.).
  */
 export function formatCompact(
-  value: number | null | undefined,
+  value: number | string | null | undefined,
   locale = "en",
 ): string {
-  if (value === null || value === undefined || !Number.isFinite(value))
+  // PostgREST serves bigint columns (owner_count/active_count) as strings.
+  const n = typeof value === "string" ? Number(value) : value;
+  if (n === null || n === undefined || !Number.isFinite(n))
     return "—";
   return new Intl.NumberFormat(locale, {
     notation: "compact",
     maximumFractionDigits: 1,
-  }).format(value);
+  }).format(n);
 }
 
 export async function StatusChip({ status }: { status: BadgeRow["status"] }) {

@@ -376,6 +376,18 @@ export async function getPlatformStats(): Promise<PlatformStats> {
   const raw = (gamification ?? null) as Record<string, unknown> | null;
   const g = (key: string) => num(raw?.[key]);
 
+  // The five aggregate views below count with `::bigint` too, so PostgREST
+  // serializes every value as a string and CountUp/formatCompact reject it —
+  // the steals/wheel/claims/traffic tiles and the system grid all rendered 0.
+  // Map each row through num() exactly like the gamification map above.
+  const rawSteals = (steals ?? null) as Record<string, unknown> | null;
+  const rawWheel = (wheel ?? null) as Record<string, unknown> | null;
+  const rawClaims = (claims ?? null) as Record<string, unknown> | null;
+  const rawTraffic = (traffic ?? null) as Record<string, unknown> | null;
+  const rawSystem = (system ?? null) as Record<string, unknown> | null;
+  const v = (row: Record<string, unknown> | null, key: string) =>
+    num(row?.[key]);
+
   return {
     gamification: raw
       ? {
@@ -448,11 +460,69 @@ export async function getPlatformStats(): Promise<PlatformStats> {
       unlocks: num(row.unlocks),
       players: num(row.players),
     })),
-    steals: steals ? (steals as StealStats) : null,
-    wheel: wheel ? (wheel as WheelStats) : null,
-    claims: claims ? (claims as ClaimStats) : null,
-    traffic: traffic ? (traffic as TrafficStats) : null,
-    system: system ? (system as SystemStats) : null,
+    steals: rawSteals
+      ? {
+          attempts: v(rawSteals, "attempts"),
+          successes: v(rawSteals, "successes"),
+          cost_paid: v(rawSteals, "cost_paid"),
+          coins_stolen: v(rawSteals, "coins_stolen"),
+          biggest_steal: v(rawSteals, "biggest_steal"),
+          thieves: v(rawSteals, "thieves"),
+          victims: v(rawSteals, "victims"),
+        }
+      : null,
+    wheel: rawWheel
+      ? {
+          spins: v(rawWheel, "spins"),
+          spins_today: v(rawWheel, "spins_today"),
+          turbo_wins: v(rawWheel, "turbo_wins"),
+          turbo_delivered: v(rawWheel, "turbo_delivered"),
+        }
+      : null,
+    claims: rawClaims
+      ? {
+          claims: v(rawClaims, "claims"),
+          claimers: v(rawClaims, "claimers"),
+          claim_xp: v(rawClaims, "claim_xp"),
+          daily_claims: v(rawClaims, "daily_claims"),
+          coin_rains: v(rawClaims, "coin_rains"),
+        }
+      : null,
+    traffic: rawTraffic
+      ? {
+          blog_posts: v(rawTraffic, "blog_posts"),
+          blog_published: v(rawTraffic, "blog_published"),
+          blog_views: v(rawTraffic, "blog_views"),
+          blog_views_7d: v(rawTraffic, "blog_views_7d"),
+          blog_reactions: v(rawTraffic, "blog_reactions"),
+          profile_visits: v(rawTraffic, "profile_visits"),
+          profile_visits_7d: v(rawTraffic, "profile_visits_7d"),
+          profile_views_total: v(rawTraffic, "profile_views_total"),
+        }
+      : null,
+    system: rawSystem
+      ? {
+          badges: v(rawSystem, "badges"),
+          badge_stat_rows: v(rawSystem, "badge_stat_rows"),
+          badge_events: v(rawSystem, "badge_events"),
+          profiles: v(rawSystem, "profiles"),
+          inventory_rows: v(rawSystem, "inventory_rows"),
+          blog_posts: v(rawSystem, "blog_posts"),
+          changelog_entries: v(rawSystem, "changelog_entries"),
+          notifications: v(rawSystem, "notifications"),
+          push_subscriptions: v(rawSystem, "push_subscriptions"),
+          activity_events: v(rawSystem, "activity_events"),
+          game_rounds: v(rawSystem, "game_rounds"),
+          steal_attempts: v(rawSystem, "steal_attempts"),
+          achievement_unlocks: v(rawSystem, "achievement_unlocks"),
+          heartbeats: v(rawSystem, "heartbeats"),
+          badges_last_seen: (rawSystem.badges_last_seen as string | null) ?? null,
+          badges_last_polled: (rawSystem.badges_last_polled as string | null) ?? null,
+          last_activity: (rawSystem.last_activity as string | null) ?? null,
+          last_change: (rawSystem.last_change as string | null) ?? null,
+          last_post: (rawSystem.last_post as string | null) ?? null,
+        }
+      : null,
     // The views name these columns `signups` / `badges`; reading `count` here
     // made both growth charts render as a flat zero line.
     dailyUsers: (dailyUsers as Array<Record<string, unknown>>).map((row) => ({
@@ -555,6 +625,15 @@ export async function getUptimeSnapshot(): Promise<PlatformStats["uptime"]> {
     .reverse();
   const lastHeartbeat = heartbeatTimes[0] ?? null;
 
+  // The recap/freeze week views count with `::bigint` too (0048/0051), so
+  // PostgREST serves strings — coerce before the status page calls
+  // toLocaleString and number formatting on them.
+  const rawRecap = (recapWeek ?? null) as { clicks_7d?: unknown } | null;
+  const rawFreeze = (freezeWeek ?? null) as {
+    freeze_circulation?: unknown;
+    freeze_saves_7d?: unknown;
+  } | null;
+
   return {
     sources,
     daily: (uptimeDaily as UptimeDailyRow[]).map((row) => ({
@@ -576,13 +655,9 @@ export async function getUptimeSnapshot(): Promise<PlatformStats["uptime"]> {
     availabilityAll: availability(sum("ok_total"), sum("checks_total")),
     lastHeartbeat,
     status: serviceStatus(sources),
-    recapClicks7d:
-      (recapWeek as { clicks_7d?: number } | null)?.clicks_7d ?? null,
-    freezeCirculation:
-      (freezeWeek as { freeze_circulation?: number } | null)?.freeze_circulation ??
-      null,
-    freezeSaves7d:
-      (freezeWeek as { freeze_saves_7d?: number } | null)?.freeze_saves_7d ?? null,
+    recapClicks7d: rawRecap ? num(rawRecap.clicks_7d) : null,
+    freezeCirculation: rawFreeze ? num(rawFreeze.freeze_circulation) : null,
+    freezeSaves7d: rawFreeze ? num(rawFreeze.freeze_saves_7d) : null,
   };
 }
 

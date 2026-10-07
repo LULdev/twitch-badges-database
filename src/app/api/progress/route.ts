@@ -28,7 +28,7 @@ export async function GET() {
     .maybeSingle();
   return Response.json({
     authenticated: true,
-    coins: progress.coins,
+    coins: Number(progress.coins),
     // Every other surface exposes the number; this returned the whole
     // LevelInfo object, so a consumer reading `level` would render an object.
     level: levelFromXp(progress.xp).level,

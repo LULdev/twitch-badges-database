@@ -382,11 +382,11 @@ export async function award(
     const granted = Number((row as { granted?: number } | null)?.granted ?? 0);
     xpAwarded = granted;
     newXp = Number(
-      (row as { out_xp?: number } | null)?.out_xp ?? current.xp + granted,
+      (row as { out_xp?: number } | null)?.out_xp ?? Number(current.xp) + granted,
     );
     newCoins = Number(
       (row as { out_coins?: number } | null)?.out_coins ??
-        Math.max(0, current.coins + coinsAwarded),
+        Math.max(0, Number(current.coins) + coinsAwarded),
     );
   } else {
     const applied = await supabase.rpc("apply_xp_coins", {
@@ -399,11 +399,11 @@ export async function award(
       ? applied.data[0]
       : applied.data;
     newXp = Number(
-      (appliedRow as { xp?: number } | null)?.xp ?? current.xp + xpAwarded,
+      (appliedRow as { xp?: number } | null)?.xp ?? Number(current.xp) + xpAwarded,
     );
     newCoins = Number(
       (appliedRow as { coins?: number } | null)?.coins ??
-        Math.max(0, current.coins + coinsAwarded),
+        Math.max(0, Number(current.coins) + coinsAwarded),
     );
   }
   noteAwardedProgress(userId, newXp, newCoins);

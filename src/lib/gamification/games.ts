@@ -113,7 +113,7 @@ export async function playGame(
         bet: Number(settled.bet),
         payout: Number(settled.payout),
         won: Boolean(settled.won),
-        balance: progress?.coins ?? 0,
+        balance: Number(progress?.coins ?? 0),
         result: (settled.result as Record<string, unknown>) ?? {},
       };
     }
@@ -223,13 +223,17 @@ export async function playGame(
   const payout = outcome.value.payout;
   const net = payout - bet;
   // ONE grading decision, used everywhere below. A resolver that reports its own
-  // `won` knows better than the payout does: hilo pays by the odds, so a correct
-  // call at the edges returns slightly less than the stake (0.981x worst) while still
-  // being a win. Previously only the streak flag honoured that — the persisted
-  // row, the `games_won` counter, the win XP, the feed line and the response all
-  // graded on `payout > bet`, so such a round was still recorded as a loss.
+  // `won` knows better than the payout does — with one exception: hilo's edges
+  // pay a correct call below the stake (cs 6/7/93/94) and the multiplier
+  // rounding can land exactly AT the stake, so from the resolver on, `won`
+  // means "payout exceeded the bet" (a real net win). Refund rounds (hilo's
+  // impossible side and ties) carry `refund: true` and are neither a win nor a
+  // loss nor a game: the round row still lands (hilo's nextScore chain and the
+  // nonce replay need it), but counters, XP, feed and the daily streak gate
+  // must not move.
   const won =
     typeof outcome.value.result.won === "boolean" ? outcome.value.result.won : payout > bet;
+  const refund = outcome.value.result.refund === true;
   const result = {
     ...outcome.value.result,
     ...currentStreakFlags(gameId, won, (streak.data ?? []) as Array<{ won: boolean }>),
@@ -267,7 +271,7 @@ export async function playGame(
           bet: Number(raced.bet),
           payout: Number(raced.payout),
           won: Boolean(raced.won),
-          balance: progress?.coins ?? 0,
+          balance: Number(progress?.coins ?? 0),
           result: (raced.result as Record<string, unknown>) ?? {},
         };
       }
@@ -313,29 +317,32 @@ export async function playGame(
   // values computed from `progress` (read before the round resolved) lost one
   // of two overlapping rounds — including the coin balance itself. Their errors
   // are thrown: a failed counter used to leave games_played/coins_won behind
-  // while the balance and the round had already moved.
-  const { error: counterError } = await supabase.rpc("bump_counters", {
-    p_user_id: userId,
-    p_deltas: {
-      games_played: 1,
-      games_won: won ? 1 : 0,
-      coins_won: Math.max(0, net),
-      coins_lost: Math.max(0, -net),
-    },
-  });
-  if (counterError) {
-    // Nothing has moved yet (no counters, no coins) — void the round so it
-    // cannot count for streaks, maxBet or the feed without ever being settled.
-    if (round?.id != null) {
-      const { error: voidError } = await supabase
-        .from("game_rounds")
-        .delete()
-        .eq("id", round.id);
-      if (voidError) {
-        console.warn("[game] could not void the unsettled round:", voidError.message);
+  // while the balance and the round had already moved. Refund rounds move
+  // NOTHING: no games_played/games_won/games_lost, no coins_won/coins_lost.
+  if (!refund) {
+    const { error: counterError } = await supabase.rpc("bump_counters", {
+      p_user_id: userId,
+      p_deltas: {
+        games_played: 1,
+        games_won: won ? 1 : 0,
+        coins_won: Math.max(0, net),
+        coins_lost: Math.max(0, -net),
+      },
+    });
+    if (counterError) {
+      // Nothing has moved yet (no counters, no coins) — void the round so it
+      // cannot count for streaks, maxBet or the feed without ever being settled.
+      if (round?.id != null) {
+        const { error: voidError } = await supabase
+          .from("game_rounds")
+          .delete()
+          .eq("id", round.id);
+        if (voidError) {
+          console.warn("[game] could not void the unsettled round:", voidError.message);
+        }
       }
+      throw counterError;
     }
-    throw counterError;
   }
   // If settlement fails after the round row is committed, void it: no coins
   // moved, so it must not pollute the flood window, the streaks, or the feed.
@@ -358,22 +365,26 @@ export async function playGame(
 
   // `economy` was resolved in wave A and is still the value the operator last
   // published (same 5 s cache bound as before — it is simply read earlier).
-  const awardResult = await award(userId, {
-    xp: won ? economy.gameWinXp : economy.gameLoseXp,
-    source: `game:${gameId}`,
-    countsAsGameXp: true,
-    skipAchievements: true,
-    feedKind: "game",
-    // `won` now comes from the resolver, and hilo's odds-priced edges pay slightly
-    // LESS than the stake on a correct call — so "won N coins" must not print a
-    // negative N. A correct call that nets nothing reads as the call it was.
-    feedTitle: won
-      ? net > 0
-        ? `won ${net.toLocaleString("en")} coins in ${meta.title ?? gameId}`
-        : `called it right in ${meta.title ?? gameId} (${net.toLocaleString("en")} coins)`
-      : `played ${gameId} (${net >= 0 ? "+" : ""}${net.toLocaleString("en")} coins)`,
-    payload: { game: gameId, bet, payout },
-  });
+  // A refund round is not a game: no XP (win or lose), no feed row, and it
+  // must not consume the daily 100 XP game cap — `award` is skipped entirely.
+  const awardResult = refund
+    ? null
+    : await award(userId, {
+        xp: won ? economy.gameWinXp : economy.gameLoseXp,
+        source: `game:${gameId}`,
+        countsAsGameXp: true,
+        skipAchievements: true,
+        feedKind: "game",
+        // `won` now comes from the resolver, and hilo's odds-priced edges pay slightly
+        // LESS than the stake on a correct call — so "won N coins" must not print a
+        // negative N. A correct call that nets nothing reads as the call it was.
+        feedTitle: won
+          ? net > 0
+            ? `won ${net.toLocaleString("en")} coins in ${meta.title ?? gameId}`
+            : `called it right in ${meta.title ?? gameId} (${net.toLocaleString("en")} coins)`
+          : `played ${gameId} (${net >= 0 ? "+" : ""}${net.toLocaleString("en")} coins)`,
+        payload: { game: gameId, bet, payout },
+      });
 
   // Big-win garnish: the standard "game" row above already landed — these are
   // ADDITIONAL best-effort rows (the wheel's turbo_win precedent), delivered
@@ -454,12 +465,16 @@ export async function playGame(
   // must never fail the round: streak advanced, next visit retries.
   let streakBonusXp = 0;
   let freezeUsed = false;
-  try {
-    const today = new Date().toISOString().slice(0, 10);
-    const { data: gate, error } = await supabase.rpc("game_streak_gate", {
-      p_user_id: userId,
-      p_today: today,
-    });
+  // Refund rounds are not games: the daily game-streak gate (which advances
+  // game_streak on the day's first settled round, and burns/earns freezes)
+  // must not move for them.
+  if (!refund) {
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const { data: gate, error } = await supabase.rpc("game_streak_gate", {
+        p_user_id: userId,
+        p_today: today,
+      });
     if (!error && gate) {
       const row = Array.isArray(gate) ? gate[0] : gate;
       const streak = Number((row as { streak?: number })?.streak ?? -1);
@@ -498,8 +513,9 @@ export async function playGame(
         }).catch(() => undefined);
       }
     }
-  } catch {
-    // streak bookkeeping is best-effort; the round itself is already settled
+    } catch {
+      // streak bookkeeping is best-effort; the round itself is already settled
+    }
   }
 
   // The achievement pass re-reads the whole player (17 aggregate queries, 8 of
@@ -523,7 +539,7 @@ export async function playGame(
     bet,
     payout,
     won,
-    balance: awardResult.coins,
+    balance: awardResult?.coins ?? Number(progress.value.coins),
     result: {
       ...result,
       ...(newPersonalBest && { newPersonalBest: true }),
@@ -781,7 +797,7 @@ export async function resolveGame(
       const actual = tie ? "equal" : nextScore > currentScore ? "higher" : "lower";
       // A tie used to be neither "higher" nor "lower", so it silently counted
       // as a full loss with no explanation. It now refunds the stake.
-      const won = !tie && actual === guess;
+      const isCorrect = !tie && actual === guess;
 
       // The player can SEE `currentScore` — the client renders it and carries it
       // from the previous round — so the guess is informed, and a flat payout is
@@ -815,13 +831,34 @@ export async function resolveGame(
             won: false,
             tie: false,
             impossible: true,
+            refund: true,
           },
         };
       }
       const multiplier = Math.min(20, 0.97 / winChance);
+      const correctPayout = Math.max(1, Math.floor(bet * multiplier));
+      // Win grade: only a correct call whose odds-priced payout EXCEEDS the
+      // stake is a win. The edges price a correct call below the stake (cs
+      // 6/7/93/94 pay 9 on a 10 bet) and the multiplier rounding can land
+      // exactly AT the stake for small bets — neither is a win (no win XP, no
+      // streak, no games_won); the player simply keeps the odds price. The
+      // payout value itself is unchanged.
+      const won = isCorrect && correctPayout > bet;
       return {
-        payout: won ? Math.max(1, Math.floor(bet * multiplier)) : tie ? bet : 0,
-        result: { currentScore, nextScore, guess, actual, won, tie },
+        payout: isCorrect ? correctPayout : tie ? bet : 0,
+        result: {
+          currentScore,
+          nextScore,
+          guess,
+          actual,
+          won,
+          tie,
+          // A stake refund (tie, like the impossible side above) is neither a
+          // win nor a loss nor a game: playGame skips counters, XP, the daily-
+          // streak gate and the feed when this flag is set. The round row still
+          // lands so the hilo chain (nextScore) and nonce replay keep working.
+          ...(tie && { refund: true }),
+        },
       };
     }
 

@@ -134,8 +134,12 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
   // ships in migration 0002, so an error here is a real failure.
   if (momentumError) throw momentumError;
   const growthByBadge = new Map<string, number | null>(
+    // growth_24h is int8 in Postgres, so PostgREST returns it as a string;
+    // rarity.ts's momentumOf() guards with Number.isFinite, which rejects
+    // "42", so without coercion the momentum term stays neutral 0.5 forever.
+    // null stays null — Number(null) would fabricate a real 0 growth.
     ((momentumRows ?? []) as Array<{ badge_id: string; growth_24h: number | null }>).map(
-      (row) => [row.badge_id, row.growth_24h],
+      (row) => [row.badge_id, row.growth_24h == null ? null : Number(row.growth_24h)],
     ),
   );
 
@@ -146,6 +150,10 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
   let statusSweeps = 0;
 
   const upsertRows: Array<Record<string, unknown>> = [];
+  // Rows whose rarity could NOT be recomputed (owners feed failed, or no
+  // count for this badge): the same payload minus rarity_score/rarity_tier,
+  // in their own array — see the payload-uniformity check below.
+  const countsOnlyRows: Array<Record<string, unknown>> = [];
   // `status` now rides on every payload row (see the upsert comment), so
   // "does this row carry a status key" no longer distinguishes a sweep from an
   // unchanged badge. The ids that actually moved are tracked here instead, and
@@ -165,29 +173,44 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
     if (!badge) continue;
     matched += 1;
 
-    const totalOwners = ownersOk
-      ? (ownersByBadge.get(`${row.badge}:${row.version}`) ?? null)
-      : (badge.owner_count as number | null);
+    const feedOwners = ownersByBadge.get(`${row.badge}:${row.version}`);
+    // totalOwners must be a JS number (or null). The owners feed hands back
+    // JSON numbers, but the fallback (badge.owner_count) is a PostgREST
+    // bigint STRING: a raw string poisons both the !== comparisons below and
+    // computeRarity (its Number.isFinite checks reject "1234"). null must
+    // stay null — Number(null) would fabricate "0 owners".
+    const totalOwners =
+      ownersOk && feedOwners !== undefined && feedOwners !== null
+        ? Number(feedOwners)
+        : (badge.owner_count == null ? null : Number(badge.owner_count));
     const activeUsers = row.user_count ?? null;
     const percentage = row.percentage ?? null;
 
-    const rarity = computeRarity(
-      {
-        totalOwners,
-        activeUsers,
-        status: badge.status as "active" | "upcoming" | "expired" | "removed",
-        startDate: badge.start_date,
-        endDate: badge.end_date,
-        firstSeenAt: badge.first_seen_at,
-        growth24h: growthByBadge.get(badge.id) ?? null,
-        requiresTicket: isTicketBadge(
-          badge.set_id as string,
-          badge.how_to_earn as string | null,
-          badge.description as string | null,
-        ),
-      },
-      now,
-    );
+    // Recompute rarity only from a real numeric count. When the owners feed
+    // failed, or this badge has neither a feed value nor a stored count,
+    // computeRarity would run on fallback/null input and its result would be
+    // upserted over the whole catalog — the file's own comment above says
+    // stored owner data must be KEPT in that case, and rarity must be too.
+    const rarity =
+      ownersOk && totalOwners !== null
+        ? computeRarity(
+            {
+              totalOwners,
+              activeUsers,
+              status: badge.status as "active" | "upcoming" | "expired" | "removed",
+              startDate: badge.start_date,
+              endDate: badge.end_date,
+              firstSeenAt: badge.first_seen_at,
+              growth24h: growthByBadge.get(badge.id) ?? null,
+              requiresTicket: isTicketBadge(
+                badge.set_id as string,
+                badge.how_to_earn as string | null,
+                badge.description as string | null,
+              ),
+            },
+            now,
+          )
+        : null;
 
     const nextStatus =
       badge.status === "removed"
@@ -202,14 +225,22 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
             now,
           );
 
+    // PostgREST serializes bigint columns as strings, so badge.owner_count /
+    // badge.active_count arrive as "1234" while totalOwners/activeUsers are
+    // JS numbers — a direct !== comparison is then ALWAYS true, which rewrote
+    // every matched row and appended a stats point on every hourly run and
+    // left the lastOld throttle dead. Coerce the DB side (null stays null)
+    // before comparing.
+    const dbOwners = badge.owner_count == null ? null : Number(badge.owner_count);
+    const dbActive = badge.active_count == null ? null : Number(badge.active_count);
     const valuesChanged =
-      totalOwners !== badge.owner_count ||
-      activeUsers !== badge.active_count;
+      totalOwners !== dbOwners ||
+      activeUsers !== dbActive;
     const lastOld =
       !badge.last_polled_at ||
       now.getTime() - new Date(badge.last_polled_at).getTime() > 3_600_000;
 
-    const tierChanged = rarity.tier !== badge.rarity_tier;
+    const tierChanged = rarity !== null && rarity.tier !== badge.rarity_tier;
     if (valuesChanged || lastOld || nextStatus !== badge.status || tierChanged) {
       // ONLY the columns this sync owns, plus the four that carry no default.
       //
@@ -237,7 +268,7 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
       // write landing after theirs would undo the day's confirmation. The
       // identity columns added above are stable catalog identity that potat
       // merely echoes back unchanged, not the volatile fields.
-      upsertRows.push({
+      const payload: Record<string, unknown> = {
         id: badge.id,
         set_id: badge.set_id,
         version: badge.version,
@@ -247,11 +278,25 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
         active_count: activeUsers,
         percentage,
         last_polled_at: now.toISOString(),
-        rarity_score: rarity.score,
-        rarity_tier: rarity.tier,
         status: nextStatus,
-      });
-      rarityUpdated += 1;
+      };
+      if (rarity !== null) {
+        // Real owner data: rarity is recomputed and written with the row.
+        payload.rarity_score = rarity.score;
+        payload.rarity_tier = rarity.tier;
+        upsertRows.push(payload);
+        rarityUpdated += 1;
+      } else {
+        // No usable owner data (feed failed or no count for this badge): write
+        // counts/status only and leave rarity alone. It must be a SEPARATE
+        // array, not a rarity-less row inside upsertRows: (1) PostgREST builds
+        // each request's column list from the union of the batch's keys and
+        // fills the gaps with NULL, so one rarity-carrying row in the batch
+        // would NULL rarity_score/rarity_tier for every counts-only row in it;
+        // (2) DO UPDATE touches only listed columns, so a batch that never
+        // lists the rarity keys leaves the stored values physically untouched.
+        countsOnlyRows.push(payload);
+      }
       if (nextStatus !== badge.status) {
         statusSweeps += 1;
         statusSweepIds.add(badge.id);
@@ -280,12 +325,23 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
   for (const row of upsertRows) {
     pendingByKey.set(String(row.id), row);
   }
+  // The counts-only rows get the same collapse. A badge can appear in only
+  // ONE of the two arrays — the rarity-usable decision depends solely on
+  // ownersOk + totalOwners, which are deterministic per badge — so no id
+  // ever lands in both batches.
+  const pendingCountsByKey = new Map<string, Record<string, unknown>>();
+  for (const row of countsOnlyRows) {
+    pendingCountsByKey.set(String(row.id), row);
+  }
   // Count from the COLLAPSED rows: the loop above tallies per distribution
   // entry, so a repeated badge inflated `rarityUpdated` and `statusSweeps` in
   // the changelog while the database only ever received one row.
   const finalRows = [...pendingByKey.values()];
+  const finalCountsRows = [...pendingCountsByKey.values()];
   rarityUpdated = finalRows.length;
-  statusSweeps = finalRows.filter((row) => statusSweepIds.has(String(row.id))).length;
+  statusSweeps =
+    finalRows.filter((row) => statusSweepIds.has(String(row.id))).length +
+    finalCountsRows.filter((row) => statusSweepIds.has(String(row.id))).length;
 
   // The same collapse must apply to the time-series points: when one catalog
   // row resolves through several distribution entries (byUuid fallback, or the
@@ -303,21 +359,41 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
   // are sent as NULL and then written over the live row. A single unequal shape
   // therefore has to fail HERE, loudly, rather than corrupting a column for the
   // subset of rows that omitted it.
-  const payloadShape = Object.keys(finalRows[0] ?? {}).sort().join(",");
-  const uneven = finalRows.filter(
-    (row) => Object.keys(row).sort().join(",") !== payloadShape,
-  );
-  if (uneven.length > 0) {
-    throw new Error(
-      `potat upsert payload is not uniform: ${uneven.length} of ${finalRows.length} rows have a different column set than the first (${payloadShape})`,
+  const assertUniform = (
+    rows: Array<Record<string, unknown>>,
+    label: string,
+  ): void => {
+    const payloadShape = Object.keys(rows[0] ?? {}).sort().join(",");
+    const uneven = rows.filter(
+      (row) => Object.keys(row).sort().join(",") !== payloadShape,
     );
-  }
+    if (uneven.length > 0) {
+      throw new Error(
+        `potat upsert payload is not uniform (${label}): ${uneven.length} of ${rows.length} rows have a different column set than the first (${payloadShape})`,
+      );
+    }
+  };
+  assertUniform(finalRows, "rarity");
+  // The counts-only batch is a separate PostgREST request with its own column
+  // set (no rarity keys) — an unequal shape inside it would corrupt the same
+  // way, so it fails the same check.
+  assertUniform(finalCountsRows, "counts-only");
 
   // Chunked commits again: a failure in a later chunk leaves earlier ones live
   // with no changelog row — the undocumented-mutation case the other syncs
   // guard against. Log what was in flight (flagged) before rethrowing.
   try {
     for (const batch of chunk(finalRows, 200)) {
+      const { error } = await supabase
+        .from("badges")
+        .upsert(batch, { onConflict: "id" });
+      if (error) throw error;
+    }
+
+    // Counts-only rows omit the rarity columns; PostgREST's DO UPDATE touches
+    // only the columns a batch lists, so this second uniform batch refreshes
+    // counts/status while leaving stored rarity_score/rarity_tier untouched.
+    for (const batch of chunk(finalCountsRows, 200)) {
       const { error } = await supabase
         .from("badges")
         .upsert(batch, { onConflict: "id" });

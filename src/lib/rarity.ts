@@ -62,22 +62,30 @@ function clamp01(value: number): number {
 }
 
 function scarcityOf(totalOwners: number | null): number {
-  if (totalOwners === null || !Number.isFinite(totalOwners)) return 0.35;
-  if (totalOwners <= 1) return 1;
-  return clamp01(1 - Math.log10(totalOwners) / Math.log10(OWNERS_MAX));
+  // badges.owner_count is int8, so PostgREST delivers it as a string — potat's
+  // owners-feed fallback and the badge page's live recompute both hand it
+  // through raw. Coerce before the finite check, or every badge falls to 0.35.
+  const owners = totalOwners === null ? null : Number(totalOwners);
+  if (owners === null || !Number.isFinite(owners)) return 0.35;
+  if (owners <= 1) return 1;
+  return clamp01(1 - Math.log10(owners) / Math.log10(OWNERS_MAX));
 }
 
 function wearOf(totalOwners: number | null, activeUsers: number | null): number {
+  // Same int8-string coercion as scarcityOf: raw values trip the finite check
+  // and the pair would fall back to the 0.5 neutral instead of the real share.
+  const owners = totalOwners === null ? null : Number(totalOwners);
+  const active = activeUsers === null ? null : Number(activeUsers);
   if (
-    totalOwners === null ||
-    activeUsers === null ||
-    totalOwners <= 0 ||
-    !Number.isFinite(totalOwners) ||
-    !Number.isFinite(activeUsers)
+    owners === null ||
+    active === null ||
+    owners <= 0 ||
+    !Number.isFinite(owners) ||
+    !Number.isFinite(active)
   ) {
     return 0.5;
   }
-  return clamp01(activeUsers / totalOwners);
+  return clamp01(active / owners);
 }
 
 function obtainabilityOf(input: RarityInput, now: Date): number {
@@ -103,17 +111,26 @@ function ageOf(firstSeenAt: string | null, now: Date): number {
 
 function momentumOf(input: RarityInput): number {
   if (input.status === "expired" || input.status === "removed") return 0;
+  // badge_momentum.growth_24h derives from int8 active_count, so PostgREST
+  // delivers it as a string — Number.isFinite on the raw value was always
+  // false and pinned every badge's momentum to the neutral 0.5. Coerce both
+  // numeric inputs before the guard.
+  const growth24h =
+    input.growth24h === null || input.growth24h === undefined
+      ? null
+      : Number(input.growth24h);
+  const activeUsers =
+    input.activeUsers === null ? null : Number(input.activeUsers);
   if (
-    input.growth24h === null ||
-    input.growth24h === undefined ||
-    !Number.isFinite(input.growth24h) ||
-    !input.activeUsers ||
-    input.activeUsers <= 0
+    growth24h === null ||
+    !Number.isFinite(growth24h) ||
+    !activeUsers ||
+    activeUsers <= 0
   ) {
     return 0.5; // no history yet — neutral
   }
   // +5% active growth in a day is a hot claim wave → 1.0
-  const ratio = input.growth24h / input.activeUsers;
+  const ratio = growth24h / activeUsers;
   return clamp01(ratio * 20);
 }
 

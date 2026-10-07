@@ -69,6 +69,23 @@ const EMPTY_SUMMARY: AnalyticsSummary = {
   unique_visitors_30d: 0,
 };
 
+/**
+ * PostgREST serializes every `::bigint`/`::numeric` column of the summary view
+ * (migration 0036 — the whole column set is numeric) as a string, and CountUp
+ * on /stats rejects non-finite inputs, so the visitor KPIs rendered 0. Coerce
+ * each field to a real number before the merge, using EMPTY_SUMMARY's keys as
+ * the column list — the view only ever appends columns, and any future
+ * non-numeric one would stay untouched here.
+ */
+function normalizeSummary(row: AnalyticsSummary): AnalyticsSummary {
+  const normalized = { ...EMPTY_SUMMARY };
+  (Object.keys(EMPTY_SUMMARY) as Array<keyof AnalyticsSummary>).forEach((key) => {
+    const value = row[key];
+    if (value != null) normalized[key] = Number(value);
+  });
+  return normalized;
+}
+
 /** Reads every analytics view. Wrapped per query so a missing view (the site
  *  runs before migration 0025 is applied) yields empty data, not a crash. */
 export async function getAnalytics(): Promise<AnalyticsBundle> {
@@ -112,7 +129,7 @@ export async function getAnalytics(): Promise<AnalyticsBundle> {
   ]);
 
   return {
-    summary: summary ? { ...EMPTY_SUMMARY, ...summary } : null,
+    summary: summary ? normalizeSummary(summary) : null,
     daily,
     paths,
     referrers,
