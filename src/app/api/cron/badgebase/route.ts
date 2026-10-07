@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { isAuthorizedCron } from "@/lib/cron-auth";
 import { runBadgebaseSync } from "@/lib/syncs/badgebase";
 import { recordHeartbeat, withHeartbeat } from "@/lib/health";
@@ -34,6 +35,11 @@ export async function GET(request: Request) {
       durationMs,
       message: skipped ? "drop-window enrichment skipped: empty listing" : null,
     });
+    // badgebase is the status authority (is_confirmed_active, status
+    // demotions) — its writes feed the cached "catalog"/"home" payloads, and
+    // these tags have no other invalidator.
+    revalidateTag("catalog", "default");
+    revalidateTag("home", "default");
     return Response.json({ ok: true, skipped, summary, durationMs });
   } catch (error) {
     const durationMs = Date.now() - started;

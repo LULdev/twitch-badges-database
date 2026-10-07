@@ -48,7 +48,21 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
   // hydration mismatch on the "Xs/Xm/Xh" text.
   const [nowTick, setNowTick] = useState<number | null>(null);
 
+  // Any tick that fires while a previous poll is still in flight is skipped.
+  // Without the guard a slow poll A that resolves AFTER a faster poll B
+  // prepends older rows above newer ones: A's fresh ids lie outside B's
+  // newer limit-30 window, so [...fresh, ...prev] renders the feed
+  // out-of-order until the next tick. `id` is a serial identity and the API
+  // returns it descending, so once polls can no longer overlap every later
+  // poll's fresh ids are newer by construction — no sorting needed. Skipping
+  // the tick also stops requests from piling up on slow networks (a poll
+  // cannot exceed one interval's worth of staleness; the next tick picks up
+  // everything a skipped one missed).
+  const polling = useRef(false);
+
   const poll = useCallback(async () => {
+    if (polling.current) return;
+    polling.current = true;
     try {
       const res = await fetch("/api/feed?limit=30", { cache: "no-store" });
       const data = (await res.json()) as { events: FeedEvent[] };
@@ -67,6 +81,8 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
       }
     } catch {
       // ignore — next poll retries
+    } finally {
+      polling.current = false;
     }
   }, []);
 

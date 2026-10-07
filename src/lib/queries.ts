@@ -406,7 +406,11 @@ export async function getBadgeEvents(badgeId: string, limit = 50): Promise<Badge
     .from("badge_events")
     .select("kind, detail, created_at")
     .eq("badge_id", badgeId)
+    // Sweeps insert event batches with shared timestamps, so created_at alone
+    // lets same-second rows shuffle between requests — the same id tiebreak
+    // (desc) listChangelog carries.
     .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
     .limit(limit);
   return (data ?? []) as BadgeEventRow[];
 }
@@ -616,22 +620,26 @@ const loadHomeData = unstable_cache(
         .eq("status", "active")
         .not("end_date", "is", null)
         .order("end_date", { ascending: true })
+        .order("id")
         .limit(6),
       supabase
         .from("badges")
         .select("*")
         .eq("status", "upcoming")
         .order("start_date", { ascending: true, nullsFirst: false })
+        .order("id")
         .limit(6),
       supabase
         .from("badges")
         .select("*")
         .order("first_seen_at", { ascending: false })
+        .order("id")
         .limit(8),
       supabase
         .from("badges")
         .select("*")
         .order("rarity_score", { ascending: false })
+        .order("id")
         .limit(6),
       // Deterministic pick for the hero orbit: the rarest ACTIVE badges that
       // actually have artwork (rarity_score desc naturally surfaces legendary/
@@ -987,6 +995,7 @@ const loadSiteStats = unstable_cache(
       .from("badges")
       .select("*")
       .order("first_seen_at", { ascending: false })
+      .order("id")
       .limit(12),
   ]);
 
@@ -1035,6 +1044,7 @@ export async function getRarestBadges(limit = 10): Promise<BadgeRow[]> {
     .from("badges")
     .select("*")
     .order("rarity_score", { ascending: false })
+    .order("id")
     .limit(limit);
   return (data ?? []) as BadgeRow[];
 }
@@ -1046,6 +1056,7 @@ export async function getMostOwnedBadges(limit = 10): Promise<BadgeRow[]> {
     .select("*")
     .not("owner_count", "is", null)
     .order("owner_count", { ascending: false })
+    .order("id")
     .limit(limit);
   return (data ?? []) as BadgeRow[];
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import AdminStatus from "./AdminStatus";
 
@@ -24,8 +24,14 @@ export default function SyncPanel() {
   const [running, setRunning] = useState<Target | null>(null);
   const [results, setResults] = useState<RunResult[]>([]);
   const [error, setError] = useState<string | null>(null);
+  // `running !== null` drives the disabled buttons; the ref guards the
+  // same-tick double dispatch, which a state flag has not re-rendered in time
+  // to catch (UsersPanel pattern).
+  const busyRef = useRef(false);
 
   async function run(target: Target) {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setRunning(target);
     setError(null);
     try {
@@ -43,6 +49,7 @@ export default function SyncPanel() {
     } catch {
       setError(t("failed"));
     } finally {
+      busyRef.current = false;
       setRunning(null);
     }
   }

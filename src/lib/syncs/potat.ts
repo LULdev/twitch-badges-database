@@ -401,9 +401,32 @@ export async function runPotatSync(): Promise<PotatSyncSummary> {
     }
 
     for (const batch of chunk(finalStatRows, 200)) {
-      const { error } = await supabase.from("badge_stats").insert(batch);
+      // One point per (badge, polled_at) even under overlapping runs (the
+      // 06:30 Vercel cron vs the GitHub :07 workflow, plus lagged or manual
+      // runs): 0066's unique index makes a second insert with the same
+      // polled_at a per-row no-op instead of a 23505 that would abort the
+      // whole chunk. The statByKey collapse above already removed
+      // within-run duplicates; this removes the cross-run ones.
+      //
+      // The conflict target must name the columns: PostgREST omits the ON
+      // CONFLICT clause entirely when on_conflict is absent, and it cannot
+      // express an index predicate — which is why the 0066 index is the
+      // full (badge_id, polled_at), not a partial one over measured rows.
+      // Archive points are unaffected either way: the backfill only writes
+      // polled_at values strictly earlier than the measured floor, so an
+      // archived timestamp can never equal a measured one.
+      const { data, error } = await supabase
+        .from("badge_stats")
+        .upsert(batch, {
+          onConflict: "badge_id,polled_at",
+          ignoreDuplicates: true,
+        })
+        .select("id");
       if (error) throw error;
-      statsInserted += batch.length;
+      // DO NOTHING skips conflicting rows silently, so count what RETURNING
+      // actually emitted (inserted rows only) — the summary and the
+      // mid-write failure row must report appended points, not attempts.
+      statsInserted += (data ?? []).length;
     }
   } catch (writeError) {
     await logChange(

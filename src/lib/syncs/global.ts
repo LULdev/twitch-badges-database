@@ -20,6 +20,8 @@ export interface GlobalSyncSummary {
   removed: number;
   statusChanged: number;
   addedTitles: string[];
+  /** True when an overlapping run's fan-out was detected and skipped. */
+  fanoutSkipped: boolean;
 }
 
 type ExistingBadge = Record<string, unknown> & {
@@ -347,6 +349,10 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
   // Drop-post fan-out failures (createDropPost swallows its errors by design;
   // without this count a total blog-posts outage would leave no DB trace).
   let dropPostFailures = 0;
+  // Set when an overlapping run already fanned this run's additions out
+  // (migration 0066's partial unique index is the durable signal): the whole
+  // fan-out is skipped and reported in the summary payload.
+  let fanoutSkipped = false;
   if (addedTitles.length > 0) {
     // The catalog rows are committed by now, so a fan-out failure here must not
     // skip the changelog row below — that was the undocumented-mutation case the
@@ -386,8 +392,53 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
       description: string | null;
     }>;
 
+    // Concurrent-run guard for the new-badge fan-out. Two overlapping
+    // runGlobalSync executions — the daily 06:00 UTC Vercel cron and an
+    // admin/manual sync — can both see the same badge as new (each reads
+    // its catalog snapshot before the other's upserts commit) and both
+    // reach this fan-out. badge_events kind='added' is the fan-out's
+    // ledger, and migration 0066's partial unique index makes "already has
+    // an 'added' event" the durable signal that SOME run fanned a badge
+    // out (events + drop posts + changelog + notification + push all
+    // commit together under that event). If any fresh row already has one,
+    // this is the overlapping duplicate run: skip the ENTIRE fan-out — a
+    // second changelog row, notification and push blast would re-announce
+    // badges that went out minutes ago. The batch is the dedupe unit, not
+    // the row: the notification and the push describe the batch, and the
+    // events insert below is one atomic statement covering every fresh row.
+    if (freshRows.length > 0) {
+      try {
+        const alreadyAdded = new Set<string>();
+        for (const batch of chunk(freshRows, 200)) {
+          const { data, error } = await supabase
+            .from("badge_events")
+            .select("badge_id")
+            .eq("kind", "added")
+            .in(
+              "badge_id",
+              batch.map((row) => row.id),
+            );
+          if (error) throw error;
+          for (const row of (data ?? []) as Array<{ badge_id: string }>) {
+            alreadyAdded.add(row.badge_id);
+          }
+        }
+        if (alreadyAdded.size > 0) {
+          fanoutSkipped = true;
+          console.warn(
+            `[global-sync] new-badge fan-out skipped: ${alreadyAdded.size} of ${freshRows.length} fresh badge(s) already have an 'added' event — an overlapping run fanned them out`,
+          );
+        }
+      } catch (error) {
+        // Transient read failure: proceed anyway — the events insert below is
+        // itself guarded by the 0066 unique index, so an overlap surfaces
+        // there as 23505 and is handled the same way.
+        console.warn("[global-sync] fan-out overlap guard read failed:", error);
+      }
+    }
+
     try {
-      if (freshRows.length > 0) {
+      if (freshRows.length > 0 && !fanoutSkipped) {
         // NOTE: if the fresh-row fetch above failed partway, this fan-out runs
         // on a PARTIAL batch — badges in unfetched batches never get events or
         // a drop post on any later run (next run they already exist). The only
@@ -399,8 +450,25 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
             detail: { source, set_id: row.set_id },
           })),
         );
-        if (eventsError) throw eventsError;
-        if (!isInitialSeed) {
+        if (eventsError) {
+          // 23505 = the badge_events_added_once partial unique index (0066):
+          // an overlapping run's fan-out committed between the guard read
+          // above and this insert (or the guard read failed and the overlap
+          // only surfaced here). The insert is atomic, so NOTHING from this
+          // batch landed — skip the rest of the fan-out exactly as the guard
+          // would have, and let the run finish normally: the catalog
+          // mutation is this run's work, the announcement was the other
+          // run's.
+          if (eventsError.code === "23505") {
+            fanoutSkipped = true;
+            console.warn(
+              "[global-sync] new-badge fan-out skipped: badge_events insert hit 23505 — an overlapping run fanned out first",
+            );
+          } else {
+            throw eventsError;
+          }
+        }
+        if (!isInitialSeed && !fanoutSkipped) {
           // Category context for the drop articles, computed from the
           // in-memory catalog (pre-run rows + this run's additions).
           const catTotals = new Map<string, number>();
@@ -450,67 +518,71 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
       fanoutError = error;
     }
 
-    await logChange(
-      {
-        kind: "badge_added",
-        title: isInitialSeed
-          ? `Initial catalog seeded: ${addedTitles.length} badges`
-          : addedTitles.length === 1
-            ? `New badge: ${addedTitles[0]}`
-            : `${addedTitles.length} new badges detected`,
-        body: isInitialSeed
-          ? `First catalog import from the Twitch API (source: ${source}).`
-          : addedTitles.slice(0, 12).join(", "),
-        payload: {
-          source,
-          initialSeed: isInitialSeed,
-          titles: addedTitles.slice(0, 50),
-          // Status transitions committed by the same run's upserts: without
-          // this count they went unlogged whenever additions co-occurred (the
-          // dedicated pure-status row is skipped) and the fan-out then failed
-          // (the summary row is skipped by the deferred rethrow).
-          statusChanged,
-          fanoutFailed: fanoutError !== null,
-          ...(dropPostFailures > 0 ? { dropPostsFailed: dropPostFailures } : {}),
+    if (!fanoutSkipped) {
+      await logChange(
+        {
+          kind: "badge_added",
+          title: isInitialSeed
+            ? `Initial catalog seeded: ${addedTitles.length} badges`
+            : addedTitles.length === 1
+              ? `New badge: ${addedTitles[0]}`
+              : `${addedTitles.length} new badges detected`,
+          body: isInitialSeed
+            ? `First catalog import from the Twitch API (source: ${source}).`
+            : addedTitles.slice(0, 12).join(", "),
+          payload: {
+            source,
+            initialSeed: isInitialSeed,
+            titles: addedTitles.slice(0, 50),
+            // Status transitions committed by the same run's upserts: without
+            // this count they went unlogged whenever additions co-occurred (the
+            // dedicated pure-status row is skipped) and the fan-out then failed
+            // (the summary row is skipped by the deferred rethrow).
+            statusChanged,
+            fanoutFailed: fanoutError !== null,
+            ...(dropPostFailures > 0 ? { dropPostsFailed: dropPostFailures } : {}),
+          },
         },
-      },
-      supabase,
-    );
-    // No early rethrow: the update and removal blocks below must still log
-    // their own committed mutations — an early throw left committed removals
-    // without a changelog row when a run had additions AND removals. The
-    // fan-out error is rethrown after them.
+        supabase,
+      );
+      // No early rethrow: the update and removal blocks below must still log
+      // their own committed mutations — an early throw left committed removals
+      // without a changelog row when a run had additions AND removals. The
+      // fan-out error is rethrown after them.
 
-    // Desktop notification: "new badge is live" — skipped on initial seed.
-    if (!isInitialSeed) {
-      const first = freshRows[0];
-      // Locale-less on purpose. Two different consumers read this one string: the
-      // /notifications page renders it through next-intl's `Link`, which prepends
-      // the ACTIVE locale — so a stored `/en/…` came out as `/en/en/…` and every
-      // notification link 404'd — while the service worker navigates to it
-      // root-relative, where the i18n middleware picks the visitor's own locale.
-      // `/badges` is also the fallback when the lookup returned no row, because
-      // `/en/badges/` (empty slug) was itself a 404.
-      const url = first ? `/badges/${first.slug}` : "/badges";
-      await recordNotification({
-        kind: "badge_added",
-        title:
-          addedTitles.length === 1
-            ? `New Twitch badge: ${addedTitles[0]}`
-            : `${addedTitles.length} new Twitch badges just went live`,
-        body: addedTitles.slice(0, 5).join(", "),
-        url,
-        tag: "new-badges",
-      }).catch((err) => console.warn("[notify] failed:", err));
-      await sendPushToAll({
-        title:
-          addedTitles.length === 1
-            ? `New Twitch badge: ${addedTitles[0]}`
-            : `${addedTitles.length} new Twitch badges just went live`,
-        body: addedTitles.slice(0, 5).join(", "),
-        url,
-        tag: "new-badges",
-      }).catch((err) => console.warn("[push] failed:", err));
+      // Desktop notification: "new badge is live" — skipped on initial seed.
+      // Also skipped when the fan-out itself was skipped: an overlapping run
+      // already sent this announcement.
+      if (!isInitialSeed) {
+        const first = freshRows[0];
+        // Locale-less on purpose. Two different consumers read this one string: the
+        // /notifications page renders it through next-intl's `Link`, which prepends
+        // the ACTIVE locale — so a stored `/en/…` came out as `/en/en/…` and every
+        // notification link 404'd — while the service worker navigates to it
+        // root-relative, where the i18n middleware picks the visitor's own locale.
+        // `/badges` is also the fallback when the lookup returned no row, because
+        // `/en/badges/` (empty slug) was itself a 404.
+        const url = first ? `/badges/${first.slug}` : "/badges";
+        await recordNotification({
+          kind: "badge_added",
+          title:
+            addedTitles.length === 1
+              ? `New Twitch badge: ${addedTitles[0]}`
+              : `${addedTitles.length} new Twitch badges just went live`,
+          body: addedTitles.slice(0, 5).join(", "),
+          url,
+          tag: "new-badges",
+        }).catch((err) => console.warn("[notify] failed:", err));
+        await sendPushToAll({
+          title:
+            addedTitles.length === 1
+              ? `New Twitch badge: ${addedTitles[0]}`
+              : `${addedTitles.length} new Twitch badges just went live`,
+          body: addedTitles.slice(0, 5).join(", "),
+          url,
+          tag: "new-badges",
+        }).catch((err) => console.warn("[push] failed:", err));
+      }
     }
   }
 
@@ -584,6 +656,10 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
         updated,
         removed: removed.length,
         statusChanged,
+        // True when an overlapping run already fanned this run's additions
+        // out: the fan-out (events/changelog/notification/push) was skipped
+        // so nothing was announced twice.
+        fanoutSkipped,
         ranAt: now.toISOString(),
       },
     },
@@ -598,5 +674,6 @@ export async function runGlobalSync(): Promise<GlobalSyncSummary> {
     removed: removed.length,
     statusChanged,
     addedTitles,
+    fanoutSkipped,
   };
 }

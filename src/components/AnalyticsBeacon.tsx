@@ -75,7 +75,9 @@ export default function AnalyticsBeacon({ locale }: { locale: string }) {
       }
     };
 
-    void send();
+    // The mount beacon's promise is held so `onHide` can wait for its id
+    // (bounded) before sending the duration beacon.
+    const mountSent = send();
 
     const onHide = () => {
       const seconds = Math.round((Date.now() - enteredAt.current) / 1000);
@@ -83,7 +85,21 @@ export default function AnalyticsBeacon({ locale }: { locale: string }) {
       // duration toward zero. Nothing is sent: the mount row already counted the
       // view, and a duration-less second beacon would only add a duplicate row.
       if (seconds <= 0) return;
-      void send(seconds);
+      // pagehide can fire while the mount beacon is still in flight: without the
+      // id the server sees a duration beacon whose mount row does not exist yet
+      // and inserts a SECOND row (the double-count this component exists to
+      // prevent). Wait for the id for at most 1.5s — a hung request must not
+      // stall pagehide — then send with the id in the payload. If the wait is
+      // lost, the server's 120s mount-row match still attaches the duration to
+      // the just-inserted mount row, so no duplicate is possible either way.
+      const idReady = Promise.race([
+        mountSent.then(
+          () => undefined,
+          () => undefined,
+        ),
+        new Promise<void>((resolve) => setTimeout(resolve, 1500)),
+      ]);
+      void idReady.then(() => send(seconds));
     };
     window.addEventListener("pagehide", onHide);
     return () => {

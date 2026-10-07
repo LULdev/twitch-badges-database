@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { isAuthorizedCron } from "@/lib/cron-auth";
 import { runPotatSync } from "@/lib/syncs/potat";
 import { recordHeartbeat, withHeartbeat } from "@/lib/health";
@@ -34,6 +35,12 @@ export async function GET(request: Request) {
     });
     // Still 200: the run completed and kept the stored counts, and the GitHub
     // Actions workflow that calls this route asserts a 200.
+    // potat rewrites owner_count/rarity_score (and possibly status), which
+    // feed the cached "catalog"/"home" payloads — revalidate so the next
+    // visitor sees fresh counts instead of up to 5 minutes of stale ones. No
+    // other caller invalidates these tags.
+    revalidateTag("catalog", "default");
+    revalidateTag("home", "default");
     return Response.json({ ok: true, summary, durationMs });
   } catch (error) {
     const durationMs = Date.now() - started;

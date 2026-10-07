@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -22,8 +22,13 @@ export default function StealPanel({
   const router = useRouter();
   const [state, setState] = useState<"idle" | "busy">("idle");
   const [result, setResult] = useState<string | null>(null);
+  // `state` drives the disabled button; the ref guards the same-tick double
+  // dispatch, which a state flag has not re-rendered in time to catch.
+  const busyRef = useRef(false);
 
   async function attempt() {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setState("busy");
     setResult(null);
     try {
@@ -60,6 +65,7 @@ export default function StealPanel({
     } catch {
       setResult(t("networkError"));
     } finally {
+      busyRef.current = false;
       setState("idle");
     }
   }

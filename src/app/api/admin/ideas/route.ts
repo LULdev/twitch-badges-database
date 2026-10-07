@@ -54,8 +54,13 @@ export async function POST(request: Request) {
       return { ok: true, id: await saveIdea(ctx, input, id) };
     }
     if (action === "vote" && id !== undefined) {
-      const up = body?.up !== false;
-      return { ok: true, votes: await voteIdea(ctx, id, up ? 1 : -1) };
+      // `body.up !== false` used to count 0, "", null and undefined as upvotes.
+      // A vote is a direction, so the field is strict: only a genuine boolean
+      // decides; anything else is a malformed request, answered as one.
+      if (typeof body?.up !== "boolean") {
+        return { error: "up must be a boolean" };
+      }
+      return { ok: true, votes: await voteIdea(ctx, id, body.up ? 1 : -1) };
     }
     if (action === "delete" && id !== undefined) {
       await deleteIdea(ctx, id);

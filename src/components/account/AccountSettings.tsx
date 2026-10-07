@@ -42,6 +42,10 @@ export default function AccountSettings({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // `state === "saving"` drives the disabled button; the ref guards the
+  // same-tick double dispatch, which a state flag has not re-rendered in time
+  // to catch (UsersPanel pattern).
+  const savingRef = useRef(false);
   // Cancel the pending state update on unmount: React 18 no longer warns about
   // setting state on an unmounted component, so nothing surfaced this.
   useEffect(
@@ -60,6 +64,8 @@ export default function AccountSettings({
   }
 
   async function save() {
+    if (savingRef.current) return;
+    savingRef.current = true;
     setState("saving");
     try {
       const res = await fetch("/api/account", {
@@ -83,6 +89,8 @@ export default function AccountSettings({
       setState("error");
       if (resetTimer.current !== null) clearTimeout(resetTimer.current);
       resetTimer.current = setTimeout(() => setState("idle"), 3000);
+    } finally {
+      savingRef.current = false;
     }
   }
 

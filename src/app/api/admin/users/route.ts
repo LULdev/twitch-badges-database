@@ -15,6 +15,12 @@ import {
 
 export const dynamic = "force-dynamic";
 
+/** A 22P02 hits PostgREST when any action's `.eq("id", userId)` feeds a
+ *  non-UUID into the uuid `profiles.id` column — a request error that used to
+ *  surface as a 500. Both read sites (GET ?id=, POST body.userId) are gated
+ *  here, before any query runs. */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /** GET /api/admin/users?q=&limit=&offset=&role=&banned=1 — search + list. */
 export async function GET(request: Request) {
   try {
@@ -22,6 +28,9 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const id = url.searchParams.get("id");
     if (id) {
+      if (!UUID_RE.test(id)) {
+        return Response.json({ error: "invalid user id" }, { status: 400 });
+      }
       const detail = await getUserDetail(id);
       if (!detail) return Response.json({ error: "not found" }, { status: 404 });
       return Response.json(detail);
@@ -76,6 +85,9 @@ export async function POST(request: Request) {
     const userId = String(body?.userId ?? "");
     if (!userId || !body?.action) {
       return Response.json({ error: "userId and action required" }, { status: 400 });
+    }
+    if (!UUID_RE.test(userId)) {
+      return Response.json({ error: "userId must be a uuid" }, { status: 400 });
     }
 
     // An admin must not be able to lock themselves out, and the owner is the

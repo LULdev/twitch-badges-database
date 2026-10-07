@@ -12,13 +12,23 @@ export async function POST(request: Request) {
   if (!gate.ok) {
     return Response.json({ error: gate.code }, { status: gate.status });
   }
-  const body = (await request.json().catch(() => null)) as { item?: string } | null;
+  const body = (await request.json().catch(() => null)) as
+    | { item?: string; nonce?: string } | null;
   if (!body?.item || !ITEMS.includes(body.item as (typeof ITEMS)[number])) {
     return Response.json({ error: "invalid payload" }, { status: 400 });
   }
 
+  // Idempotency nonce (0067, mirror of the games/play route): a purchase that
+  // committed before the response was lost replays under the same nonce, so a
+  // retry cannot charge the coins twice. Sanitised to a plain short token —
+  // the RPC only matches exact equality on it.
+  const nonce =
+    typeof body.nonce === "string" && body.nonce.length > 0 && body.nonce.length <= 64
+      ? body.nonce
+      : undefined;
+
   if (body.item === "streak_freeze") {
-    const result = await buyFreeze(gate.userId);
+    const result = await buyFreeze(gate.userId, nonce);
     return Response.json(result, { status: result.ok ? 200 : 400 });
   }
   return Response.json({ error: "invalid payload" }, { status: 400 });

@@ -9,6 +9,9 @@ export default function SyncButton() {
   const router = useRouter();
   const [state, setState] = useState<"idle" | "busy" | "done" | "error">("idle");
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // `state` drives the disabled button; the ref guards the same-tick double
+  // dispatch, which a state flag has not re-rendered in time to catch.
+  const busyRef = useRef(false);
   // Cancel the pending reset on unmount: React 18 no longer warns about setting
   // state on an unmounted component, so nothing surfaced this.
   useEffect(
@@ -19,6 +22,8 @@ export default function SyncButton() {
   );
 
   async function sync() {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setState("busy");
     try {
       const res = await fetch("/api/inventory/sync", { method: "POST" });
@@ -47,6 +52,8 @@ export default function SyncButton() {
       setState("error");
       if (resetTimer.current !== null) clearTimeout(resetTimer.current);
       resetTimer.current = setTimeout(() => setState("idle"), 4000);
+    } finally {
+      busyRef.current = false;
     }
   }
 

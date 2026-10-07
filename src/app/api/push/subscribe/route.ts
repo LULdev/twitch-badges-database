@@ -26,6 +26,16 @@ function isAllowedPushEndpoint(endpoint: string): boolean {
   return host.includes(".");
 }
 
+/** Shared endpoint gate for POST, PATCH and DELETE: a non-empty string that is
+ *  a real public HTTPS URL, capped at 512 chars (storage + SSRF guard). This
+ *  is the exact contract POST applied inline; PATCH and DELETE skipped it and
+ *  accepted any truthy endpoint. */
+function validateEndpoint(value: unknown): string | null {
+  if (typeof value !== "string" || value.length === 0) return null;
+  if (value.length > 512 || !isAllowedPushEndpoint(value)) return null;
+  return value;
+}
+
 interface SubscriptionPayload {
   endpoint?: string;
   keys?: { p256dh?: string; auth?: string };
@@ -70,7 +80,7 @@ export async function POST(request: Request) {
   // The endpoint is later fetched by the push service server-side, so it must
   // be a real public HTTPS URL — not an internal host, a redirector or an
   // unbounded string (SSRF / storage abuse).
-  if (endpoint.length > 512 || !isAllowedPushEndpoint(endpoint)) {
+  if (!validateEndpoint(endpoint)) {
     return Response.json({ error: "invalid endpoint" }, { status: 400 });
   }
 
@@ -156,6 +166,11 @@ export async function PATCH(request: Request) {
   if (!body?.endpoint || typeof body.recap !== "boolean") {
     return Response.json({ error: "invalid payload" }, { status: 400 });
   }
+  // PATCH used to skip the endpoint gate POST applies: an oversized or internal
+  // URL reached the ownership lookup. Same validator, same message.
+  if (!validateEndpoint(body.endpoint)) {
+    return Response.json({ error: "invalid endpoint" }, { status: 400 });
+  }
   const supabase = await createClient();
   const {
     data: { user },
@@ -182,6 +197,11 @@ export async function DELETE(request: Request) {
   const endpoint = body?.endpoint;
   if (!endpoint) {
     return Response.json({ error: "endpoint required" }, { status: 400 });
+  }
+  // Same gap as PATCH: DELETE removed rows by any truthy endpoint string.
+  // Validate before touching the database.
+  if (!validateEndpoint(endpoint)) {
+    return Response.json({ error: "invalid endpoint" }, { status: 400 });
   }
 
   const supabase = await createClient();

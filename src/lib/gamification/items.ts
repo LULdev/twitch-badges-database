@@ -11,10 +11,14 @@ export type BuyResult =
 /**
  * Buy one Streak Freeze for the admin-editable economy price. The price is
  * read SERVER-side — the client never sends an amount. All atomicity lives in
- * the purchase_item RPC (migration 0052): row lock, balance and stock
- * predicates, debit + upsert in one transaction, with real failure reasons.
+ * the purchase_item RPC (migrations 0052/0053/0059): row lock, balance and
+ * stock predicates, debit + upsert in one transaction, with real failure
+ * reasons. Idempotency (0067): an optional client nonce makes a retry replay
+ * the committed purchase instead of charging twice — the RPC stores it on the
+ * item_purchase feed row and answers a same-nonce call with the committed
+ * receipt.
  */
-export async function buyFreeze(userId: string): Promise<BuyResult> {
+export async function buyFreeze(userId: string, nonce?: string): Promise<BuyResult> {
   const economy = await getEconomy();
   const price = economy.freezePrice;
   try {
@@ -24,6 +28,7 @@ export async function buyFreeze(userId: string): Promise<BuyResult> {
       p_item_key: "streak_freeze",
       p_price: price,
       p_cap: FREEZE_MAX,
+      p_nonce: nonce ?? null,
     });
     if (error) throw error;
     const row = (Array.isArray(data) ? data[0] : data) as

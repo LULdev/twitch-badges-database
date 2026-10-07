@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { adminAction } from "@/lib/admin-route";
 import { runGlobalSync } from "@/lib/syncs/global";
 import { runBadgebaseSync } from "@/lib/syncs/badgebase";
@@ -47,15 +48,29 @@ export async function POST(request: Request) {
       await audit(ctx, `sync.${target}`, "manual", {
         durationMs: Date.now() - started,
       });
+      // A manual run changes the same rows the crons do — drop the cached
+      // "catalog"/"home" payloads (loadHomeData, loadSiteStats, loadCategories)
+      // so the dashboard's own sync button does not leave the site serving a
+      // 5-minute-stale snapshot. Request context is guaranteed here.
+      revalidateTag("catalog", "default");
+      revalidateTag("home", "default");
       return { ok: true, target, durationMs: Date.now() - started, summary };
     } catch (error) {
       // The failure is returned, not thrown: the dashboard shows the message in
-      // place, and a provider incident is not an admin-route error.
+      // place, and a provider incident is not an admin-route error. The engine's
+      // raw message goes to the server log only (it can contain connection or
+      // table internals), never to the panel, and the failed run is audited
+      // exactly like a success so the trail shows it happened.
+      console.error(`[admin/sync] ${target} failed:`, error);
+      await audit(ctx, `sync.${target}`, "manual", {
+        ok: false,
+        durationMs: Date.now() - started,
+      });
       return {
         ok: false,
         target,
         durationMs: Date.now() - started,
-        error: error instanceof Error ? error.message : "sync failed",
+        error: "sync failed",
       };
     }
   }, request);

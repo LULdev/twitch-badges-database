@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import Coin from "@/components/Coin";
 
@@ -8,8 +8,13 @@ import Coin from "@/components/Coin";
 export default function CoinRainButton({ profileId }: { profileId: string }) {
   const t = useTranslations("profile");
   const [state, setState] = useState<"idle" | "busy" | "done" | "again">("idle");
+  // `state` drives the disabled button; the ref guards the same-tick double
+  // dispatch, which a state flag has not re-rendered in time to catch.
+  const busyRef = useRef(false);
 
   async function rain() {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setState("busy");
     try {
       const res = await fetch("/api/coinrain", {
@@ -48,6 +53,8 @@ export default function CoinRainButton({ profileId }: { profileId: string }) {
       }
     } catch {
       setState("idle");
+    } finally {
+      busyRef.current = false;
     }
   }
 

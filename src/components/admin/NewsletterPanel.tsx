@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import AdminStatus from "./AdminStatus";
 
@@ -41,6 +41,9 @@ export default function NewsletterPanel() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // `busy` drives the disabled buttons; the ref guards the same-tick double
+  // dispatch, which a state flag has not re-rendered in time to catch.
+  const busyRef = useRef(false);
 
   const load = useCallback(async () => {
     try {
@@ -65,6 +68,8 @@ export default function NewsletterPanel() {
   }, [load]);
 
   async function post(payload: Record<string, unknown>, successKey: string) {
+    if (busyRef.current) return false;
+    busyRef.current = true;
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -88,6 +93,7 @@ export default function NewsletterPanel() {
       setError(t("failed"));
       return false;
     } finally {
+      busyRef.current = false;
       setBusy(false);
     }
   }

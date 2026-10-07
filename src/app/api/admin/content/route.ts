@@ -108,6 +108,26 @@ export async function POST(request: Request) {
       if (action === "save") {
         const input = checkBody<BadgeInput>(body?.input);
         if (!input) return { error: "missing badge fields" };
+        // Badge dates reached the database unvalidated: garbage strings made
+        // PostgREST answer a 500, and a reversed range (end before start) was
+        // stored as-is. Reject both at the boundary with operator-facing
+        // errors; null/undefined still mean "not set" and are left alone.
+        const startRaw =
+          input.startDate === undefined || input.startDate === null ? null : input.startDate;
+        const endRaw =
+          input.endDate === undefined || input.endDate === null ? null : input.endDate;
+        const parseTime = (raw: string): number | null => {
+          const t = Date.parse(raw);
+          return Number.isNaN(t) ? null : t;
+        };
+        const startTime = startRaw === null || startRaw === "" ? null : parseTime(startRaw);
+        const endTime = endRaw === null || endRaw === "" ? null : parseTime(endRaw);
+        if ((startRaw !== null && startTime === null) || (endRaw !== null && endTime === null)) {
+          return { error: "startDate and endDate must be valid ISO dates" };
+        }
+        if (startTime !== null && endTime !== null && endTime < startTime) {
+          return { error: "endDate must not be before startDate" };
+        }
         return { ok: true, id: await upsertBadge(ctx, input, id) };
       }
     }

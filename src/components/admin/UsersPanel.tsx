@@ -88,9 +88,16 @@ export default function UsersPanel() {
   // The latest member the operator asked to open, compared after every await so a
   // stale response cannot replace the drawer they are now looking at.
   const detailRequest = useRef<string | null>(null);
+  // Monotone token for the debounced list load: a slow response for an older
+  // query must not overwrite the list the operator is looking at now.
+  const listToken = useRef(0);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const load = useCallback(async () => {
+    // Token: the debounce only spaces out starts — a slow response for query
+    // "a" can still land after a fast one for "ab" and overwrite the list the
+    // operator is now looking at.
+    const token = ++listToken.current;
     setLoading(true);
     setError(null);
     try {
@@ -100,11 +107,14 @@ export default function UsersPanel() {
       const res = await fetch(`/api/admin/users?${params}`);
       if (!res.ok) throw new Error(String(res.status));
       const data = (await res.json()) as { users: UserRow[]; total: number };
+      if (token !== listToken.current) return;
       setUsers(data.users);
       setTotal(data.total);
     } catch {
+      if (token !== listToken.current) return;
       setError(t("loadFailed"));
     } finally {
+      if (token !== listToken.current) return;
       setLoading(false);
     }
   }, [query, bannedOnly, t]);
@@ -171,7 +181,14 @@ export default function UsersPanel() {
         }
         setNotice(t(successKey));
         await load();
-        if (selected && body.action !== "delete") await openDetail(selected);
+        // `selected` is the closure value from the render that dispatched this
+        // action; while the POST was in flight the operator may have clicked
+        // another row or closed the drawer (both move `detailRequest`). Re-
+        // opening then would overwrite the newer member's token and swap the
+        // drawer back to the stale one — edits could hit the wrong user.
+        if (selected && body.action !== "delete" && detailRequest.current === selected) {
+          await openDetail(selected);
+        }
         return true;
       } catch {
         setError(t("actionFailed"));

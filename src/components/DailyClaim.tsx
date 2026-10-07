@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import Coin from "@/components/Coin";
 
@@ -9,8 +9,13 @@ export default function DailyClaim({ compact = false }: { compact?: boolean }) {
   const t = useTranslations("games");
   const [state, setState] = useState<"idle" | "busy" | "done" | "already">("idle");
   const [reward, setReward] = useState<{ xp: number; coins: number; streak: number } | null>(null);
+  // `state` drives the disabled button; the ref guards the same-tick double
+  // dispatch, which a state flag has not re-rendered in time to catch.
+  const busyRef = useRef(false);
 
   async function claim() {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setState("busy");
     try {
       const res = await fetch("/api/daily/claim", { method: "POST" });
@@ -33,6 +38,8 @@ export default function DailyClaim({ compact = false }: { compact?: boolean }) {
       setState("done");
     } catch {
       setState("idle");
+    } finally {
+      busyRef.current = false;
     }
   }
 

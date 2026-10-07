@@ -357,7 +357,15 @@ export default async function BadgeDetailPage({ params }: PageProps) {
       "@type": "Offer",
       price: 0,
       priceCurrency: "USD",
-      availability: "https://schema.org/InStock",
+      // The offer exists only so the Product passes Google's rich-results
+      // check; the availability must still tell the truth per catalog status
+      // (InStock / PreOrder / OutOfStock), never hardcoded InStock.
+      availability:
+        badge.status === "active"
+          ? "https://schema.org/InStock"
+          : badge.status === "upcoming"
+            ? "https://schema.org/PreOrder"
+            : "https://schema.org/OutOfStock",
       url: `${siteUrl()}/${locale}/badges/${badge.slug}`,
     },
     ...(badge.start_date && badge.end_date
@@ -385,7 +393,7 @@ export default async function BadgeDetailPage({ params }: PageProps) {
         {badge.is_paid ? tc("paid") : tc("free")}
       </span>
       <span className="chip pointer-events-none">{badge.category}</span>
-      {badge.is_confirmed_active && (
+      {badge.is_confirmed_active && badge.status === "active" && (
         <span className="chip chip-live pointer-events-none">{t("confirmedActive")}</span>
       )}
     </>
@@ -413,25 +421,29 @@ export default async function BadgeDetailPage({ params }: PageProps) {
 
   /** The preserved countdown strip — contract documented inline. */
   const claimStrip = (badge.status === "active" || badge.status === "upcoming") &&
-    (badge.end_date || badge.start_date) && (
+    (badge.start_date || (badge.status === "active" && badge.end_date)) && (
       <div className="flex flex-col items-center gap-2 border-t border-line bg-surface-2 px-6 py-4 sm:flex-row sm:justify-between">
         <span className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
           {badge.status === "upcoming" && badge.start_date
             ? tcd("startsIn")
-            : badge.end_date
+            : badge.status === "active" && badge.end_date
               ? tcd("expiresIn")
               : tcd("permanent")}
         </span>
         {badge.status === "upcoming" && badge.start_date ? (
           <Countdown size="lg" target={badge.start_date} mode="starts" />
-        ) : badge.end_date ? (
+        ) : badge.status === "active" && badge.end_date ? (
           <Countdown size="lg" target={badge.end_date} mode="expires" />
         ) : (
           // An ACTIVE badge with a start date and no end date has no window
           // to count down to. The strip used to render "Expires in" against
           // `end_date ?? start_date!` — i.e. a countdown to a date in the
           // PAST, beside the "Live" status chip, and the non-null assertion
-          // hid the missing case from the type checker.
+          // hid the missing case from the type checker. An upcoming badge
+          // with only an end date never renders this strip at all (outer
+          // gate) — counting down to a window that never opened, then
+          // flipping to red "Expired" next to the "Upcoming" chip, is the
+          // bug this guard removes.
           <span className="text-xs font-semibold text-success">{tcd("live")}</span>
         )}
       </div>

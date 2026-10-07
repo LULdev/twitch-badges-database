@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { isAuthorizedCron } from "@/lib/cron-auth";
 import { runGlobalSync } from "@/lib/syncs/global";
 import { runBadgebaseSync } from "@/lib/syncs/badgebase";
@@ -66,6 +67,18 @@ export async function GET(request: Request) {
     console.error("[cron/badgebase]", error);
     badgebaseFailed = true;
     badgebaseError = error instanceof Error ? error.message : "failed";
+  }
+
+  // The catalog moved if either half of the daily sync succeeded — drop the
+  // unstable_cache payloads tagged "catalog"/"home" (loadHomeData /
+  // loadSiteStats / loadCategories) instead of serving up to 5 minutes of
+  // stale rows (a removed badge used to keep rendering until the revalidate
+  // window expired). These tags have no other invalidator, and revalidateTag
+  // only runs in a request context — which is why this call lives in this
+  // route and not in the sync engines.
+  if (!globalFailed || !badgebaseFailed) {
+    revalidateTag("catalog", "default");
+    revalidateTag("home", "default");
   }
 
   // Daily housekeeping: keep the heartbeat table bounded. The coin-rain gate

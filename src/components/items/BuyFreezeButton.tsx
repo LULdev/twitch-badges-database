@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import Coin from "@/components/Coin";
@@ -29,20 +29,34 @@ export default function BuyFreezeButton({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  // Idempotency nonce (0067, the useGame pattern): one token per buy INTENT.
+  // Minted on the first attempt, kept while the purchase's fate is unknown —
+  // a network error replies "unknown", so the next click sends the same token
+  // and the server replays the committed purchase instead of charging twice.
+  // A definitive server answer (success or rejection) clears it, so the next
+  // click is a fresh purchase.
+  const intentNonce = useRef<string | null>(null);
 
   async function buy() {
     if (busy) return;
     setBusy(true);
     setError(null);
+    intentNonce.current ??= crypto.randomUUID();
+    const nonce = intentNonce.current;
     try {
       const res = await fetch("/api/items/buy", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ item: "streak_freeze" }),
+        body: JSON.stringify({ item: "streak_freeze", nonce }),
       });
       const data = (await res.json().catch(() => null)) as
         | { ok?: boolean; code?: string; price?: number }
         | null;
+      // A parsed body is a definitive answer (a rejection bought nothing) — the
+      // intent is over. A null body means the response was lost or mangled:
+      // fate unknown, keep the nonce so the retry replays instead of buying a
+      // second freeze.
+      if (data) intentNonce.current = null;
       if (!res.ok || !data?.ok) {
         // Map the server's stable code to a localized message; the price the
         // server echoes is authoritative over the prop.

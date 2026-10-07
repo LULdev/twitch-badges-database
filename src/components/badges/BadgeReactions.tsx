@@ -42,12 +42,23 @@ export default function BadgeReactions({
       });
       // An error body is not a removal: never move the count on !res.ok.
       if (!res.ok) return;
-      const data = (await res.json()) as { added?: boolean; removed?: boolean };
+      const data = (await res.json()) as {
+        added?: boolean;
+        removed?: boolean;
+        counts?: Record<string, number>;
+      };
       if (!data.added && !data.removed) return;
-      setCounts((prev) => ({
-        ...prev,
-        [reaction]: Math.max(0, (prev[reaction] ?? 0) + (data.added ? 1 : -1)),
-      }));
+      // Adopt the server's authoritative counts instead of ±1 arithmetic: a
+      // ±1 applied to a stale snapshot diverges whenever another tab or
+      // visitor toggled in between (the route re-counts after every write).
+      if (data.counts) {
+        setCounts(data.counts);
+      } else {
+        setCounts((prev) => ({
+          ...prev,
+          [reaction]: Math.max(0, (prev[reaction] ?? 0) + (data.added ? 1 : -1)),
+        }));
+      }
       // Follow the server's answer — the stored row decides the toggle, and
       // the client cannot know it.
       setActive((prev) => {
