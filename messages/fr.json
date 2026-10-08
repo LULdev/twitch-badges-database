@@ -112,7 +112,7 @@
     "heroF2Title": "Indice de rareté TBRI",
     "heroF2Desc": "Un score de 0 à 100 fondé sur la rareté, la diffusion et la dynamique — sache quels badges sont vraiment rares avant de les récupérer.",
     "heroF3Title": "Joue pendant que tu collectionnes",
-    "heroF3Desc": "14 jeux d'arcade, de l'XP, des niveaux, des pièces et 133 succès — plus une roue quotidienne avec un jackpot Twitch Turbo à de vraies chances de 1 sur 100 000 000.",
+    "heroF3Desc": "14 jeux d'arcade, de l'XP, des niveaux, des pièces et 135 succès — plus une roue quotidienne avec un jackpot Twitch Turbo à de vraies chances de 1 sur 100 000 000.",
     "heroF4Title": "Ton profil de collectionneur",
     "heroF4Desc": "Connecte-toi avec Twitch pour synchroniser les badges que tu possèdes déjà, créer une vitrine et grimper dans les classements mondiaux — en 11 langues."
   },
@@ -818,7 +818,9 @@
     "jackpotMegaChip": "Méga {n}",
     "jackpotWon": "Jackpot !",
     "jackpotWonMega": "MÉGA JACKPOT !",
-    "jackpotWinners": "Derniers gains de jackpot"
+    "jackpotWinners": "Derniers gains de jackpot",
+    "jackpotHofTitle": "Plus gros gains de jackpot de tous les temps",
+    "jackpotLastMega": "Dernier Méga Jackpot : {name} +{n}"
   },
   "wheel": {
     "title": "Roue de la fortune",
@@ -935,7 +937,9 @@
     "wheelA": "Une fois par jour. Les prix vont de +25 XP (le plus courant) à +2 500 XP (très rare), chacun avec des BadgesCoins bonus.",
     "wheelQ": "À quelle fréquence puis-je tourner la Roue de la fortune ?",
     "xpA": "Connexion quotidienne +10 XP plus +5 par jour de série (max +50). Chaque badge Twitch synchronisé +1 000 XP. Les succès paient jusqu'à 5 000 XP. Les jeux paient +2 XP par manche et +10 XP par victoire, plafonné à 100 XP par jour pour éviter le farming. La Roue de la fortune paie de 25 à 2 500 XP par tour.",
-    "xpQ": "Comment l'XP est-il exactement attribué ?"
+    "xpQ": "Comment l'XP est-il exactement attribué ?",
+    "jackpotQ": "Comment fonctionnent les jackpots progressifs ?",
+    "jackpotA": "Chaque pièce que vous perdez dans l'arcade alimente deux jackpots progressifs : {gameRate}% va dans le pot du jeu concerné et {megaRate}% dans le Méga Jackpot partagé par les quatorze jeux. Chaque manche jouée tire aussi une chance de 1 sur {gameOdds} sur le pot du jeu et de 1 sur {megaOdds} sur le Méga — et le tour quotidien de la Roue de la Fortune tire aussi le Méga. Un gain paie le pot entier, puis le pot se réinitialise et recommence à grandir. Les pots en direct sont toujours visibles sur la page des jeux."
   },
   "customizer": {
     "commonSection": "Profil — réglages communs",

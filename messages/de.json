@@ -112,7 +112,7 @@
     "heroF2Title": "TBRI-Seltenheitsindex",
     "heroF2Desc": "Ein 0–100-Score aus Knappheit, Verbreitung und Dynamik — erkenne vor dem Einsammeln, welche Badges wirklich selten sind.",
     "heroF3Title": "Spielen beim Sammeln",
-    "heroF3Desc": "14 Arcade-Spiele, XP, Level, Coins und 133 Erfolge — plus ein tägliches Glücksrad mit einem Twitch-Turbo-Jackpot mit echten 1-zu-100.000.000-Chancen.",
+    "heroF3Desc": "14 Arcade-Spiele, XP, Level, Coins und 135 Erfolge — plus ein tägliches Glücksrad mit einem Twitch-Turbo-Jackpot mit echten 1-zu-100.000.000-Chancen.",
     "heroF4Title": "Dein Sammlerprofil",
     "heroF4Desc": "Melde dich mit Twitch an, um deine Badges zu synchronisieren, eine Vitrine aufzubauen und in weltweiten Ranglisten aufzusteigen — in 11 Sprachen."
   },
@@ -818,7 +818,9 @@
     "jackpotMegaChip": "Mega {n}",
     "jackpotWon": "Jackpot!",
     "jackpotWonMega": "MEGA-JACKPOT!",
-    "jackpotWinners": "Neueste Jackpot-Gewinne"
+    "jackpotWinners": "Neueste Jackpot-Gewinne",
+    "jackpotHofTitle": "Die größten Jackpot-Gewinne aller Zeiten",
+    "jackpotLastMega": "Letzter Mega-Jackpot: {name} +{n}"
   },
   "wheel": {
     "title": "Glücksrad",
@@ -935,7 +937,9 @@
     "wheelA": "Einmal pro Tag. Gewinne reichen von +25 XP (sehr häufig) bis +5,000 XP (sehr selten), jeweils mit Bonus-BadgesCoins.",
     "wheelQ": "Wie oft kann ich das Glücksrad drehen?",
     "xpA": "Tageslogin +10 XP plus +5 pro Serientag (max. +50). Jedes synchronisierte Twitch-Badge +1.000 XP. Errungenschaften zahlen bis zu 5.000 XP. Spiele geben +2 XP pro Runde und +10 XP pro Sieg, gedeckelt auf 100 XP pro Tag gegen Farming. Das Glücksrad zahlt 25 bis 5,000 XP pro Dreh.",
-    "xpQ": "Wie genau wird XP vergeben?"
+    "xpQ": "Wie genau wird XP vergeben?",
+    "jackpotQ": "Wie funktionieren die progressiven Jackpots?",
+    "jackpotA": "Jede Coin, die du in der Arcade verlierst, speist zwei progressive Jackpots: {gameRate}% wandern in den Jackpot des jeweiligen Spiels und {megaRate}% in den Mega-Jackpot, in den alle vierzehn Spiele einzahlen. Jede gespielte Runde würfelt außerdem eine 1-zu-{gameOdds}-Chance auf den Spiel-Jackpot und eine 1-zu-{megaOdds}-Chance auf den Mega-Jackpot — und auch der tägliche Dreh am Glücksrad würfelt den Mega. Ein Treffer zahlt den kompletten Jackpot aus, danach startet er neu und wächst wieder. Die aktuellen Jackpots sind immer auf der Spiele-Übersicht sichtbar."
   },
   "customizer": {
     "commonSection": "Profil — Grundeinstellungen",

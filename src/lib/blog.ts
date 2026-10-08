@@ -153,6 +153,16 @@ export function buildDropArticle(
   return { content, excerpt };
 }
 
+/** Progressive-jackpot numbers for a recap: the LIVE pots at generation time
+ *  (snapshot) plus the hits paid inside the covered window. Null when the
+ *  jackpot tables are unreachable — the line is omitted, never wrong. */
+export interface ArcadeJackpotStats {
+  potsTotal: number;
+  megaPot: number;
+  hits: number;
+  paid: number;
+}
+
 /** Inputs for the daily arcade recap, gathered by the sync engine. Every
  *  field except the day itself can be missing on a quiet day — the builder
  *  must stand on fallbacks exactly like buildDropArticle. */
@@ -172,6 +182,8 @@ export interface ArcadeHighlightsInput {
   streakSaves: number;
   /** Logged coin movement in the covered day (sum of |coins_amount| ledger rows). */
   coinFlow: number;
+  /** Progressive-jackpot snapshot + hits in the covered day (0069). */
+  jackpot: ArcadeJackpotStats | null;
 }
 
 /** Weekly recap inputs: one ISO week (Mon–Sun UTC) plus the prior week's
@@ -197,6 +209,8 @@ export interface ArcadeWeeklyInput {
   streakSaves: number;
   /** Logged coin movement in the covered week (sum of |coins_amount| ledger rows). */
   coinFlow: number;
+  /** Progressive-jackpot snapshot + hits in the covered week (0069). */
+  jackpot: ArcadeJackpotStats | null;
 }
 
 /** ISO week label ("2026-W39") from a UTC date inside that week, via the
@@ -228,12 +242,19 @@ export function buildArcadeHighlightsArticle(input: ArcadeHighlightsInput): {
   const dateLabel = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d)))
     .toLocaleDateString("en-US", { timeZone: "UTC", month: "long", day: "numeric", year: "numeric" });
 
+  // The jackpot sentence prints the live pots even on a quiet day — the pots
+  // grow from every lost coin, so "what's in them right now" is the recap's
+  // ad for the next session. Hits only print when the window actually paid one.
+  const jackpotSentence = input.jackpot
+    ? `${input.jackpot.hits > 0 ? ` **${input.jackpot.hits} progressive jackpot ${input.jackpot.hits === 1 ? "hit" : "hits"}** paid out **${input.jackpot.paid.toLocaleString("en-US")} BadgesCoins**, and ` : ""}the pots left the day holding **${input.jackpot.potsTotal.toLocaleString("en-US")} BadgesCoins** (${input.jackpot.megaPot.toLocaleString("en-US")} of them in the cross-game [Mega Jackpot](/en/games)).`
+    : "";
+
   const lines: string[] = [
     `## The day in the Badge Arcade`,
     "",
     totalRounds > 0
-      ? `On ${dateLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 14 games`}. Every round was server-authoritative, capped at the house stake, and graded by the same engine that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` The same ledger also recorded **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** spent — ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} bridged through a missed day instead of resetting.` : ""}${input.coinFlow > 0 ? ` The ledger logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — logged movements only, since regular arcade rounds move coins without a ledger entry.` : ""}`
-      : `On ${dateLabel} the arcade floors stayed quiet — not a single round was settled. The boards are always open: pick a game on the [arcade overview](/en/games), set a stake between the posted limits, and the next recap could carry your name.`,
+      ? `On ${dateLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 14 games`}. Every round was server-authoritative, capped at the house stake, and graded by the same engine that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` The same ledger also recorded **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** spent — ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} bridged through a missed day instead of resetting.` : ""}${input.coinFlow > 0 ? ` The ledger logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — logged movements only, since regular arcade rounds move coins without a ledger entry.` : ""}${jackpotSentence}`
+      : `On ${dateLabel} the arcade floors stayed quiet — not a single round was settled. The boards are always open: pick a game on the [arcade overview](/en/games), set a stake between the posted limits, and the next recap could carry your name.${jackpotSentence ? ` ${jackpotSentence.trim()}` : ""}`,
     "",
   ];
 
@@ -275,7 +296,7 @@ export function buildArcadeHighlightsArticle(input: ArcadeHighlightsInput): {
   const title = `Arcade highlights — ${dateLabel}`;
   const excerpt =
     totalRounds > 0
-      ? `${dateLabel} in the Badge Arcade: ${totalRounds.toLocaleString("en-US")} settled rounds, ${top ? `${top.game} on top` : "a quiet board"}${input.biggestWin ? `, and the day's biggest win of +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} spent` : ""}${input.coinFlow > 0 ? `, ${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved` : ""}.`
+      ? `${dateLabel} in the Badge Arcade: ${totalRounds.toLocaleString("en-US")} settled rounds, ${top ? `${top.game} on top` : "a quiet board"}${input.biggestWin ? `, and the day's biggest win of +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} spent` : ""}${input.coinFlow > 0 ? `, ${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved` : ""}${input.jackpot && input.jackpot.hits > 0 ? `, ${input.jackpot.hits} jackpot ${input.jackpot.hits === 1 ? "hit" : "hits"}` : ""}.`
       : `${dateLabel} in the Badge Arcade: a quiet day with no settled rounds — the boards stay open for the next player.`;
 
   return { content, excerpt, title };
@@ -314,8 +335,8 @@ export function buildArcadeWeeklyArticle(
     "## The week in the Badge Arcade",
     "",
     totalRounds > 0
-      ? `From Monday ${startLabel} to Sunday ${endLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 14 games`}${trend ? ` — ${trend}` : ""}. One post per week, computed from the same server-authoritative ledger that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` Across the week, **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** bridged missed days and kept ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} alive.` : ""}${input.coinFlow > 0 ? ` The ledger logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — logged movements only, since regular arcade rounds move coins without a ledger entry.` : ""}`
-      : `From Monday ${startLabel} to Sunday ${endLabel} the arcade floors stayed completely quiet — not a single settled round in seven days. The boards never close: pick a game on the [arcade overview](/en/games), and next week's recap could open with your name.`,
+      ? `From Monday ${startLabel} to Sunday ${endLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 14 games`}${trend ? ` — ${trend}` : ""}. One post per week, computed from the same server-authoritative ledger that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` Across the week, **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** bridged missed days and kept ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} alive.` : ""}${input.coinFlow > 0 ? ` The ledger logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — logged movements only, since regular arcade rounds move coins without a ledger entry.` : ""}${input.jackpot ? ` ${input.jackpot.hits > 0 ? `**${input.jackpot.hits} progressive jackpot ${input.jackpot.hits === 1 ? "hit" : "hits"}** paid out **${input.jackpot.paid.toLocaleString("en-US")} BadgesCoins**${input.jackpot.hits === 1 ? "" : " combined"} over the week, and ` : ""}the pots closed the week holding **${input.jackpot.potsTotal.toLocaleString("en-US")} BadgesCoins** (${input.jackpot.megaPot.toLocaleString("en-US")} of them in the cross-game [Mega Jackpot](/en/games)).` : ""}`
+      : `From Monday ${startLabel} to Sunday ${endLabel} the arcade floors stayed completely quiet — not a single settled round in seven days. The boards never close: pick a game on the [arcade overview](/en/games), and next week's recap could open with your name.${input.jackpot ? ` Even so, the progressive jackpots hold **${input.jackpot.potsTotal.toLocaleString("en-US")} BadgesCoins** (${input.jackpot.megaPot.toLocaleString("en-US")} in the [Mega Jackpot](/en/games)).` : ""}`,
     "",
   ];
 
@@ -358,7 +379,7 @@ export function buildArcadeWeeklyArticle(
   const title = `Arcade weekly — ${input.isoWeek}`;
   const excerpt =
     totalRounds > 0
-      ? `Week ${input.isoWeek} (${startLabel}–${endLabel}): ${totalRounds.toLocaleString("en-US")} settled rounds${top ? `, ${top.game} as game of the week` : ""}${input.biggestWin ? `, biggest win +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} bridged missed days` : ""}${input.coinFlow > 0 ? `, ${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved` : ""}.`
+      ? `Week ${input.isoWeek} (${startLabel}–${endLabel}): ${totalRounds.toLocaleString("en-US")} settled rounds${top ? `, ${top.game} as game of the week` : ""}${input.biggestWin ? `, biggest win +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} bridged missed days` : ""}${input.coinFlow > 0 ? `, ${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved` : ""}${input.jackpot && input.jackpot.hits > 0 ? `, ${input.jackpot.hits} jackpot ${input.jackpot.hits === 1 ? "hit" : "hits"}` : ""}.`
       : `Week ${input.isoWeek} (${startLabel}–${endLabel}): a silent week with no settled rounds.`;
 
   return { content, excerpt, title };

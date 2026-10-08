@@ -726,6 +726,36 @@ export async function getRecentJackpotWins(limit = 3): Promise<JackpotWinEntry[]
   }
 }
 
+/**
+ * The BIGGEST jackpot wins of all time — the hall-of-fame row on the hub
+ * strip, distinct from the newest-wins row above. Ordered by amount desc with
+ * a created_at desc tie-break (the podium read's double-order pattern); no
+ * index on `amount` needed at hit-frequency scale. Same public-read contract:
+ * [] on any failure, the row hides.
+ */
+export async function getTopJackpotWins(limit = 3): Promise<JackpotWinEntry[]> {
+  const supabase = await createClient();
+  try {
+    const { data } = await supabase
+      .from("jackpot_wins")
+      .select("id,username,scope,kind,amount,game,created_at")
+      .order("amount", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+      id: Number(row.id),
+      username: (row.username as string | null) ?? null,
+      scope: String(row.scope),
+      kind: row.kind === "mega" ? ("mega" as const) : ("game" as const),
+      amount: Number(row.amount),
+      game: (row.game as string | null) ?? null,
+      created_at: String(row.created_at),
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export interface HomeData {
   endingSoon: BadgeRow[];
   upcoming: BadgeRow[];

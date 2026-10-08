@@ -32,9 +32,19 @@ export default async function WheelPage({
   const t = await getTranslations("wheel");
 
   // Mega Jackpot pot (0069): the daily spin rolls it, so the page shows the
-  // live amount next to the Turbo odds. An unreachable table hides the line.
+  // live amount next to the Turbo odds — plus the last hit for the record
+  // line. An unreachable table hides both.
   const jackpots = await getJackpots();
-  const megaPot = jackpots.find((j) => j.kind === "mega")?.pot ?? null;
+  const mega = jackpots.find((j) => j.kind === "mega") ?? null;
+  const megaPot = mega?.pot ?? null;
+  const megaLast =
+    mega?.last_winner && mega.last_won_at
+      ? {
+          winner: mega.last_winner,
+          amount: mega.last_win_amount ?? 0,
+          at: mega.last_won_at,
+        }
+      : null;
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 py-6">
@@ -45,7 +55,7 @@ export default async function WheelPage({
         </h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t("subtitle")}</p>
       </header>
-      <WheelOfFortune megaPot={megaPot} />
+      <WheelOfFortune megaPot={megaPot} megaLast={megaLast} />
     </div>
   );
 }

@@ -16,7 +16,7 @@ import GameIcon from "@/components/GameIcon";
 import GameArt, { GAME_COLORS } from "@/components/games/GameArt";
 import JackpotStrip from "@/components/games/JackpotStrip";
 import Reveal from "@/components/stats/Reveal";
-import { getJackpots, getRecentJackpotWins } from "@/lib/queries";
+import { getJackpots, getRecentJackpotWins, getTopJackpotWins } from "@/lib/queries";
 import { localeAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -127,10 +127,14 @@ export default async function GamesHubPage({
   }
 
   // Progressive jackpots (0069): the Mega pot plus every game pot, one anon
-  // read, and the newest winners for the strip's history row. An empty
-  // result (unreachable table) hides the strip — the arcade must not depend
-  // on the jackpot surface existing.
-  const [jackpots, jackpotWins] = await Promise.all([getJackpots(), getRecentJackpotWins(3)]);
+  // read, the newest winners for the recency row and the biggest ever for the
+  // hall-of-fame row. An empty result (unreachable table) hides the strip —
+  // the arcade must not depend on the jackpot surface existing.
+  const [jackpots, jackpotWins, jackpotHall] = await Promise.all([
+    getJackpots(),
+    getRecentJackpotWins(3),
+    getTopJackpotWins(3),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -163,7 +167,12 @@ export default async function GamesHubPage({
       </header>
 
       {jackpots.length > 0 && (
-        <JackpotStrip jackpots={jackpots} wins={jackpotWins} locale={locale} />
+        <JackpotStrip
+          jackpots={jackpots}
+          wins={jackpotWins}
+          hallOfFame={jackpotHall}
+          locale={locale}
+        />
       )}
 
       {ticker.length > 0 && (

@@ -59,6 +59,9 @@ export interface AchStats {
   dailyCount: number;
   /** Streak Freeze saves (activity_events kind=streak_freeze) — the Ice Guardian signal. */
   freezeRescues: number;
+  /** Progressive-jackpot hits (0069): any pot, and the Mega pot alone. */
+  jackpotWins: number;
+  megaWins: number;
   /** UTC hour of the most recent daily-bonus claim, or null if none yet. */
   lastDailyHour: number | null;
   userCount: number;
@@ -105,7 +108,7 @@ function hasFlag(s: AchStats, game: string, flag: string): boolean {
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
-  // ---------- 50 common ----------
+  // ---------- 54 common ----------
   COMMON("c_first_login", "Welcome Aboard", "Log in with Twitch for the first time.", () => true),
   COMMON("c_daily_1", "First Steps", "Claim your first daily login bonus.", (s) => s.dailyCount >= 1),
   COMMON("c_daily_7", "Regular", "7-day login streak.", (s) => s.progress.best_login_streak >= 7),
@@ -165,7 +168,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   COMMON("c_robbed_first", "It Happens", "Someone tried to steal from you.", (s) => s.progress.times_robbed >= 1),
   COMMON("c_feed_first", "On the Record", "Appear in the live activity feed.", (s) => s.activityCount >= 1),
 
-  // ---------- 50 creative ----------
+  // ---------- 52 creative ----------
   // Both read the hour of the member's LATEST daily claim. They used to read the
   // clock at evaluation time and ignore their stats argument, so any award between
   // 00:00 and 07:00 UTC unlocked "claimed a daily bonus at that hour" without a
@@ -255,8 +258,11 @@ export const ACHIEVEMENTS: Achievement[] = [
   CREATIVE("k_podium_finish", "Podium Finish", "Hold a top-3 spot on any game's all-time big-win podium.", (s) => s.podiumFinish),
   CREATIVE("k_xp_100k", "Six Figures", "Earn 100,000 lifetime XP.", (s) => s.progress.xp >= 100000, 1000, 1000),
   CREATIVE("k_coin_millionaire", "Coin Millionaire", "Hold 1,000,000 coins.", (s) => s.progress.coins >= 1000000, 5000, 0),
+  // Progressive jackpots (0069): any pot — a game pot or the Mega one. The
+  // count comes from jackpot_wins, written by the payout's own transaction.
+  CREATIVE("k_jackpot_winner", "Jackpot Winner", "Hit any progressive jackpot.", (s) => s.jackpotWins >= 1, 1000, 500),
 
-  // ---------- 25 special (unexpected) ----------
+  // ---------- 29 special (unexpected) ----------
   SPECIAL("s_turbo_winner", "One in a Hundred Million", "Win the Twitch Turbo subscription jackpot on the wheel.", (s) => s.turboWins >= 1, 5000, 50000),
   SPECIAL("s_midas", "Midas Touch", "Win 10 games in a row.", (s) => s.winStreak >= 10),
   SPECIAL("s_cursed", "Properly Cursed", "Lose 20 games in a row.", (s) => s.lossStreak >= 20, 1000, 500),
@@ -282,6 +288,10 @@ export const ACHIEVEMENTS: Achievement[] = [
   SPECIAL("s_sniper", "Sniper", "Steal 200+ coins in a single successful heist.", (s) => s.bestStealAmount >= 200),
   SPECIAL("s_slots_jackpot", "Ra's Jackpot", "Win 5,000+ coins in a single Badges of Ra spin.", (s) => s.recentResults.some((r) => r.game === "slots" && r.payout >= 5000)),
   SPECIAL("s_pingu_jackpot", "Crown of the Ice", "Hit the 10x Pingu Throw jackpot.", (s) => hasFlag(s, "pingu", "jackpot")),
+  // The rarest thing in the arcade: 1-in-10,000 per settled round, fed by
+  // every game and the wheel. Rewards sit above the ordinary SPECIAL tier
+  // (and below the 1:1e8 turbo) — the moment already pays five figures.
+  SPECIAL("s_mega_jackpot", "Mega Jackpot", "Hit the cross-game Mega Jackpot.", (s) => s.megaWins >= 1, 2500, 2500),
   SPECIAL("s_birthday", "Badge Birthday", "Log in on your Twitch account's creation anniversary.", (s) => s.twitchBirthday, 1000, 1000),
   // The old check accepted ANY three wins among the last 60 rounds — the same
   // game a week apart satisfied "different games within 10 minutes". The wins
@@ -624,7 +634,7 @@ async function buildStats(userId: string): Promise<AchStats> {
   const progress = await getProgress(userId);
   const todayStr = new Date().toISOString().slice(0, 10);
 
-  const [badgesRes, gamesRes, roundsRes, todayRoundsRes, wheelRes, turboRes, profileRes,
+  const [badgesRes, gamesRes, roundsRes, todayRoundsRes, wheelRes, turboRes, jackpotRes, megaRes, profileRes,
     rainRes, stealRes, reactRes, visitsRes, usersRes, topCoinsRes, podiumRes, achRes, visitorsRes,
     maxBetRes, lastDailyRes] =
     await Promise.all([
@@ -667,6 +677,12 @@ async function buildStats(userId: string): Promise<AchStats> {
           .range(from, to),
       ),
       supabase.from("turbo_wins").select("id", { count: "exact", head: true }).eq("user_id", userId),
+      // Progressive-jackpot wins (0069): the jackpot_wins history is written by
+      // the same transaction that pays, so a count here can never see a win the
+      // balance did not receive. Two head counts (any pot / Mega only) — the
+      // turbo_wins shape; hits are rare, so no cap concern.
+      supabase.from("jackpot_wins").select("id", { count: "exact", head: true }).eq("user_id", userId),
+      supabase.from("jackpot_wins").select("id", { count: "exact", head: true }).eq("user_id", userId).eq("kind", "mega"),
       supabase.from("profiles").select("username, view_count, customization, mood, twitch_created_at, showcase_slots, created_at").eq("id", userId).maybeSingle(),
       pageAll<{ payload: Record<string, unknown> | null }>((from, to) =>
         supabase
@@ -873,6 +889,8 @@ async function buildStats(userId: string): Promise<AchStats> {
     lossStreak,
     wheelBest,
     turboWins: turboRes.count ?? 0,
+    jackpotWins: jackpotRes.count ?? 0,
+    megaWins: megaRes.count ?? 0,
     profileViews: profileRes.data?.view_count ?? 0,
     visitorsCount: distinctVisitors,
     rainsReceived,

@@ -1,7 +1,26 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useGame, BetBar, GameError, GameAction, RoundOutcome } from "./useGame";
+import { useGame, BetBar, GameError, GameAction, RoundOutcome, type PlayResponse } from "./useGame";
+
+/** Scaffolding for proving the jackpot-hit ceremony without a real 1-in-10,000
+ *  hit (flip true, mount temporarily, screenshot, revert — the SlotsGame
+ *  CEREMONY_PREVIEW precedent). Static instead of state-seeded: the preview
+ *  verdict IS the data, so there is nothing to seed after mount — Vault was
+ *  picked as the mount point because it renders RoundOutcome directly and has
+ *  no other verdict UI to keep in sync. */
+const CEREMONY_PREVIEW = false;
+const PREVIEW_LAST = {
+  ok: true,
+  bet: 50,
+  payout: 100,
+  won: true,
+  balance: 12345,
+  result: {
+    jackpotWon: { kind: "mega", amount: 3000 },
+    jackpots: { game: 512, mega: 250 },
+  },
+} satisfies PlayResponse;
 
 /** Crack the Vault: stop three rotating needles inside the green zone. */
 export default function VaultGame() {
@@ -82,7 +101,7 @@ export default function VaultGame() {
     <div className="space-y-4">
       <BetBar bet={bet} setBet={setBet} min={10} max={2000} busy={busy} balance={balance} />
       <GameError error={error} />
-      <RoundOutcome last={last} />
+      <RoundOutcome last={CEREMONY_PREVIEW ? PREVIEW_LAST : last} />
       <div className="card space-y-4 p-6">
         <div className="flex justify-center gap-6">
           {angles.map((angle, index) => (

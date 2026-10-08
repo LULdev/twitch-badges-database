@@ -195,10 +195,13 @@ export default async function GamePage({ params }: PageProps) {
   // Progressive jackpots (0069) for the hero: this game's own pot plus the
   // Mega pot, from the same public read the hub strip uses. Shown in every
   // state (playable, login wall, arcade off) — the pots are the argument for
-  // playing; null hides both chips on an unreachable table.
+  // playing; null hides both chips on an unreachable table. The Mega row also
+  // carries the last hit (winner/amount/date) for the record line below the
+  // chips.
   const jackpots = await getJackpots();
   const gamePot = jackpots.find((j) => j.scope === game)?.pot ?? null;
-  const megaPot = jackpots.find((j) => j.kind === "mega")?.pot ?? null;
+  const mega = jackpots.find((j) => j.kind === "mega") ?? null;
+  const megaPot = mega?.pot ?? null;
 
   // One hero shell for EVERY state (playable, login wall, arcade off): the
   // game art makes the page recognizable even before login. `stats` is the
@@ -240,6 +243,20 @@ export default async function GamePage({ params }: PageProps) {
           )}
           {stats}
         </div>
+        {mega?.last_winner && mega.last_won_at && (
+          // The last Mega Jackpot hit — the rarest moment of the arcade,
+          // visible on every game page until the next one lands.
+          <p className="mt-2 text-xs font-semibold text-warning">
+            {t("jackpotLastMega", {
+              name: mega.last_winner,
+              n: mega.last_win_amount ?? 0,
+            })}
+            {" · "}
+            <time dateTime={mega.last_won_at}>
+              {winsDate.format(new Date(mega.last_won_at))}
+            </time>
+          </p>
+        )}
       </div>
     </header>
   );

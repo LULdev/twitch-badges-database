@@ -92,18 +92,50 @@ async function main(): Promise<void> {
       coinFlow += page.reduce((sum, row) => sum + Math.abs(row.coins_amount ?? 0), 0);
       if (page.length < 1000) break;
     }
+    // Progressive-jackpot snapshot + windowed hits, same shape as the engine's
+    // jackpotStats (duplicated here because dry mode imports the pieces, not
+    // the engine — the documented dry-branch trade-off).
+    const [potsRes, winsRes] = await Promise.all([
+      supabase.from("jackpots").select("scope,kind,pot"),
+      supabase
+        .from("jackpot_wins")
+        .select("amount")
+        .gte("created_at", start.toISOString())
+        .lt("created_at", end.toISOString()),
+    ]);
+    const jackpot =
+      potsRes.error || winsRes.error
+        ? null
+        : {
+            potsTotal: ((potsRes.data ?? []) as Array<{ kind: string; pot: string | number }>).reduce(
+              (sum, row) => sum + Number(row.pot ?? 0),
+              0,
+            ),
+            megaPot: Number(
+              ((potsRes.data ?? []) as Array<{ kind: string; pot: string | number }>).find(
+                (row) => row.kind === "mega",
+              )?.pot ?? 0,
+            ),
+            hits: (winsRes.data ?? []).length,
+            paid: ((winsRes.data ?? []) as Array<{ amount: string | number }>).reduce(
+              (sum, row) => sum + Number(row.amount ?? 0),
+              0,
+            ),
+          };
     const article = buildArcadeHighlightsArticle({
       day: start.toISOString().slice(0, 10),
       roundsByGame: counts,
       biggestWin,
       streakSaves,
       coinFlow,
+      jackpot,
     });
     console.log("=== DRY — nothing written ===");
     console.log("title:", article.title);
     console.log("excerpt:", article.excerpt);
     console.log("content chars:", article.content.length, "(floor 600)");
-    console.log("streak saves:", streakSaves, "| coin flow:", coinFlow, "| sentences:", article.content.includes("Streak Freeze"), article.content.includes("BadgesCoins moved"));
+    console.log("streak saves:", streakSaves, "| coin flow:", coinFlow, "| sentences:", article.content.includes("Streak Freeze"), article.content.includes("BadgesCoins moved"), article.content.includes("Mega Jackpot"));
+    console.log("jackpot:", JSON.stringify(jackpot));
     console.log(counts.filter((c) => c.rounds > 0));
     if (biggestWin) console.log("biggest win:", biggestWin);
     return;

@@ -112,7 +112,7 @@
     "heroF2Title": "TBRI rarity index",
     "heroF2Desc": "A 0–100 score built from scarcity, wear and momentum — know which badges are genuinely rare before you claim them.",
     "heroF3Title": "Play while you collect",
-    "heroF3Desc": "14 arcade games, XP, levels, coins and 133 achievements — plus a daily Wheel of Fortune with a Twitch Turbo jackpot at real 1-in-100,000,000 odds.",
+    "heroF3Desc": "14 arcade games, XP, levels, coins and 135 achievements — plus a daily Wheel of Fortune with a Twitch Turbo jackpot at real 1-in-100,000,000 odds.",
     "heroF4Title": "Your collection profile",
     "heroF4Desc": "Log in with Twitch to sync the badges you already own, build a showcase and climb worldwide leaderboards — in 11 languages."
   },
@@ -818,7 +818,9 @@
     "jackpotMegaChip": "Mega {n}",
     "jackpotWon": "Jackpot!",
     "jackpotWonMega": "MEGA JACKPOT!",
-    "jackpotWinners": "Latest jackpot wins"
+    "jackpotWinners": "Latest jackpot wins",
+    "jackpotHofTitle": "Biggest jackpot wins ever",
+    "jackpotLastMega": "Last Mega Jackpot: {name} +{n}"
   },
   "wheel": {
     "title": "Wheel of Fortune",
@@ -935,7 +937,9 @@
     "wheelA": "Once per day. Prizes range from +25 XP (most common) to +5,000 XP (very rare), each with bonus BadgesCoins.",
     "wheelQ": "How often can I spin the Wheel of Fortune?",
     "xpA": "Daily login +10 XP plus +5 per streak day (max +50). Each synced Twitch badge +1,000 XP. Achievements pay up to 5,000 XP. Games pay +2 XP per round and +10 XP per win, capped at 100 XP per day to prevent farming. The Wheel of Fortune pays 25 to 5,000 XP per spin.",
-    "xpQ": "How exactly is XP awarded?"
+    "xpQ": "How exactly is XP awarded?",
+    "jackpotQ": "How do the progressive jackpots work?",
+    "jackpotA": "Every coin you lose in the arcade feeds two progressive jackpots: {gameRate}% goes into that game's own pot and {megaRate}% into the Mega Jackpot shared across all fourteen games. Every settled round also rolls a 1-in-{gameOdds} chance at your game's pot and a 1-in-{megaOdds} chance at the Mega — and the daily Wheel of Fortune spin rolls the Mega too. A hit pays out the entire pot, then the pot reseeds itself and starts growing again. The live pots are always visible on the games hub."
   },
   "customizer": {
     "commonSection": "Profile — common settings",

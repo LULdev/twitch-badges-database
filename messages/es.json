@@ -112,7 +112,7 @@
     "heroF2Title": "Índice de rareza TBRI",
     "heroF2Desc": "Una puntuación de 0 a 100 basada en escasez, difusión y momentum — sabe qué insignias son realmente raras antes de conseguirlas.",
     "heroF3Title": "Juega mientras coleccionas",
-    "heroF3Desc": "14 juegos arcade, XP, niveles, monedas y 133 logros — más una ruleta diaria con un jackpot de Twitch Turbo con probabilidades reales de 1 entre 100.000.000.",
+    "heroF3Desc": "14 juegos arcade, XP, niveles, monedas y 135 logros — más una ruleta diaria con un jackpot de Twitch Turbo con probabilidades reales de 1 entre 100.000.000.",
     "heroF4Title": "Tu perfil de colección",
     "heroF4Desc": "Inicia sesión con Twitch para sincronizar las insignias que ya tienes, montar una vitrina y escalar en las clasificaciones mundiales — en 11 idiomas."
   },
@@ -818,7 +818,9 @@
     "jackpotMegaChip": "Mega {n}",
     "jackpotWon": "¡Jackpot!",
     "jackpotWonMega": "¡MEGA JACKPOT!",
-    "jackpotWinners": "Últimos premios de jackpot"
+    "jackpotWinners": "Últimos premios de jackpot",
+    "jackpotHofTitle": "Mayores premios de jackpot de la historia",
+    "jackpotLastMega": "Último Mega Jackpot: {name} +{n}"
   },
   "wheel": {
     "title": "Ruleta de la fortuna",
@@ -935,7 +937,9 @@
     "wheelA": "Una vez al día. Los premios van de +25 XP (lo más común) a +5,000 XP (muy raro), cada uno con BadgesCoins extra.",
     "wheelQ": "¿Con qué frecuencia puedo girar la Ruleta de la fortuna?",
     "xpA": "Inicio de sesión diario +10 XP más +5 por día de racha (máx. +50). Cada insignia de Twitch sincronizada +1.000 XP. Los logros pagan hasta 5.000 XP. Los juegos pagan +2 XP por ronda y +10 XP por victoria, con un tope de 100 XP al día para evitar el farmeo. La Ruleta de la fortuna paga de 25 a 5,000 XP por giro.",
-    "xpQ": "¿Cómo se otorga exactamente el XP?"
+    "xpQ": "¿Cómo se otorga exactamente el XP?",
+    "jackpotQ": "¿Cómo funcionan los jackpots progresivos?",
+    "jackpotA": "Cada moneda que pierdes en el arcade alimenta dos jackpots progresivos: {gameRate}% va al bote del propio juego y {megaRate}% al Mega Jackpot compartido entre los catorce juegos. Cada ronda jugada también sortea una probabilidad de 1 entre {gameOdds} en el bote del juego y de 1 entre {megaOdds} en el Mega — y el giro diario de la Ruleta de la Fortuna también sortea el Mega. Un acierto paga el bote completo, y luego el bote se reinicia y vuelve a crecer. Los botes en vivo siempre están visibles en la página de juegos."
   },
   "customizer": {
     "commonSection": "Perfil — ajustes comunes",

@@ -8,19 +8,21 @@ import { GAMES } from "@/lib/gamification/games";
 
 /**
  * The progressive-jackpot strip on the games hub (0069): the global Mega pot
- * as the headline number, every game pot as a live chip, and the newest
- * winners as a row beneath. Server-rendered from the public tables — a
- * snapshot, deliberately: the pots tick in real time on the game pages
- * (every round response carries the fresh values), while the hub re-reads on
- * every visit.
+ * as the headline number, every game pot as a live chip, the newest winners
+ * and the biggest winners of all time as full-width rows beneath. Server-
+ * rendered from the public tables — a snapshot, deliberately: the pots tick
+ * in real time on the game pages (every round response carries the fresh
+ * values), while the hub re-reads on every visit.
  */
 export default async function JackpotStrip({
   jackpots,
   wins,
+  hallOfFame,
   locale,
 }: {
   jackpots: JackpotPot[];
   wins: JackpotWinEntry[];
+  hallOfFame: JackpotWinEntry[];
   locale: string;
 }) {
   const t = await getTranslations("games");
@@ -32,6 +34,16 @@ export default async function JackpotStrip({
     const pot = gamePots.find((j) => j.scope === meta.id);
     return pot ? [pot] : [];
   });
+  // The house short-date pattern (game page / BestRoundsCard).
+  const winDate = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short" });
+  // Hall-of-fame medal tints — the .rank-row podium tokens (dark + light).
+  const medals = ["var(--rank-gold)", "var(--rank-silver)", "var(--rank-bronze)"];
+  const scopeLabel = (win: JackpotWinEntry) =>
+    win.kind === "mega"
+      ? t("jackpotMegaTitle")
+      : win.scope in GAME_COLORS
+        ? t(`${win.scope}Title`)
+        : win.scope;
 
   return (
     <section className="card jackpot-strip" aria-labelledby="jackpot-head">
@@ -55,14 +67,22 @@ export default async function JackpotStrip({
             <CountUp value={mega.pot} locale={locale} />{" "}
             <Coin size={20} variant="b" className="bcoin-lg" />
           </p>
-          <p className="jackpot-last">
-            {mega.last_winner
-              ? t("jackpotLastWin", {
-                  name: mega.last_winner,
-                  n: mega.last_win_amount ?? 0,
-                })
-              : t("jackpotNobodyYet")}
-          </p>
+            <p className="jackpot-last">
+              {mega.last_winner
+                ? t("jackpotLastWin", {
+                    name: mega.last_winner,
+                    n: mega.last_win_amount ?? 0,
+                  })
+                : t("jackpotNobodyYet")}
+              {mega.last_winner && mega.last_won_at ? (
+                <>
+                  {" · "}
+                  <time dateTime={mega.last_won_at}>
+                    {winDate.format(new Date(mega.last_won_at))}
+                  </time>
+                </>
+              ) : null}
+            </p>
         </div>
       </div>
 
@@ -110,23 +130,61 @@ export default async function JackpotStrip({
                   {win.username}
                 </Link>
               ) : null}
-              <span className="text-xs text-muted">
-                {win.kind === "mega"
-                  ? t("jackpotMegaTitle")
-                  : win.scope in GAME_COLORS
-                    ? t(`${win.scope}Title`)
-                    : win.scope}
+                <span className="text-xs text-muted">
+                  {scopeLabel(win)}
+                </span>
+                <span
+                  dir="ltr"
+                  className="inline-flex items-center gap-1 font-bold text-success tabular-nums"
+                >
+                  +{win.amount.toLocaleString(locale)} <Coin size={11} />
+                </span>
               </span>
+            ))}
+          </div>
+        )}
+
+        {hallOfFame.length > 0 && (
+          // All-time records, distinct from the recency row above: the three
+          // BIGGEST wins ever with a podium-medal rank. Hidden until the
+          // first hit, like every other jackpot surface.
+          <div className="jackpot-hof">
+            <span className="jackpot-winners-label">
               <span
-                dir="ltr"
-                className="inline-flex items-center gap-1 font-bold text-success tabular-nums"
-              >
-                +{win.amount.toLocaleString(locale)} <Coin size={11} />
-              </span>
+                className="size-2 rounded-full"
+                style={{ background: "var(--rank-gold)" }}
+                aria-hidden="true"
+              />
+              {t("jackpotHofTitle")}
             </span>
-          ))}
-        </div>
-      )}
-    </section>
-  );
+            {hallOfFame.map((win, index) => (
+              <span key={win.id} className="jackpot-winner">
+                <span
+                  className="jackpot-hof-rank"
+                  style={{ color: medals[index] ?? "var(--muted)" }}
+                  aria-hidden="true"
+                >
+                  {index + 1}
+                </span>
+                {win.username ? (
+                  <Link href={`/profile/${win.username}`} className="font-bold hover:text-accent">
+                    {win.username}
+                  </Link>
+                ) : null}
+                <span className="text-xs text-muted">{scopeLabel(win)}</span>
+                <span
+                  dir="ltr"
+                  className="inline-flex items-center gap-1 font-bold text-success tabular-nums"
+                >
+                  +{win.amount.toLocaleString(locale)} <Coin size={11} />
+                </span>
+                <time dateTime={win.created_at} className="text-xs text-muted">
+                  {winDate.format(new Date(win.created_at))}
+                </time>
+              </span>
+            ))}
+          </div>
+        )}
+      </section>
+    );
 }

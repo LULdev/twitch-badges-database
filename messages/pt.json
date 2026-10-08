@@ -112,7 +112,7 @@
     "heroF2Title": "Índice de raridade TBRI",
     "heroF2Desc": "Uma pontuação de 0 a 100 baseada em escassez, adoção e momento — saiba quais emblemas são realmente raros antes de resgatá-los.",
     "heroF3Title": "Jogue enquanto coleciona",
-    "heroF3Desc": "14 jogos de fliperama, XP, níveis, moedas e 133 conquistas — mais uma roleta diária com um jackpot de Twitch Turbo com chances reais de 1 em 100.000.000.",
+    "heroF3Desc": "14 jogos de fliperama, XP, níveis, moedas e 135 conquistas — mais uma roleta diária com um jackpot de Twitch Turbo com chances reais de 1 em 100.000.000.",
     "heroF4Title": "Seu perfil de coleção",
     "heroF4Desc": "Entre com a Twitch para sincronizar os emblemas que já possui, montar uma vitrine e subir nos rankings mundiais — em 11 idiomas."
   },
@@ -818,7 +818,9 @@
     "jackpotMegaChip": "Mega {n}",
     "jackpotWon": "Jackpot!",
     "jackpotWonMega": "MEGA JACKPOT!",
-    "jackpotWinners": "Últimos prêmios de jackpot"
+    "jackpotWinners": "Últimos prêmios de jackpot",
+    "jackpotHofTitle": "Maiores prêmios de jackpot de todos os tempos",
+    "jackpotLastMega": "Último Mega Jackpot: {name} +{n}"
   },
   "wheel": {
     "title": "Roleta da fortuna",
@@ -935,7 +937,9 @@
     "wheelA": "Uma vez por dia. Os prêmios vão de +25 XP (mais comum) a +5,000 XP (muito raro), cada um com BadgesCoins extras.",
     "wheelQ": "Com que frequência posso girar a Roleta da fortuna?",
     "xpA": "Login diário +10 XP mais +5 por dia de sequência (máx. +50). Cada emblema da Twitch sincronizado +1.000 XP. As conquistas pagam até 5.000 XP. Os jogos pagam +2 XP por rodada e +10 XP por vitória, limitado a 100 XP por dia para evitar farm. A Roleta da fortuna paga de 25 a 5,000 XP por giro.",
-    "xpQ": "Como o XP é concedido exatamente?"
+    "xpQ": "Como o XP é concedido exatamente?",
+    "jackpotQ": "Como funcionam os jackpots progressivos?",
+    "jackpotA": "Cada moeda que você perde no fliperama alimenta dois jackpots progressivos: {gameRate}% vai para o pote do próprio jogo e {megaRate}% para o Mega Jackpot compartilhado entre todos os catorze jogos. Cada rodada jogada também sorteia uma chance de 1 em {gameOdds} no pote do jogo e de 1 em {megaOdds} no Mega — e o giro diário da Roda da Fortuna também sorteia o Mega. Um acerto paga o pote inteiro, e então o pote reinicia e volta a crescer. Os potes ao vivo estão sempre visíveis na página dos jogos."
   },
   "customizer": {
     "commonSection": "Perfil — ajustes comuns",

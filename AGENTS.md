@@ -33,7 +33,7 @@ Read `README.md` for data sources and setup; read this file before editing.
 - `src/lib/` — queries.ts (DB reads via server client), rarity.ts (TBRI),
   changelog.ts, inventory.ts, push.ts, markdown.ts, seo.ts, health.ts
   (heartbeats), stats.ts (reads the `stats_*` views for `/stats`)
-- `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 128 achievements
+- `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 133 achievements
   (achievements.ts, self-evaluating), games.ts (14 server-authoritative games),
   wheel.ts (daily wheel + Turbo jackpot 1:1e8 + Mega Jackpot roll), daily.ts
   (login bonus, heists, coin rain), visits.ts (5-min-IP-dedup view counters),
@@ -45,6 +45,12 @@ Read `README.md` for data sources and setup; read this file before editing.
   also publishes the date-stamped `mega-jackpot-<date>` auto post (shared
   helper in jackpot.ts, one post per UTC day, no second push) and surfaces on
   the hub strip's winners row + the /stats `stats_jackpot_economy` card (0070).
+  Two achievements ride it: `k_jackpot_winner` (any pot) and `s_mega_jackpot`,
+  counted from `jackpot_wins`; the daily/weekly arcade recap carries a live
+  pot + windowed-hits line. Hub strip shows newest wins AND the all-time
+  hall of fame (top-3 by amount); game heroes + the wheel carry a dated
+  "last Mega hit" line; the FAQ's jackpot answer interpolates the live
+  economy rates/odds (answerFor per-key values, the achievements precedent).
 - `src/components/stats/` — animated chart set for the stats dashboard
   (CountUp, Reveal, TrendChart, DonutChart, DistributionBars, LevelHistogram,
   UptimeGauge, UptimeCalendar, AvailabilityStrip, LiveStatus, useChartTheme)

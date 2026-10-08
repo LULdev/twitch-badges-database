@@ -6,6 +6,7 @@ import {
   buildArcadeWeeklyArticle,
   createFeaturePost,
   isoWeekLabel,
+  type ArcadeJackpotStats,
 } from "@/lib/blog";
 import { sendPushToAll, recordNotification } from "@/lib/push";
 
@@ -15,6 +16,8 @@ export interface ArcadeHighlightsSummary {
   totalRounds: number;
   topGame: string | null;
   biggestWinUsername: string | null;
+  /** Live pots snapshot + windowed hits feeding the recap's jackpot line. */
+  jackpot: ArcadeJackpotStats | null;
   published: boolean;
   skipped: boolean;
   /** Present on Mondays (or forced): the weekly recap outcome. */
@@ -24,6 +27,7 @@ export interface ArcadeHighlightsSummary {
     totalRounds: number;
     priorWeekTotal: number | null;
     topGame: string | null;
+    jackpot: ArcadeJackpotStats | null;
     published: boolean;
     skipped: boolean;
     failed: boolean;
@@ -97,6 +101,40 @@ async function countCoinFlow(
     if (page.length < 1000) break;
   }
   return total;
+}
+
+/** Progressive-jackpot numbers for a recap window (0069): the LIVE pots as a
+ *  snapshot (sum over the jackpots table — the same numbers the hub strip
+ *  and the game heroes show) plus the hits paid inside [start, end) from the
+ *  public history. Null on any error: the recap line is omitted rather than
+ *  wrong. Hits are rare by design, so the windowed read fetches rows — no
+ *  paging concern at 1-in-4000+ odds. */
+async function jackpotStats(
+  supabase: ReturnType<typeof createAdminClient>,
+  start: Date,
+  end: Date,
+): Promise<ArcadeJackpotStats | null> {
+  try {
+    const [potsRes, winsRes] = await Promise.all([
+      supabase.from("jackpots").select("scope,kind,pot"),
+      supabase
+        .from("jackpot_wins")
+        .select("amount")
+        .gte("created_at", start.toISOString())
+        .lt("created_at", end.toISOString()),
+    ]);
+    if (potsRes.error || winsRes.error) return null;
+    const pots = (potsRes.data ?? []) as Array<{ scope: string; kind: string; pot: string | number }>;
+    const wins = (winsRes.data ?? []) as Array<{ amount: string | number }>;
+    return {
+      potsTotal: pots.reduce((sum, row) => sum + Number(row.pot ?? 0), 0),
+      megaPot: Number(pots.find((row) => row.kind === "mega")?.pot ?? 0),
+      hits: wins.length,
+      paid: wins.reduce((sum, row) => sum + Number(row.amount ?? 0), 0),
+    };
+  } catch {
+    return null;
+  }
 }
 
 /** Biggest won round in [start, end): server-side max ordering returns the
@@ -181,18 +219,21 @@ export async function runArcadeHighlights(
     totalRounds: 0,
     topGame: null,
     biggestWinUsername: null,
+    jackpot: null,
     published: false,
     skipped: false,
   };
 
   const counts = await countRounds(supabase, start, end);
   summary.totalRounds = counts.reduce((sum, g) => sum + g.rounds, 0);
-  const [win, daySaves, dayCoinFlow] = await Promise.all([
+  const [win, daySaves, dayCoinFlow, dayJackpot] = await Promise.all([
     biggestWin(supabase, start, end),
     countStreakSaves(supabase, start, end),
     countCoinFlow(supabase, start, end),
+    jackpotStats(supabase, start, end),
   ]);
   summary.biggestWinUsername = win?.username ?? null;
+  summary.jackpot = dayJackpot;
 
   const played = counts.filter((g) => g.rounds > 0);
   const top = played.length
@@ -218,6 +259,7 @@ export async function runArcadeHighlights(
       biggestWin: win,
       streakSaves: daySaves,
       coinFlow: dayCoinFlow,
+      jackpot: dayJackpot,
     });
     summary.published = await createFeaturePost({
       slug,
@@ -268,6 +310,10 @@ export async function runArcadeHighlights(
           chars: content.length,
           streakSaves: daySaves,
           coinFlow: dayCoinFlow,
+          jackpotHits: dayJackpot?.hits ?? 0,
+          jackpotPaid: dayJackpot?.paid ?? 0,
+          jackpotPotsTotal: dayJackpot?.potsTotal ?? null,
+          jackpotMegaPot: dayJackpot?.megaPot ?? null,
         },
       },
       supabase,
@@ -294,12 +340,13 @@ export async function runArcadeHighlights(
       const isoWeek = isoWeekLabel(wStart);
       const wSlug = `arcade-weekly-${isoWeek}`;
 
-      const [wCounts, pCounts, wWin, wSaves, wCoinFlow] = await Promise.all([
+      const [wCounts, pCounts, wWin, wSaves, wCoinFlow, wJackpot] = await Promise.all([
         countRounds(supabase, wStart, wEnd),
         countRounds(supabase, pStart, wStart),
         biggestWin(supabase, wStart, wEnd),
         countStreakSaves(supabase, wStart, wEnd),
         countCoinFlow(supabase, wStart, wEnd),
+        jackpotStats(supabase, wStart, wEnd),
       ]);
       const wTotal = wCounts.reduce((sum, g) => sum + g.rounds, 0);
       const pTotal = pCounts.reduce((sum, g) => sum + g.rounds, 0);
@@ -314,6 +361,7 @@ export async function runArcadeHighlights(
         totalRounds: wTotal,
         priorWeekTotal: pTotal,
         topGame: wTop?.game ?? null,
+        jackpot: wJackpot,
         published: false,
         skipped: false,
         failed: false,
@@ -345,6 +393,7 @@ export async function runArcadeHighlights(
           biggestWin: wWin,
           streakSaves: wSaves,
           coinFlow: wCoinFlow,
+          jackpot: wJackpot,
         });
         weekly.published = await createFeaturePost({
           slug: wSlug,
@@ -396,6 +445,10 @@ export async function runArcadeHighlights(
               chars: wArticle.content.length,
               streakSaves: wSaves,
               coinFlow: wCoinFlow,
+              jackpotHits: wJackpot?.hits ?? 0,
+              jackpotPaid: wJackpot?.paid ?? 0,
+              jackpotPotsTotal: wJackpot?.potsTotal ?? null,
+              jackpotMegaPot: wJackpot?.megaPot ?? null,
             },
           },
           supabase,
@@ -410,6 +463,7 @@ export async function runArcadeHighlights(
           totalRounds: 0,
           priorWeekTotal: null,
           topGame: null,
+          jackpot: null,
           published: false,
           skipped: false,
         }),

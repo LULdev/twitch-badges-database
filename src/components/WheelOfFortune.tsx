@@ -90,10 +90,14 @@ function applyAngle(node: HTMLDivElement | null, angle: number, transitionMs: nu
 /** Daily Wheel of Fortune with animated spin and Turbo jackpot slot. */
 export default function WheelOfFortune({
   megaPot: initialMegaPot,
+  megaLast = null,
 }: {
   /** Server-read Mega Jackpot pot (0069) for the ticking display; the spin
    *  response replaces it with the authoritative post-spin value. */
   megaPot?: number | null;
+  /** The last Mega Jackpot hit (winner/amount/date), server-read; null hides
+   *  the record line. */
+  megaLast?: { winner: string; amount: number; at: string } | null;
 }) {
   const t = useTranslations("wheel");
   const tg = useTranslations("games");
@@ -439,6 +443,17 @@ export default function WheelOfFortune({
             <span className="inline-flex items-center gap-1 tabular-nums">
               {megaPot.toLocaleString(locale)} <Coin size={12} variant="b" />
             </span>
+          </p>
+        )}
+        {megaLast && (
+          <p className="mx-auto mt-1 text-xs font-semibold text-warning">
+            {tg("jackpotLastMega", { name: megaLast.winner, n: megaLast.amount })}
+            {" · "}
+            <time dateTime={megaLast.at}>
+              {new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short" }).format(
+                new Date(megaLast.at),
+              )}
+            </time>
           </p>
         )}
       </div>

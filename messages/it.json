@@ -112,7 +112,7 @@
     "heroF2Title": "Indice di rarità TBRI",
     "heroF2Desc": "Un punteggio 0–100 costruito da scarsità, diffusione e slancio — scopri quali badge sono davvero rari prima di ottenerli.",
     "heroF3Title": "Gioca mentre collezioni",
-    "heroF3Desc": "14 giochi arcade, XP, livelli, monete e 133 obiettivi — più una ruota quotidiana con un jackpot Twitch Turbo a probabilità reali di 1 su 100.000.000.",
+    "heroF3Desc": "14 giochi arcade, XP, livelli, monete e 135 obiettivi — più una ruota quotidiana con un jackpot Twitch Turbo a probabilità reali di 1 su 100.000.000.",
     "heroF4Title": "Il tuo profilo da collezionista",
     "heroF4Desc": "Accedi con Twitch per sincronizzare i badge che già possiedi, creare una vetrina e scalare le classifiche mondiali — in 11 lingue."
   },
@@ -818,7 +818,9 @@
     "jackpotMegaChip": "Mega {n}",
     "jackpotWon": "Jackpot!",
     "jackpotWonMega": "MEGA JACKPOT!",
-    "jackpotWinners": "Ultime vincite del jackpot"
+    "jackpotWinners": "Ultime vincite del jackpot",
+    "jackpotHofTitle": "Le più grandi vincite jackpot di sempre",
+    "jackpotLastMega": "Ultimo Mega Jackpot: {name} +{n}"
   },
   "wheel": {
     "title": "Ruota della fortuna",
@@ -935,7 +937,9 @@
     "wheelA": "Una volta al giorno. I premi vanno da +25 XP (più comune) a +5,000 XP (molto raro), ciascuno con BadgesCoins extra.",
     "wheelQ": "Quanto spesso posso girare la Ruota della fortuna?",
     "xpA": "Accesso giornaliero +10 XP più +5 per giorno di serie (max +50). Ogni badge Twitch sincronizzato +1.000 XP. Gli obiettivi pagano fino a 5.000 XP. I giochi pagano +2 XP per partita e +10 XP per vittoria, con un tetto di 100 XP al giorno per evitare il farming. La Ruota della fortuna paga da 25 a 5,000 XP per giro.",
-    "xpQ": "Come viene assegnato esattamente l'XP?"
+    "xpQ": "Come viene assegnato esattamente l'XP?",
+    "jackpotQ": "Come funzionano i jackpot progressivi?",
+    "jackpotA": "Ogni moneta che perdi nell'arcade alimenta due jackpot progressivi: {gameRate}% va nel piatto del gioco stesso e {megaRate}% nel Mega Jackpot condiviso da tutti e quattordici i giochi. Ogni round giocato tira anche una probabilità di 1 su {gameOdds} per il piatto del gioco e di 1 su {megaOdds} per il Mega — e anche il giro giornaliero della Ruota della Fortuna tira il Mega. Una vincita paga l'intero piatto, poi il piatto riparte da capo e ricomincia a crescere. I piatti live sono sempre visibili nella pagina dei giochi."
   },
   "customizer": {
     "commonSection": "Profilo — impostazioni comuni",

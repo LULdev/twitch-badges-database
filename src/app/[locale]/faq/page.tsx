@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { localeAlternates } from "@/lib/seo";
 import { jsonLdScript } from "@/lib/jsonld";
 import { ACTIVE_ACHIEVEMENTS } from "@/lib/gamification/achievements";
+import { getEconomy } from "@/lib/settings";
 
 const FAQ_KEYS = [
   "what",
@@ -12,6 +13,7 @@ const FAQ_KEYS = [
   "daily",
   "wheel",
   "turbo",
+  "jackpot",
   "badges",
   "games",
   "pingu",
@@ -58,17 +60,28 @@ export default async function FaqPage({
   // The achievement counts are templated so the copy cannot drift from the
   // catalog (it claimed 125 after two entries were retired). Answers are looked
   // up through a dynamic key list, so the values have to be supplied per key
-  // here instead of at one call site.
+  // here instead of at one call site. The jackpot answer follows the same
+  // doctrine: the rates and odds are admin-tunable economy settings, so they
+  // are read live instead of hardcoded (unlike the wheel's fixed 1:1e8).
   const achievementCounts = {
     total: ACTIVE_ACHIEVEMENTS.length,
     common: ACTIVE_ACHIEVEMENTS.filter((a) => a.category === "common").length,
     creative: ACTIVE_ACHIEVEMENTS.filter((a) => a.category === "creative").length,
     special: ACTIVE_ACHIEVEMENTS.filter((a) => a.category === "special").length,
   };
+  const economy = await getEconomy();
+  const jackpotValues = {
+    gameRate: economy.jackpotGameRate,
+    megaRate: economy.jackpotMegaRate,
+    gameOdds: economy.jackpotGameOdds.toLocaleString(locale),
+    megaOdds: economy.jackpotMegaOdds.toLocaleString(locale),
+  };
   const answerFor = (key: string) =>
     key === "achievements"
       ? t(`${key}A`, achievementCounts)
-      : t(`${key}A`);
+      : key === "jackpot"
+        ? t(`${key}A`, jackpotValues)
+        : t(`${key}A`);
 
   const jsonLd = {
     "@context": "https://schema.org",
