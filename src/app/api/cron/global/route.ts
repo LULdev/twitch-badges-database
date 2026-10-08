@@ -5,6 +5,7 @@ import { runBadgebaseSync } from "@/lib/syncs/badgebase";
 import { runArcadeHighlights } from "@/lib/syncs/arcade-highlights";
 import { pruneHeartbeats, recordHeartbeat, withHeartbeat } from "@/lib/health";
 import { prunedCoinRainGate } from "@/lib/gamification/daily";
+import { runBadgeStatsRollup } from "@/lib/syncs/badge-stats-rollup";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -88,6 +89,22 @@ export async function GET(request: Request) {
   const pruned = await pruneHeartbeats(90).catch(() => 0);
   const prunedRainGate = await prunedCoinRainGate().catch(() => 0);
 
+  // Nightly badge_stats retention (0068): raw measured points older than 14
+  // days collapse into badge_stats_daily. The prune-precedent reporting shape
+  // — counts ride the cron/global heartbeat payload; a failure degrades the
+  // run but never blocks the catalog sync above, and a quiet night (nothing
+  // old enough to roll) is a zero, not an error.
+  let rollup: { dailyRows: number; rawDeleted: number } | null = null;
+  let rollupFailed = false;
+  let rollupError: string | null = null;
+  try {
+    rollup = await runBadgeStatsRollup();
+  } catch (error) {
+    console.error("[cron/global] badge stats rollup", error);
+    rollupFailed = true;
+    rollupError = error instanceof Error ? error.message : "failed";
+  }
+
   // Ledger-growth probe. steal_attempts is the victim-side coin ledger (the
   // inventory transaction list reads it all-time), NOT gate state like
   // coin_rain_gate — it must never be bulk-pruned, or victims lose their theft
@@ -137,7 +154,7 @@ export async function GET(request: Request) {
   await recordHeartbeat({
     source: "cron/global",
     status:
-      globalFailed || badgebaseFailed || badgebaseSkipped || highlightsFailed
+      globalFailed || badgebaseFailed || badgebaseSkipped || highlightsFailed || rollupFailed
         ? "degraded"
         : "ok",
     durationMs,
@@ -149,10 +166,15 @@ export async function GET(request: Request) {
           ? "drop-window enrichment skipped"
           : highlightsFailed
             ? (highlightsError ?? "arcade highlights failed")
-            : null,
+            : rollupFailed
+              ? (rollupError ?? "badge stats rollup failed")
+              : null,
     payload: {
       prunedHeartbeats: pruned,
       prunedRainGate,
+      rollupDailyRows: rollup?.dailyRows ?? 0,
+      rollupRawDeleted: rollup?.rawDeleted ?? 0,
+      rollupFailed,
       stealAttempts,
       globalFailed,
       badgebaseFailed,
@@ -182,6 +204,9 @@ export async function GET(request: Request) {
       durationMs,
       pruned,
       prunedRainGate,
+      rollup,
+      rollupFailed,
+      rollupError,
       stealAttempts,
     },
     { status },

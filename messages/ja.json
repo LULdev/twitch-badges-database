@@ -492,6 +492,7 @@
     "lastStatus": "状態",
     "lastUpdate": "最終シグナル",
     "legendArchived": "アーカイブ（ウェブアーカイブ）",
+    "legendBand": "1日の範囲",
     "legendActive": "アクティブユーザー",
     "legendCoins": "BadgesCoins",
     "legendOwners": "所有者",
@@ -597,7 +598,16 @@
     "recordLeadersTitle": "記録更新リーダー",
     "recordLeadersNote": "×N は選択した期間で各プレイヤーの自己ベストが更新された回数、コインはその期間の最高純利益を示します。",
     "periodDays": "{n} 日間",
-    "periodAll": "全期間"
+    "periodAll": "全期間",
+    "jackpotTitle": "ジャックポットの経済",
+    "jackpotMega": "メガジャックポット",
+    "jackpotGames": "ゲームジャックポット合計",
+    "jackpotContributed": "投入コイン",
+    "jackpotPaid": "支払いコイン",
+    "jackpotBiggest": "最高当選額",
+    "jackpotHits": "当選回数",
+    "jackpotNote": "失ったコインの一部がジャックポットを積み増します。当選すると蓄積額が支払われ、再び貯まります。",
+    "jackpotWeek": "今週：{wins} 回の当選、{coins} コインの支払い。"
   },
   "notifications": {
     "title": "通知",
@@ -800,7 +810,15 @@
     "scratchFounder": "ファウンダー",
     "scratchJackpot": "ジャックポット",
     "roundFailed": "ラウンド失敗",
-    "networkError": "ネットワークエラー"
+    "networkError": "ネットワークエラー",
+    "jackpotMegaTitle": "メガジャックポット",
+    "jackpotLastWin": "最後の獲得者：{name}（{n} コイン）",
+    "jackpotNobodyYet": "まだ誰も獲得していません",
+    "jackpotChip": "ジャックポット {n}",
+    "jackpotMegaChip": "メガ {n}",
+    "jackpotWon": "ジャックポット！",
+    "jackpotWonMega": "メガジャックポット！",
+    "jackpotWinners": "最新のジャックポット獲得"
   },
   "wheel": {
     "title": "フォーチュンホイール",
@@ -814,7 +832,9 @@
     "wheelDisabled": "現在、ルーレットは無効です。",
     "notAuthed": "Twitch でログインしてルーレットを回してください。",
     "banned": "あなたのアカウントは停止されています。",
-    "youWon": "獲得しました"
+    "youWon": "獲得しました",
+    "jackpotMega": "メガジャックポット",
+    "jackpotWon": "メガジャックポット獲得！"
   },
   "feed": {
     "title": "ライブアクティビティフィード",
@@ -840,7 +860,8 @@
     "coin_rain": "BadgesCoinsの雨",
     "profile": "プロフィール",
     "first_login": "初回ログイン",
-    "item_purchase": "アイテム購入"
+    "item_purchase": "アイテム購入",
+    "jackpot_win": "ジャックポット獲得"
   },
   "achievements": {
     "title": "実績",
@@ -1286,7 +1307,13 @@
         "stealMax": "既定の奪取上限",
         "stealFloodMinutes": "奪取の待ち時間（分）",
         "stealPerHour": "1時間あたりの奪取回数",
-        "freezePrice": "フリーズ価格"
+        "freezePrice": "フリーズ価格",
+        "jackpotGameRate": "ゲームジャックポット配分（失ったコインの %）",
+        "jackpotMegaRate": "メガジャックポット配分（失ったコインの %）",
+        "jackpotGameOdds": "ゲームジャックポット確率（1ラウンドあたり 1/N）",
+        "jackpotMegaOdds": "メガジャックポット確率（1ラウンドあたり 1/N）",
+        "jackpotGameSeed": "ゲームジャックポット初期値（コイン）",
+        "jackpotMegaSeed": "メガジャックポット初期値（コイン）"
       },
       "games": {
         "title": "ゲーム",

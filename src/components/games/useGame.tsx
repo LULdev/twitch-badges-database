@@ -221,10 +221,25 @@ export function GameError({ error }: { error: string | null }) {
  */
 export function RoundOutcome({ last }: { last: PlayResponse | null }) {
   const t = useTranslations("games");
+  const locale = useLocale();
   if (!last) return null;
   const streakBonus =
     typeof last.result.streakBonusXp === "number" ? last.result.streakBonusXp : 0;
   const freezeUsed = last.result.freezeUsed === true;
+  // Live jackpot pots (0069): every settled round's response carries the
+  // fresh post-round values, so this line ticks while you play. The key
+  // forces a remount per value so the tick animation replays every round.
+  const pots = last.result.jackpots as { game?: unknown; mega?: unknown } | undefined;
+  const gamePot = typeof pots?.game === "number" ? pots.game : null;
+  const megaPot = typeof pots?.mega === "number" ? pots.mega : null;
+  const wonInfo = last.result.jackpotWon as
+    | { kind?: unknown; amount?: unknown }
+    | undefined;
+  const jackpotWin =
+    wonInfo && (wonInfo.kind === "mega" || wonInfo.kind === "game") &&
+    typeof wonInfo.amount === "number" && wonInfo.amount > 0
+      ? { kind: wonInfo.kind as "mega" | "game", amount: wonInfo.amount }
+      : null;
   return (
     <>
       <p
@@ -256,6 +271,29 @@ export function RoundOutcome({ last }: { last: PlayResponse | null }) {
           <Coin variant="b" size={14} className="bcoin-lg" />
           {t("newPersonalBest")}
         </div>
+      ) : null}
+      {jackpotWin ? (
+        <div
+          key={`${jackpotWin.kind}-${jackpotWin.amount}`}
+          className="jackpot-hit"
+          role="status"
+        >
+          <Coin variant="b" size={20} className="bcoin-ceremony" />
+          <span className="jackpot-hit-label">
+            {jackpotWin.kind === "mega" ? t("jackpotWonMega") : t("jackpotWon")}
+          </span>
+          <span dir="ltr" className="jackpot-hit-amount">
+            +{jackpotWin.amount.toLocaleString(locale)}
+            <Coin size={14} />
+          </span>
+        </div>
+      ) : null}
+      {gamePot !== null && megaPot !== null ? (
+        <p key={`jp-${gamePot}-${megaPot}`} className="jackpot-tick" dir="ltr">
+          <span>{t("jackpotChip", { n: gamePot })}</span>
+          <span className="jackpot-tick-sep" aria-hidden="true">·</span>
+          <span className="jackpot-tick-mega">{t("jackpotMegaChip", { n: megaPot })}</span>
+        </p>
       ) : null}
     </>
   );

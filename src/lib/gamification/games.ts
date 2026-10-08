@@ -1,15 +1,18 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { award, bumpCoins, getProgress, logActivity, ensureStarterItems } from "./xp";
 import { evaluateAchievements } from "./achievements";
+import { createMegaJackpotPost } from "./jackpot";
 import { getEconomy, getFeatures, getGames } from "@/lib/settings";
 import { after } from "next/server";
 import { recordNotification, sendPushToAll } from "@/lib/push";
 import { simulateThrow } from "@/lib/games/pingu-sim";
 
 /**
- * The arcade: 13 badge-themed games, all server-authoritative.
+ * The arcade: 14 badge-themed games, all server-authoritative.
  * Luck games roll on the server; skill games accept a score report with
- * sanity caps. Every round lands in game_rounds and the live feed.
+ * sanity caps. Every round lands in game_rounds and the live feed. A share
+ * of every LOST round feeds this game's progressive jackpot and the global
+ * Mega Jackpot (0069); every settled round rolls a hit chance per pot.
  */
 
 export interface GameMeta {
@@ -363,6 +366,86 @@ export async function playGame(
     throw coinError;
   }
 
+  // ── Progressive jackpots (0069) ────────────────────────────────────────────
+  // A configurable share of every LOST coin (a slice of `net`, never an extra
+  // debit) feeds this game's pot and the Mega pot; every settled round with a
+  // real stake rolls a 1-in-N hit chance per pot. `jackpot_round` is ONE
+  // transaction — contributions, the row-locked pot claim, the payout to the
+  // balance, the feed row and the history row all commit together, so a
+  // claimed pot can never go unpaid (the purchase_item doctrine). Best-effort
+  // by design: the round is already settled above, so a failed call logs and
+  // moves on — it must not void or 500 a paid round. The nonce replay paths
+  // return before this point, so a tossed response can never double-feed the
+  // pots. Refund rounds are not games: no contribution, no roll.
+  let jackpots: { game: number; mega: number } | null = null;
+  let jackpotWon: { scope: string; kind: "mega" | "game"; amount: number } | null =
+    null;
+  if (!refund && bet > 0) {
+    try {
+      const gameHit =
+        economy.jackpotGameOdds > 0 && Math.random() < 1 / economy.jackpotGameOdds;
+      const megaHit =
+        economy.jackpotMegaOdds > 0 && Math.random() < 1 / economy.jackpotMegaOdds;
+      const { data: jpRaw, error: jpError } = await supabase.rpc("jackpot_round", {
+        p_user_id: userId,
+        p_game: gameId,
+        p_loss: Math.max(0, -net),
+        p_game_rate: economy.jackpotGameRate / 100,
+        p_mega_rate: economy.jackpotMegaRate / 100,
+        p_game_seed: economy.jackpotGameSeed,
+        p_mega_seed: economy.jackpotMegaSeed,
+        p_game_hit: gameHit,
+        p_mega_hit: megaHit,
+      });
+      if (jpError) throw jpError;
+      const row = (
+        Array.isArray(jpRaw) ? jpRaw[0] : jpRaw
+      ) as {
+        out_game_pot: string | number;
+        out_mega_pot: string | number;
+        out_game_win: string | number;
+        out_mega_win: string | number;
+      } | null;
+      if (row) {
+        jackpots = { game: Number(row.out_game_pot), mega: Number(row.out_mega_pot) };
+        const gameWin = Number(row.out_game_win ?? 0);
+        const megaWin = Number(row.out_mega_win ?? 0);
+        if (megaWin > 0) jackpotWon = { scope: "mega", kind: "mega", amount: megaWin };
+        else if (gameWin > 0)
+          jackpotWon = { scope: gameId, kind: "game", amount: gameWin };
+        // The RPC already wrote the ledger row and credited the balance; the
+        // broadcast alert is garnish, the turbo_win house pattern. A Mega hit
+        // additionally publishes the date-stamped auto post (idempotent per
+        // UTC day; the push above already broadcast the moment, so the post
+        // deliberately fires no second notification).
+        if (jackpotWon) {
+          const won = jackpotWon;
+          afterResponse(() =>
+            sendJackpotAlert(
+              supabase,
+              userId,
+              gameId,
+              won.kind === "mega"
+                ? `MEGA JACKPOT hit in ${meta.title}!`
+                : `Jackpot on ${meta.title}!`,
+              won.amount,
+            ),
+          );
+          if (won.kind === "mega") {
+            afterResponse(() =>
+              createMegaJackpotPost(userId, won.amount, {
+                game: { id: gameId, title: meta.title ?? gameId },
+                odds: economy.jackpotMegaOdds,
+              }).then(() => undefined, () => undefined),
+            );
+          }
+        }
+      }
+    } catch (error) {
+      console.warn("[game] jackpot round failed:", error);
+    }
+  }
+
   // `economy` was resolved in wave A and is still the value the operator last
   // published (same 5 s cache bound as before — it is simply read earlier).
   // A refund round is not a game: no XP (win or lose), no feed row, and it
@@ -545,6 +628,8 @@ export async function playGame(
       ...(newPersonalBest && { newPersonalBest: true }),
       ...(streakBonusXp > 0 && { streakBonusXp }),
       ...(freezeUsed && { freezeUsed: true }),
+      ...(jackpots && { jackpots }),
+      ...(jackpotWon && { jackpotWon }),
     },
   };
 }

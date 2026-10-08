@@ -3982,3 +3982,254 @@ html {
   .cl-feature-glyph::before { animation: none; }
   .chron-entry, .chron-entry:hover { transform: none; }
 }
+
+/* ==== progressive jackpots (0069) =========================================
+   Two tiers: the global Mega pot (every game feeds it) and one pot per game.
+   Gold is the jackpot voice — --rank-gold/--warning in dark, --rank-gold
+   switches to the light-theme gold automatically via the token override.
+   Scale/opacity keyframes only, so RTL needs no twins (the bcoin-stamp
+   precedent). */
+
+.jackpot-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  padding: 1.125rem 1.375rem;
+  border: 1px solid color-mix(in oklab, var(--rank-gold) 45%, var(--line));
+  background:
+    linear-gradient(
+      120deg,
+      color-mix(in oklab, var(--rank-gold) 9%, transparent),
+      transparent 42%
+    ),
+    var(--surface);
+  overflow: hidden;
+  position: relative;
+}
+.jackpot-strip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    color-mix(in oklab, var(--rank-gold) 7%, transparent) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  animation: jackpot-sheen 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes jackpot-sheen {
+  0%, 55% { transform: translateX(-100%); }
+  85%, 100% { transform: translateX(100%); }
+}
+.jackpot-mega {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  min-width: 0;
+}
+.jackpot-crown {
+  display: grid;
+  place-items: center;
+  size: 3.25rem;
+  flex-shrink: 0;
+  border-radius: 0.875rem;
+  color: var(--rank-gold);
+  background: color-mix(in oklab, var(--rank-gold) 14%, transparent);
+  border: 1px solid color-mix(in oklab, var(--rank-gold) 35%, var(--line));
+  animation: jackpot-glow 3.2s ease-in-out infinite;
+}
+@keyframes jackpot-glow {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--rank-gold) 0%, transparent); }
+  50% { box-shadow: 0 0 1.375rem 0.125rem color-mix(in oklab, var(--rank-gold) 28%, transparent); }
+}
+.jackpot-mega-body { min-width: 0; }
+.jackpot-label {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--rank-gold);
+}
+.jackpot-amount {
+  margin: 0.125rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.625rem;
+  line-height: 1.1;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: var(--foreground);
+}
+.jackpot-last {
+  margin: 0.25rem 0 0;
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+.jackpot-games {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.25rem, 1fr));
+  gap: 0.5rem;
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+.jackpot-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+  min-width: 0;
+  padding: 0.4375rem 0.625rem;
+  border-radius: var(--radius-chip, 999px);
+  border: 1px solid color-mix(in oklab, var(--gg-color, var(--accent)) 38%, var(--line));
+  background: color-mix(in oklab, var(--gg-color, var(--accent)) 8%, var(--surface-2));
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+.jackpot-chip:hover {
+  border-color: var(--gg-color, var(--accent));
+  background: color-mix(in oklab, var(--gg-color, var(--accent)) 16%, var(--surface-2));
+  transform: translateY(-1px);
+}
+.jackpot-chip-dot {
+  size: 0.5rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--gg-color, var(--accent));
+}
+.jackpot-chip-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 700;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.jackpot-chip-pot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--rank-gold);
+}
+
+/* Gold chip variant — the hero pots on each game page. */
+.chip-gold {
+  border-color: color-mix(in oklab, var(--rank-gold) 45%, var(--line));
+  background: color-mix(in oklab, var(--rank-gold) 12%, var(--surface-2));
+  color: var(--rank-gold);
+  font-weight: 700;
+}
+
+/* Round-by-round pot tick + the hit ceremony inside RoundOutcome. */
+.jackpot-tick {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4375rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  animation: jackpot-tick-in 0.5s ease-out;
+}
+.jackpot-tick-mega { color: var(--rank-gold); }
+.jackpot-tick-sep { color: var(--line-strong); }
+@keyframes jackpot-tick-in {
+  from { opacity: 0.35; transform: translateY(-0.1875rem); }
+  to { opacity: 1; transform: none; }
+}
+.jackpot-hit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-card, 0.875rem);
+  border: 1px solid color-mix(in oklab, var(--rank-gold) 55%, var(--line));
+  background:
+    linear-gradient(
+      120deg,
+      color-mix(in oklab, var(--rank-gold) 16%, transparent),
+      transparent 55%
+    ),
+    var(--surface-2);
+  animation: jackpot-hit-in 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+}
+.jackpot-hit-label {
+  font-size: 0.9375rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rank-gold);
+}
+.jackpot-hit-amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  font-size: 1.0625rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: var(--foreground);
+}
+@keyframes jackpot-hit-in {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* The Mega pot line on the wheel page. */
+.jackpot-wheel-line {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* Winners row — the newest hits from the public jackpot_wins history. */
+.jackpot-winners {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 1rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid color-mix(in oklab, var(--rank-gold) 25%, var(--line));
+  font-size: 0.75rem;
+}
+.jackpot-winners-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.jackpot-winner {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jackpot-strip::before { animation: none; }
+  .jackpot-crown { animation: none; }
+  .jackpot-tick, .jackpot-hit { animation: none; }
+}

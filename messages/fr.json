@@ -492,6 +492,7 @@
     "lastStatus": "Statut",
     "lastUpdate": "Dernier signal",
     "legendArchived": "Archivé (archive web)",
+    "legendBand": "Plage quotidienne",
     "legendActive": "Utilisateurs actifs",
     "legendCoins": "BadgesCoins",
     "legendOwners": "Détenteurs",
@@ -597,7 +598,16 @@
     "recordLeadersTitle": "Champions des records battus",
     "recordLeadersNote": "×N compte combien de fois le record personnel de chaque joueur a progressé sur la période choisie ; la pièce montre le meilleur gain net de cette période.",
     "periodDays": "{n} jours",
-    "periodAll": "Depuis le début"
+    "periodAll": "Depuis le début",
+    "jackpotTitle": "Économie du jackpot",
+    "jackpotMega": "Pot du Méga Jackpot",
+    "jackpotGames": "Dans les jackpots de jeux",
+    "jackpotContributed": "Pièces versées",
+    "jackpotPaid": "Pièces payées",
+    "jackpotBiggest": "Plus gros gain",
+    "jackpotHits": "Jackpots gagnés",
+    "jackpotNote": "Une part de chaque pièce perdue alimente les jackpots ; un gain paie le pot, qui repart de sa base.",
+    "jackpotWeek": "Cette semaine : {wins} gains, {coins} pièces payées."
   },
   "notifications": {
     "title": "Notifications",
@@ -800,7 +810,15 @@
     "scratchFounder": "Fondateur",
     "scratchJackpot": "JACKPOT",
     "roundFailed": "Manche échouée",
-    "networkError": "Erreur réseau"
+    "networkError": "Erreur réseau",
+    "jackpotMegaTitle": "Méga Jackpot",
+    "jackpotLastWin": "Gagné pour la dernière fois par {name} ({n} pièces)",
+    "jackpotNobodyYet": "Pas encore gagné",
+    "jackpotChip": "Jackpot {n}",
+    "jackpotMegaChip": "Méga {n}",
+    "jackpotWon": "Jackpot !",
+    "jackpotWonMega": "MÉGA JACKPOT !",
+    "jackpotWinners": "Derniers gains de jackpot"
   },
   "wheel": {
     "title": "Roue de la fortune",
@@ -814,7 +832,9 @@
     "wheelDisabled": "La roue est désactivée pour le moment.",
     "notAuthed": "Connecte-toi avec Twitch pour faire tourner la roue.",
     "banned": "Ton compte est banni.",
-    "youWon": "Tu as gagné"
+    "youWon": "Tu as gagné",
+    "jackpotMega": "Méga Jackpot",
+    "jackpotWon": "Méga Jackpot gagné !"
   },
   "feed": {
     "title": "Fil d'activité en direct",
@@ -840,7 +860,8 @@
     "coin_rain": "Pluie de BadgesCoins",
     "profile": "Profil",
     "first_login": "Première connexion",
-    "item_purchase": "Achat d’objet"
+    "item_purchase": "Achat d’objet",
+    "jackpot_win": "Gain de jackpot"
   },
   "achievements": {
     "title": "Succès",
@@ -1286,7 +1307,13 @@
         "stealMax": "Vol maximum par défaut",
         "stealFloodMinutes": "Attente entre vols (minutes)",
         "stealPerHour": "Tentatives de vol par heure",
-        "freezePrice": "Prix du gel"
+        "freezePrice": "Prix du gel",
+        "jackpotGameRate": "Part des pièces perdues vers le jackpot du jeu (%)",
+        "jackpotMegaRate": "Part des pièces perdues vers le Méga Jackpot (%)",
+        "jackpotGameOdds": "Chances du jackpot du jeu (1 sur N par manche)",
+        "jackpotMegaOdds": "Chances du Méga Jackpot (1 sur N par manche)",
+        "jackpotGameSeed": "Base du jackpot du jeu (pièces)",
+        "jackpotMegaSeed": "Base du Méga Jackpot (pièces)"
       },
       "games": {
         "title": "Jeux",

@@ -492,6 +492,7 @@
     "lastStatus": "状态",
     "lastUpdate": "最后信号",
     "legendArchived": "存档（来自网页存档）",
+    "legendBand": "每日区间",
     "legendActive": "活跃用户",
     "legendCoins": "BadgesCoins",
     "legendOwners": "持有者",
@@ -597,7 +598,16 @@
     "recordLeadersTitle": "破纪录领先者",
     "recordLeadersNote": "×N 表示所选期间内每位玩家个人纪录上升的次数；金币为该期间的最佳净胜。",
     "periodDays": "{n} 天",
-    "periodAll": "全部时间"
+    "periodAll": "全部时间",
+    "jackpotTitle": "奖池经济",
+    "jackpotMega": "超级奖池金额",
+    "jackpotGames": "各游戏奖池合计",
+    "jackpotContributed": "注入硬币",
+    "jackpotPaid": "支出硬币",
+    "jackpotBiggest": "最高单次奖金",
+    "jackpotHits": "中奖次数",
+    "jackpotNote": "每枚损失的硬币都会按比例注入奖池；命中即赢得奖池，随后奖池重新累积。",
+    "jackpotWeek": "本周：{wins} 次中奖，支出 {coins} 枚硬币。"
   },
   "notifications": {
     "title": "通知",
@@ -800,7 +810,15 @@
     "scratchFounder": "创始人",
     "scratchJackpot": "头奖",
     "roundFailed": "回合失败",
-    "networkError": "网络错误"
+    "networkError": "网络错误",
+    "jackpotMegaTitle": "超级大奖",
+    "jackpotLastWin": "上一次由 {name} 赢得（{n} 枚硬币）",
+    "jackpotNobodyYet": "尚未有人赢得",
+    "jackpotChip": "奖池 {n}",
+    "jackpotMegaChip": "超级 {n}",
+    "jackpotWon": "中奖了！",
+    "jackpotWonMega": "超级大奖！",
+    "jackpotWinners": "最新大奖记录"
   },
   "wheel": {
     "title": "命运转盘",
@@ -814,7 +832,9 @@
     "wheelDisabled": "幸运转盘目前已停用。",
     "notAuthed": "请使用 Twitch 登录以旋转转盘。",
     "banned": "你的账号已被封禁。",
-    "youWon": "你赢得了"
+    "youWon": "你赢得了",
+    "jackpotMega": "超级大奖",
+    "jackpotWon": "赢得超级大奖！"
   },
   "feed": {
     "title": "实时活动动态",
@@ -840,7 +860,8 @@
     "coin_rain": "BadgesCoins 雨",
     "profile": "主页",
     "first_login": "首次登录",
-    "item_purchase": "物品购买"
+    "item_purchase": "物品购买",
+    "jackpot_win": "头奖"
   },
   "achievements": {
     "title": "成就",
@@ -1286,7 +1307,13 @@
         "stealMax": "默认偷取上限",
         "stealFloodMinutes": "偷取等待（分钟）",
         "stealPerHour": "每小时偷取次数",
-        "freezePrice": "冻结价格"
+        "freezePrice": "冻结价格",
+        "jackpotGameRate": "游戏奖池抽成（占损失硬币的 %）",
+        "jackpotMegaRate": "超级奖池抽成（占损失硬币的 %）",
+        "jackpotGameOdds": "游戏奖池中奖几率（每局 1/N）",
+        "jackpotMegaOdds": "超级奖池中奖几率（每局 1/N）",
+        "jackpotGameSeed": "游戏奖池底金（硬币）",
+        "jackpotMegaSeed": "超级奖池底金（硬币）"
       },
       "games": {
         "title": "游戏",

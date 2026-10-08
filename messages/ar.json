@@ -492,6 +492,7 @@
     "lastStatus": "الحالة",
     "lastUpdate": "آخر إشارة",
     "legendArchived": "مؤرشف (من أرشيف الويب)",
+    "legendBand": "المدى اليومي",
     "legendActive": "المستخدمون النشطون",
     "legendCoins": "BadgesCoins",
     "legendOwners": "المالكون",
@@ -597,7 +598,16 @@
     "recordLeadersTitle": "رواد الأرقام القياسية",
     "recordLeadersNote": "×N يعدّ عدد مرات ارتفاع الرقم القياسي الشخصي لكل لاعب في الفترة المختارة، والعملة تُظهر أفضل صافي لتلك الفترة.",
     "periodDays": "{n} يوم",
-    "periodAll": "طوال الوقت"
+    "periodAll": "طوال الوقت",
+    "jackpotTitle": "اقتصاد الجاكبوت",
+    "jackpotMega": "رصيد الميجا جاكبوت",
+    "jackpotGames": "في جاكبوت الألعاب",
+    "jackpotContributed": "العملات المُغذّاة",
+    "jackpotPaid": "العملات المدفوعة",
+    "jackpotBiggest": "أكبر فوز",
+    "jackpotHits": "مرات الفوز",
+    "jackpotNote": "نسبة من كل عملة مفقودة تغذي الجاكبوت؛ الفوز يدفع قيمة الجاكبوت ثم يبدأ من جديد.",
+    "jackpotWeek": "هذا الأسبوع: {wins} فوزًا، و{coins} عملة مدفوعة."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -800,7 +810,15 @@
     "scratchFounder": "مؤسِّس",
     "scratchJackpot": "الجاكبوت",
     "roundFailed": "فشلت الجولة",
-    "networkError": "خطأ في الشبكة"
+    "networkError": "خطأ في الشبكة",
+    "jackpotMegaTitle": "ميجا جاكبوت",
+    "jackpotLastWin": "آخر من فاز بها {name} ({n} عملة)",
+    "jackpotNobodyYet": "لم يفز بها أحد بعد",
+    "jackpotChip": "الجاكبوت {n}",
+    "jackpotMegaChip": "ميجا {n}",
+    "jackpotWon": "الجاكبوت!",
+    "jackpotWonMega": "ميجا جاكبوت!",
+    "jackpotWinners": "آخر الفوز بالجاكبوت"
   },
   "wheel": {
     "title": "عجلة الحظ",
@@ -814,7 +832,9 @@
     "wheelDisabled": "العجلة معطّلة حاليًا.",
     "notAuthed": "سجّل الدخول عبر Twitch لتدوير العجلة.",
     "banned": "تم حظر حسابك.",
-    "youWon": "لقد فزت"
+    "youWon": "لقد فزت",
+    "jackpotMega": "ميجا جاكبوت",
+    "jackpotWon": "تم الفوز بميجا جاكبوت!"
   },
   "feed": {
     "title": "خلاصة النشاط المباشر",
@@ -840,7 +860,8 @@
     "coin_rain": "مطر BadgesCoins",
     "profile": "الملف",
     "first_login": "أول تسجيل دخول",
-    "item_purchase": "شراء عنصر"
+    "item_purchase": "شراء عنصر",
+    "jackpot_win": "الفوز بالجاكبوت"
   },
   "achievements": {
     "title": "الإنجازات",
@@ -1286,7 +1307,13 @@
         "stealMax": "الحد الأقصى الافتراضي للسرقة",
         "stealFloodMinutes": "مهلة السرقة (دقائق)",
         "stealPerHour": "محاولات السرقة في الساعة",
-        "freezePrice": "سعر التجميد"
+        "freezePrice": "سعر التجميد",
+        "jackpotGameRate": "نسبة من العملات المفقودة لجاكبوت اللعبة (%)",
+        "jackpotMegaRate": "نسبة من العملات المفقودة للميجا جاكبوت (%)",
+        "jackpotGameOdds": "احتمالات جاكبوت اللعبة (1 من N لكل جولة)",
+        "jackpotMegaOdds": "احتمالات الميجا جاكبوت (1 من N لكل جولة)",
+        "jackpotGameSeed": "رصيد جاكبوت اللعبة الابتدائي (عملة)",
+        "jackpotMegaSeed": "رصيد الميجا جاكبوت الابتدائي (عملة)"
       },
       "games": {
         "title": "الألعاب",

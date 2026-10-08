@@ -310,7 +310,31 @@ export async function runArchiveBackfill(
   // wrong floor would put archived points inside the measured era.
   if (floorError) throw floorError;
   const measuredFloor = (floorRows?.[0]?.polled_at as string | undefined) ?? null;
-  const measuredFloorMs = measuredFloor ? new Date(measuredFloor).getTime() : null;
+  let measuredFloorMs = measuredFloor ? new Date(measuredFloor).getTime() : null;
+
+  // The rollup (0068) deletes measured RAW points older than the retention
+  // window, which would move this floor later and re-open the vacated dates
+  // to archive captures — landing recovered points INSIDE the (now daily-row)
+  // measured era. The earliest rolled-up day is still a measured-era floor,
+  // so it clamps the floor back; the read only fails on a database that has
+  // not reached 0068, where the null is correct (nothing was ever rolled up).
+  // PostgrestBuilder rejects on network failure — wrap before .catch.
+  const dailyFloor = await Promise.resolve(
+    supabase
+      .from("badge_stats_daily")
+      .select("day")
+      .order("day", { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+  )
+    .then((r) => {
+      const day = (r.data as { day: string } | null)?.day;
+      return day ? new Date(`${day}T00:00:00Z`).getTime() : null;
+    })
+    .catch(() => null);
+  if (dailyFloor !== null && (measuredFloorMs === null || dailyFloor < measuredFloorMs)) {
+    measuredFloorMs = dailyFloor;
+  }
 
   async function collectCaptures(badge: ArchiveBadgeRow): Promise<CaptureGroup[]> {
     const identifiers = [badge.set_id, badge.slug].filter(Boolean);

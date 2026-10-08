@@ -3,6 +3,7 @@
 import {
   LineChart,
   Line,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
@@ -22,6 +23,14 @@ export interface OwnersChartPoint {
    * been migrated to the archive pass still type-checks.
    */
   ownersArchived?: number | null;
+  /**
+   * The daily-range band (0068): `ownersMin` is the invisible stacked base,
+   * `bandSpan` the painted height (max − min). Both null on rows without
+   * rollup min/max — raw points are single samples with no range, so the
+   * band exists only over the rolled-up era.
+   */
+  ownersMin?: number | null;
+  bandSpan?: number | null;
   /** Provenance of the row. Absent means "measured", the pre-archive default. */
   source?: "measured" | "archive";
 }
@@ -48,12 +57,27 @@ export default function OwnersChart({ data }: { data: OwnersChartPoint[] }) {
   const hasArchived = data.some(
     (point) => point.ownersArchived !== null && point.ownersArchived !== undefined,
   );
+  const hasBand = data.some(
+    (point) =>
+      point.bandSpan !== null &&
+      point.bandSpan !== undefined &&
+      point.bandSpan > 0,
+  );
 
   return (
     <div className="w-full">
       <div className="h-64 w-full" role="img" aria-label={t("legendOwners")}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+            <defs>
+              {/* The daily-range band's vertical fade — the TrendChart recipe.
+                  Accent-tinted and quiet: it explains the line above it, it
+                  does not compete with it. */}
+              <linearGradient id="owners-band" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={theme.accent} stopOpacity={0.28} />
+                <stop offset="100%" stopColor={theme.accent} stopOpacity={0.04} />
+              </linearGradient>
+            </defs>
             <CartesianGrid stroke={theme.line} strokeDasharray="3 3" vertical={false} />
             <XAxis
               dataKey="label"
@@ -103,6 +127,36 @@ export default function OwnersChart({ data }: { data: OwnersChartPoint[] }) {
                 ];
               }}
             />
+            {hasBand ? (
+              // The daily min–max band (0068), painted as two stacked areas:
+              // an invisible base at `ownersMin` plus `bandSpan` height on
+              // top, so the fill sits BETWEEN min and max instead of down to
+              // zero. Declared before the lines (recharts paints in order) so
+              // the owners line rides on top of its own range. `tooltipType
+              // "none"` keeps the two mechanical series out of the tooltip;
+              // nulls (raw-era and archive rows) leave gaps, which is honest —
+              // those days have no recorded range.
+              <>
+                <Area
+                  type="monotone"
+                  dataKey="ownersMin"
+                  stackId="ownersBand"
+                  stroke="none"
+                  fill="transparent"
+                  isAnimationActive={false}
+                  tooltipType="none"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="bandSpan"
+                  stackId="ownersBand"
+                  stroke="none"
+                  fill="url(#owners-band)"
+                  isAnimationActive={false}
+                  tooltipType="none"
+                />
+              </>
+            ) : null}
             <Line
               type="monotone"
               dataKey="owners"
@@ -146,13 +200,14 @@ export default function OwnersChart({ data }: { data: OwnersChartPoint[] }) {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      {hasArchived ? (
-        // Only rendered when there is an archived series to explain; with
-        // measured-only data the chart is what it was before the archive pass
-        // existed, empty legend and all. `.chart-legend`/`.swatch` are the
-        // established legend classes in this set (see /stats); `.chip` is not
-        // used because it carries cursor:pointer and a hover state, which would
-        // advertise a click target that does nothing.
+      {hasArchived || hasBand ? (
+        // Only rendered when there is something to explain beyond the two
+        // plain lines; with measured-only raw data the chart is what it was
+        // before the archive pass existed, empty legend and all.
+        // `.chart-legend`/`.swatch` are the established legend classes in
+        // this set (see /stats); `.chip` is not used because it carries
+        // cursor:pointer and a hover state, which would advertise a click
+        // target that does nothing.
         <div className="chart-legend mt-3">
           <span>
             <span className="swatch" style={{ background: theme.accent }} aria-hidden="true" />
@@ -162,16 +217,34 @@ export default function OwnersChart({ data }: { data: OwnersChartPoint[] }) {
             <span className="swatch" style={{ background: theme.info }} aria-hidden="true" />
             {t("legendActive")}
           </span>
-          <span>
-            {/* Outline rather than fill: the archived series is a dashed line, and
-                a solid swatch would claim it is only a different colour. */}
-            <span
-              className="swatch"
-              style={{ background: "transparent", border: `1px dashed ${theme.warning}` }}
-              aria-hidden="true"
-            />
-            {t("legendArchived")}
-          </span>
+          {hasArchived ? (
+            <span>
+              {/* Outline rather than fill: the archived series is a dashed line, and
+                  a solid swatch would claim it is only a different colour. */}
+              <span
+                className="swatch"
+                style={{ background: "transparent", border: `1px dashed ${theme.warning}` }}
+                aria-hidden="true"
+              />
+              {t("legendArchived")}
+            </span>
+          ) : null}
+          {hasBand ? (
+            <span>
+              {/* Translucent fill mirrors the band: the day's min–max range
+                  behind the owners line. */}
+              <span
+                className="swatch"
+                style={{
+                  background: "transparent",
+                  border: `1px solid ${theme.accent}`,
+                  boxShadow: `inset 0 0 0 2px ${theme.accent}44`,
+                }}
+                aria-hidden="true"
+              />
+              {t("legendBand")}
+            </span>
+          ) : null}
         </div>
       ) : null}
     </div>

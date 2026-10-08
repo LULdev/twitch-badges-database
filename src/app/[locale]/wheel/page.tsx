@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import WheelOfFortune from "@/components/WheelOfFortune";
 import GameIcon from "@/components/GameIcon";
+import { getJackpots } from "@/lib/queries";
 import { localeAlternates } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -30,6 +31,11 @@ export default async function WheelPage({
   setRequestLocale(locale);
   const t = await getTranslations("wheel");
 
+  // Mega Jackpot pot (0069): the daily spin rolls it, so the page shows the
+  // live amount next to the Turbo odds. An unreachable table hides the line.
+  const jackpots = await getJackpots();
+  const megaPot = jackpots.find((j) => j.kind === "mega")?.pot ?? null;
+
   return (
     <div className="mx-auto max-w-2xl space-y-8 py-6">
       <header className="text-center">
@@ -39,7 +45,7 @@ export default async function WheelPage({
         </h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t("subtitle")}</p>
       </header>
-      <WheelOfFortune />
+      <WheelOfFortune megaPot={megaPot} />
     </div>
   );
 }

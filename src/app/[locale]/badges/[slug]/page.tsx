@@ -183,17 +183,31 @@ export default async function BadgeDetailPage({ params }: PageProps) {
   // not globally.
   const chartData = [...ownerSeries]
     .sort((a, b) => Date.parse(a.polled_at) - Date.parse(b.polled_at))
-    .map((point) => ({
-      label: new Date(point.polled_at).toLocaleString(locale, {
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-      }),
-      owners: point.source === "measured" ? point.owner_count : null,
-      active: point.source === "measured" ? point.active_count : null,
-      ownersArchived: point.source === "archive" ? point.owner_count : null,
-      source: point.source,
-    }));
+    .map((point) => {
+      // The daily-range band (0068): rollup days carry the day's min/max;
+      // raw points are single samples, so the band collapses onto the line
+      // (min = max = value). Archive points carry no band at all — null keeps
+      // the area out of the recovered era.
+      const measured = point.source === "measured";
+      const min = measured ? (point.owner_min ?? point.owner_count) : null;
+      const max = measured ? (point.owner_max ?? point.owner_count) : null;
+      return {
+        label: new Date(point.polled_at).toLocaleString(locale, {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+        }),
+        owners: measured ? point.owner_count : null,
+        active: measured ? point.active_count : null,
+        ownersArchived: point.source === "archive" ? point.owner_count : null,
+        // Stacked-area band inputs: the invisible base (min) plus the span
+        // (max − min) paints between min and max instead of down to zero.
+        ownersMin: min,
+        bandSpan:
+          min !== null && max !== null && point.owner_min != null ? max - min : null,
+        source: point.source,
+      };
+    });
 
   // Read from the series, not from `firstArchived`: the subtitle describes what
   // the chart above it actually plots, and the series is limit-capped.

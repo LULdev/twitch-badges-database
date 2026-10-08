@@ -12,6 +12,9 @@ interface Economy {
   coinRainCoins: number; stealPrice: number; stealMax: number;
   stealFloodMinutes: number; stealPerHour: number;
   freezePrice: number;
+  jackpotGameRate: number; jackpotMegaRate: number;
+  jackpotGameOdds: number; jackpotMegaOdds: number;
+  jackpotGameSeed: number; jackpotMegaSeed: number;
 }
 interface GameSetting { enabled: boolean; minBet: number; maxBet: number }
 interface Features {
@@ -43,6 +46,12 @@ const ECONOMY_FIELDS: Array<[keyof Economy, string]> = [
   ["stealFloodMinutes", "stealFloodMinutes"],
   ["stealPerHour", "stealPerHour"],
   ["freezePrice", "freezePrice"],
+  ["jackpotGameRate", "jackpotGameRate"],
+  ["jackpotMegaRate", "jackpotMegaRate"],
+  ["jackpotGameOdds", "jackpotGameOdds"],
+  ["jackpotMegaOdds", "jackpotMegaOdds"],
+  ["jackpotGameSeed", "jackpotGameSeed"],
+  ["jackpotMegaSeed", "jackpotMegaSeed"],
 ];
 
 const FEATURE_KEYS: Array<keyof Features> = [

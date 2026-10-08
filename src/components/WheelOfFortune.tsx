@@ -88,13 +88,24 @@ function applyAngle(node: HTMLDivElement | null, angle: number, transitionMs: nu
 }
 
 /** Daily Wheel of Fortune with animated spin and Turbo jackpot slot. */
-export default function WheelOfFortune() {
+export default function WheelOfFortune({
+  megaPot: initialMegaPot,
+}: {
+  /** Server-read Mega Jackpot pot (0069) for the ticking display; the spin
+   *  response replaces it with the authoritative post-spin value. */
+  megaPot?: number | null;
+}) {
   const t = useTranslations("wheel");
   const tg = useTranslations("games");
   const locale = useLocale();
   const [phase, setPhase] = useState<Phase>("idle");
   const [result, setResult] = useState<SpinResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Mega Jackpot (0069): the pot line under the odds, plus the won amount of
+  // the spin being displayed. The pot comes from the server — initial prop on
+  // load, response value after every spin — never a local copy.
+  const [megaPot, setMegaPot] = useState<number | null>(initialMegaPot ?? null);
+  const [megaWon, setMegaWon] = useState(0);
   // The daily limit is per account, not per page load: read the current state
   // so a reload does not offer a spin that the server will refuse.
   const [usedToday, setUsedToday] = useState(false);
@@ -224,6 +235,7 @@ export default function WheelOfFortune() {
     setPhase("waiting");
     setError(null);
     setResult(null);
+    setMegaWon(0);
     startWaitingSpin(reduced ? REDUCED_WAIT_SPIN_DEG_PER_MS : WAIT_SPIN_DEG_PER_MS);
     try {
       const res = await fetch("/api/wheel/spin", { method: "POST" });
@@ -231,6 +243,8 @@ export default function WheelOfFortune() {
         | {
             slot: { id: string; label: string; xp: number; coins: number; turbo?: boolean };
             turboWon: boolean;
+            megaPot?: number;
+            megaWon?: number;
           }
         | { error: string; code?: string };
       if ("error" in data) {
@@ -284,6 +298,10 @@ export default function WheelOfFortune() {
           coins: data.slot.coins,
           turbo: Boolean(data.turboWon),
         });
+        // Mega Jackpot: adopt the authoritative post-spin pot whether it hit
+        // or not, so the line keeps ticking day over day.
+        if (typeof data.megaPot === "number") setMegaPot(data.megaPot);
+        setMegaWon(typeof data.megaWon === "number" ? data.megaWon : 0);
       }, duration);
     } catch {
       failWith(t("networkError"), false);
@@ -405,9 +423,24 @@ export default function WheelOfFortune() {
             <p className="mt-1 text-sm text-muted">
               {result.turbo ? t("turboWon") : (<span dir="ltr" className="inline-flex items-center gap-1.5">+{result.coins.toLocaleString(locale)} <Coin size={16} className="bcoin-lg" /></span>)}
             </p>
+            {/* Mega Jackpot win (0069) — its own line under the wheel prize. */}
+            {megaWon > 0 && (
+              <p dir="ltr" className="mt-2 flex items-center justify-center gap-1.5 text-sm font-black text-warning">
+                <Coin variant="b" size={15} className="bcoin-lg" />
+                {t("jackpotWon")} +{megaWon.toLocaleString(locale)}
+              </p>
+            )}
           </div>
         )}
         <p className="mx-auto mt-4 max-w-md text-xs text-muted">{t("turboOdds")}</p>
+        {megaPot !== null && (
+          <p dir="ltr" className="jackpot-wheel-line mx-auto mt-2">
+            <span className="font-bold text-warning">{t("jackpotMega")}</span>
+            <span className="inline-flex items-center gap-1 tabular-nums">
+              {megaPot.toLocaleString(locale)} <Coin size={12} variant="b" />
+            </span>
+          </p>
+        )}
       </div>
     </div>
   );

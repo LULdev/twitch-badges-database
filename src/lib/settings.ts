@@ -33,6 +33,16 @@ export interface EconomySettings {
   gameStreakXpCap: number;
   /** Coin price of one Streak Freeze in the shelf shop. */
   freezePrice: number;
+  /** Progressive jackpots (0069). The rates are the percent of a round's
+   *  net LOSS that feeds the game's own pot / the global Mega pot; the odds
+   *  are "1 in N" per settled round (0 disables the roll); the seeds are the
+   *  pot floors a hit resets to (and the minimum a hit pays). */
+  jackpotGameRate: number;
+  jackpotMegaRate: number;
+  jackpotGameOdds: number;
+  jackpotMegaOdds: number;
+  jackpotGameSeed: number;
+  jackpotMegaSeed: number;
   /** Coins a visitor's coin rain gifts the profile owner. */
   coinRainCoins: number;
   /** Fallback steal settings for members who never configured their own. */
@@ -55,6 +65,12 @@ export const ECONOMY_DEFAULTS: EconomySettings = {
   gameStreakXpPerDay: 5,
   gameStreakXpCap: 50,
   freezePrice: 500,
+  jackpotGameRate: 30,
+  jackpotMegaRate: 30,
+  jackpotGameOdds: 4000,
+  jackpotMegaOdds: 10000,
+  jackpotGameSeed: 250,
+  jackpotMegaSeed: 2500,
   coinRainCoins: 1,
   stealPrice: 100,
   stealMax: 250,

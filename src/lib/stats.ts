@@ -134,6 +134,7 @@ export interface TrafficStats {
 export interface SystemStats {
   badges: number;
   badge_stat_rows: number;
+  badge_stat_daily_rows: number;
   badge_events: number;
   profiles: number;
   inventory_rows: number;
@@ -504,6 +505,7 @@ export async function getPlatformStats(): Promise<PlatformStats> {
       ? {
           badges: v(rawSystem, "badges"),
           badge_stat_rows: v(rawSystem, "badge_stat_rows"),
+          badge_stat_daily_rows: v(rawSystem, "badge_stat_daily_rows"),
           badge_events: v(rawSystem, "badge_events"),
           profiles: v(rawSystem, "profiles"),
           inventory_rows: v(rawSystem, "inventory_rows"),
@@ -727,6 +729,50 @@ export async function getCommunityCoinFlow(): Promise<CommunityCoinFlowData | nu
     const earned = days.reduce((sum, day) => sum + day.earned, 0);
     const spent = days.reduce((sum, day) => sum + day.spent, 0);
     return { days, earned, spent, net: earned - spent };
+  } catch {
+    // Network-level failure: /stats must render without the card, not crash.
+    return null;
+  }
+}
+
+export interface JackpotEconomyData {
+  megaPot: number;
+  gamePotsTotal: number;
+  contributionsTotal: number;
+  totalPaid: number;
+  hitsTotal: number;
+  biggestWin: number;
+  wins7d: number;
+  paid7d: number;
+}
+
+/**
+ * The public "Jackpot economy" card slice (0070): one aggregate row over the
+ * progressive-jackpot tables — live pots, all-time contributions/payouts,
+ * the biggest win and the 7-day win activity. Aggregates only, no per-user
+ * data. Null on a missing/failed view so /stats renders without the card
+ * (the same doctrine as getCommunityCoinFlow).
+ */
+export async function getJackpotEconomy(): Promise<JackpotEconomyData | null> {
+  const supabase = await createClient();
+  try {
+    const { data, error } = await supabase
+      .from("stats_jackpot_economy")
+      .select("*")
+      .maybeSingle();
+    if (error || !data) return null;
+    const row = data as Record<string, string | number | null>;
+    const num = (key: string) => Number(row[key] ?? 0);
+    return {
+      megaPot: num("mega_pot"),
+      gamePotsTotal: num("game_pots_total"),
+      contributionsTotal: num("contributions_total"),
+      totalPaid: num("total_paid"),
+      hitsTotal: num("hits_total"),
+      biggestWin: num("biggest_win"),
+      wins7d: num("wins_7d"),
+      paid7d: num("paid_7d"),
+    };
   } catch {
     // Network-level failure: /stats must render without the card, not crash.
     return null;

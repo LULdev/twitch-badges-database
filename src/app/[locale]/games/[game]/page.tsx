@@ -9,6 +9,7 @@ import Coin from "@/components/Coin";
 import { createClient } from "@/lib/supabase/server";
 import { authUserId } from "@/lib/gamification/session";
 import { getFeatures, getGames } from "@/lib/settings";
+import { getJackpots } from "@/lib/queries";
 import TwitchLoginButton from "@/components/TwitchLoginButton";
 import RpsGame from "@/components/games/RpsGame";
 import CoinflipGame from "@/components/games/CoinflipGame";
@@ -191,6 +192,14 @@ export default async function GamePage({ params }: PageProps) {
     }
   }
 
+  // Progressive jackpots (0069) for the hero: this game's own pot plus the
+  // Mega pot, from the same public read the hub strip uses. Shown in every
+  // state (playable, login wall, arcade off) — the pots are the argument for
+  // playing; null hides both chips on an unreachable table.
+  const jackpots = await getJackpots();
+  const gamePot = jackpots.find((j) => j.scope === game)?.pot ?? null;
+  const megaPot = jackpots.find((j) => j.kind === "mega")?.pot ?? null;
+
   // One hero shell for EVERY state (playable, login wall, arcade off): the
   // game art makes the page recognizable even before login. `stats` is the
   // state-specific chip (last-round result) that only the playable state has.
@@ -219,6 +228,16 @@ export default async function GamePage({ params }: PageProps) {
             {t("betRange", { min: range.minBet, max: range.maxBet })}{" "}
             <Coin size={12} />
           </span>
+          {gamePot !== null && megaPot !== null && (
+            <>
+              <span className="chip chip-gold pointer-events-none" dir="ltr">
+                {t("jackpotChip", { n: gamePot })} <Coin size={12} />
+              </span>
+              <span className="chip chip-gold pointer-events-none" dir="ltr">
+                {t("jackpotMegaChip", { n: megaPot })} <Coin size={12} variant="b" />
+              </span>
+            </>
+          )}
           {stats}
         </div>
       </div>

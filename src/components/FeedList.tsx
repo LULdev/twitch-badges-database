@@ -31,6 +31,7 @@ const KIND_COLORS: Record<string, string> = {
   coin_rain: "var(--info)",
   streak_freeze: "#38bdf8",
   big_win: "#fbbf24",
+  jackpot_win: "#fbbf24",
   item_purchase: "var(--accent)",
 };
 
@@ -127,12 +128,16 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
       </div>
 
       <ol className="space-y-2">
-        {events.map((event) => (
+        {events.map((event) => {
+          // Jackpot wins get the big-win treatment: the Jewel coin instead of
+          // the kind dot and the gold-tinted row (0069).
+          const ceremonial = event.kind === "big_win" || event.kind === "jackpot_win";
+          return (
           <li
             key={event.id}
-            className={`card flex items-start gap-3 p-3.5 ${event.kind === "big_win" ? "feed-bigwin" : ""}`}
+            className={`card flex items-start gap-3 p-3.5 ${ceremonial ? "feed-bigwin" : ""}`}
           >
-            {event.kind === "big_win" ? (
+            {ceremonial ? (
               // Big wins trade the plain kind dot for the Jewel coin; the
               // aria-hidden wrapper keeps the coin's own role="img" label out
               // of the row (the kind label below already says "Big win").
@@ -184,7 +189,8 @@ export default function FeedList({ initialEvents }: { initialEvents?: FeedEvent[
               </div>
             </div>
           </li>
-        ))}
+          );
+        })}
       </ol>
       {events.length === 0 && (
         <div className="card p-10 text-center text-sm text-muted">{t("empty")}</div>

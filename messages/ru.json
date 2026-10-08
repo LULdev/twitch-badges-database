@@ -492,6 +492,7 @@
     "lastStatus": "Статус",
     "lastUpdate": "Последний сигнал",
     "legendArchived": "Из архива (веб-архив)",
+    "legendBand": "Дневной диапазон",
     "legendActive": "Активные пользователи",
     "legendCoins": "BadgesCoins",
     "legendOwners": "Владельцы",
@@ -597,7 +598,16 @@
     "recordLeadersTitle": "Лидеры по рекордам",
     "recordLeadersNote": "×N — сколько раз за выбранный период вырос личный рекорд каждого игрока; монета — лучший нетто-результат этого периода.",
     "periodDays": "{n} дней",
-    "periodAll": "За всё время"
+    "periodAll": "За всё время",
+    "jackpotTitle": "Экономика джекпотов",
+    "jackpotMega": "Банк Мега-джекпота",
+    "jackpotGames": "В джекпотах игр",
+    "jackpotContributed": "Внесено монет",
+    "jackpotPaid": "Выплачено монет",
+    "jackpotBiggest": "Крупнейший выигрыш",
+    "jackpotHits": "Джекпотов выиграно",
+    "jackpotNote": "Доля каждой проигранной монеты пополняет джекпоты; выигрыш выплачивается, и джекпот начинается заново.",
+    "jackpotWeek": "На этой неделе: выигрышей — {wins}, выплачено — {coins} монет."
   },
   "notifications": {
     "title": "Уведомления",
@@ -800,7 +810,15 @@
     "scratchFounder": "Основатель",
     "scratchJackpot": "ДЖЕКПОТ",
     "roundFailed": "Раунд не удался",
-    "networkError": "Ошибка сети"
+    "networkError": "Ошибка сети",
+    "jackpotMegaTitle": "Мега-джекпот",
+    "jackpotLastWin": "В последний раз выиграл(а) {name} ({n} монет)",
+    "jackpotNobodyYet": "Ещё никто не выиграл",
+    "jackpotChip": "Джекпот {n}",
+    "jackpotMegaChip": "Мега {n}",
+    "jackpotWon": "Джекпот!",
+    "jackpotWonMega": "МЕГА-ДЖЕКПОТ!",
+    "jackpotWinners": "Последние джекпоты"
   },
   "wheel": {
     "title": "Колесо фортуны",
@@ -814,7 +832,9 @@
     "wheelDisabled": "Колесо сейчас отключено.",
     "notAuthed": "Войдите через Twitch, чтобы крутить колесо.",
     "banned": "Ваш аккаунт заблокирован.",
-    "youWon": "Вы выиграли"
+    "youWon": "Вы выиграли",
+    "jackpotMega": "Мега-джекпот",
+    "jackpotWon": "Мега-джекпот выигран!"
   },
   "feed": {
     "title": "Лента активности в реальном времени",
@@ -840,7 +860,8 @@
     "coin_rain": "Дождь BadgesCoins",
     "profile": "Профиль",
     "first_login": "Первый вход",
-    "item_purchase": "Покупка предмета"
+    "item_purchase": "Покупка предмета",
+    "jackpot_win": "Выигрыш джекпота"
   },
   "achievements": {
     "title": "Достижения",
@@ -1286,7 +1307,13 @@
         "stealMax": "Максимум кражи по умолчанию",
         "stealFloodMinutes": "Пауза между кражами (минуты)",
         "stealPerHour": "Попыток кражи в час",
-        "freezePrice": "Цена стрик-фриза"
+        "freezePrice": "Цена стрик-фриза",
+        "jackpotGameRate": "Доля проигранных монет в джекпот игры (%)",
+        "jackpotMegaRate": "Доля проигранных монет в Мега-джекпот (%)",
+        "jackpotGameOdds": "Шанс джекпота игры (1 к N за раунд)",
+        "jackpotMegaOdds": "Шанс Мега-джекпота (1 к N за раунд)",
+        "jackpotGameSeed": "Начальная сумма джекпота игры (монеты)",
+        "jackpotMegaSeed": "Начальная сумма Мега-джекпота (монеты)"
       },
       "games": {
         "title": "Игры",

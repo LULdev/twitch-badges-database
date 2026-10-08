@@ -3,7 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getSiteStats } from "@/lib/queries";
-import { daySeries, getCommunityCoinFlow, getPlatformStats, getRecordBreakLeaders } from "@/lib/stats";
+import { daySeries, getCommunityCoinFlow, getJackpotEconomy, getPlatformStats, getRecordBreakLeaders } from "@/lib/stats";
 import { authUserId } from "@/lib/gamification/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import CoinFlowCard, {
@@ -12,6 +12,7 @@ import CoinFlowCard, {
   type CoinFlowRow,
 } from "@/components/profile/CoinFlowCard";
 import CommunityCoinFlow from "@/components/stats/CommunityCoinFlow";
+import JackpotEconomy from "@/components/stats/JackpotEconomy";
 import RecordLeaders from "@/components/stats/RecordLeaders";
 import {
   ACH_BY_ID,
@@ -211,10 +212,11 @@ export default async function StatsPage({
   const tr = await getTranslations("rarity");
   const tf = await getTranslations("feed");
 
-  const [catalog, platform, communityCoin, recordLeaders] = await Promise.all([
+  const [catalog, platform, communityCoin, jackpotEconomy, recordLeaders] = await Promise.all([
     getSiteStats().catch(() => null),
     getPlatformStats(),
     getCommunityCoinFlow(),
+    getJackpotEconomy(),
     getRecordBreakLeaders(period),
   ]);
 
@@ -464,6 +466,7 @@ export default async function StatsPage({
     ? [
         ["badges", platform.system.badges],
         ["badge_stats", platform.system.badge_stat_rows],
+        ["badge_stats_daily", platform.system.badge_stat_daily_rows],
         ["badge_events", platform.system.badge_events],
         ["profiles", platform.system.profiles],
         ["user_inventory", platform.system.inventory_rows],
@@ -620,6 +623,9 @@ export default async function StatsPage({
 
       {/* Public aggregate card — everyone's logged coin movement. */}
       {communityCoin && <CommunityCoinFlow data={communityCoin} />}
+
+      {/* Public aggregate card — the progressive-jackpot economy (0070). */}
+      {jackpotEconomy && <JackpotEconomy data={jackpotEconomy} />}
 
       {/* Record-break leaderboard — whose personal best rose most this period. */}
       {recordLeaders && recordLeaders.length > 0 && (

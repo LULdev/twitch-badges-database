@@ -1,6 +1,9 @@
 import { after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { award, ensureProgress, logActivity, today } from "./xp";
+import { createMegaJackpotPost } from "./jackpot";
+import { getEconomy } from "@/lib/settings";
+import { recordNotification, sendPushToAll } from "@/lib/push";
 import { createFeaturePost } from "@/lib/blog";
 
 /**
@@ -41,6 +44,10 @@ export interface SpinResult {
   slot: WheelSlot;
   turboWon: boolean;
   alreadySpunToday: boolean;
+  /** Live Mega Jackpot pot after this spin (0069), for the ticking display. */
+  megaPot?: number;
+  /** Mega Jackpot coins WON by this spin (0 when it did not hit). */
+  megaWon?: number;
 }
 
 export async function spinWheel(userId: string): Promise<
@@ -139,6 +146,70 @@ export async function spinWheel(userId: string): Promise<
     throw error;
   }
 
+  // ── Mega Jackpot roll (0069) ───────────────────────────────────────────────
+  // The daily spin wagers nothing, so it FEEDS nothing — but it rolls the
+  // global Mega pot exactly like an arcade round. The RPC credits the win,
+  // writes the feed row and the history row in one transaction; the push
+  // broadcast below is garnish. Best-effort: the spin above is already paid,
+  // so a failed roll must not unwind it.
+  let megaPot: number | undefined;
+  let megaWon: number | undefined;
+  try {
+    const economy = await getEconomy();
+    const megaHit =
+      economy.jackpotMegaOdds > 0 && Math.random() < 1 / economy.jackpotMegaOdds;
+    const { data: jpRaw, error: jpError } = await supabase.rpc("jackpot_round", {
+      p_user_id: userId,
+      p_game: null,
+      p_loss: 0,
+      p_game_rate: 0,
+      p_mega_rate: 0,
+      p_game_seed: economy.jackpotGameSeed,
+      p_mega_seed: economy.jackpotMegaSeed,
+      p_game_hit: false,
+      p_mega_hit: megaHit,
+    });
+    if (jpError) throw jpError;
+    const row = (
+      Array.isArray(jpRaw) ? jpRaw[0] : jpRaw
+    ) as { out_mega_pot: string | number; out_mega_win: string | number } | null;
+    if (row) {
+      megaPot = Number(row.out_mega_pot);
+      megaWon = Number(row.out_mega_win ?? 0);
+      if (megaWon > 0) {
+        const won = megaWon;
+        afterResponse(async () => {
+          try {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("username")
+              .eq("id", userId)
+              .maybeSingle();
+            const who = (profile as { username: string | null } | null)?.username ?? "Someone";
+            const payload = {
+              title: "MEGA JACKPOT hit on the Wheel of Fortune!",
+              body: `${who} won ${won.toLocaleString("en-US")} BadgesCoins`,
+              url: "/wheel",
+              tag: "jackpot",
+            };
+            await recordNotification({ kind: "jackpot", ...payload }).catch(() => undefined);
+            await sendPushToAll(payload).catch(() => undefined);
+          } catch {
+            // A failed alert must never surface to the spinner.
+          }
+        });
+        // The date-stamped auto post (idempotent per UTC day; the push above
+        // already broadcast the moment, so no second notification here).
+        afterResponse(() =>
+          createMegaJackpotPost(userId, won, { game: null, odds: economy.jackpotMegaOdds })
+            .then(() => undefined, () => undefined),
+        );
+      }
+    }
+  } catch (error) {
+    console.warn("[wheel] mega jackpot roll failed:", error);
+  }
+
   if (turboWon) {
     // The row is already persisted; the activity log and the feature post are
     // best-effort garnish (logActivity swallows internally, the post catches).
@@ -183,7 +254,13 @@ export async function spinWheel(userId: string): Promise<
 
   return {
     ok: true,
-    result: { slot, turboWon, alreadySpunToday: false },
+    result: {
+      slot,
+      turboWon,
+      alreadySpunToday: false,
+      ...(megaPot !== undefined && { megaPot }),
+      ...(megaWon !== undefined && { megaWon }),
+    },
   };
 }
 

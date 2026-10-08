@@ -492,6 +492,7 @@
     "lastStatus": "Status",
     "lastUpdate": "Last signal",
     "legendArchived": "Archived (from web archive)",
+    "legendBand": "Daily range",
     "legendActive": "Active users",
     "legendCoins": "BadgesCoins",
     "legendOwners": "Owners",
@@ -597,7 +598,16 @@
     "recordLeadersTitle": "Record-break leaders",
     "recordLeadersNote": "×N counts how often each player's all-time personal best rose in the selected period; the coin shows that period's best net.",
     "periodDays": "{n} days",
-    "periodAll": "All time"
+    "periodAll": "All time",
+    "jackpotTitle": "Jackpot economy",
+    "jackpotMega": "Mega Jackpot pot",
+    "jackpotGames": "In game pots",
+    "jackpotContributed": "Coins fed in",
+    "jackpotPaid": "Coins paid out",
+    "jackpotBiggest": "Biggest win",
+    "jackpotHits": "Jackpot hits",
+    "jackpotNote": "A share of every lost coin feeds the pots; a hit pays the pot and it reseeds.",
+    "jackpotWeek": "This week: {wins} wins, {coins} coins paid."
   },
   "notifications": {
     "title": "Notifications",
@@ -800,7 +810,15 @@
     "scratchFounder": "Founder",
     "scratchJackpot": "JACKPOT",
     "roundFailed": "Round failed",
-    "networkError": "Network error"
+    "networkError": "Network error",
+    "jackpotMegaTitle": "Mega Jackpot",
+    "jackpotLastWin": "Last won by {name} ({n} coins)",
+    "jackpotNobodyYet": "Never won yet",
+    "jackpotChip": "Jackpot {n}",
+    "jackpotMegaChip": "Mega {n}",
+    "jackpotWon": "Jackpot!",
+    "jackpotWonMega": "MEGA JACKPOT!",
+    "jackpotWinners": "Latest jackpot wins"
   },
   "wheel": {
     "title": "Wheel of Fortune",
@@ -814,7 +832,9 @@
     "wheelDisabled": "The wheel is disabled right now.",
     "notAuthed": "Log in with Twitch to spin the wheel.",
     "banned": "Your account is banned.",
-    "youWon": "You won"
+    "youWon": "You won",
+    "jackpotMega": "Mega Jackpot",
+    "jackpotWon": "Mega Jackpot won!"
   },
   "feed": {
     "title": "Live Activity Feed",
@@ -840,7 +860,8 @@
     "coin_rain": "BadgesCoin rain",
     "profile": "Profile",
     "first_login": "First login",
-    "item_purchase": "Item purchase"
+    "item_purchase": "Item purchase",
+    "jackpot_win": "Jackpot win"
   },
   "achievements": {
     "title": "Achievements",
@@ -1286,7 +1307,13 @@
         "stealMax": "Default steal maximum",
         "stealFloodMinutes": "Steal wait (minutes)",
         "stealPerHour": "Steal attempts per hour",
-        "freezePrice": "Freeze price"
+        "freezePrice": "Freeze price",
+        "jackpotGameRate": "Game jackpot share of lost coins (%)",
+        "jackpotMegaRate": "Mega jackpot share of lost coins (%)",
+        "jackpotGameOdds": "Game jackpot odds (1 in N per round)",
+        "jackpotMegaOdds": "Mega jackpot odds (1 in N per round)",
+        "jackpotGameSeed": "Game jackpot seed (coins)",
+        "jackpotMegaSeed": "Mega jackpot seed (coins)"
       },
       "games": {
         "title": "Games",

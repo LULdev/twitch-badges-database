@@ -492,6 +492,7 @@
     "lastStatus": "상태",
     "lastUpdate": "마지막 신호",
     "legendArchived": "아카이브(웹 아카이브)",
+    "legendBand": "일일 범위",
     "legendActive": "활성 사용자",
     "legendCoins": "BadgesCoins",
     "legendOwners": "소유자",
@@ -597,7 +598,16 @@
     "recordLeadersTitle": "기록 갱신 리더",
     "recordLeadersNote": "×N은 선택한 기간 동안 각 플레이어의 개인 최고 기록이 오른 횟수이며, 코인은 해당 기간의 최고 순수익입니다.",
     "periodDays": "{n}일",
-    "periodAll": "전체 기간"
+    "periodAll": "전체 기간",
+    "jackpotTitle": "잭팟 경제",
+    "jackpotMega": "메가 잭팟 금액",
+    "jackpotGames": "게임 잭팟 합계",
+    "jackpotContributed": "투입된 코인",
+    "jackpotPaid": "지급된 코인",
+    "jackpotBiggest": "최고 당첨",
+    "jackpotHits": "당첨 횟수",
+    "jackpotNote": "잃은 코인의 일부가 잭팟을 채우며, 당첨되면 잭팟이 지급되고 다시 쌓입니다.",
+    "jackpotWeek": "이번 주: 당첨 {wins}회, 지급 {coins} 코인."
   },
   "notifications": {
     "title": "알림",
@@ -800,7 +810,15 @@
     "scratchFounder": "파운더",
     "scratchJackpot": "잭팟",
     "roundFailed": "라운드 실패",
-    "networkError": "네트워크 오류"
+    "networkError": "네트워크 오류",
+    "jackpotMegaTitle": "메가 잭팟",
+    "jackpotLastWin": "마지막 당첨자 {name} ({n} 코인)",
+    "jackpotNobodyYet": "아직 당첨자 없음",
+    "jackpotChip": "잭팟 {n}",
+    "jackpotMegaChip": "메가 {n}",
+    "jackpotWon": "잭팟!",
+    "jackpotWonMega": "메가 잭팟!",
+    "jackpotWinners": "최근 잭팟 당첨"
   },
   "wheel": {
     "title": "운명의 수레바퀴",
@@ -814,7 +832,9 @@
     "wheelDisabled": "현재 룰렛 기능이 비활성화되어 있습니다.",
     "notAuthed": "Twitch로 로그인하여 룰렛을 돌려 주세요.",
     "banned": "계정이 차단되었습니다.",
-    "youWon": "축하합니다"
+    "youWon": "축하합니다",
+    "jackpotMega": "메가 잭팟",
+    "jackpotWon": "메가 잭팟 당첨!"
   },
   "feed": {
     "title": "실시간 활동 피드",
@@ -840,7 +860,8 @@
     "coin_rain": "BadgesCoins 비",
     "profile": "프로필",
     "first_login": "첫 로그인",
-    "item_purchase": "아이템 구매"
+    "item_purchase": "아이템 구매",
+    "jackpot_win": "잭팟 당첨"
   },
   "achievements": {
     "title": "업적",
@@ -1286,7 +1307,13 @@
         "stealMax": "기본 훔치기 최대",
         "stealFloodMinutes": "훔치기 대기(분)",
         "stealPerHour": "시간당 훔치기 횟수",
-        "freezePrice": "프리즈 가격"
+        "freezePrice": "프리즈 가격",
+        "jackpotGameRate": "게임 잭팟 몫 (잃은 코인의 %)",
+        "jackpotMegaRate": "메가 잭팟 몫 (잃은 코인의 %)",
+        "jackpotGameOdds": "게임 잭팟 확률 (라운드당 1/N)",
+        "jackpotMegaOdds": "메가 잭팟 확률 (라운드당 1/N)",
+        "jackpotGameSeed": "게임 잭팟 시드 (코인)",
+        "jackpotMegaSeed": "메가 잭팟 시드 (코인)"
       },
       "games": {
         "title": "게임",

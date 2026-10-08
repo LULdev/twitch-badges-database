@@ -23,14 +23,28 @@ Read `README.md` for data sources and setup; read this file before editing.
   potat: /users/{login} enriches profiles after login;
   /twitch/badges?badge={id} feeds the live count on badge pages; the
   badge_momentum view feeds rarity momentum.
-- `src/lib/syncs/` — sync engines shared by `scripts/*.ts` AND `/api/cron/*`
+- `src/lib/syncs/` — sync engines shared by `scripts/*.ts` AND `/api/cron/*`.
+  badge_stats retention: the nightly `cron/global` pass also runs
+  `runBadgeStatsRollup` (0068) — measured points older than 14 days collapse
+  into `badge_stats_daily` (one row per badge per UTC day, closing/min/max)
+  and the raw rows are deleted; archive points are NEVER rolled, the archive
+  backfill's measured-era floor considers `badge_stats_daily` too, and the
+  owner-trend chart + trend sentence union daily + raw.
 - `src/lib/` — queries.ts (DB reads via server client), rarity.ts (TBRI),
   changelog.ts, inventory.ts, push.ts, markdown.ts, seo.ts, health.ts
   (heartbeats), stats.ts (reads the `stats_*` views for `/stats`)
 - `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 128 achievements
-  (achievements.ts, self-evaluating), games.ts (13 server-authoritative games),
-  wheel.ts (daily wheel + Turbo jackpot 1:1e8), daily.ts (login bonus, heists,
-  coin rain), visits.ts (5-min-IP-dedup view counters), session.ts
+  (achievements.ts, self-evaluating), games.ts (14 server-authoritative games),
+  wheel.ts (daily wheel + Turbo jackpot 1:1e8 + Mega Jackpot roll), daily.ts
+  (login bonus, heists, coin rain), visits.ts (5-min-IP-dedup view counters),
+  session.ts. Progressive jackpots (0069): a share of every LOST round feeds
+  the game's own pot AND the global Mega pot (`jackpot_round` RPC — one
+  transaction: contributions, row-locked claim, payout, `jackpot_win` feed
+  row, `jackpot_wins` history); every settled round rolls a hit chance per
+  pot; rates/odds/seeds are economy settings (`jackpot*` keys). A Mega hit
+  also publishes the date-stamped `mega-jackpot-<date>` auto post (shared
+  helper in jackpot.ts, one post per UTC day, no second push) and surfaces on
+  the hub strip's winners row + the /stats `stats_jackpot_economy` card (0070).
 - `src/components/stats/` — animated chart set for the stats dashboard
   (CountUp, Reveal, TrendChart, DonutChart, DistributionBars, LevelHistogram,
   UptimeGauge, UptimeCalendar, AvailabilityStrip, LiveStatus, useChartTheme)
@@ -43,6 +57,7 @@ npm run dev | build | lint | typecheck
 npm run verify          # lint + typecheck + build + locale matrix (the ritual)
 npm run check:locale    # locale negotiation redirect matrix (needs a build; see Conventions)
 npm run e2e:steal       # theft-ledger E2E — manual only: writes real throwaway users, asserts, cleans up
+npm run e2e:jackpot     # progressive-jackpot RPC E2E — same discipline (forced hits, full baseline restore)
 npm run db:apply        # apply pending migrations once (supabase_migrations ledger)
 npm run sync:global | sync:badgebase | sync:potat | sync:archive
 npm run send:push -- "Title" "Body" "/en/badges/slug"
@@ -67,7 +82,11 @@ feed are generated from that table, so an undocumented change is invisible.
   and daily bonus through `award()`'s feed row; steals through `attemptSteal`'s
   row (gross loot on success — the thief's net is loot − cost, mirrored by the
   victim-side `steal_attempts` row); purchases through the `item_purchase` row
-  the `purchase_item` RPC writes (0059); admin balance edits through
+  the `purchase_item` RPC writes (0059); jackpot payouts through the
+  `jackpot_win` row the `jackpot_round` RPC writes inside its own transaction
+  (0069 — `coinsAmount` = the pot won; jackpot CONTRIBUTIONS are pure
+  bookkeeping over coins the player already lost and deliberately write no
+  row); admin balance edits through
   `setUserProgress` (`admin_adjust` with the delta derived from the pre-read —
   the individual row is NEVER broadcast: both `/api/feed` and the SSR `/feed`
   page exclude the kind, and the achievement activity counter ignores it; it

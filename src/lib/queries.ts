@@ -384,13 +384,40 @@ export async function getBadgeStatsHistory(
   // not reached, and this is the pre-archive contract. It is NOT the chart's
   // read any more — getBadgeOwnerSeries below is, because only that one splits
   // the two sources.
-  const { data } = await supabase
-    .from("badge_stats")
-    .select("polled_at, owner_count, active_count")
-    .eq("badge_id", badgeId)
-    .order("polled_at", { ascending: false })
-    .limit(limit);
-  return ((data ?? []) as StatsPoint[]).reverse();
+  const [rawRes, dailyRes] = await Promise.all([
+    supabase
+      .from("badge_stats")
+      .select("polled_at, owner_count, active_count")
+      .eq("badge_id", badgeId)
+      .order("polled_at", { ascending: false })
+      .limit(limit),
+    // The daily rollup (0068) keeps the long horizon: raw points only survive
+    // ~14 days, so the trend sentence would collapse to a two-week window
+    // without the aggregate. A daily row is the day's CLOSING value stamped at
+    // end-of-day UTC. A failed/missing read is simply dropped — the raw series
+    // alone is the pre-0068 behaviour.
+    supabase
+      .from("badge_stats_daily")
+      .select("day, owner_last, active_last")
+      .eq("badge_id", badgeId)
+      .order("day", { ascending: false })
+      .limit(limit)
+      .then((res) => res, () => null),
+  ]);
+  const raw = ((rawRes.data ?? []) as StatsPoint[]).reverse();
+  const daily = (((dailyRes?.data ?? []) as Array<{
+    day: string;
+    owner_last: number | null;
+    active_last: number | null;
+  }>).map((row) => ({
+    polled_at: `${row.day}T23:59:59Z`,
+    owner_count: row.owner_last,
+    active_count: row.active_last,
+  })));
+  if (daily.length === 0) return raw;
+  return [...raw, ...daily].sort((a, b) =>
+    a.polled_at < b.polled_at ? -1 : a.polled_at > b.polled_at ? 1 : 0,
+  );
 }
 
 export interface BadgeEventRow {
@@ -465,6 +492,11 @@ export interface OwnerSeriesPoint {
   owner_count: number | null;
   active_count: number | null;
   source: "measured" | "archive";
+  /** Daily-rollup rows only (0068): the day's min/max owner counts. Absent
+   *  on raw points (a single sample — callers collapse min=max=value) and on
+   *  archive rows. */
+  owner_min?: number | null;
+  owner_max?: number | null;
 }
 
 const OWNER_SERIES_COLUMNS = "polled_at, owner_count, active_count, source";
@@ -512,7 +544,7 @@ export async function getBadgeOwnerSeries(
   // era and discard the early ones, which are the ones the recovery pass
   // exists to find, and would leave the chart starting years after the "first
   // archived count" fact printed above it.
-  const [measuredRes, archivedRes] = await Promise.all([
+  const [measuredRes, archivedRes, dailyRes] = await Promise.all([
     supabase
       .from("badge_stats")
       .select(OWNER_SERIES_COLUMNS)
@@ -527,6 +559,18 @@ export async function getBadgeOwnerSeries(
       .eq("source", "archive")
       .order("polled_at", { ascending: true })
       .limit(archivedLimit),
+    // The daily rollup (0068): the measured line's history beyond the ~14-day
+    // raw window. Same end-of-day stamp and closing values as
+    // getBadgeStatsHistory; dropped on any failure so an un-migrated or
+    // unreachable table degrades to the raw-only chart. owner_min/owner_max
+    // ride along for the chart's daily-range band (absent on raw points).
+    supabase
+      .from("badge_stats_daily")
+      .select("day, owner_last, active_last, owner_min, owner_max")
+      .eq("badge_id", badgeId)
+      .order("day", { ascending: false })
+      .limit(measuredLimit)
+      .then((res) => res, () => null),
   ]);
 
   if (
@@ -541,10 +585,26 @@ export async function getBadgeOwnerSeries(
     return legacy.map((point) => ({ ...point, source: "measured" as const }));
   }
 
+  const daily = (((dailyRes?.data ?? []) as Array<{
+    day: string;
+    owner_last: number | null;
+    active_last: number | null;
+    owner_min: number | null;
+    owner_max: number | null;
+  }>).map((row) => ({
+    polled_at: `${row.day}T23:59:59Z`,
+    owner_count: row.owner_last,
+    active_count: row.active_last,
+    source: "measured" as const,
+    owner_min: row.owner_min,
+    owner_max: row.owner_max,
+  })));
+
   // A failure on one side drops that series, not the page: the chart is
   // progressive enhancement. Timestamps are Postgres timestamptz, so the
   // lexicographic comparison on the ISO-8601 strings is the chronological one.
   return [
+    ...daily,
     ...((measuredRes.data ?? []) as OwnerSeriesPoint[]),
     ...((archivedRes.data ?? []) as OwnerSeriesPoint[]),
   ].sort((a, b) =>
@@ -583,6 +643,87 @@ export async function getFirstArchivedOwnerPoint(
     .limit(1)
     .maybeSingle();
   return (data as FirstArchivedPoint | null) ?? null;
+}
+
+export interface JackpotPot {
+  scope: string;
+  kind: "mega" | "game";
+  pot: number;
+  contributions: number;
+  hits: number;
+  last_won_at: string | null;
+  last_winner: string | null;
+  last_win_amount: number | null;
+}
+
+/**
+ * The progressive jackpot pots (0069) — the Mega pot plus every game pot, one
+ * anon read for the games hub strip, the game hero chips and the wheel page.
+ * bigint columns arrive as strings, so everything numeric is coerced here once.
+ * A failed read yields []: the surfaces render nothing rather than a crash
+ * (the same progressive-enhancement cut every catalog read takes).
+ */
+export async function getJackpots(): Promise<JackpotPot[]> {
+  const supabase = await createClient();
+  try {
+    const { data } = await supabase
+      .from("jackpots")
+      .select(
+        "scope,kind,pot,contributions,hits,last_won_at,last_winner,last_win_amount",
+      )
+      .order("kind")
+      .order("scope");
+    return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+      scope: String(row.scope),
+      kind: row.kind === "mega" ? ("mega" as const) : ("game" as const),
+      pot: Number(row.pot),
+      contributions: Number(row.contributions),
+      hits: Number(row.hits),
+      last_won_at: (row.last_won_at as string | null) ?? null,
+      last_winner: (row.last_winner as string | null) ?? null,
+      last_win_amount:
+        row.last_win_amount == null ? null : Number(row.last_win_amount),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export interface JackpotWinEntry {
+  id: number;
+  username: string | null;
+  scope: string;
+  kind: "mega" | "game";
+  amount: number;
+  game: string | null;
+  created_at: string;
+}
+
+/**
+ * The newest jackpot wins (0069) — the winners row on the games-hub jackpot
+ * strip. `jackpot_wins` is public-read with the username denormalized, so
+ * this is one anon read; [] on any failure (the row simply hides).
+ */
+export async function getRecentJackpotWins(limit = 3): Promise<JackpotWinEntry[]> {
+  const supabase = await createClient();
+  try {
+    const { data } = await supabase
+      .from("jackpot_wins")
+      .select("id,username,scope,kind,amount,game,created_at")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+      id: Number(row.id),
+      username: (row.username as string | null) ?? null,
+      scope: String(row.scope),
+      kind: row.kind === "mega" ? ("mega" as const) : ("game" as const),
+      amount: Number(row.amount),
+      game: (row.game as string | null) ?? null,
+      created_at: String(row.created_at),
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export interface HomeData {

@@ -30,7 +30,8 @@
     "shots:buttons": "tsx scripts/shots-buttons.ts",
     "health:check": "tsx scripts/code-health.ts",
     "health:refresh": "tsx scripts/code-health.ts --refresh",
-    "shots:games": "node scripts/game-render-check.mjs"
+    "shots:games": "node scripts/game-render-check.mjs",
+    "e2e:jackpot": "tsx scripts/e2e-jackpot.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
