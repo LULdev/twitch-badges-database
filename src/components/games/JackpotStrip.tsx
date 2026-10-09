@@ -1,10 +1,10 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Coin from "@/components/Coin";
-import CountUp from "@/components/stats/CountUp";
 import { GAME_COLORS } from "@/components/games/GameArt";
 import type { JackpotPot, JackpotWinEntry } from "@/lib/queries";
 import { GAMES } from "@/lib/gamification/games";
+import JackpotPotsLive from "@/components/games/JackpotPotsLive";
 
 /**
  * The progressive-jackpot strip on the games hub (0069): the global Mega pot
@@ -28,28 +28,21 @@ export default async function JackpotStrip({
   const t = await getTranslations("games");
   const mega = jackpots.find((j) => j.kind === "mega");
   if (!mega) return null;
-  const gamePots = jackpots.filter((j) => j.kind === "game");
-  // GAMES order (hub tile order), not the alphabetical table order.
-  const ordered = GAMES.flatMap((meta) => {
-    const pot = gamePots.find((j) => j.scope === meta.id);
-    return pot ? [pot] : [];
-  });
+
   // The house short-date pattern (game page / BestRoundsCard).
   const winDate = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short" });
+  // The live component needs only the pot fields — the winners rows below
+  // stay server-rendered (they change with a hit, not with a tick).
+  const livePots = jackpots.map((pot) => ({
+    scope: pot.scope,
+    kind: pot.kind,
+    pot: pot.pot,
+    last_won_at: pot.last_won_at,
+    last_winner: pot.last_winner,
+    last_win_amount: pot.last_win_amount,
+  }));
   // Hall-of-fame medal tints — the .rank-row podium tokens (dark + light).
   const medals = ["var(--rank-gold)", "var(--rank-silver)", "var(--rank-bronze)"];
-  // Per-chip last-winner hint: the ONE title tooltip convention this house
-  // uses (56 title= call sites). Only set when a hit exists — no tooltip on
-  // a never-won pot is honest; the strip's overflow:hidden rules out a CSS
-  // bubble anyway.
-  const chipTitle = (pot: JackpotPot) =>
-    pot.last_winner && pot.last_won_at
-      ? t("jackpotChipLast", {
-          name: pot.last_winner,
-          n: pot.last_win_amount ?? 0,
-          date: winDate.format(new Date(pot.last_won_at)),
-        })
-      : undefined;
   const scopeLabel = (win: JackpotWinEntry) =>
     win.kind === "mega"
       ? t("jackpotMegaTitle")
@@ -59,62 +52,11 @@ export default async function JackpotStrip({
 
   return (
     <section className="card jackpot-strip" aria-labelledby="jackpot-head">
-      <div className="jackpot-mega">
-        <span className="jackpot-crown" aria-hidden="true">
-          {/* Trophy — the one jackpot glyph, inline SVG per house style. */}
-          <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
-            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-            <path d="M4 22h16" />
-            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
-            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
-            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
-          </svg>
-        </span>
-        <div className="jackpot-mega-body">
-          <h2 id="jackpot-head" className="jackpot-label">
-            {t("jackpotMegaTitle")}
-          </h2>
-          <p className="jackpot-amount" dir="ltr">
-            <CountUp value={mega.pot} locale={locale} />{" "}
-            <Coin size={20} variant="b" className="bcoin-lg" />
-          </p>
-            <p className="jackpot-last">
-              {mega.last_winner
-                ? t("jackpotLastWin", {
-                    name: mega.last_winner,
-                    n: mega.last_win_amount ?? 0,
-                  })
-                : t("jackpotNobodyYet")}
-              {mega.last_winner && mega.last_won_at ? (
-                <>
-                  {" · "}
-                  <time dateTime={mega.last_won_at}>
-                    {winDate.format(new Date(mega.last_won_at))}
-                  </time>
-                </>
-              ) : null}
-            </p>
-        </div>
-      </div>
-
-      <div className="jackpot-games">
-        {ordered.map((pot) => (
-          <Link
-            key={pot.scope}
-            href={`/games/${pot.scope}`}
-            className="jackpot-chip"
-            title={chipTitle(pot)}
-            style={{ ["--gg-color" as string]: GAME_COLORS[pot.scope] ?? "var(--accent)" }}
-          >
-            <span className="jackpot-chip-dot" aria-hidden="true" />
-            <span className="jackpot-chip-name">{t(`${pot.scope}Title`)}</span>
-            <span className="jackpot-chip-pot" dir="ltr">
-              {pot.pot.toLocaleString(locale)} <Coin size={11} />
-            </span>
-          </Link>
-        ))}
-      </div>
+      {/* The live half — Mega headline, last-winner line, per-game chips —
+          rendered from the server snapshot, then polled every 15s so the
+          pots tick between page loads (display:contents keeps the strip's
+          flex layout untouched). */}
+      <JackpotPotsLive initialJackpots={livePots} gameOrder={GAMES.map((meta) => meta.id)} />
 
       {wins.length > 0 && (
         <div className="jackpot-winners">

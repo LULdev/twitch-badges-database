@@ -4102,6 +4102,16 @@ html {
   border-radius: 999px;
   background: var(--gg-color, var(--accent));
 }
+/* Winner marker: a tiny gold dot on every chip whose pot has been hit at
+   least once — the touch-visible twin of the title tooltip (title never
+   shows on mobile). Purely additive to the game-colour dot. */
+.jackpot-chip-won {
+  size: 0.375rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--rank-gold);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--rank-gold) 30%, transparent);
+}
 .jackpot-chip-name {
   flex: 1 1 auto;
   min-width: 0;
@@ -4256,4 +4266,11 @@ html {
   .jackpot-strip::before { animation: none; }
   .jackpot-crown { animation: none; }
   .jackpot-tick, .jackpot-hit { animation: none; }
+}
+
+/* Live-pot wrapper (0069 ticker): its children are the strip's real flex
+   items — display:contents keeps the mega/games layout identical to the
+   pre-client tree. */
+.jackpot-live {
+  display: contents;
 }

@@ -53,6 +53,22 @@ interface Customization {
   effectsIntensity: "off" | "subtle" | "full";
   coinRainAuto: boolean;
   visitorMarquee: boolean;
+  // Arcade-statistics tiles (0073): one toggle per displayed statistic,
+  // default visible — hiding is per-statistic, not per-section.
+  showStatWagered: boolean;
+  showStatWon: boolean;
+  showStatLost: boolean;
+  showStatNet: boolean;
+  showStatRounds: boolean;
+  showStatWins: boolean;
+  showStatWinRate: boolean;
+  showStatBestRound: boolean;
+  showStatJackpots: boolean;
+  showStatWheel: boolean;
+  showStatSteals: boolean;
+  showStatRobbed: boolean;
+  showStatLoginStreak: boolean;
+  showStatAchievements: boolean;
 }
 
 const DEFAULTS: Customization = {
@@ -69,6 +85,11 @@ const DEFAULTS: Customization = {
   levelHalo: "#a970ff", cursorBadge: false, statusBubble: "",
   profileTheme: "auto", effectsIntensity: "subtle", coinRainAuto: false,
   visitorMarquee: true,
+  showStatWagered: true, showStatWon: true, showStatLost: true, showStatNet: true,
+  showStatRounds: true, showStatWins: true, showStatWinRate: true,
+  showStatBestRound: true, showStatJackpots: true, showStatWheel: true,
+  showStatSteals: true, showStatRobbed: true, showStatLoginStreak: true,
+  showStatAchievements: true,
 };
 
 type Field =
@@ -120,6 +141,26 @@ const CREATIVE_FIELDS: Field[] = [
   { key: "effectsIntensity", kind: "select", label: "effectsIntensity", options: [["off", "options.effectsIntensity.off"], ["subtle", "options.effectsIntensity.subtle"], ["full", "options.effectsIntensity.full"]] },
   { key: "coinRainAuto", kind: "toggle", label: "coinRainAuto" },
   { key: "visitorMarquee", kind: "toggle", label: "visitorMarquee" },
+];
+
+// Arcade-statistics visibility (0073): every tile on the profile is one
+// toggle, default visible. Labels live in the customizer namespace next to
+// the section heading.
+const STATS_FIELDS: Field[] = [
+  { key: "showStatWagered", kind: "toggle", label: "showStatWagered" },
+  { key: "showStatWon", kind: "toggle", label: "showStatWon" },
+  { key: "showStatLost", kind: "toggle", label: "showStatLost" },
+  { key: "showStatNet", kind: "toggle", label: "showStatNet" },
+  { key: "showStatRounds", kind: "toggle", label: "showStatRounds" },
+  { key: "showStatWins", kind: "toggle", label: "showStatWins" },
+  { key: "showStatWinRate", kind: "toggle", label: "showStatWinRate" },
+  { key: "showStatBestRound", kind: "toggle", label: "showStatBestRound" },
+  { key: "showStatJackpots", kind: "toggle", label: "showStatJackpots" },
+  { key: "showStatWheel", kind: "toggle", label: "showStatWheel" },
+  { key: "showStatSteals", kind: "toggle", label: "showStatSteals" },
+  { key: "showStatRobbed", kind: "toggle", label: "showStatRobbed" },
+  { key: "showStatLoginStreak", kind: "toggle", label: "showStatLoginStreak" },
+  { key: "showStatAchievements", kind: "toggle", label: "showStatAchievements" },
 ];
 
 export default function ProfileCustomizer({
@@ -286,6 +327,13 @@ export default function ProfileCustomizer({
         <h2 className="text-sm font-bold uppercase tracking-[0.08em] text-muted">{t("creativeSection")}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {CREATIVE_FIELDS.map(renderField)}
+        </div>
+      </section>
+
+      <section className="card space-y-4 p-6">
+        <h2 className="text-sm font-bold uppercase tracking-[0.08em] text-muted">{t("statsSection")}</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {STATS_FIELDS.map(renderField)}
         </div>
       </section>
 

@@ -27,6 +27,17 @@ export default async function JackpotEconomy({
   // Pot LEVELS, not flows: the series is exactly the days the snapshot ran —
   // no zero-fill (a missing day is unknown, not zero) — and the label matches
   // the daySeries format the other /stats charts use.
+  // Staleness signal: the nightly snapshot should run every UTC day. A gap
+  // of more than one day means a cron night was missed — the flat line after
+  // it would silently read as "the pot stopped growing" otherwise.
+  const lastSnapshotDay = history.length > 0 ? history[history.length - 1].day : null;
+  const snapshotStaleDays = (() => {
+    if (!lastSnapshotDay) return 0;
+    const last = Date.parse(lastSnapshotDay + "T00:00:00Z");
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+    return Math.max(0, Math.round((today.getTime() - last) / 86_400_000) - 1);
+  })();
   const chartData = history.map((point) => {
     const [, month, day] = point.day.split("-");
     return {
@@ -95,6 +106,11 @@ export default async function JackpotEconomy({
         </div>
       ) : (
         <p className="mt-2 text-xs text-muted">{t("jackpotHistoryHint")}</p>
+      )}
+      {snapshotStaleDays > 1 && (
+        <p className="mt-1 text-xs text-warning">
+          {t("jackpotHistoryStale", { n: snapshotStaleDays })}
+        </p>
       )}
     </section>
   );

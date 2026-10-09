@@ -330,6 +330,9 @@ export async function playGame(
         games_won: won ? 1 : 0,
         coins_won: Math.max(0, net),
         coins_lost: Math.max(0, -net),
+        // Turnover: the full stake of every settled round (0073), gross of
+        // the outcome -- the third member of the won/lost/wagered trio.
+        coins_wagered: bet,
       },
     });
     if (counterError) {

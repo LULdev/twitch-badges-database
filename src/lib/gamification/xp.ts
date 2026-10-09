@@ -15,6 +15,8 @@ export interface ProgressRow {
   games_won: number;
   coins_won: number;
   coins_lost: number;
+  /** Lifetime stake volume of settled rounds (0073) — owned by bump_counters. */
+  coins_wagered: number;
   wheel_spins: number;
   steals_successful: number;
   steals_failed: number;
@@ -237,6 +239,7 @@ export async function getProgress(userId: string): Promise<ProgressRow> {
     games_won: 0,
     coins_won: 0,
     coins_lost: 0,
+    coins_wagered: 0,
     wheel_spins: 0,
     steals_successful: 0,
     steals_failed: 0,
@@ -424,6 +427,7 @@ export async function award(
     games_won: _gamesWon,
     coins_won: _coinsWon,
     coins_lost: _coinsLost,
+    coins_wagered: _coinsWagered,
     wheel_spins: _wheelSpins,
     steals_successful: _stealsOk,
     steals_failed: _stealsFailed,
@@ -451,6 +455,7 @@ export async function award(
   void _gamesWon;
   void _coinsWon;
   void _coinsLost;
+  void _coinsWagered;
   void _wheelSpins;
   void _stealsOk;
   void _stealsFailed;

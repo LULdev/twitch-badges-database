@@ -45,6 +45,13 @@ Read `README.md` for data sources and setup; read this file before editing.
   also publishes the date-stamped `mega-jackpot-<date>` auto post (shared
   helper in jackpot.ts, one post per UTC day, no second push) and surfaces on
   the hub strip's winners row + the /stats `stats_jackpot_economy` card (0070).
+  The profile's Arcade-statistics grid (0073): 14 tiles (coins_wagered is a
+  new bump_counters column, backfilled from game_rounds; won=green,
+  lost=red, net signed; win rate, best round, jackpots, wheel, heists,
+  robbed, login streak, true achievement count), EACH individually hideable
+  via `showStat*` customization booleans (default visible); zero-activity
+  tiles stay hidden (false-zeros doctrine). The hub strip's pots poll
+  /api/jackpots every 15s (JackpotPotsLive, display:contents wrapper).
   Two achievements ride it: `k_jackpot_winner` (any pot) and `s_mega_jackpot`,
   counted from `jackpot_wins`; the daily/weekly arcade recap carries a live
   pot + windowed-hits line. Hub strip shows newest wins AND the all-time

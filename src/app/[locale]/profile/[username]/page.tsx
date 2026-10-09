@@ -248,6 +248,22 @@ export default async function ProfilePage({ params }: PageProps) {
   const showLevel = flag("showLevel", true);
   const showCoins = flag("showCoins", true);
   const showVisitors = flag("showVisitors", true);
+  // Arcade-statistics tiles (0073): each statistic is individually hideable,
+  // default visible — the same show* semantics as the five flags above.
+  const showStatWagered = flag("showStatWagered", true);
+  const showStatWon = flag("showStatWon", true);
+  const showStatLost = flag("showStatLost", true);
+  const showStatNet = flag("showStatNet", true);
+  const showStatRounds = flag("showStatRounds", true);
+  const showStatWins = flag("showStatWins", true);
+  const showStatWinRate = flag("showStatWinRate", true);
+  const showStatBestRound = flag("showStatBestRound", true);
+  const showStatJackpots = flag("showStatJackpots", true);
+  const showStatWheel = flag("showStatWheel", true);
+  const showStatSteals = flag("showStatSteals", true);
+  const showStatRobbed = flag("showStatRobbed", true);
+  const showStatLoginStreak = flag("showStatLoginStreak", true);
+  const showStatAchievements = flag("showStatAchievements", true);
   // Only a comma-separated list of hex colours is accepted, so the value cannot
   // smuggle arbitrary CSS into a style attribute.
   const nameGradientRaw = text("nameGradient");
@@ -350,11 +366,15 @@ export default async function ProfilePage({ params }: PageProps) {
   let coinRows: CoinFlowRow[] = [];
   let bestRows: BestRoundRow[] = [];
   let recordHistory: RecordHistoryEntry[] = [];
+  // Progressive-jackpot wins (0069) + the TRUE achievement count (the 25-row
+  // read above caps the visible list, the head count does not).
+  let jackpotWins: Array<{ kind: string; amount: number }> = [];
+  let achievementCount = 0;
   if (profile) {
     const admin = createAdminClient();
     // 30 rendered UTC days starting today-29 (the card strip's window).
     const since = coinFlowSince();
-    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes, coinsRes, bestRes, historyRes] = await Promise.all([
+    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes, coinsRes, bestRes, historyRes, jackpotRes, achCountRes] = await Promise.all([
       readProgress(profile.id).catch(() => null),
       admin
         .from("user_achievements")
@@ -400,6 +420,13 @@ export default async function ProfilePage({ params }: PageProps) {
       // that beat every prior round, most recent first. Invoker rights —
       // game_rounds is public-read.
       admin.rpc("player_record_history", { p_user: profile.id, p_limit: 5 }),
+      // Jackpot wins are public history (0069) — one read gives count AND the
+      // coin total; kind splits mega from game pots if ever displayed.
+      admin.from("jackpot_wins").select("kind,amount").eq("user_id", profile.id),
+      admin
+        .from("user_achievements")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", profile.id),
     ]);
     const achievementRows = (achievementRes.data ?? []) as Array<{
       achievement_id: string;
@@ -420,8 +447,32 @@ export default async function ProfilePage({ params }: PageProps) {
     coinRows = coinsRes;
     bestRows = (bestRes.data ?? []) as BestRoundRow[];
     recordHistory = (historyRes.data ?? []) as RecordHistoryEntry[];
+    jackpotWins = ((jackpotRes.data ?? []) as Array<{ kind: string; amount: string | number }>).map(
+      (row) => ({ kind: row.kind, amount: Number(row.amount ?? 0) }),
+    );
+    achievementCount = achCountRes.count ?? 0;
   }
 
+
+  // Arcade-statistics inputs (0073): played/wagered read from progress, best
+  // single round from the already-fetched per-game view rows. arcadeActive
+  // keeps a never-played member's grid hidden entirely (false-zeros doctrine);
+  // inside the grid, tiles still hide individually when their activity is 0.
+  const played = progress?.games_played ?? 0;
+  const wagered = progress?.coins_wagered ?? 0;
+  const wonTotal = progress?.coins_won ?? 0;
+  const lostTotal = progress?.coins_lost ?? 0;
+  const netTotal = wonTotal - lostTotal;
+  const bestNet = Math.max(0, ...bestRows.map((row) => Number(row.best_net ?? 0)));
+  const stealAttempts = (progress?.steals_successful ?? 0) + (progress?.steals_failed ?? 0);
+  const arcadeActive =
+    !!progress &&
+    (played > 0 ||
+      (progress.wheel_spins ?? 0) > 0 ||
+      stealAttempts > 0 ||
+      (progress.times_robbed ?? 0) > 0 ||
+      jackpotWins.length > 0);
+  const fmtNum = (value: number) => value.toLocaleString(locale);
 
   return (
     <div
@@ -703,6 +754,123 @@ export default async function ProfilePage({ params }: PageProps) {
         </section>
       )}
 
+      {/* Arcade statistics (0073): the won/lost/wagered trio (green/red by
+          sign), plus rounds, win rate, best round, jackpots, wheel, heists
+          and streaks — every tile individually hideable from the customizer
+          (default visible); zeros for never-touched activities stay hidden. */}
+      {profile && progress && arcadeActive && (
+        <section aria-labelledby="arcade-stats-head" className="space-y-3">
+          <h2
+            id="arcade-stats-head"
+            className="text-sm font-bold uppercase tracking-[0.08em] text-muted"
+          >
+            {t("arcadeStats")}
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {showStatWagered && played > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value">
+                  {fmtNum(wagered)} <Coin size={12} />
+                </dd>
+                <dt className="stat-label">{t("statWagered")}</dt>
+              </div>
+            )}
+            {showStatWon && played > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value text-success">
+                  +{fmtNum(wonTotal)} <Coin size={12} />
+                </dd>
+                <dt className="stat-label">{t("statWon")}</dt>
+              </div>
+            )}
+            {showStatLost && played > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value text-danger">
+                  −{fmtNum(lostTotal)} <Coin size={12} />
+                </dd>
+                <dt className="stat-label">{t("statLost")}</dt>
+              </div>
+            )}
+            {showStatNet && played > 0 && (
+              <div className="card stat-tile">
+                <dd
+                  dir="ltr"
+                  className={netTotal >= 0 ? "stat-value text-success" : "stat-value text-danger"}
+                >
+                  {netTotal >= 0 ? "+" : "−"}{fmtNum(Math.abs(netTotal))} <Coin size={12} />
+                </dd>
+                <dt className="stat-label">{t("statNet")}</dt>
+              </div>
+            )}
+            {showStatRounds && played > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value">{fmtNum(played)}</dd>
+                <dt className="stat-label">{t("statRounds")}</dt>
+              </div>
+            )}
+            {showStatWins && played > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value">{fmtNum(progress.games_won)}</dd>
+                <dt className="stat-label">{t("statWins")}</dt>
+              </div>
+            )}
+            {showStatWinRate && played > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value">
+                  {Math.round((progress.games_won / played) * 100)}%
+                </dd>
+                <dt className="stat-label">{t("statWinRate")}</dt>
+              </div>
+            )}
+            {showStatBestRound && bestNet > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value text-success">
+                  +{fmtNum(bestNet)} <Coin size={12} />
+                </dd>
+                <dt className="stat-label">{t("statBestRound")}</dt>
+              </div>
+            )}
+            {showStatJackpots && jackpotWins.length > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value text-warning">
+                  {jackpotWins.length}
+                </dd>
+                <dt className="stat-label">{t("statJackpots")}</dt>
+              </div>
+            )}
+            {showStatWheel && progress.wheel_spins > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value">{fmtNum(progress.wheel_spins)}</dd>
+                <dt className="stat-label">{t("statWheel")}</dt>
+              </div>
+            )}
+            {showStatSteals && stealAttempts > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value">{fmtNum(progress.steals_successful)}</dd>
+                <dt className="stat-label">{t("statSteals")}</dt>
+              </div>
+            )}
+            {showStatRobbed && progress.times_robbed > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value">{fmtNum(progress.times_robbed)}</dd>
+                <dt className="stat-label">{t("statRobbed")}</dt>
+              </div>
+            )}
+            {showStatLoginStreak && progress.best_login_streak > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value">{fmtNum(progress.best_login_streak)}</dd>
+                <dt className="stat-label">{t("statLoginStreak")}</dt>
+              </div>
+            )}
+            {showStatAchievements && achievementCount > 0 && (
+              <div className="card stat-tile">
+                <dd dir="ltr" className="stat-value">{fmtNum(achievementCount)}</dd>
+                <dt className="stat-label">{t("statAchievements")}</dt>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
       {/* Coin flow — the shared card, also rendered on /stats for the owner. */}
       {profile && progress && showCoins && (
         <CoinFlowCard rows={coinRows} id="profile-coin-flow" />
