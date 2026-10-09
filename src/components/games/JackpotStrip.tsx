@@ -38,6 +38,18 @@ export default async function JackpotStrip({
   const winDate = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short" });
   // Hall-of-fame medal tints — the .rank-row podium tokens (dark + light).
   const medals = ["var(--rank-gold)", "var(--rank-silver)", "var(--rank-bronze)"];
+  // Per-chip last-winner hint: the ONE title tooltip convention this house
+  // uses (56 title= call sites). Only set when a hit exists — no tooltip on
+  // a never-won pot is honest; the strip's overflow:hidden rules out a CSS
+  // bubble anyway.
+  const chipTitle = (pot: JackpotPot) =>
+    pot.last_winner && pot.last_won_at
+      ? t("jackpotChipLast", {
+          name: pot.last_winner,
+          n: pot.last_win_amount ?? 0,
+          date: winDate.format(new Date(pot.last_won_at)),
+        })
+      : undefined;
   const scopeLabel = (win: JackpotWinEntry) =>
     win.kind === "mega"
       ? t("jackpotMegaTitle")
@@ -92,6 +104,7 @@ export default async function JackpotStrip({
             key={pot.scope}
             href={`/games/${pot.scope}`}
             className="jackpot-chip"
+            title={chipTitle(pot)}
             style={{ ["--gg-color" as string]: GAME_COLORS[pot.scope] ?? "var(--accent)" }}
           >
             <span className="jackpot-chip-dot" aria-hidden="true" />

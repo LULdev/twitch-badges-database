@@ -134,7 +134,7 @@ export async function POST(request: Request) {
   return Response.json({ ok: true });
 }
 
-/** Read the caller's recap opt-out flag. The endpoint identifies the
+/** Read the caller's push preference flags. The endpoint identifies the
  *  subscription (the browser knows it from pushManager.getSubscription());
  *  the ownership guard prevents probing third-party settings. */
 export async function GET(request: Request) {
@@ -152,18 +152,26 @@ export async function GET(request: Request) {
   const admin = createAdminClient();
   const { data: row } = await admin
     .from("push_subscriptions")
-    .select("recap")
+    .select("recap, jackpot_only")
     .eq("endpoint", endpoint)
     .maybeSingle();
-  return Response.json({ recap: (row as { recap: boolean } | null)?.recap ?? true });
+  const flags = row as { recap: boolean; jackpot_only: boolean } | null;
+  return Response.json({
+    recap: flags?.recap ?? true,
+    jackpotOnly: flags?.jackpot_only ?? false,
+  });
 }
 
-/** Toggle the recap flag for the caller's subscription. */
+/** Toggle the recap opt-out and/or the jackpot-only opt-in for the caller's
+ *  subscription. Either flag alone is a valid payload (the two checkboxes
+ *  write independently); supplying neither is rejected. */
 export async function PATCH(request: Request) {
   const body = (await request.json().catch(() => null)) as
-    | { endpoint?: string; recap?: boolean }
+    | { endpoint?: string; recap?: boolean; jackpotOnly?: boolean }
     | null;
-  if (!body?.endpoint || typeof body.recap !== "boolean") {
+  const hasRecap = typeof body?.recap === "boolean";
+  const hasJackpot = typeof body?.jackpotOnly === "boolean";
+  if (!body?.endpoint || (!hasRecap && !hasJackpot)) {
     return Response.json({ error: "invalid payload" }, { status: 400 });
   }
   // PATCH used to skip the endpoint gate POST applies: an oversized or internal
@@ -179,15 +187,22 @@ export async function PATCH(request: Request) {
     return Response.json({ error: "not found" }, { status: 404 });
   }
   const admin = createAdminClient();
+  const update: Record<string, boolean> = {};
+  if (hasRecap) update.recap = body.recap as boolean;
+  if (hasJackpot) update.jackpot_only = body.jackpotOnly as boolean;
   const { error } = await admin
     .from("push_subscriptions")
-    .update({ recap: body.recap })
+    .update(update)
     .eq("endpoint", body.endpoint);
   if (error) {
-    console.warn("[push] recap toggle failed:", error.message);
+    console.warn("[push] preference toggle failed:", error.message);
     return Response.json({ error: "toggle failed" }, { status: 500 });
   }
-  return Response.json({ ok: true, recap: body.recap });
+  return Response.json({
+    ok: true,
+    ...(hasRecap && { recap: body.recap }),
+    ...(hasJackpot && { jackpotOnly: body.jackpotOnly }),
+  });
 }
 
 export async function DELETE(request: Request) {

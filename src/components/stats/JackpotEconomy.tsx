@@ -1,24 +1,40 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import Coin from "@/components/Coin";
-import type { JackpotEconomyData } from "@/lib/stats";
+import TrendChart from "@/components/stats/TrendChart";
+import type { JackpotEconomyData, JackpotHistoryPoint } from "@/lib/stats";
 
 /**
  * Public economy card on /stats: the progressive-jackpot aggregates from the
  * stats_jackpot_economy view (0070) — live pots, all-time contributions and
- * payouts, the biggest win, the 7-day win activity. Aggregates only, no
+ * payouts, the biggest win, the 7-day win activity — plus the pot-growth
+ * chart from the nightly history snapshots (0072). Aggregates only, no
  * per-user data; the tile markup mirrors CommunityCoinFlow deliberately
  * (same bl-kpi tiles, only the strings and the data source differ).
  */
 export default async function JackpotEconomy({
   data,
+  history,
   id = "jackpot-economy",
 }: {
   data: JackpotEconomyData;
+  /** Pot levels per day, oldest first; fewer than 2 points hides the chart. */
+  history: JackpotHistoryPoint[];
   id?: string;
 }) {
   const t = await getTranslations("stats");
   const locale = await getLocale();
   const fmt = (value: number) => value.toLocaleString(locale);
+  // Pot LEVELS, not flows: the series is exactly the days the snapshot ran —
+  // no zero-fill (a missing day is unknown, not zero) — and the label matches
+  // the daySeries format the other /stats charts use.
+  const chartData = history.map((point) => {
+    const [, month, day] = point.day.split("-");
+    return {
+      label: `${Number(day)}.${Number(month)}.`,
+      mega: point.mega,
+      total: point.total,
+    };
+  });
 
   return (
     <section className="card p-5" aria-labelledby={id}>
@@ -61,6 +77,25 @@ export default async function JackpotEconomy({
         {t("jackpotNote")}{" "}
         {t("jackpotWeek", { wins: data.wins7d, coins: fmt(data.paid7d) })}
       </p>
+
+      {chartData.length >= 2 ? (
+        <div className="mt-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+            {t("jackpotHistoryTitle")}
+          </p>
+          <TrendChart
+            data={chartData}
+            series={[
+              { key: "mega", label: t("jackpotHistoryMega"), color: "#fbbf24" },
+              { key: "total", label: t("jackpotHistoryTotal"), color: "#a970ff" },
+            ]}
+            ariaLabel={t("jackpotHistoryTitle")}
+            height={140}
+          />
+        </div>
+      ) : (
+        <p className="mt-2 text-xs text-muted">{t("jackpotHistoryHint")}</p>
+      )}
     </section>
   );
 }

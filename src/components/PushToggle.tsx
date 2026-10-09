@@ -46,9 +46,12 @@ export default function PushToggle() {
     [],
   );
   const [error, setError] = useState(false);
-  // Recap opt-out (migration 0045): endpoint-scoped, loaded once subscribed.
+  // Recap opt-out (migration 0045) and jackpot-only opt-in (0071):
+  // endpoint-scoped, loaded once subscribed.
   const [recap, setRecap] = useState(true);
   const [recapBusy, setRecapBusy] = useState(false);
+  const [jackpotOnly, setJackpotOnly] = useState(false);
+  const [jackpotBusy, setJackpotBusy] = useState(false);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -62,17 +65,23 @@ export default function PushToggle() {
           if (cancelled) return;
           if (subscription) {
             setState("on");
-            // Load the stored recap flag; default true on any read failure.
+            // Load the stored preference flags; defaults on any read failure.
             try {
               const res = await fetch(
                 `/api/push/subscribe?endpoint=${encodeURIComponent(subscription.endpoint)}`,
               );
               if (res.ok) {
-                const data = (await res.json()) as { recap?: boolean };
-                if (!cancelled) setRecap(data.recap ?? true);
+                const data = (await res.json()) as {
+                  recap?: boolean;
+                  jackpotOnly?: boolean;
+                };
+                if (!cancelled) {
+                  setRecap(data.recap ?? true);
+                  setJackpotOnly(data.jackpotOnly ?? false);
+                }
               }
             } catch {
-              // keep the default
+              // keep the defaults
             }
           } else if (Notification.permission === "denied") setState("denied");
           else setState("off");
@@ -203,6 +212,30 @@ export default function PushToggle() {
     }
   }
 
+  async function toggleJackpotOnly() {
+    if (jackpotBusy) return;
+    setJackpotBusy(true);
+    try {
+      const registration = await serviceWorkerReady();
+      const subscription = await registration.pushManager.getSubscription();
+      if (!subscription) return;
+      const next = !jackpotOnly;
+      const res = await fetch("/api/push/subscribe", {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ endpoint: subscription.endpoint, jackpotOnly: next }),
+      });
+      // Follow the server's answer instead of guessing from local state.
+      if (!res.ok) return;
+      const data = (await res.json()) as { jackpotOnly?: boolean };
+      if (typeof data.jackpotOnly === "boolean") setJackpotOnly(data.jackpotOnly);
+    } catch {
+      // keep the old state on failure
+    } finally {
+      setJackpotBusy(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
@@ -240,20 +273,36 @@ export default function PushToggle() {
         ) : null}
       </div>
       {state === "on" ? (
-        <label className="flex items-start gap-2.5 text-xs text-muted">
-          <input
-            type="checkbox"
-            checked={recap}
-            onChange={toggleRecap}
-            disabled={recapBusy}
-            className="mt-0.5 size-4 accent-[var(--accent)]"
-          />
-          <span>
-            <span className="font-semibold text-foreground">{t("recapToggle")}</span>
-            <br />
-            {t("recapHint")}
-          </span>
-        </label>
+        <>
+          <label className="flex items-start gap-2.5 text-xs text-muted">
+            <input
+              type="checkbox"
+              checked={recap}
+              onChange={toggleRecap}
+              disabled={recapBusy}
+              className="mt-0.5 size-4 accent-[var(--accent)]"
+            />
+            <span>
+              <span className="font-semibold text-foreground">{t("recapToggle")}</span>
+              <br />
+              {t("recapHint")}
+            </span>
+          </label>
+          <label className="flex items-start gap-2.5 text-xs text-muted">
+            <input
+              type="checkbox"
+              checked={jackpotOnly}
+              onChange={toggleJackpotOnly}
+              disabled={jackpotBusy}
+              className="mt-0.5 size-4 accent-[var(--accent)]"
+            />
+            <span>
+              <span className="font-semibold text-foreground">{t("jackpotOnlyToggle")}</span>
+              <br />
+              {t("jackpotOnlyHint")}
+            </span>
+          </label>
+        </>
       ) : null}
     </div>
   );

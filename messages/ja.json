@@ -607,7 +607,11 @@
     "jackpotBiggest": "最高当選額",
     "jackpotHits": "当選回数",
     "jackpotNote": "失ったコインの一部がジャックポットを積み増します。当選すると蓄積額が支払われ、再び貯まります。",
-    "jackpotWeek": "今週：{wins} 回の当選、{coins} コインの支払い。"
+    "jackpotWeek": "今週：{wins} 回の当選、{coins} コインの支払い。",
+    "jackpotHistoryTitle": "ポットの成長",
+    "jackpotHistoryMega": "メガジャックポット",
+    "jackpotHistoryTotal": "全ポット合計",
+    "jackpotHistoryHint": "成長グラフは毎晩のポット記録から作られます — 数日後にもう一度ご覧ください。"
   },
   "notifications": {
     "title": "通知",
@@ -624,7 +628,9 @@
     "feedEmpty": "アラートはまだありません。新しいドロップはここに表示されます。",
     "pushFailed": "プッシュ通知の登録ができませんでした。",
     "recapToggle": "アーケードまとめ",
-    "recapHint": "毎日・毎週のアーケードまとめ通知。ほかの通知を保ったままここでオフにできます。まとめ自体は下のフィードに表示されます。"
+    "recapHint": "毎日・毎週のアーケードまとめ通知。ほかの通知を保ったままここでオフにできます。まとめ自体は下のフィードに表示されます。",
+    "jackpotOnlyToggle": "ジャックポット通知のみ",
+    "jackpotOnlyHint": "有効にすると、ジャックポットの通知だけを受け取ります — 新しいバッジ、アーケードのまとめ、ニュースレターなどはすべてオフになります。ジャックポットの通知は常に届きます。"
   },
   "account": {
     "title": "設定",
@@ -820,7 +826,8 @@
     "jackpotWonMega": "メガジャックポット！",
     "jackpotWinners": "最新のジャックポット獲得",
     "jackpotHofTitle": "歴代最大のジャックポット獲得",
-    "jackpotLastMega": "最新のメガジャックポット: {name} +{n}"
+    "jackpotLastMega": "最新のメガジャックポット: {name} +{n}",
+    "jackpotChipLast": "最新: {name} +{n} · {date}"
   },
   "wheel": {
     "title": "フォーチュンホイール",

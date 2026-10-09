@@ -607,7 +607,11 @@
     "jackpotBiggest": "Mayor premio",
     "jackpotHits": "Premios ganados",
     "jackpotNote": "Una parte de cada moneda perdida alimenta los jackpots; un premio paga el bote y este se reinicia.",
-    "jackpotWeek": "Esta semana: {wins} premios, {coins} monedas pagadas."
+    "jackpotWeek": "Esta semana: {wins} premios, {coins} monedas pagadas.",
+    "jackpotHistoryTitle": "Crecimiento de los botes",
+    "jackpotHistoryMega": "Mega Jackpot",
+    "jackpotHistoryTotal": "Todos los botes juntos",
+    "jackpotHistoryHint": "El gráfico de crecimiento se construye con las instantáneas nocturnas de los botes — vuelve en unos días."
   },
   "notifications": {
     "title": "Notificaciones",
@@ -624,7 +628,9 @@
     "feedEmpty": "Aún no hay alertas. Los nuevos drops de insignias aparecerán aquí.",
     "pushFailed": "No se pudo registrar para notificaciones push.",
     "recapToggle": "Resúmenes arcade",
-    "recapHint": "Notificaciones diarias y semanales de resúmenes arcade. Puedes desactivarlas aquí sin perder otras alertas; los resúmenes siguen apareciendo en el feed de abajo."
+    "recapHint": "Notificaciones diarias y semanales de resúmenes arcade. Puedes desactivarlas aquí sin perder otras alertas; los resúmenes siguen apareciendo en el feed de abajo.",
+    "jackpotOnlyToggle": "Solo alertas de jackpot",
+    "jackpotOnlyHint": "Cuando está activado, recibes SOLO alertas de jackpot — nuevas insignias, resúmenes del arcade, boletines y todo lo demás quedan en silencio. Los alertas de jackpot siempre te llegan."
   },
   "account": {
     "title": "Ajustes",
@@ -820,7 +826,8 @@
     "jackpotWonMega": "¡MEGA JACKPOT!",
     "jackpotWinners": "Últimos premios de jackpot",
     "jackpotHofTitle": "Mayores premios de jackpot de la historia",
-    "jackpotLastMega": "Último Mega Jackpot: {name} +{n}"
+    "jackpotLastMega": "Último Mega Jackpot: {name} +{n}",
+    "jackpotChipLast": "Último: {name} +{n} · {date}"
   },
   "wheel": {
     "title": "Ruleta de la fortuna",

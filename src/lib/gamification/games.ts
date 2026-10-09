@@ -685,7 +685,9 @@ async function sendJackpotAlert(
       tag: "jackpot",
     };
     await recordNotification({ kind: "jackpot", ...payload }).catch(() => undefined);
-    await sendPushToAll(payload).catch(() => undefined);
+    // `jackpot: true` — this is the one payload that also reaches "jackpot
+    // only" subscribers (0071); every other broadcast skips them.
+    await sendPushToAll(payload, { jackpot: true }).catch(() => undefined);
   } catch {
     // A failed alert must never surface to the player.
   }

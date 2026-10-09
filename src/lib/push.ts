@@ -30,21 +30,29 @@ export interface PushResult {
   configured: boolean;
 }
 
-/** Fan out a web push to every stored subscription; prunes dead endpoints.
- *  `recapOnly` filters to subscriptions that have not opted out of the daily
- *  and weekly arcade recaps (migration 0045) — generic alerts ignore the flag. */
-export async function sendPushToAll(
-  payload: PushPayload,
-  opts: { recapOnly?: boolean } = {},
-): Promise<PushResult> {
-  if (!pushConfigured()) {
-    return { sent: 0, failed: 0, configured: false };
-  }
+/** The audience filter options for a push fan-out (see fetchPushTargets). */
+export interface PushAudienceOptions {
+  /** Recap pushes: only subscriptions that have not opted out (0045). */
+  recapOnly?: boolean;
+  /** This payload IS a jackpot alert: it reaches every subscriber, including
+   *  the ones on "jackpot only" (0071). Generic broadcasts omit this and are
+   *  filtered to exclude jackpot-only subscribers. */
+  jackpot?: boolean;
+}
 
+/**
+ * The subscription set one fan-out reaches. Exported because it is the whole
+ * filter contract (0045 recap opt-out, 0071 jackpot-only) — the e2e script
+ * asserts it against throwaway rows without sending a single push.
+ *
+ * Paged: PostgREST caps one response at 1000 rows, so a single select would
+ * silently notify an arbitrary 1000 subscribers and only ever see their dead
+ * endpoints.
+ */
+export async function fetchPushTargets(
+  opts: PushAudienceOptions = {},
+): Promise<Array<{ endpoint: string; p256dh: string; auth: string }>> {
   const supabase = createAdminClient();
-  // Paged: PostgREST caps one response at 1000 rows, so a single select would
-  // silently notify an arbitrary 1000 subscribers and only ever see their dead
-  // endpoints.
   type Subscription = { endpoint: string; p256dh: string; auth: string };
   const subscriptions: Subscription[] = [];
   for (let offset = 0; ; offset += 1000) {
@@ -54,12 +62,33 @@ export async function sendPushToAll(
       .order("endpoint")
       .range(offset, offset + 999);
     if (opts.recapOnly) query = query.eq("recap", true);
+    // A "jackpot only" subscriber asked to be excluded from everything except
+    // jackpot alerts — the flag's whole point is that this one filter reaches
+    // them and no other does.
+    if (!opts.jackpot) query = query.eq("jackpot_only", false);
     const { data, error } = await query;
     if (error) throw error;
     const page = (data ?? []) as Subscription[];
     subscriptions.push(...page);
     if (page.length < 1000) break;
   }
+  return subscriptions;
+}
+
+/** Fan out a web push to every stored subscription; prunes dead endpoints.
+ *  `recapOnly` filters to subscriptions that have not opted out of the daily
+ *  and weekly arcade recaps (0045); `jackpot` marks a jackpot alert, which is
+ *  the one payload that also reaches "jackpot only" subscribers (0071) —
+ *  every other broadcast skips them. */
+export async function sendPushToAll(
+  payload: PushPayload,
+  opts: PushAudienceOptions = {},
+): Promise<PushResult> {
+  if (!pushConfigured()) {
+    return { sent: 0, failed: 0, configured: false };
+  }
+
+  const subscriptions = await fetchPushTargets(opts);
 
   let sent = 0;
   let failed = 0;
@@ -113,6 +142,7 @@ export async function sendPushToAll(
     // `.in()` list for a mass notification builds a multi-KB query string the
     // gateway rejects — and the failure was invisible, so the dead rows survived
     // and were re-attempted and re-counted as failed on every later broadcast.
+    const supabase = createAdminClient();
     for (let i = 0; i < deadEndpoints.length; i += 200) {
       const { error: pruneError } = await supabase
         .from("push_subscriptions")

@@ -1,11 +1,52 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createFeaturePost } from "@/lib/blog";
+import { logChange } from "@/lib/changelog";
 
 /**
  * Shared garnish for the progressive jackpots (0069) — the pieces both the
  * arcade engine (games.ts) and the wheel need, kept here so neither imports
  * the other.
  */
+
+/**
+ * Snapshot every pot into jackpot_pot_history (0072) for today's UTC day.
+ *
+ * Called by the nightly cron/global run. `ignoreDuplicates` makes the FIRST
+ * write of a day authoritative — a manual re-run can never shift the day's
+ * representative value, and the inserted-row count is an honest first-run
+ * signal for the changelog (routine re-runs log nothing, the rollup
+ * precedent). A quiet failure is the caller's concern; this throws.
+ */
+export async function snapshotJackpotPots(): Promise<{ pots: number }> {
+  const supabase = createAdminClient();
+  const day = new Date().toISOString().slice(0, 10);
+  const { data: pots, error } = await supabase
+    .from("jackpots")
+    .select("scope,pot");
+  if (error) throw error;
+  const rows = ((pots ?? []) as Array<{ scope: string; pot: string | number }>).map(
+    (row) => ({ scope: row.scope, day, pot: Number(row.pot ?? 0) }),
+  );
+  if (rows.length === 0) return { pots: 0 };
+  const { data: inserted, error: insertError } = await supabase
+    .from("jackpot_pot_history")
+    .upsert(rows, { onConflict: "scope,day", ignoreDuplicates: true })
+    .select("scope");
+  if (insertError) throw insertError;
+  const written = (inserted ?? []).length;
+  if (written > 0) {
+    await logChange(
+      {
+        kind: "data_sync",
+        title: "Jackpot pots snapshotted",
+        body: `Daily pot history: ${written} snapshots written to jackpot_pot_history for ${day}. The first write of the day wins, so re-runs change nothing.`,
+        payload: { ranAt: new Date().toISOString(), day, pots: written },
+      },
+      supabase,
+    );
+  }
+  return { pots: written };
+}
 
 export interface MegaWinContext {
   /** The game being played when the Mega pot hit; null = the daily wheel. */

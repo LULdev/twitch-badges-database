@@ -779,6 +779,42 @@ export async function getJackpotEconomy(): Promise<JackpotEconomyData | null> {
   }
 }
 
+export interface JackpotHistoryPoint {
+  day: string;
+  mega: number;
+  total: number;
+}
+
+/**
+ * The pot-growth series for the /stats chart (0072): one point per day the
+ * nightly snapshot ran, oldest first. Deliberately NOT zero-filled (the
+ * daySeries helper would plunge pre-launch days to 0 — a pot level, unlike a
+ * daily flow, carries forward); the caller renders nothing until there are at
+ * least two points. [] on a missing/failed view.
+ */
+export async function getJackpotHistory(days = 30): Promise<JackpotHistoryPoint[]> {
+  const supabase = await createClient();
+  const since = new Date();
+  since.setUTCHours(0, 0, 0, 0);
+  since.setUTCDate(since.getUTCDate() - (days - 1));
+  try {
+    const { data, error } = await supabase
+      .from("stats_jackpot_history")
+      .select("day,mega_pot,total_pot")
+      .gte("day", since.toISOString().slice(0, 10))
+      .order("day", { ascending: true });
+    if (error || !data) return [];
+    return (data as Array<Record<string, unknown>>).map((row) => ({
+      day: String(row.day).slice(0, 10),
+      mega: Number(row.mega_pot ?? 0),
+      total: Number(row.total_pot ?? 0),
+    }));
+  } catch {
+    // Network-level failure: /stats must render without the chart, not crash.
+    return [];
+  }
+}
+
 export interface RecordBreakLeader {
   username: string;
   avatar_url: string | null;

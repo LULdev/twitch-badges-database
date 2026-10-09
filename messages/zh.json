@@ -607,7 +607,11 @@
     "jackpotBiggest": "最高单次奖金",
     "jackpotHits": "中奖次数",
     "jackpotNote": "每枚损失的硬币都会按比例注入奖池；命中即赢得奖池，随后奖池重新累积。",
-    "jackpotWeek": "本周：{wins} 次中奖，支出 {coins} 枚硬币。"
+    "jackpotWeek": "本周：{wins} 次中奖，支出 {coins} 枚硬币。",
+    "jackpotHistoryTitle": "奖池增长",
+    "jackpotHistoryMega": "超级大奖",
+    "jackpotHistoryTotal": "所有奖池合计",
+    "jackpotHistoryHint": "增长图表由每晚的奖池快照生成——几天后再来看看。"
   },
   "notifications": {
     "title": "通知",
@@ -624,7 +628,9 @@
     "feedEmpty": "暂无提醒。新徽章掉落会显示在这里。",
     "pushFailed": "无法注册推送通知。",
     "recapToggle": "街机回顾",
-    "recapHint": "每日和每周街机回顾通知。可在此关闭而不影响其他提醒；回顾仍会显示在下方的动态中。"
+    "recapHint": "每日和每周街机回顾通知。可在此关闭而不影响其他提醒；回顾仍会显示在下方的动态中。",
+    "jackpotOnlyToggle": "仅大奖通知",
+    "jackpotOnlyHint": "开启后，你将只收到大奖通知——新徽章、街机回顾、简报及其他所有推送都会静音。大奖通知始终会送达。"
   },
   "account": {
     "title": "设置",
@@ -820,7 +826,8 @@
     "jackpotWonMega": "超级大奖！",
     "jackpotWinners": "最新大奖记录",
     "jackpotHofTitle": "史上最大的奖池中奖",
-    "jackpotLastMega": "最近超级大奖：{name} +{n}"
+    "jackpotLastMega": "最近超级大奖：{name} +{n}",
+    "jackpotChipLast": "最近：{name} +{n} · {date}"
   },
   "wheel": {
     "title": "命运转盘",

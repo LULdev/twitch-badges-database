@@ -607,7 +607,11 @@
     "jackpotBiggest": "최고 당첨",
     "jackpotHits": "당첨 횟수",
     "jackpotNote": "잃은 코인의 일부가 잭팟을 채우며, 당첨되면 잭팟이 지급되고 다시 쌓입니다.",
-    "jackpotWeek": "이번 주: 당첨 {wins}회, 지급 {coins} 코인."
+    "jackpotWeek": "이번 주: 당첨 {wins}회, 지급 {coins} 코인.",
+    "jackpotHistoryTitle": "잭팟 성장",
+    "jackpotHistoryMega": "메가 잭팟",
+    "jackpotHistoryTotal": "모든 잭팟 합계",
+    "jackpotHistoryHint": "성장 차트는 매일 밤의 잭팟 스냅샷으로 만들어집니다 — 며칠 후 다시 확인해 보세요."
   },
   "notifications": {
     "title": "알림",
@@ -624,7 +628,9 @@
     "feedEmpty": "아직 알림이 없습니다. 새 배지 드롭이 여기 표시됩니다.",
     "pushFailed": "푸시 알림에 등록할 수 없습니다.",
     "recapToggle": "아케이드 요약",
-    "recapHint": "매일·매주 아케이드 요약 알림입니다. 다른 알림은 그대로 둔 채 여기서 끌 수 있고, 요약은 아래 피드에 계속 표시됩니다."
+    "recapHint": "매일·매주 아케이드 요약 알림입니다. 다른 알림은 그대로 둔 채 여기서 끌 수 있고, 요약은 아래 피드에 계속 표시됩니다.",
+    "jackpotOnlyToggle": "잭팟 알림만 받기",
+    "jackpotOnlyHint": "활성화하면 잭팟 알림만 받습니다 — 새 배지, 아케이드 요약, 뉴스레터 등 나머지는 모두 꺼집니다. 잭팟 알림은 항상 도착합니다."
   },
   "account": {
     "title": "설정",
@@ -820,7 +826,8 @@
     "jackpotWonMega": "메가 잭팟!",
     "jackpotWinners": "최근 잭팟 당첨",
     "jackpotHofTitle": "역대 최고 잭팟 당첨",
-    "jackpotLastMega": "최근 메가 잭팟: {name} +{n}"
+    "jackpotLastMega": "최근 메가 잭팟: {name} +{n}",
+    "jackpotChipLast": "최근: {name} +{n} · {date}"
   },
   "wheel": {
     "title": "운명의 수레바퀴",

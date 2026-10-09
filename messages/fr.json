@@ -607,7 +607,11 @@
     "jackpotBiggest": "Plus gros gain",
     "jackpotHits": "Jackpots gagnés",
     "jackpotNote": "Une part de chaque pièce perdue alimente les jackpots ; un gain paie le pot, qui repart de sa base.",
-    "jackpotWeek": "Cette semaine : {wins} gains, {coins} pièces payées."
+    "jackpotWeek": "Cette semaine : {wins} gains, {coins} pièces payées.",
+    "jackpotHistoryTitle": "Croissance des pots",
+    "jackpotHistoryMega": "Méga Jackpot",
+    "jackpotHistoryTotal": "Tous les pots réunis",
+    "jackpotHistoryHint": "Le graphique de croissance se construit à partir des relevés nocturnes des pots — revenez dans quelques jours."
   },
   "notifications": {
     "title": "Notifications",
@@ -624,7 +628,9 @@
     "feedEmpty": "Aucune alerte pour l'instant. Les nouveaux drops apparaîtront ici.",
     "pushFailed": "Impossible de s'inscrire aux notifications push.",
     "recapToggle": "Récaps arcade",
-    "recapHint": "Notifications quotidiennes et hebdomadaires des récaps arcade. Vous pouvez les désactiver ici sans perdre les autres alertes ; les récaps restent visibles dans le fil ci-dessous."
+    "recapHint": "Notifications quotidiennes et hebdomadaires des récaps arcade. Vous pouvez les désactiver ici sans perdre les autres alertes ; les récaps restent visibles dans le fil ci-dessous.",
+    "jackpotOnlyToggle": "Alertes jackpot uniquement",
+    "jackpotOnlyHint": "Lorsque cette option est activée, vous ne recevez QUE les alertes jackpot — nouveaux badges, récapitulatifs de l'arcade, newsletters et tout le reste restent silencieux. Les alertes jackpot vous parviennent toujours."
   },
   "account": {
     "title": "Paramètres",
@@ -820,7 +826,8 @@
     "jackpotWonMega": "MÉGA JACKPOT !",
     "jackpotWinners": "Derniers gains de jackpot",
     "jackpotHofTitle": "Plus gros gains de jackpot de tous les temps",
-    "jackpotLastMega": "Dernier Méga Jackpot : {name} +{n}"
+    "jackpotLastMega": "Dernier Méga Jackpot : {name} +{n}",
+    "jackpotChipLast": "Dernier : {name} +{n} · {date}"
   },
   "wheel": {
     "title": "Roue de la fortune",

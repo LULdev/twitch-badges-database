@@ -48,9 +48,12 @@ Read `README.md` for data sources and setup; read this file before editing.
   Two achievements ride it: `k_jackpot_winner` (any pot) and `s_mega_jackpot`,
   counted from `jackpot_wins`; the daily/weekly arcade recap carries a live
   pot + windowed-hits line. Hub strip shows newest wins AND the all-time
-  hall of fame (top-3 by amount); game heroes + the wheel carry a dated
-  "last Mega hit" line; the FAQ's jackpot answer interpolates the live
-  economy rates/odds (answerFor per-key values, the achievements precedent).
+  hall of fame (top-3 by amount), chips carry last-winner title tooltips;
+  game heroes + the wheel carry a dated "last Mega hit" line; the FAQ's
+  jackpot answer interpolates the live economy rates/odds (answerFor
+  per-key values, the achievements precedent). The nightly cron also
+  snapshots every pot into jackpot_pot_history (0072, first write of a day
+  wins) — the source of the /stats pot-growth chart.
 - `src/components/stats/` — animated chart set for the stats dashboard
   (CountUp, Reveal, TrendChart, DonutChart, DistributionBars, LevelHistogram,
   UptimeGauge, UptimeCalendar, AvailabilityStrip, LiveStatus, useChartTheme)
@@ -82,6 +85,11 @@ feed are generated from that table, so an undocumented change is invisible.
 
 ## Architecture rules
 
+- **Push audiences filter server-side** (`fetchPushTargets` in push.ts is the
+  whole contract, shared with the E2E): recap pushes respect the 0045 opt-out
+  (`recapOnly`), generic broadcasts skip "jackpot only" subscribers (0071),
+  and ONLY jackpot alerts pass `{ jackpot: true }` to reach them. A new
+  broadcast category must decide which side of that line it is on.
 - **BadgesCoins movements write a ledger row** in
   `activity_events.coins_amount` — the single table the public feed, the
   coin-flow card and the inventory transaction list all read. Writers: wheel

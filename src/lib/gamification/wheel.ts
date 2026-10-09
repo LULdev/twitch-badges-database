@@ -193,7 +193,8 @@ export async function spinWheel(userId: string): Promise<
               tag: "jackpot",
             };
             await recordNotification({ kind: "jackpot", ...payload }).catch(() => undefined);
-            await sendPushToAll(payload).catch(() => undefined);
+            // `jackpot: true` — also reaches "jackpot only" subscribers (0071).
+            await sendPushToAll(payload, { jackpot: true }).catch(() => undefined);
           } catch {
             // A failed alert must never surface to the spinner.
           }

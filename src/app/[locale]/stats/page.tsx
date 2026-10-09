@@ -3,7 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getSiteStats } from "@/lib/queries";
-import { daySeries, getCommunityCoinFlow, getJackpotEconomy, getPlatformStats, getRecordBreakLeaders } from "@/lib/stats";
+import { daySeries, getCommunityCoinFlow, getJackpotEconomy, getJackpotHistory, getPlatformStats, getRecordBreakLeaders } from "@/lib/stats";
 import { authUserId } from "@/lib/gamification/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import CoinFlowCard, {
@@ -212,13 +212,15 @@ export default async function StatsPage({
   const tr = await getTranslations("rarity");
   const tf = await getTranslations("feed");
 
-  const [catalog, platform, communityCoin, jackpotEconomy, recordLeaders] = await Promise.all([
-    getSiteStats().catch(() => null),
-    getPlatformStats(),
-    getCommunityCoinFlow(),
-    getJackpotEconomy(),
-    getRecordBreakLeaders(period),
-  ]);
+  const [catalog, platform, communityCoin, jackpotEconomy, jackpotHistory, recordLeaders] =
+    await Promise.all([
+      getSiteStats().catch(() => null),
+      getPlatformStats(),
+      getCommunityCoinFlow(),
+      getJackpotEconomy(),
+      getJackpotHistory(),
+      getRecordBreakLeaders(period),
+    ]);
 
   // Owner-only view: the logged-in viewer's own 30-day coin flow, same card
   // as the profile page. user_id is not anon-readable (0040 column grants),
@@ -625,7 +627,7 @@ export default async function StatsPage({
       {communityCoin && <CommunityCoinFlow data={communityCoin} />}
 
       {/* Public aggregate card — the progressive-jackpot economy (0070). */}
-      {jackpotEconomy && <JackpotEconomy data={jackpotEconomy} />}
+      {jackpotEconomy && <JackpotEconomy data={jackpotEconomy} history={jackpotHistory} />}
 
       {/* Record-break leaderboard — whose personal best rose most this period. */}
       {recordLeaders && recordLeaders.length > 0 && (

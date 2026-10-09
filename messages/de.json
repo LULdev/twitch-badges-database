@@ -607,7 +607,11 @@
     "jackpotBiggest": "Größter Gewinn",
     "jackpotHits": "Jackpot-Treffer",
     "jackpotNote": "Ein Anteil jeder verlorenen Coin speist die Jackpots; ein Treffer zahlt den Jackpot aus und er startet neu.",
-    "jackpotWeek": "Diese Woche: {wins} Gewinne, {coins} Coins ausgezahlt."
+    "jackpotWeek": "Diese Woche: {wins} Gewinne, {coins} Coins ausgezahlt.",
+    "jackpotHistoryTitle": "Pot-Wachstum",
+    "jackpotHistoryMega": "Mega-Jackpot",
+    "jackpotHistoryTotal": "Alle Jackpots zusammen",
+    "jackpotHistoryHint": "Das Wachstumsdiagramm entsteht aus den nächtlichen Pot-Aufzeichnungen — schau in ein paar Tagen wieder vorbei."
   },
   "notifications": {
     "title": "Benachrichtigungen",
@@ -624,7 +628,9 @@
     "feedEmpty": "Noch keine Meldungen. Neue Badge-Drops erscheinen hier.",
     "pushFailed": "Registrierung für Push-Benachrichtigungen fehlgeschlagen.",
     "recapToggle": "Arcade-Rückblicke",
-    "recapHint": "Tägliche und wöchentliche Arcade-Rückblick-Benachrichtigungen. Lassen sie sich hier abschalten, ohne andere Hinweise zu verlieren; die Rückblicke erscheinen weiter im Feed unten."
+    "recapHint": "Tägliche und wöchentliche Arcade-Rückblick-Benachrichtigungen. Lassen sie sich hier abschalten, ohne andere Hinweise zu verlieren; die Rückblicke erscheinen weiter im Feed unten.",
+    "jackpotOnlyToggle": "Nur Jackpot-Benachrichtigungen",
+    "jackpotOnlyHint": "Wenn aktiviert, erhältst du NUR Jackpot-Benachrichtigungen — neue Badges, Arcade-Rückblicke, Newsletter und alles andere bleiben stumm. Jackpot-Benachrichtigungen erreichen dich immer."
   },
   "account": {
     "title": "Einstellungen",
@@ -820,7 +826,8 @@
     "jackpotWonMega": "MEGA-JACKPOT!",
     "jackpotWinners": "Neueste Jackpot-Gewinne",
     "jackpotHofTitle": "Die größten Jackpot-Gewinne aller Zeiten",
-    "jackpotLastMega": "Letzter Mega-Jackpot: {name} +{n}"
+    "jackpotLastMega": "Letzter Mega-Jackpot: {name} +{n}",
+    "jackpotChipLast": "Zuletzt: {name} +{n} · {date}"
   },
   "wheel": {
     "title": "Glücksrad",

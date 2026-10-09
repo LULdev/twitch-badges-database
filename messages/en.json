@@ -607,7 +607,11 @@
     "jackpotBiggest": "Biggest win",
     "jackpotHits": "Jackpot hits",
     "jackpotNote": "A share of every lost coin feeds the pots; a hit pays the pot and it reseeds.",
-    "jackpotWeek": "This week: {wins} wins, {coins} coins paid."
+    "jackpotWeek": "This week: {wins} wins, {coins} coins paid.",
+    "jackpotHistoryTitle": "Pot growth",
+    "jackpotHistoryMega": "Mega Jackpot",
+    "jackpotHistoryTotal": "All pots combined",
+    "jackpotHistoryHint": "The growth chart builds from the nightly pot snapshots — check back after a few days."
   },
   "notifications": {
     "title": "Notifications",
@@ -624,7 +628,9 @@
     "feedEmpty": "No alerts yet. New badge drops will show up here.",
     "pushFailed": "Could not register for push notifications.",
     "recapToggle": "Arcade recaps",
-    "recapHint": "Daily and weekly arcade recap notifications. You can switch them off here without losing other alerts; recaps still appear in the feed below."
+    "recapHint": "Daily and weekly arcade recap notifications. You can switch them off here without losing other alerts; recaps still appear in the feed below.",
+    "jackpotOnlyToggle": "Only jackpot alerts",
+    "jackpotOnlyHint": "When enabled, you receive ONLY jackpot alerts — new badges, arcade recaps, newsletters and everything else stay silent. Jackpot alerts always reach you."
   },
   "account": {
     "title": "Settings",
@@ -820,7 +826,8 @@
     "jackpotWonMega": "MEGA JACKPOT!",
     "jackpotWinners": "Latest jackpot wins",
     "jackpotHofTitle": "Biggest jackpot wins ever",
-    "jackpotLastMega": "Last Mega Jackpot: {name} +{n}"
+    "jackpotLastMega": "Last Mega Jackpot: {name} +{n}",
+    "jackpotChipLast": "Last: {name} +{n} · {date}"
   },
   "wheel": {
     "title": "Wheel of Fortune",

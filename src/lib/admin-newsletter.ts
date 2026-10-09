@@ -59,7 +59,10 @@ export async function countRecipients(): Promise<{
   }
   const { count } = await supabase
     .from("push_subscriptions")
-    .select("id", { count: "exact", head: true });
+    .select("id", { count: "exact", head: true })
+    // The newsletter is a generic broadcast and skips "jackpot only"
+    // subscribers (0071) — the count must reflect the real send audience.
+    .eq("jackpot_only", false);
   return {
     emails,
     pushSubscriptions: count ?? 0,

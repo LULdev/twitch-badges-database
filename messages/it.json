@@ -607,7 +607,11 @@
     "jackpotBiggest": "Vincita più grande",
     "jackpotHits": "Jackpot vinti",
     "jackpotNote": "Una quota di ogni moneta persa alimenta i jackpot; una vincita paga il montepremi, che poi riparte.",
-    "jackpotWeek": "Questa settimana: {wins} vincite, {coins} monete pagate."
+    "jackpotWeek": "Questa settimana: {wins} vincite, {coins} monete pagate.",
+    "jackpotHistoryTitle": "Crescita dei piatti",
+    "jackpotHistoryMega": "Mega Jackpot",
+    "jackpotHistoryTotal": "Tutti i piatti insieme",
+    "jackpotHistoryHint": "Il grafico di crescita si costruisce dalle istantanee notturne dei piatti — torna tra qualche giorno."
   },
   "notifications": {
     "title": "Notifiche",
@@ -624,7 +628,9 @@
     "feedEmpty": "Nessun avviso. I nuovi drop compariranno qui.",
     "pushFailed": "Impossibile registrarsi alle notifiche push.",
     "recapToggle": "Recap arcade",
-    "recapHint": "Notifiche giornaliere e settimanali dei recap arcade. Puoi disattivarle qui senza perdere gli altri avvisi; i recap restano visibili nel feed qui sotto."
+    "recapHint": "Notifiche giornaliere e settimanali dei recap arcade. Puoi disattivarle qui senza perdere gli altri avvisi; i recap restano visibili nel feed qui sotto.",
+    "jackpotOnlyToggle": "Solo avvisi jackpot",
+    "jackpotOnlyHint": "Se attivato, ricevi SOLO gli avvisi dei jackpot — nuovi badge, riepiloghi dell'arcade, newsletter e tutto il resto restano silenziosi. Gli avvisi dei jackpot ti arrivano sempre."
   },
   "account": {
     "title": "Impostazioni",
@@ -820,7 +826,8 @@
     "jackpotWonMega": "MEGA JACKPOT!",
     "jackpotWinners": "Ultime vincite del jackpot",
     "jackpotHofTitle": "Le più grandi vincite jackpot di sempre",
-    "jackpotLastMega": "Ultimo Mega Jackpot: {name} +{n}"
+    "jackpotLastMega": "Ultimo Mega Jackpot: {name} +{n}",
+    "jackpotChipLast": "Ultimo: {name} +{n} · {date}"
   },
   "wheel": {
     "title": "Ruota della fortuna",
