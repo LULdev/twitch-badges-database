@@ -8,11 +8,28 @@ import TrendChart, { type TrendSeries } from "@/components/stats/TrendChart";
 import DonutChart, { type DonutSlice } from "@/components/stats/DonutChart";
 import DistributionBars from "@/components/stats/DistributionBars";
 import type { AnalyticsBundle } from "@/lib/analytics";
+import { formatCompact } from "@/components/badges/BadgeCard";
 
 const CLIENT_COLORS = ["#a970ff", "#60a5fa", "#34d399", "#fbbf24", "#f472b6", "#f87171", "#9aa0b0"];
 
+interface EconomyRow {
+  user_id: string;
+  username: string | null;
+  avatar_url: string | null;
+  coins_wagered: number;
+  coins_won: number;
+  coins_lost: number;
+  coins_net: number;
+  rounds_played: number;
+  rounds_won: number;
+  win_rate: number;
+  wheel_spins: number;
+  jackpot_wins: number;
+}
+
 interface Payload extends AnalyticsBundle {
   system?: Record<string, number | string | null>;
+  playerEconomy?: EconomyRow[];
 }
 
 export default function StatsPanel({ locale }: { locale: string }) {
@@ -98,6 +115,63 @@ export default function StatsPanel({ locale }: { locale: string }) {
           </Reveal>
         ))}
       </div>
+
+      {(data?.playerEconomy?.length ?? 0) > 0 && (
+        <Reveal>
+          <div className="card overflow-hidden">
+            <div className="border-b border-line px-5 py-4">
+              <h3 className="text-sm font-bold">{t("economy.title")}</h3>
+              <p className="mt-0.5 text-xs text-muted">{t("economy.desc")}</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th className="w-12">#</th>
+                    <th>{t("economy.member")}</th>
+                    <th className="text-end">{t("economy.wagered")}</th>
+                    <th className="text-end">{t("economy.won")}</th>
+                    <th className="text-end">{t("economy.lost")}</th>
+                    <th className="text-end">{t("economy.net")}</th>
+                    <th className="text-end">{t("economy.rounds")}</th>
+                    <th className="text-end">{t("economy.winRate")}</th>
+                    <th className="text-end">{t("economy.jackpots")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data!.playerEconomy!.map((row, index) => (
+                    <tr key={row.user_id} className="hover:bg-surface-2">
+                      <td className="font-bold tabular-nums text-muted">{index + 1}</td>
+                      <td>
+                        <span className="flex items-center gap-2 font-semibold">
+                          {row.avatar_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={row.avatar_url} alt="" width={22} height={22} className="rounded-full" loading="lazy" />
+                          ) : (
+                            <span className="grid size-5.5 place-items-center rounded-full bg-accent-soft text-[0.5625rem] font-bold text-accent">
+                              {(row.username ?? "?").slice(0, 2).toUpperCase()}
+                            </span>
+                          )}
+                          {row.username ?? "—"}
+                        </span>
+                      </td>
+                      <td dir="ltr" className="text-end font-semibold tabular-nums">{formatCompact(row.coins_wagered, locale)}</td>
+                      <td dir="ltr" className="text-end tabular-nums text-success">+{formatCompact(row.coins_won, locale)}</td>
+                      <td dir="ltr" className="text-end tabular-nums text-danger">−{formatCompact(row.coins_lost, locale)}</td>
+                      <td dir="ltr" className={"text-end font-semibold tabular-nums " + (row.coins_net >= 0 ? "text-success" : "text-danger")}>
+                        {row.coins_net >= 0 ? "+" : "−"}{formatCompact(Math.abs(row.coins_net), locale)}
+                      </td>
+                      <td dir="ltr" className="text-end tabular-nums">{row.rounds_played}</td>
+                      <td dir="ltr" className="text-end tabular-nums">{row.win_rate}%</td>
+                      <td dir="ltr" className="text-end tabular-nums">{row.jackpot_wins}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </Reveal>
+      )}
 
       <Reveal>
         <div className="card p-4">

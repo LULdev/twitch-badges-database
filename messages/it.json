@@ -255,7 +255,10 @@
     "collector": "Collezionista",
     "badges": "Badge",
     "badge": "Badge",
-    "empty": "Nessun dato ancora disponibile."
+    "empty": "Nessun dato ancora disponibile.",
+    "wageredTitle": "Più monete puntate",
+    "wageredDesc": "Volume totale puntato — la classifica di attività: conta giocare tanto, non accumulare.",
+    "wageredUnit": "Monete puntate"
   },
   "compare": {
     "title": "Confronta collezionisti",
@@ -311,6 +314,7 @@
     "statRobbed": "Volte derubato",
     "statLoginStreak": "Migliore serie di accessi",
     "statAchievements": "Obiettivi",
+    "statThisWeek": "questa settimana",
     "itemShelf": "Scaffale oggetti",
     "freezeName": "Congelamento di serie",
     "freezeExplain": "Un congelamento mette in pausa la tua serie di gioco per un giorno perso invece di azzerarla. Parti con 2 al collegamento con Twitch e ne guadagni uno ogni 7 giorni di serie (7, 14, 21…). Se ne consuma uno per giorno colmato — in quel giorno la serie né cresce né cala.",
@@ -1383,6 +1387,18 @@
       "loading": "Caricamento statistiche…",
       "loadFailed": "Impossibile caricare le statistiche.",
       "noData": "Ancora nessun dato sulle visite.",
+      "economy": {
+        "title": "Economia dei membri — Top 20",
+        "desc": "Maggiore volume puntato con vinto/perso/netto, round, percentuale di vittorie e jackpot. Picchi e percentuali strane saltano qui all'occhio.",
+        "member": "Membro",
+        "wagered": "Puntato",
+        "won": "Vinto",
+        "lost": "Perso",
+        "net": "Netto",
+        "rounds": "Round",
+        "winRate": "% vittorie",
+        "jackpots": "Jackpot"
+      },
       "kpi": {
         "online": "Online ora",
         "views24": "Visite oggi",

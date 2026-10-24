@@ -255,7 +255,10 @@
     "collector": "Collector",
     "badges": "Badges",
     "badge": "Badge",
-    "empty": "No data available yet."
+    "empty": "No data available yet.",
+    "wageredTitle": "Most coins wagered",
+    "wageredDesc": "Lifetime stake volume — the activity board: playing hard counts, not hoarding.",
+    "wageredUnit": "Coins wagered"
   },
   "compare": {
     "title": "Compare collectors",
@@ -311,6 +314,7 @@
     "statRobbed": "Times robbed",
     "statLoginStreak": "Best login streak",
     "statAchievements": "Achievements",
+    "statThisWeek": "this week",
     "itemShelf": "Item shelf",
     "freezeName": "Streak Freeze",
     "freezeExplain": "A Streak Freeze pauses your game streak for one missed day instead of letting it reset. You start with 2 when you connect with Twitch and earn one more every 7 streak days (7, 14, 21…). One freeze burns per bridged day — the streak itself neither grows nor shrinks on that day.",
@@ -1383,6 +1387,18 @@
       "loading": "Loading statistics…",
       "loadFailed": "Could not load the statistics.",
       "noData": "No visitor data yet.",
+      "economy": {
+        "title": "Member economy — Top 20",
+        "desc": "Highest lifetime turnover with won/lost/net, rounds, win rate and jackpots. Spikes and odd win rates stand out here.",
+        "member": "Member",
+        "wagered": "Wagered",
+        "won": "Won",
+        "lost": "Lost",
+        "net": "Net",
+        "rounds": "Rounds",
+        "winRate": "Win rate",
+        "jackpots": "Jackpots"
+      },
       "kpi": {
         "online": "Online now",
         "views24": "Views today",

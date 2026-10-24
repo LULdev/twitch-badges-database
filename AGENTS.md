@@ -7,7 +7,8 @@ Read `README.md` for data sources and setup; read this file before editing.
 ## Layout
 
 - `src/app/[locale]/` — all pages (locale-prefixed, `localePrefix: "always"`)
-- `src/app/api/` — cron endpoints, push, inventory sync, OG images, RSS
+- `src/app/api/` — cron endpoints, push, inventory sync, OG images, RSS,
+  `/api/jackpots` (public live-pot feed for the hub ticker)
 - `src/lib/twitch/` — external data services (helix, ivr, badgebase, potat, perfil).
   Status/role badges (moderator, VIP, partner, …) are EXCLUDED from the
   catalog (`isStatusSetId` in types.ts; global sync deletes any that exist).
@@ -29,38 +30,43 @@ Read `README.md` for data sources and setup; read this file before editing.
   into `badge_stats_daily` (one row per badge per UTC day, closing/min/max)
   and the raw rows are deleted; archive points are NEVER rolled, the archive
   backfill's measured-era floor considers `badge_stats_daily` too, and the
-  owner-trend chart + trend sentence union daily + raw.
+  owner-trend chart + trend sentence union daily + raw. The same nightly pass
+  snapshots every jackpot pot into `jackpot_pot_history` (0072, first write
+  of a day wins) — the source of the /stats pot-growth chart.
 - `src/lib/` — queries.ts (DB reads via server client), rarity.ts (TBRI),
   changelog.ts, inventory.ts, push.ts, markdown.ts, seo.ts, health.ts
-  (heartbeats), stats.ts (reads the `stats_*` views for `/stats`)
-- `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 133 achievements
-  (achievements.ts, self-evaluating), games.ts (14 server-authoritative games),
-  wheel.ts (daily wheel + Turbo jackpot 1:1e8 + Mega Jackpot roll), daily.ts
-  (login bonus, heists, coin rain), visits.ts (5-min-IP-dedup view counters),
-  session.ts. Progressive jackpots (0069): a share of every LOST round feeds
-  the game's own pot AND the global Mega pot (`jackpot_round` RPC — one
+  (heartbeats), stats.ts (reads the `stats_*` views for `/stats`),
+  admin-users.ts (ACP user management + the member-economy Top 20)
+- `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 135
+  achievements / 133 active (achievements.ts, self-evaluating), games.ts
+  (14 server-authoritative games), wheel.ts (daily wheel + Turbo jackpot
+  1:1e8 + Mega Jackpot roll), daily.ts (login bonus, heists, coin rain),
+  visits.ts (5-min-IP-dedup view counters), session.ts, jackpot.ts (Mega
+  auto post + pot snapshots).
+  **Progressive jackpots (0069)**: a share of every LOST round feeds the
+  game's own pot AND the global Mega pot (`jackpot_round` RPC — one
   transaction: contributions, row-locked claim, payout, `jackpot_win` feed
   row, `jackpot_wins` history); every settled round rolls a hit chance per
   pot; rates/odds/seeds are economy settings (`jackpot*` keys). A Mega hit
-  also publishes the date-stamped `mega-jackpot-<date>` auto post (shared
-  helper in jackpot.ts, one post per UTC day, no second push) and surfaces on
-  the hub strip's winners row + the /stats `stats_jackpot_economy` card (0070).
-  The profile's Arcade-statistics grid (0073): 14 tiles (coins_wagered is a
-  new bump_counters column, backfilled from game_rounds; won=green,
-  lost=red, net signed; win rate, best round, jackpots, wheel, heists,
-  robbed, login streak, true achievement count), EACH individually hideable
-  via `showStat*` customization booleans (default visible); zero-activity
-  tiles stay hidden (false-zeros doctrine). The hub strip's pots poll
-  /api/jackpots every 15s (JackpotPotsLive, display:contents wrapper).
-  Two achievements ride it: `k_jackpot_winner` (any pot) and `s_mega_jackpot`,
-  counted from `jackpot_wins`; the daily/weekly arcade recap carries a live
-  pot + windowed-hits line. Hub strip shows newest wins AND the all-time
-  hall of fame (top-3 by amount), chips carry last-winner title tooltips;
-  game heroes + the wheel carry a dated "last Mega hit" line; the FAQ's
-  jackpot answer interpolates the live economy rates/odds (answerFor
-  per-key values, the achievements precedent). The nightly cron also
-  snapshots every pot into jackpot_pot_history (0072, first write of a day
-  wins) — the source of the /stats pot-growth chart.
+  also publishes the date-stamped `mega-jackpot-<date>` auto post (one per
+  UTC day, no second push) and surfaces on the hub strip's winners row + the
+  /stats `stats_jackpot_economy` card (0070) with the pot-growth chart.
+  Surfaces: hub strip (live pots via `JackpotPotsLive` polling
+  `/api/jackpots` every 15 s, newest wins, all-time hall of fame top-3,
+  chips with last-winner tooltips + gold winner dots), game heroes + wheel
+  (dated "last Mega hit" line), RoundOutcome (per-round pot tick + hit
+  ceremony), the FAQ's live-values jackpot answer, two achievements
+  (`k_jackpot_winner`, `s_mega_jackpot`), and the daily/weekly recap's
+  pot + windowed-hits line.
+  **Profile Arcade-statistics grid (0073)**: 14 tiles — coins
+  wagered/won/lost/net (won=green, lost=red, net signed), rounds, wins, win
+  rate, best round, jackpot wins, wheel spins, heists, robbed, login streak,
+  true achievement count — each with a 7-day delta chip where meaningful
+  (`stat-trend`, zero deltas hidden), EACH individually hideable via
+  `showStat*` customization booleans (default visible; zero-activity tiles
+  stay hidden — false-zeros doctrine). `coins_wagered` is a bump_counters
+  column backfilled from game_rounds. The /leaderboards page carries a
+  "Most coins wagered" board (the activity ranking).
 - `src/components/stats/` — animated chart set for the stats dashboard
   (CountUp, Reveal, TrendChart, DonutChart, DistributionBars, LevelHistogram,
   UptimeGauge, UptimeCalendar, AvailabilityStrip, LiveStatus, useChartTheme)
@@ -76,6 +82,7 @@ npm run e2e:steal       # theft-ledger E2E — manual only: writes real throwawa
 npm run e2e:jackpot     # progressive-jackpot RPC E2E — same discipline (forced hits, full baseline restore)
 npm run db:apply        # apply pending migrations once (supabase_migrations ledger)
 npm run sync:global | sync:badgebase | sync:potat | sync:archive
+npm run sync:highlights -- [--dry|--no-push|--weekly]  # arcade recap (dry = aggregate+print, writes nothing)
 npm run send:push -- "Title" "Body" "/en/badges/slug"
 npm run log:change -- <feature|bugfix|data_sync|…> "Title" "Explanation" '{"json":"payload"}'
 ```
@@ -113,21 +120,23 @@ feed are generated from that table, so an undocumented change is invisible.
   page exclude the kind, and the achievement activity counter ignores it; it
   shows in the affected member's own card and list, and — deliberately — in
   AGGREGATES like `stats_coin_flow_daily` and the recap posts, because those
-  coins are real creation); the slots-15x and
-  scratch-jackpot `big_win` rows with `coinsAmount: net`. Deliberate
-  exceptions, each covered by a reader instead of a row: ordinary arcade rounds
-  (`bumpCoins(net)`, no `coins` field on their `award()` call — the inventory
-  list unions `game_rounds`, `payout − bet`) and the theft VICTIM (no feed row
-  — unioned from `steal_attempts`, `cost − coins`). `steal_attempts` is itself
+  coins are real creation); the slots-15x/scratch-jackpot/pingu `big_win`
+  rows with `coinsAmount: net`. Deliberate exceptions, each covered by a
+  reader instead of a row: ordinary arcade rounds (`bumpCoins(net)`, no
+  `coins` field on their `award()` call — the inventory list unions
+  `game_rounds`, `payout − bet`) and the theft VICTIM (no feed row —
+  unioned from `steal_attempts`, `cost − coins`). `steal_attempts` is itself
   part of the ledger — all-time victim history — so it must NEVER be
   bulk-pruned like `coin_rain_gate` (whose rows are only consulted for the
-  current day and are pruned after 7); its growth series
-  is the `stealAttempts` field of the daily `cron/global` heartbeat payload.
-  When adding a new coin source, write its feed row with `coinsAmount` set or
-  add a union leg — a movement with neither is invisible to every balance
-  history.
+  current day and are pruned after 7); its growth series is the
+  `stealAttempts` field of the daily `cron/global` heartbeat payload.
+  When adding a new coin source, write its feed row with `coinsAmount` set
+  or add a union leg — a movement with neither is invisible to every
+  balance history.
 - **Service-role client** (`src/lib/supabase/admin.ts`) only in scripts, cron
-  routes and server push code. Never import it from client components.
+  routes and server push code. Never import it from client components — and
+  never import ANY module that (transitively) imports it (e.g. `GAMES` from
+  games.ts) into a client component; pass data as props instead.
 - **Sync engines live in `src/lib/syncs/`** — scripts and Vercel cron routes
   call the same functions; don't duplicate sync logic.
 - **Every sync mutation must write a changelog row** via `logChange()` — the
@@ -140,19 +149,25 @@ feed are generated from that table, so an undocumented change is invisible.
 - Pages read through `src/lib/queries.ts` (anon key + RLS); most catalog
   queries are wrapped in `.catch(() => …)` so an un-migrated DB renders empty
   states, not crashes.
-- **Stats aggregation lives in Postgres** (`stats_*` views in migration 0004).
-  They are `security_invoker = off` so aggregates over RLS tables are complete,
-  but they expose only aggregates and non-sensitive profile columns
-  (`username`, `avatar_url`) — never `profiles.email`.
+- **Stats aggregation lives in Postgres** (`stats_*` views). They are
+  `security_invoker = off` so aggregates over RLS tables are complete.
+  PUBLIC views grant `anon, authenticated` and expose only aggregates +
+  non-sensitive profile columns (`username`, `avatar_url`) — never
+  `profiles.email`. The ACP's `stats_admin_player_economy` (0074) is the
+  first SERVICE-ROLE-ONLY stats view (per-user ranking behind the panel) —
+  note Supabase default privileges auto-grant SELECT on new public views to
+  anon, so admin-only views need an explicit
+  `revoke select … from anon, authenticated`.
 - RLS: catalog/content tables are public-read, service-role-write only;
   `profiles` never exposes email.
 
 ## Conventions
 
-- i18n: **all** UI strings go through `messages/<locale>.json`. Adding a
+- i18n: **all** UI strings go through `messages/<locale>.json` (11 files,
+  key-identical, checked by `npm run i18n:check` inside the build). Adding a
   locale = `src/i18n/routing.ts` (locales + `localeNames` + `localeHtmlLang`,
   all three are `Record<Locale,…>` — TS enforces completeness) + a new
-  messages file + README count update. Keep all 11 files key-identical.
+  messages file + README count update.
 - **Locale negotiation order is load-bearing** (`src/proxy.ts` +
   `src/i18n/geo.ts`): NEXT_LOCALE cookie → Accept-Language (next-intl) →
   `x-vercel-ip-country` fallback (~50 countries in geo.ts) → default `en`.
@@ -168,9 +183,16 @@ feed are generated from that table, so an undocumented change is invisible.
   import, not default** (createNavigation exports named members).
 - Styling: use the component classes in `src/app/globals.css`
   (`.card`, `.btn`, `.chip`, `.input`, `.badge-tile`, `.data-table`,
-  `.prose-content`, `.countdown`) and the `--surface/--line/--accent` tokens;
-  dark is the `:root` default, light overrides via `.light` on `<html>`.
+  `.prose-content`, `.countdown`, `.stat-tile`, `.bl-kpi`) and the
+  `--surface/--line/--accent` tokens; dark is the `:root` default, light
+  overrides via `.light` on `<html>`. Won/positive = `text-success`,
+  lost/negative = `text-danger`, jackpot gold = `text-warning`/`--rank-gold`.
 - No emojis in UI; inline SVG icons.
+- **Profile customization** (`profiles.customization`, flat jsonb ≤64 keys /
+  ≤4096 chars, validated shape-only by `/api/account`): show/hide booleans
+  default VISIBLE; the reader mirrors the customizer DEFAULTS so an unsaved
+  profile sees everything. New flags = interface + DEFAULTS + field array +
+  profile-page `flag(key, true)` + i18n ×11 (four places, no API change).
 
 ## Gotchas (all hit and fixed — do not rediscover)
 
@@ -199,11 +221,22 @@ feed are generated from that table, so an undocumented change is invisible.
   namespace is not in `CLIENT_NAMESPACES` (`[locale]/layout.tsx` ships only a
   subset to keep RSC payloads small; server `getTranslations` reads the full
   catalog, which is why the page still renders). Dynamic keys
-  (`t(map[k])`, template literals) stay warn-only in the script.
+  (`t(map[k])`, template literals — the FAQ's `t(`${key}Q`)`) stay warn-only
+  in the script: a missing pair renders the raw key path, so FAQ additions
+  must add `jackpotQ`/`jackpotA`-style pairs to all 11 files by hand.
 - `useSearchParams()` must sit inside a `<Suspense>` boundary or prerendering
   fails (see `[locale]/auth/callback/page.tsx`).
 - **satori OG images** (`/api/og/profile`): every div with >1 child needs an
   explicit `display: "flex"`.
+- **PL/pgSQL `RETURNS TABLE` functions must end with `return next;`** —
+  assigning the OUT columns alone returns ZERO rows while the mutations
+  still commit (burned jackpot_round AND rollup_badge_stats: the rollup
+  moved 10k rows while reporting 0/0). An empty `[]` RPC result with no
+  error means suspect this first.
+- **`bump_counters` has a HARDCODED column list** (recreated in 0073 to add
+  `coins_wagered`): a new counter column needs a migration that re-creates
+  the function with one more `set` line, plus the games.ts delta — passing
+  an unknown jsonb key is silently ignored.
 - **potat.app**: `first` max 200 (400 above), honors `Retry-After: 60` on 429
   (handled in `potatFetch`).
 - **Per-user badge ownership has NO official Twitch API** — it resolves via
@@ -242,7 +275,8 @@ if it recurs, check the Vercel dashboard for account notices and retry later.
 Blocked deployments can be DELETEd via the v13 API; the cancel API 400s.)
 
 **Sync schedule** (Vercel Hobby = max 2 cron jobs, daily only):
-- `/api/cron/global` (catalog diff + badgebase enrichment) — daily 06:00 UTC
+- `/api/cron/global` (catalog diff + badgebase enrichment + badge_stats
+  rollup + jackpot pot snapshots) — daily 06:00 UTC
 - `/api/cron/potat` (owner stats, rarity, status sweeps) — daily 06:30 UTC
 - **Hourly at :07**: GitHub Actions `.github/workflows/potat-sync.yml`
   hits `/api/cron/potat` with the `CRON_SECRET` repo secret. Don't add

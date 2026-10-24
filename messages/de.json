@@ -255,7 +255,10 @@
     "collector": "Sammler",
     "badges": "Badges",
     "badge": "Badge",
-    "empty": "Noch keine Daten verfügbar."
+    "empty": "Noch keine Daten verfügbar.",
+    "wageredTitle": "Meiste Coins im Einsatz",
+    "wageredDesc": "Gesamtes Einsatzvolumen — das Aktivitätsboard: viel spielen zählt, nicht horten.",
+    "wageredUnit": "Eingesetzte Coins"
   },
   "compare": {
     "title": "Sammler vergleichen",
@@ -311,6 +314,7 @@
     "statRobbed": "Mal überfallen worden",
     "statLoginStreak": "Beste Login-Serie",
     "statAchievements": "Erfolge",
+    "statThisWeek": "diese Woche",
     "itemShelf": "Item-Regal",
     "freezeName": "Streak-Freeze",
     "freezeExplain": "Ein Streak-Freeze pausiert deine Spiel-Serie für einen verpassten Tag, statt sie zurückzusetzen. Du startest mit 2, sobald du dich mit Twitch verbindest, und verdienst einen weiteren alle 7 Streak-Tage (7, 14, 21…). Pro überbrücktem Tag verbrennt ein Freeze — an dem Tag selbst wächst oder schrumpft die Serie nicht.",
@@ -1383,6 +1387,18 @@
       "loading": "Statistiken werden geladen…",
       "loadFailed": "Die Statistiken konnten nicht geladen werden.",
       "noData": "Noch keine Besucherdaten.",
+      "economy": {
+        "title": "Mitglieder-Ökonomie — Top 20",
+        "desc": "Höchstes Einsatzvolumen mit Gewinn/Verlust/Netto, Runden, Siegquote und Jackpots. Spitzen und seltsige Quoten fallen hier auf.",
+        "member": "Mitglied",
+        "wagered": "Einsatz",
+        "won": "Gewonnen",
+        "lost": "Verloren",
+        "net": "Netto",
+        "rounds": "Runden",
+        "winRate": "Siegquote",
+        "jackpots": "Jackpots"
+      },
       "kpi": {
         "online": "Jetzt online",
         "views24": "Aufrufe heute",

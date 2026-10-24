@@ -1,6 +1,7 @@
 import { adminAction } from "@/lib/admin-route";
 import { getAnalytics } from "@/lib/analytics";
 import { getPlatformStats } from "@/lib/stats";
+import { getAdminPlayerEconomy } from "@/lib/admin-users";
 
 export const dynamic = "force-dynamic";
 
@@ -11,12 +12,14 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(request: Request) {
   return adminAction(async () => {
-    const [analytics, platform] = await Promise.all([
+    const [analytics, platform, playerEconomy] = await Promise.all([
       getAnalytics(),
       getPlatformStats().catch(() => null),
+      getAdminPlayerEconomy().catch(() => []),
     ]);
     return {
       ...analytics,
+      playerEconomy,
       platform: platform
         ? {
             gamification: platform.gamification,

@@ -255,7 +255,10 @@
     "collector": "Colecionador",
     "badges": "Insígnias",
     "badge": "Insígnia",
-    "empty": "Ainda não há dados disponíveis."
+    "empty": "Ainda não há dados disponíveis.",
+    "wageredTitle": "Mais moedas apostadas",
+    "wageredDesc": "Volume total de apostas — o quadro de atividade: jogar muito conta, não acumular.",
+    "wageredUnit": "Moedas apostadas"
   },
   "compare": {
     "title": "Comparar colecionadores",
@@ -311,6 +314,7 @@
     "statRobbed": "Vezes roubado",
     "statLoginStreak": "Melhor sequência de login",
     "statAchievements": "Conquistas",
+    "statThisWeek": "esta semana",
     "itemShelf": "Prateleira de itens",
     "freezeName": "Congelamento de sequência",
     "freezeExplain": "Um congelamento pausa a sua sequência de jogos por um dia perdido em vez de reiniciá-la. Começa com 2 ao ligar-se ao Twitch e ganha mais um a cada 7 dias de sequência (7, 14, 21…). Gasta-se um por dia compensado — nesse dia a sequência não cresce nem diminui.",
@@ -1383,6 +1387,18 @@
       "loading": "Carregando estatísticas…",
       "loadFailed": "Não foi possível carregar as estatísticas.",
       "noData": "Ainda não há dados de visitas.",
+      "economy": {
+        "title": "Economia dos membros — Top 20",
+        "desc": "Maior volume apostado com ganho/perda/líquido, rodadas, taxa de vitória e jackpots. Picos e taxas estranhas destacam-se aqui.",
+        "member": "Membro",
+        "wagered": "Apostado",
+        "won": "Ganho",
+        "lost": "Perdido",
+        "net": "Líquido",
+        "rounds": "Rodadas",
+        "winRate": "Taxa de vitória",
+        "jackpots": "Jackpots"
+      },
       "kpi": {
         "online": "Online agora",
         "views24": "Views hoje",

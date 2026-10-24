@@ -370,11 +370,19 @@ export default async function ProfilePage({ params }: PageProps) {
   // read above caps the visible list, the head count does not).
   let jackpotWins: Array<{ kind: string; amount: number }> = [];
   let achievementCount = 0;
+  // 7-day trend inputs (the grid's delta chips).
+  let weekRounds: Array<{ bet: number; payout: number }> = [];
+  let weekJackpotWins = 0;
   if (profile) {
     const admin = createAdminClient();
+    // 7-day trend window cutoff, computed once for both trend queries.
+    const weekCutoff = new Date(
+      // eslint-disable-next-line react-hooks/purity
+      Date.now() - 7 * 86_400_000,
+    ).toISOString();
     // 30 rendered UTC days starting today-29 (the card strip's window).
     const since = coinFlowSince();
-    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes, coinsRes, bestRes, historyRes, jackpotRes, achCountRes] = await Promise.all([
+    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes, coinsRes, bestRes, historyRes, jackpotRes, achCountRes, weekRoundsRes, weekJackpotRes] = await Promise.all([
       readProgress(profile.id).catch(() => null),
       admin
         .from("user_achievements")
@@ -427,6 +435,22 @@ export default async function ProfilePage({ params }: PageProps) {
         .from("user_achievements")
         .select("id", { count: "exact", head: true })
         .eq("user_id", profile.id),
+      // 7-day trend window for the arcade grid's delta chips: one read of
+      // the week's settled rounds (bet + payout feed the wagered/won/lost/
+      // rounds deltas), plus the week's jackpot wins. game_rounds rides the
+      // (user_id, created_at desc) index; a week of play is far below the
+      // 1000-row PostgREST cap for any realistic player.
+      admin
+        .from("game_rounds")
+        .select("bet,payout")
+        .eq("user_id", profile.id)
+        .gte("created_at", weekCutoff)
+        .limit(1000),
+      admin
+        .from("jackpot_wins")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", profile.id)
+        .gte("created_at", weekCutoff),
     ]);
     const achievementRows = (achievementRes.data ?? []) as Array<{
       achievement_id: string;
@@ -451,6 +475,10 @@ export default async function ProfilePage({ params }: PageProps) {
       (row) => ({ kind: row.kind, amount: Number(row.amount ?? 0) }),
     );
     achievementCount = achCountRes.count ?? 0;
+    weekRounds = ((weekRoundsRes.data ?? []) as Array<{ bet: string | number; payout: string | number }>).map(
+      (row) => ({ bet: Number(row.bet ?? 0), payout: Number(row.payout ?? 0) }),
+    );
+    weekJackpotWins = weekJackpotRes.count ?? 0;
   }
 
 
@@ -472,7 +500,25 @@ export default async function ProfilePage({ params }: PageProps) {
       stealAttempts > 0 ||
       (progress.times_robbed ?? 0) > 0 ||
       jackpotWins.length > 0);
-  const fmtNum = (value: number) => value.toLocaleString(locale);
+  const fmtNum = (value: number) => value.toLocaleString(locale);
+  // 7-day deltas for the trend chips: coins wagered = sum of the week's
+  // stakes, won/lost = the signed halves of the week's nets (the same split
+  // the lifetime counters use), rounds = count, wins = positive nets.
+  const weekWagered = weekRounds.reduce((sum, r) => sum + r.bet, 0);
+  const weekWon = weekRounds.reduce((sum, r) => sum + Math.max(0, r.payout - r.bet), 0);
+  const weekLost = weekRounds.reduce((sum, r) => sum + Math.max(0, r.bet - r.payout), 0);
+  const weekNet = weekWon - weekLost;
+  const weekRoundsCount = weekRounds.length;
+  const weekWinsCount = weekRounds.filter((r) => r.payout > r.bet).length;
+  // The per-tile delta chip: '+N this week' in green when the week moved the
+  // number up, hidden when the week was quiet (a zero delta is noise, not a
+  // trend — the false-zeros doctrine applied to time).
+  const trendChip = (value: number) =>
+    value > 0 ? (
+      <span dir="ltr" className="stat-trend text-success">
+        +{fmtNum(value)} {t("statThisWeek")}
+      </span>
+    ) : null;
 
   return (
     <div
@@ -772,6 +818,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 <dd dir="ltr" className="stat-value">
                   {fmtNum(wagered)} <Coin size={12} />
                 </dd>
+                {trendChip(weekWagered)}
                 <dt className="stat-label">{t("statWagered")}</dt>
               </div>
             )}
@@ -780,6 +827,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 <dd dir="ltr" className="stat-value text-success">
                   +{fmtNum(wonTotal)} <Coin size={12} />
                 </dd>
+                {trendChip(weekWon)}
                 <dt className="stat-label">{t("statWon")}</dt>
               </div>
             )}
@@ -788,6 +836,11 @@ export default async function ProfilePage({ params }: PageProps) {
                 <dd dir="ltr" className="stat-value text-danger">
                   −{fmtNum(lostTotal)} <Coin size={12} />
                 </dd>
+                {weekLost > 0 ? (
+                  <span dir="ltr" className="stat-trend text-danger">
+                    +{fmtNum(weekLost)} {t("statThisWeek")}
+                  </span>
+                ) : null}
                 <dt className="stat-label">{t("statLost")}</dt>
               </div>
             )}
@@ -799,18 +852,28 @@ export default async function ProfilePage({ params }: PageProps) {
                 >
                   {netTotal >= 0 ? "+" : "−"}{fmtNum(Math.abs(netTotal))} <Coin size={12} />
                 </dd>
+                {weekNet !== 0 ? (
+                  <span
+                    dir="ltr"
+                    className={weekNet > 0 ? "stat-trend text-success" : "stat-trend text-danger"}
+                  >
+                    {weekNet > 0 ? "+" : "−"}{fmtNum(Math.abs(weekNet))} {t("statThisWeek")}
+                  </span>
+                ) : null}
                 <dt className="stat-label">{t("statNet")}</dt>
               </div>
             )}
             {showStatRounds && played > 0 && (
               <div className="card stat-tile">
                 <dd dir="ltr" className="stat-value">{fmtNum(played)}</dd>
+                {trendChip(weekRoundsCount)}
                 <dt className="stat-label">{t("statRounds")}</dt>
               </div>
             )}
             {showStatWins && played > 0 && (
               <div className="card stat-tile">
                 <dd dir="ltr" className="stat-value">{fmtNum(progress.games_won)}</dd>
+                {trendChip(weekWinsCount)}
                 <dt className="stat-label">{t("statWins")}</dt>
               </div>
             )}
@@ -835,6 +898,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 <dd dir="ltr" className="stat-value text-warning">
                   {jackpotWins.length}
                 </dd>
+                {trendChip(weekJackpotWins)}
                 <dt className="stat-label">{t("statJackpots")}</dt>
               </div>
             )}

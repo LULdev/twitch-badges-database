@@ -62,6 +62,49 @@ export interface ListUsersOptions {
 }
 
 /** Searches by username, display name or Twitch id; newest first by default. */
+export interface AdminPlayerEconomyRow {
+  user_id: string;
+  username: string | null;
+  avatar_url: string | null;
+  coins_wagered: number;
+  coins_won: number;
+  coins_lost: number;
+  coins_net: number;
+  rounds_played: number;
+  rounds_won: number;
+  win_rate: number;
+  wheel_spins: number;
+  jackpot_wins: number;
+}
+
+/**
+ * The ACP member-economy Top 20 (0074): highest turnover with the full economy
+ * column set, from the service-role-only view — the farming/bot-pattern table.
+ * Bigints arrive as strings; everything numeric is coerced here once.
+ */
+export async function getAdminPlayerEconomy(): Promise<AdminPlayerEconomyRow[]> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("stats_admin_player_economy")
+    .select(
+      "user_id,username,avatar_url,coins_wagered,coins_won,coins_lost,coins_net,rounds_played,rounds_won,win_rate,wheel_spins,jackpot_wins",
+    );
+  if (error) throw error;
+  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+    user_id: String(row.user_id),
+    username: (row.username as string | null) ?? null,
+    avatar_url: (row.avatar_url as string | null) ?? null,
+    coins_wagered: Number(row.coins_wagered ?? 0),
+    coins_won: Number(row.coins_won ?? 0),
+    coins_lost: Number(row.coins_lost ?? 0),
+    coins_net: Number(row.coins_net ?? 0),
+    rounds_played: Number(row.rounds_played ?? 0),
+    rounds_won: Number(row.rounds_won ?? 0),
+    win_rate: Number(row.win_rate ?? 0),
+    wheel_spins: Number(row.wheel_spins ?? 0),
+    jackpot_wins: Number(row.jackpot_wins ?? 0),
+  }));
+}
 export async function listUsers(
   options: ListUsersOptions = {},
 ): Promise<{ users: AdminUserRow[]; total: number }> {

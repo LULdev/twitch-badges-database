@@ -4274,3 +4274,12 @@ html {
 .jackpot-live {
   display: contents;
 }
+
+/* Trend chip under a profile stat-value: the 7-day delta (0073 round). */
+.stat-trend {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}

@@ -255,7 +255,10 @@
     "collector": "收藏家",
     "badges": "徽章数",
     "badge": "徽章",
-    "empty": "暂无可用数据。"
+    "empty": "暂无可用数据。",
+    "wageredTitle": "投入硬币最多",
+    "wageredDesc": "累计投注量——活跃榜：拼的是游玩量，不是囤积。",
+    "wageredUnit": "投入硬币"
   },
   "compare": {
     "title": "收藏家对比",
@@ -311,6 +314,7 @@
     "statRobbed": "被劫次数",
     "statLoginStreak": "最长连续登录",
     "statAchievements": "成就数",
+    "statThisWeek": "本周",
     "itemShelf": "物品架",
     "freezeName": "连击冻结",
     "freezeExplain": "连击冻结在你漏掉一天时暂停游戏连击，而不是让它清零。连接 Twitch 即获赠 2 个，每连续 7 天再得一个（7、14、21…）。每补上一天消耗一个——当天连击既不增长也不缩短。",
@@ -1383,6 +1387,18 @@
       "loading": "正在加载统计…",
       "loadFailed": "无法加载统计。",
       "noData": "尚无访客数据。",
+      "economy": {
+        "title": "成员经济 — 前 20",
+        "desc": "累计投注量最高的成员，含赢/输/净额、局数、胜率和大奖。异常峰值和胜率在这里一目了然。",
+        "member": "成员",
+        "wagered": "投注",
+        "won": "赢",
+        "lost": "输",
+        "net": "净额",
+        "rounds": "局数",
+        "winRate": "胜率",
+        "jackpots": "大奖"
+      },
       "kpi": {
         "online": "当前在线",
         "views24": "今日浏览",

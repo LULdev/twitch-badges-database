@@ -255,7 +255,10 @@
     "collector": "Coleccionista",
     "badges": "Insignias",
     "badge": "Insignia",
-    "empty": "Aún no hay datos disponibles."
+    "empty": "Aún no hay datos disponibles.",
+    "wageredTitle": "Monedas más apostadas",
+    "wageredDesc": "Volumen total apostado — el tablero de actividad: jugar mucho cuenta, no acumular.",
+    "wageredUnit": "Monedas apostadas"
   },
   "compare": {
     "title": "Comparar coleccionistas",
@@ -311,6 +314,7 @@
     "statRobbed": "Veces robado",
     "statLoginStreak": "Mejor racha de inicio de sesión",
     "statAchievements": "Logros",
+    "statThisWeek": "esta semana",
     "itemShelf": "Estantería de objetos",
     "freezeName": "Congelamiento de racha",
     "freezeExplain": "Un congelamiento pausa tu racha de juegos por un día perdido en lugar de reiniciarla. Empiezas con 2 al conectar con Twitch y ganas uno más cada 7 días de racha (7, 14, 21…). Se gasta uno por día puenteado — ese día la racha ni crece ni se reduce.",
@@ -1383,6 +1387,18 @@
       "loading": "Cargando estadísticas…",
       "loadFailed": "No se pudieron cargar las estadísticas.",
       "noData": "Todavía no hay datos de visitas.",
+      "economy": {
+        "title": "Economía de miembros — Top 20",
+        "desc": "Mayor volumen apostado con ganado/perdido/neto, rondas, porcentaje de victorias y jackpots. Los picos y porcentajes extraños destacan aquí.",
+        "member": "Miembro",
+        "wagered": "Apostado",
+        "won": "Ganado",
+        "lost": "Perdido",
+        "net": "Neto",
+        "rounds": "Rondas",
+        "winRate": "% victorias",
+        "jackpots": "Jackpots"
+      },
       "kpi": {
         "online": "En línea ahora",
         "views24": "Vistas hoy",

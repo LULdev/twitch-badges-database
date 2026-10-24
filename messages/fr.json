@@ -255,7 +255,10 @@
     "collector": "Collectionneur",
     "badges": "Badges",
     "badge": "Badge",
-    "empty": "Aucune donnée disponible pour le moment."
+    "empty": "Aucune donnée disponible pour le moment.",
+    "wageredTitle": "Pièces les plus misées",
+    "wageredDesc": "Volume total misé — le tableau d'activité : jouer beaucoup compte, pas thésauriser.",
+    "wageredUnit": "Pièces misées"
   },
   "compare": {
     "title": "Comparer des collectionneurs",
@@ -311,6 +314,7 @@
     "statRobbed": "Fois détroussé",
     "statLoginStreak": "Meilleure série de connexions",
     "statAchievements": "Succès",
+    "statThisWeek": "cette semaine",
     "itemShelf": "Étagère d'objets",
     "freezeName": "Gel de série",
     "freezeExplain": "Un gel met votre série de jeux en pause pour un jour manqué au lieu de la réinitialiser. Vous démarrez avec 2 dès la connexion avec Twitch et en gagnez un de plus tous les 7 jours de série (7, 14, 21…). Un gel brûle par jour comblé — ce jour-là, la série ne grandit ni ne diminue.",
@@ -1383,6 +1387,18 @@
       "loading": "Chargement des statistiques…",
       "loadFailed": "Impossible de charger les statistiques.",
       "noData": "Pas encore de données de visite.",
+      "economy": {
+        "title": "Économie des membres — Top 20",
+        "desc": "Plus gros volume misé avec gagné/perdu/net, manches, taux de victoire et jackpots. Les pics et taux étranges ressortent ici.",
+        "member": "Membre",
+        "wagered": "Misé",
+        "won": "Gagné",
+        "lost": "Perdu",
+        "net": "Net",
+        "rounds": "Manches",
+        "winRate": "Taux de victoire",
+        "jackpots": "Jackpots"
+      },
       "kpi": {
         "online": "En ligne",
         "views24": "Vues aujourd'hui",

@@ -1015,6 +1015,34 @@ export async function getStreakLeaderboard(): Promise<
   }));
 }
 
+/**
+ * Most coins wagered (turnover), top 10 — the ACTIVITY leaderboard: unlike the
+ * balance boards this rewards stake volume, so a member who played thousands
+ * of rounds and spent it all still outranks a hoarder. Same shape as the
+ * streak board (0073's coins_wagered is maintained by bump_counters, so the
+ * read is one indexed column).
+ */
+export async function getWageredLeaderboard(): Promise<
+  Array<{ user_id: string; coins_wagered: number; profile: { username: string; avatar_url: string | null } | null }>
+> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("user_progress")
+    .select("user_id, coins_wagered, profile:profiles(username, avatar_url)")
+    .gt("coins_wagered", 0)
+    .order("coins_wagered", { ascending: false })
+    .limit(10);
+  return ((data ?? []) as unknown as Array<{
+    user_id: string;
+    coins_wagered: string | number;
+    profile: { username: string; avatar_url: string | null } | null;
+  }>).map((row) => ({
+    user_id: row.user_id,
+    coins_wagered: Number(row.coins_wagered ?? 0),
+    profile: Array.isArray(row.profile) ? row.profile[0] : row.profile,
+  }));
+}
+
 export async function listPosts(publishedOnly = true): Promise<BlogPostRow[]> {
   const supabase = await createClient();
   let query = supabase
