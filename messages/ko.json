@@ -1399,6 +1399,12 @@
         "winRate": "승률",
         "jackpots": "잭팟"
       },
+      "alerts": {
+        "title": "경제 알림",
+        "winRate": "{rounds} 라운드 동안 승률 {rate}%",
+        "wagerSpike": "이번 주 {thisWeek} 베팅 (전주의 {factor}배)",
+        "note": "매일 밤 스캔에서 기록됨 — 행동 전에 조사하세요. 행운의 연승은 증거가 아닙니다."
+      },
       "kpi": {
         "online": "현재 접속 중",
         "views24": "오늘 조회",

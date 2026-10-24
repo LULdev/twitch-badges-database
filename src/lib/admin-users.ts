@@ -82,6 +82,35 @@ export interface AdminPlayerEconomyRow {
  * column set, from the service-role-only view — the farming/bot-pattern table.
  * Bigints arrive as strings; everything numeric is coerced here once.
  */
+export interface AdminEconomyAlert {
+  id: number;
+  username: string | null;
+  kind: "win_rate" | "wager_spike";
+  detail: Record<string, unknown>;
+  created_at: string;
+}
+
+/**
+ * The ACP economy-alert feed (0075): the newest 20 abuse findings from the
+ * nightly scan (win_rate / wager_spike). Service-role-only table.
+ */
+export async function getAdminEconomyAlerts(): Promise<AdminEconomyAlert[]> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("economy_alerts")
+    .select("id,username,kind,detail,created_at")
+    .order("created_at", { ascending: false })
+    .limit(20);
+  if (error) throw error;
+  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+    id: Number(row.id),
+    username: (row.username as string | null) ?? null,
+    kind: row.kind === "wager_spike" ? "wager_spike" : "win_rate",
+    detail: (row.detail as Record<string, unknown>) ?? {},
+    created_at: String(row.created_at),
+  }));
+}
+
 export async function getAdminPlayerEconomy(): Promise<AdminPlayerEconomyRow[]> {
   const supabase = createAdminClient();
   const { data, error } = await supabase

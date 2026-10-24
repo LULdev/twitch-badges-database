@@ -1399,6 +1399,12 @@
         "winRate": "Taxa de vitória",
         "jackpots": "Jackpots"
       },
+      "alerts": {
+        "title": "Alertas da economia",
+        "winRate": "taxa de vitória {rate}% em {rounds} rodadas",
+        "wagerSpike": "apostou {thisWeek} esta semana ({factor}× a semana anterior)",
+        "note": "Registrado pela verificação noturna — investigue antes de agir; uma sequência de sorte não é prova."
+      },
       "kpi": {
         "online": "Online agora",
         "views24": "Views hoje",

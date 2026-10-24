@@ -17,6 +17,23 @@ import { logChange } from "@/lib/changelog";
  * signal for the changelog (routine re-runs log nothing, the rollup
  * precedent). A quiet failure is the caller's concern; this throws.
  */
+/**
+ * Nightly economy-abuse scan (0075): win-rate and wager-spike gates via the
+ * economy_scan_alerts RPC. Throws on failure (the cron route degrades);
+ * returns only counts — member names stay out of every payload.
+ */
+export async function scanEconomyAlerts(): Promise<{ alerts: number; newRows: number }> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.rpc("economy_scan_alerts");
+  if (error) throw error;
+  const row = (Array.isArray(data) ? data[0] : data) as
+    | { out_alerts: string | number; out_new_rows: string | number }
+    | null;
+  return {
+    alerts: Number(row?.out_alerts ?? 0),
+    newRows: Number(row?.out_new_rows ?? 0),
+  };
+}
 export async function snapshotJackpotPots(): Promise<{ pots: number }> {
   const supabase = createAdminClient();
   const day = new Date().toISOString().slice(0, 10);

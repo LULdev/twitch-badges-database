@@ -373,6 +373,9 @@ export default async function ProfilePage({ params }: PageProps) {
   // 7-day trend inputs (the grid's delta chips).
   let weekRounds: Array<{ bet: number; payout: number }> = [];
   let weekJackpotWins = 0;
+  // Owner-only rank chips: rank per metric (1 + players with a HIGHER value)
+  // and the player total. Null when progress is missing or the counts fail.
+  let statRanks: Record<"wagered" | "won" | "rounds" | "streak", { rank: number; total: number }> | null = null;
   if (profile) {
     const admin = createAdminClient();
     // 7-day trend window cutoff, computed once for both trend queries.
@@ -479,6 +482,28 @@ export default async function ProfilePage({ params }: PageProps) {
       (row) => ({ bet: Number(row.bet ?? 0), payout: Number(row.payout ?? 0) }),
     );
     weekJackpotWins = weekJackpotRes.count ?? 0;
+    // Rank chips (fetched for every visitor, rendered isOwn only): four
+    // indexed head-counts over public-read user_progress + the player total.
+    if (progressRow) {
+      const rankRes = await Promise.all([
+        admin.from("user_progress").select("user_id", { count: "exact", head: true }).gt("coins_wagered", progressRow.coins_wagered),
+        admin.from("user_progress").select("user_id", { count: "exact", head: true }).gt("coins_won", progressRow.coins_won),
+        admin.from("user_progress").select("user_id", { count: "exact", head: true }).gt("games_played", progressRow.games_played),
+        admin.from("user_progress").select("user_id", { count: "exact", head: true }).gt("best_game_streak", progressRow.best_game_streak),
+        admin.from("user_progress").select("user_id", { count: "exact", head: true }),
+      ] as PromiseLike<{ count: number | null }>[])
+        .then((rs) => rs.map((r) => (r as { count: number | null }).count ?? 0))
+        .catch(() => null);
+      const [aboveWagered, aboveWon, aboveRounds, aboveStreak, totalPlayers] = rankRes ?? [];
+      if (rankRes != null) {
+        statRanks = {
+          wagered: { rank: aboveWagered + 1, total: totalPlayers },
+          won: { rank: aboveWon + 1, total: totalPlayers },
+          rounds: { rank: aboveRounds + 1, total: totalPlayers },
+          streak: { rank: aboveStreak + 1, total: totalPlayers },
+        };
+      }
+    }
   }
 
 
@@ -513,6 +538,14 @@ export default async function ProfilePage({ params }: PageProps) {
   // The per-tile delta chip: '+N this week' in green when the week moved the
   // number up, hidden when the week was quiet (a zero delta is noise, not a
   // trend — the false-zeros doctrine applied to time).
+  // '#N of M' chip for the owner's own view; rendered inside the tiles that
+  // have a rank and are visible.
+  const rankChip = (key: keyof NonNullable<typeof statRanks>) =>
+    isOwn && statRanks && statRanks[key].rank <= statRanks[key].total ? (
+      <span className="chip pointer-events-none mt-1 text-[0.5625rem]">
+        #{statRanks[key].rank} / {fmtNum(statRanks[key].total)}
+      </span>
+    ) : null;
   const trendChip = (value: number) =>
     value > 0 ? (
       <span dir="ltr" className="stat-trend text-success">
@@ -819,6 +852,7 @@ export default async function ProfilePage({ params }: PageProps) {
                   {fmtNum(wagered)} <Coin size={12} />
                 </dd>
                 {trendChip(weekWagered)}
+                {rankChip("wagered")}
                 <dt className="stat-label">{t("statWagered")}</dt>
               </div>
             )}
@@ -828,6 +862,7 @@ export default async function ProfilePage({ params }: PageProps) {
                   +{fmtNum(wonTotal)} <Coin size={12} />
                 </dd>
                 {trendChip(weekWon)}
+                {rankChip("won")}
                 <dt className="stat-label">{t("statWon")}</dt>
               </div>
             )}
@@ -867,6 +902,7 @@ export default async function ProfilePage({ params }: PageProps) {
               <div className="card stat-tile">
                 <dd dir="ltr" className="stat-value">{fmtNum(played)}</dd>
                 {trendChip(weekRoundsCount)}
+                {rankChip("rounds")}
                 <dt className="stat-label">{t("statRounds")}</dt>
               </div>
             )}

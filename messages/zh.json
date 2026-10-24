@@ -1399,6 +1399,12 @@
         "winRate": "胜率",
         "jackpots": "大奖"
       },
+      "alerts": {
+        "title": "经济警报",
+        "winRate": "在 {rounds} 局中胜率 {rate}%",
+        "wagerSpike": "本周投注 {thisWeek}（是上周的 {factor} 倍）",
+        "note": "由每夜扫描记录——先调查再行动；幸运连胜不是证据。"
+      },
       "kpi": {
         "online": "当前在线",
         "views24": "今日浏览",

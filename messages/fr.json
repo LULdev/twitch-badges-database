@@ -1399,6 +1399,12 @@
         "winRate": "Taux de victoire",
         "jackpots": "Jackpots"
       },
+      "alerts": {
+        "title": "Alertes économie",
+        "winRate": "taux de victoire {rate}% sur {rounds} manches",
+        "wagerSpike": "a misé {thisWeek} cette semaine ({factor}× la semaine précédente)",
+        "note": "Enregistré par le scan nocturne — enquêtez avant d'agir ; une série de chance n'est pas une preuve."
+      },
       "kpi": {
         "online": "En ligne",
         "views24": "Vues aujourd'hui",

@@ -30,6 +30,15 @@ interface EconomyRow {
 interface Payload extends AnalyticsBundle {
   system?: Record<string, number | string | null>;
   playerEconomy?: EconomyRow[];
+  economyAlerts?: EconomyAlert[];
+}
+
+interface EconomyAlert {
+  id: number;
+  username: string | null;
+  kind: "win_rate" | "wager_spike";
+  detail: Record<string, unknown>;
+  created_at: string;
 }
 
 export default function StatsPanel({ locale }: { locale: string }) {
@@ -115,6 +124,31 @@ export default function StatsPanel({ locale }: { locale: string }) {
           </Reveal>
         ))}
       </div>
+
+      {(data?.economyAlerts?.length ?? 0) > 0 && (
+        <div className="card border-warning/40 bg-warning/10 p-4 text-sm">
+          <p className="font-bold text-warning">{t("alerts.title")}</p>
+          <ul className="mt-2 space-y-1">
+            {data!.economyAlerts!.slice(0, 5).map((alert) => (
+              <li key={alert.id} className="flex flex-wrap items-baseline gap-x-2">
+                <span className="font-semibold">{alert.username ?? "—"}</span>
+                <span className="text-muted">
+                  {alert.kind === "win_rate"
+                    ? t("alerts.winRate", {
+                        rate: String(alert.detail.win_rate ?? "?"),
+                        rounds: String(alert.detail.rounds ?? "?"),
+                      })
+                    : t("alerts.wagerSpike", {
+                        thisWeek: String(alert.detail.this_week ?? "?"),
+                        factor: String(alert.detail.factor ?? "?"),
+                      })}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-muted">{t("alerts.note")}</p>
+        </div>
+      )}
 
       {(data?.playerEconomy?.length ?? 0) > 0 && (
         <Reveal>

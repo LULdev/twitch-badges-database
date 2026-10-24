@@ -1399,6 +1399,12 @@
         "winRate": "% victorias",
         "jackpots": "Jackpots"
       },
+      "alerts": {
+        "title": "Alertas de economía",
+        "winRate": "porcentaje de victorias {rate}% en {rounds} rondas",
+        "wagerSpike": "apostó {thisWeek} esta semana ({factor}× la semana anterior)",
+        "note": "Registrado por el escaneo nocturno — investiga antes de actuar; una racha de suerte no es prueba."
+      },
       "kpi": {
         "online": "En línea ahora",
         "views24": "Vistas hoy",

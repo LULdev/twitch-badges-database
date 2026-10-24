@@ -1,0 +1,12 @@
+▲ Next.js 16.3.8 (Turbopack)
+- Local:         http://localhost:3122
+- Network:       http://192.168.178.20:3122
+- Environments: .env.local
+✓ Ready in 882ms
+✓ Running next.config.ts took 99ms
+
+Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.
+[rankwave] running, wagered= 500
+[rankwave] rankRes= [0,0,0,0,0]
+ GET /en/profile/dbgs2mvm1tlfs 200 in 2.5s (next.js: 1055ms, proxy.ts: 195ms, application-code: 1261ms)
+[?25h

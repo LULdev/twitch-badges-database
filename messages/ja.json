@@ -1399,6 +1399,12 @@
         "winRate": "勝率",
         "jackpots": "ジャックポット"
       },
+      "alerts": {
+        "title": "経済アラート",
+        "winRate": "{rounds} ラウンドで勝率 {rate}%",
+        "wagerSpike": "今週 {thisWeek} をベット（前週の {factor} 倍）",
+        "note": "夜間スキャンによる記録 — 行動前に調査を。幸運の連勝は証拠ではありません。"
+      },
       "kpi": {
         "online": "現在オンライン",
         "views24": "今日の閲覧",

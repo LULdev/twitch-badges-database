@@ -1399,6 +1399,12 @@
         "winRate": "Siegquote",
         "jackpots": "Jackpots"
       },
+      "alerts": {
+        "title": "Ökonomie-Alarme",
+        "winRate": "Siegquote {rate}% über {rounds} Runden",
+        "wagerSpike": "hat diese Woche {thisWeek} eingesetzt ({factor}× die Vorwoche)",
+        "note": "Vom nächtlichen Scan erfasst — erst untersuchen, dann handeln; eine Glückssträhne ist kein Beweis."
+      },
       "kpi": {
         "online": "Jetzt online",
         "views24": "Aufrufe heute",

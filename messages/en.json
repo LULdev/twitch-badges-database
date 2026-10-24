@@ -1399,6 +1399,12 @@
         "winRate": "Win rate",
         "jackpots": "Jackpots"
       },
+      "alerts": {
+        "title": "Economy alerts",
+        "winRate": "win rate {rate}% over {rounds} rounds",
+        "wagerSpike": "wagered {thisWeek} this week ({factor}× the prior week)",
+        "note": "Recorded by the nightly scan — investigate before acting; a lucky streak is not proof."
+      },
       "kpi": {
         "online": "Online now",
         "views24": "Views today",

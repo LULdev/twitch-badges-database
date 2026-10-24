@@ -5,7 +5,7 @@ import { runBadgebaseSync } from "@/lib/syncs/badgebase";
 import { runArcadeHighlights } from "@/lib/syncs/arcade-highlights";
 import { pruneHeartbeats, recordHeartbeat, withHeartbeat } from "@/lib/health";
 import { prunedCoinRainGate } from "@/lib/gamification/daily";
-import { snapshotJackpotPots } from "@/lib/gamification/jackpot";
+import { scanEconomyAlerts, snapshotJackpotPots } from "@/lib/gamification/jackpot";
 import { runBadgeStatsRollup } from "@/lib/syncs/badge-stats-rollup";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -121,6 +121,20 @@ export async function GET(request: Request) {
     jackpotSnapshotError = error instanceof Error ? error.message : "failed";
   }
 
+  // Nightly economy-abuse scan (0075): win-rate and wager-spike gates into
+  // the service-role-only economy_alerts table. Counts only in the payload —
+  // member names must never reach the public /status message surface.
+  let economyScan: { alerts: number; newRows: number } | null = null;
+  let economyScanFailed = false;
+  let economyScanError: string | null = null;
+  try {
+    economyScan = await scanEconomyAlerts();
+  } catch (error) {
+    console.error("[cron/global] economy scan", error);
+    economyScanFailed = true;
+    economyScanError = error instanceof Error ? error.message : "failed";
+  }
+
   // Ledger-growth probe. steal_attempts is the victim-side coin ledger (the
   // inventory transaction list reads it all-time), NOT gate state like
   // coin_rain_gate — it must never be bulk-pruned, or victims lose their theft
@@ -175,7 +189,8 @@ export async function GET(request: Request) {
       badgebaseSkipped ||
       highlightsFailed ||
       rollupFailed ||
-      jackpotSnapshotFailed
+      jackpotSnapshotFailed ||
+      economyScanFailed
         ? "degraded"
         : "ok",
     durationMs,
@@ -191,7 +206,9 @@ export async function GET(request: Request) {
               ? (rollupError ?? "badge stats rollup failed")
               : jackpotSnapshotFailed
                 ? (jackpotSnapshotError ?? "jackpot snapshot failed")
-                : null,
+                : economyScanFailed
+                  ? (economyScanError ?? "economy scan failed")
+                  : null,
     payload: {
       prunedHeartbeats: pruned,
       prunedRainGate,
@@ -200,6 +217,8 @@ export async function GET(request: Request) {
       rollupFailed,
       jackpotSnapshotPots: jackpotSnapshot?.pots ?? 0,
       jackpotSnapshotFailed,
+      economyAlerts: economyScan?.alerts ?? 0,
+      economyScanFailed,
       stealAttempts,
       globalFailed,
       badgebaseFailed,
@@ -235,6 +254,9 @@ export async function GET(request: Request) {
       jackpotSnapshot,
       jackpotSnapshotFailed,
       jackpotSnapshotError,
+      economyScan,
+      economyScanFailed,
+      economyScanError,
       stealAttempts,
     },
     { status },
