@@ -37,8 +37,8 @@ Read `README.md` for data sources and setup; read this file before editing.
   changelog.ts, inventory.ts, push.ts, markdown.ts, seo.ts, health.ts
   (heartbeats), stats.ts (reads the `stats_*` views for `/stats`),
   admin-users.ts (ACP user management + the member-economy Top 20)
-- `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 135
-  achievements / 133 active (achievements.ts, self-evaluating), games.ts
+- `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 136
+  achievements / 134 active (achievements.ts, self-evaluating), games.ts
   (14 server-authoritative games), wheel.ts (daily wheel + Turbo jackpot
   1:1e8 + Mega Jackpot roll), daily.ts (login bonus, heists, coin rain),
   visits.ts (5-min-IP-dedup view counters), session.ts, jackpot.ts (Mega

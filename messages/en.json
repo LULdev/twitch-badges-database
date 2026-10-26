@@ -112,7 +112,7 @@
     "heroF2Title": "TBRI rarity index",
     "heroF2Desc": "A 0–100 score built from scarcity, wear and momentum — know which badges are genuinely rare before you claim them.",
     "heroF3Title": "Play while you collect",
-    "heroF3Desc": "14 arcade games, XP, levels, coins and 135 achievements — plus a daily Wheel of Fortune with a Twitch Turbo jackpot at real 1-in-100,000,000 odds.",
+    "heroF3Desc": "14 arcade games, XP, levels, coins and 136 achievements — plus a daily Wheel of Fortune with a Twitch Turbo jackpot at real 1-in-100,000,000 odds.",
     "heroF4Title": "Your collection profile",
     "heroF4Desc": "Log in with Twitch to sync the badges you already own, build a showcase and climb worldwide leaderboards — in 11 languages."
   },
@@ -342,7 +342,11 @@
     "shareTitle": "{name} — badge collection",
     "greeting": "Welcome to {name}'s badge collection",
     "socialTwitterLabel": "Twitter/X profile",
-    "socialDiscordLabel": "Discord profile"
+    "socialDiscordLabel": "Discord profile",
+    "statToNext": "to #{rank}",
+    "monthSummaryUp": "This month: {wagered} coins wagered across {rounds} rounds ({wins} won) — net +{net}.",
+    "monthSummaryDown": "This month: {wagered} coins wagered across {rounds} rounds ({wins} won) — net −{net}.",
+    "monthSummaryFlat": "This month: {wagered} coins wagered across {rounds} rounds ({wins} won) — net level."
   },
   "inventory": {
     "title": "My badges",
@@ -1026,6 +1030,7 @@
     "showStatRobbed": "Times robbed",
     "showStatLoginStreak": "Best login streak",
     "showStatAchievements": "Achievements",
+    "showMonthSummary": "Month summary",
     "stealEnabled": "Allow coin stealing on my profile",
     "stealPrice": "Attempt price (BadgesCoins)",
     "stealMax": "Max haul per heist",
@@ -1403,7 +1408,8 @@
         "title": "Economy alerts",
         "winRate": "win rate {rate}% over {rounds} rounds",
         "wagerSpike": "wagered {thisWeek} this week ({factor}× the prior week)",
-        "note": "Recorded by the nightly scan — investigate before acting; a lucky streak is not proof."
+        "note": "Recorded by the nightly scan — investigate before acting; a lucky streak is not proof.",
+        "series": "Alerts per night:"
       },
       "kpi": {
         "online": "Online now",

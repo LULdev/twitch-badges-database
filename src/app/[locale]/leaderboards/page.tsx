@@ -37,6 +37,10 @@ export async function generateMetadata({
     }, title: t("title"), description: t("subtitle") };
 }
 
+// Podium medal tints for the wagered board's top 3 — the .rank-row podium
+// tokens (dark + light), same source as the jackpot hall of fame.
+const MEDALS = ["var(--rank-gold)", "var(--rank-silver)", "var(--rank-bronze)"];
+
 function Avatar({ src, name }: { src: string | null; name: string }) {
   if (src) {
     return (
@@ -289,7 +293,19 @@ export default async function LeaderboardsPage({
               <tbody>
                 {wagered.map((entry, index) => (
                   <tr key={entry.user_id} className="hover:bg-surface-2">
-                    <td className="font-bold tabular-nums text-muted">#{index + 1}</td>
+                    <td className="font-bold tabular-nums text-muted">
+                      {index < 3 ? (
+                        <span
+                          className="jackpot-hof-rank"
+                          style={{ color: MEDALS[index] }}
+                          aria-hidden="true"
+                        >
+                          {index + 1}
+                        </span>
+                      ) : (
+                        <>#{index + 1}</>
+                      )}
+                    </td>
                     <td>
                       {entry.profile ? (
                         <Link

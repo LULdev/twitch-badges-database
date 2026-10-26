@@ -76,8 +76,8 @@
   --accent-soft: rgba(124, 58, 237, 0.09);
   --accent-deep: #6d28d9;
 
-  --success: #059669;
-  --warning: #d97706;
+  --success: #047857;
+  --warning: #b45309;
   --danger: #b91c1c;
   --info: #2563eb;
 
@@ -89,7 +89,7 @@
 
   /* Darker golds/silvers: `#fbbf24` on white is ~1.7:1 and `#cbd5e1` ~1.35:1,
      which made the podium rank numbers unreadable in light mode. */
-  --rank-gold: #a16207;
+  --rank-gold: #854d0e;
   --rank-silver: #64748b;
   --rank-bronze: #92400e;
   /* Solid white sparkles vanish on a white card; tint them instead. */
@@ -4282,4 +4282,12 @@ html {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
+}
+
+/* Compact variant for the profile stat tiles' 30-day activity strips: the
+   .coin-flow-bar rules are reused verbatim; only the container shrinks. */
+.coin-flow-bars-sm {
+  height: 1.25rem;
+  gap: 1px;
+  margin-top: 0.5rem;
 }

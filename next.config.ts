@@ -11,6 +11,13 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  // Local builds on this machine run next to a full browser session: the 15
+  // default static-generation workers exhaust RAM (worker dies 134 / Zone
+  // Allocation). BUILD_CPUS caps them locally only — Vercel builds stay at
+  // the platform default (env var unset there).
+  ...(process.env.BUILD_CPUS
+    ? { experimental: { cpus: Number(process.env.BUILD_CPUS) } }
+    : {}),
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "static-cdn.jtvnw.net" },

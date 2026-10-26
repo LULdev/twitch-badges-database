@@ -112,7 +112,7 @@
     "heroF2Title": "TBRI レア度指数",
     "heroF2Desc": "希少性・保有度・勢いから算出する 0～100 のスコア — 獲得前にどのバッジが本当にレアか分かります。",
     "heroF3Title": "集めながら遊ぶ",
-    "heroF3Desc": "14 のアーケード ゲーム、XP、レベル、コイン、135 個の実績 — 毎日のルーレットには本物の確率 1 億分の 1 で Twitch Turbo ジャックポット。",
+    "heroF3Desc": "14 のアーケード ゲーム、XP、レベル、コイン、136 個の実績 — 毎日のルーレットには本物の確率 1 億分の 1 で Twitch Turbo ジャックポット。",
     "heroF4Title": "あなたのコレクション プロフィール",
     "heroF4Desc": "Twitch でログインして保有バッジを同期し、ショーケースを作り、世界ランキングを登りましょう — 11 言語対応。"
   },
@@ -342,7 +342,11 @@
     "shareTitle": "{name} — バッジコレクション",
     "greeting": "{name} のバッジコレクションへようこそ",
     "socialTwitterLabel": "Twitter/X プロフィール",
-    "socialDiscordLabel": "Discord プロフィール"
+    "socialDiscordLabel": "Discord プロフィール",
+    "statToNext": "あと#{rank}位へ",
+    "monthSummaryUp": "今月: {rounds} ラウンドで {wagered} コインをベット（{wins} 勝利）— 収支 +{net}。",
+    "monthSummaryDown": "今月: {rounds} ラウンドで {wagered} コインをベット（{wins} 勝利）— 収支 −{net}。",
+    "monthSummaryFlat": "今月: {rounds} ラウンドで {wagered} コインをベット（{wins} 勝利）— 収支は横ばい。"
   },
   "inventory": {
     "title": "マイバッジ",
@@ -1026,6 +1030,7 @@
     "showStatRobbed": "強盗被害回数",
     "showStatLoginStreak": "最長ログイン連続記録",
     "showStatAchievements": "実績数",
+    "showMonthSummary": "月間サマリー",
     "stealEnabled": "プロフィールでのコイン強奪を許可",
     "stealPrice": "試行価格（BadgesCoins）",
     "stealMax": "1回の強奪での最大獲得",
@@ -1403,7 +1408,8 @@
         "title": "経済アラート",
         "winRate": "{rounds} ラウンドで勝率 {rate}%",
         "wagerSpike": "今週 {thisWeek} をベット（前週の {factor} 倍）",
-        "note": "夜間スキャンによる記録 — 行動前に調査を。幸運の連勝は証拠ではありません。"
+        "note": "夜間スキャンによる記録 — 行動前に調査を。幸運の連勝は証拠ではありません。",
+        "series": "1晩あたりのアラート:"
       },
       "kpi": {
         "online": "現在オンライン",

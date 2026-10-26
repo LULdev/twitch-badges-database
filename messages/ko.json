@@ -112,7 +112,7 @@
     "heroF2Title": "TBRI 희귀도 지수",
     "heroF2Desc": "희소성, 보유량, 추세로 계산한 0~100 점수 — 받기 전에 어떤 배지가 진짜 희귀한지 알 수 있습니다.",
     "heroF3Title": "수집하며 플레이",
-    "heroF3Desc": "14개의 아케이드 게임, XP, 레벨, 코인, 135개 업적 — 매일 돌리는 룰렛에는 1억 분의 1의 실제 확률로 Twitch Turbo 잭팟이.",
+    "heroF3Desc": "14개의 아케이드 게임, XP, 레벨, 코인, 136개 업적 — 매일 돌리는 룰렛에는 1억 분의 1의 실제 확률로 Twitch Turbo 잭팟이.",
     "heroF4Title": "나의 컬렉션 프로필",
     "heroF4Desc": "Twitch로 로그인하면 보유 배지가 동기화되고, 쇼케이스를 꾸미고, 세계 랭킹을 오를 수 있습니다 — 11개 언어 지원."
   },
@@ -342,7 +342,11 @@
     "shareTitle": "{name} — 배지 컬렉션",
     "greeting": "{name}의 배지 컬렉션에 오신 것을 환영합니다",
     "socialTwitterLabel": "Twitter/X 프로필",
-    "socialDiscordLabel": "Discord 프로필"
+    "socialDiscordLabel": "Discord 프로필",
+    "statToNext": "#{rank}위까지",
+    "monthSummaryUp": "이번 달: {rounds} 라운드에 {wagered} 코인 베팅 ({wins}승) — 순수 +{net}.",
+    "monthSummaryDown": "이번 달: {rounds} 라운드에 {wagered} 코인 베팅 ({wins}승) — 순수 −{net}.",
+    "monthSummaryFlat": "이번 달: {rounds} 라운드에 {wagered} 코인 베팅 ({wins}승) — 순수 변동 없음."
   },
   "inventory": {
     "title": "내 배지",
@@ -1026,6 +1030,7 @@
     "showStatRobbed": "강도당한 횟수",
     "showStatLoginStreak": "최장 로그인 연속",
     "showStatAchievements": "업적 수",
+    "showMonthSummary": "이번 달 요약",
     "stealEnabled": "내 프로필에서 코인 훔치기 허용",
     "stealPrice": "시도 비용 (BadgesCoins)",
     "stealMax": "강탈 1회 최대 습득",
@@ -1403,7 +1408,8 @@
         "title": "경제 알림",
         "winRate": "{rounds} 라운드 동안 승률 {rate}%",
         "wagerSpike": "이번 주 {thisWeek} 베팅 (전주의 {factor}배)",
-        "note": "매일 밤 스캔에서 기록됨 — 행동 전에 조사하세요. 행운의 연승은 증거가 아닙니다."
+        "note": "매일 밤 스캔에서 기록됨 — 행동 전에 조사하세요. 행운의 연승은 증거가 아닙니다.",
+        "series": "밤마다 알림:"
       },
       "kpi": {
         "online": "현재 접속 중",

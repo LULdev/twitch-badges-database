@@ -112,7 +112,7 @@
     "heroF2Title": "TBRI-Seltenheitsindex",
     "heroF2Desc": "Ein 0–100-Score aus Knappheit, Verbreitung und Dynamik — erkenne vor dem Einsammeln, welche Badges wirklich selten sind.",
     "heroF3Title": "Spielen beim Sammeln",
-    "heroF3Desc": "14 Arcade-Spiele, XP, Level, Coins und 135 Erfolge — plus ein tägliches Glücksrad mit einem Twitch-Turbo-Jackpot mit echten 1-zu-100.000.000-Chancen.",
+    "heroF3Desc": "14 Arcade-Spiele, XP, Level, Coins und 136 Erfolge — plus ein tägliches Glücksrad mit einem Twitch-Turbo-Jackpot mit echten 1-zu-100.000.000-Chancen.",
     "heroF4Title": "Dein Sammlerprofil",
     "heroF4Desc": "Melde dich mit Twitch an, um deine Badges zu synchronisieren, eine Vitrine aufzubauen und in weltweiten Ranglisten aufzusteigen — in 11 Sprachen."
   },
@@ -342,7 +342,11 @@
     "shareTitle": "{name} — Badge-Sammlung",
     "greeting": "Willkommen in {name}s Badge-Sammlung",
     "socialTwitterLabel": "Twitter/X-Profil",
-    "socialDiscordLabel": "Discord-Profil"
+    "socialDiscordLabel": "Discord-Profil",
+    "statToNext": "bis #{rank}",
+    "monthSummaryUp": "Diesen Monat: {wagered} Coins umgesetzt in {rounds} Runden ({wins} gewonnen) — netto +{net}.",
+    "monthSummaryDown": "Diesen Monat: {wagered} Coins umgesetzt in {rounds} Runden ({wins} gewonnen) — netto −{net}.",
+    "monthSummaryFlat": "Diesen Monat: {wagered} Coins umgesetzt in {rounds} Runden ({wins} gewonnen) — netto ausgeglichen."
   },
   "inventory": {
     "title": "Meine Badges",
@@ -1026,6 +1030,7 @@
     "showStatRobbed": "Mal überfallen worden",
     "showStatLoginStreak": "Beste Login-Serie",
     "showStatAchievements": "Erfolge",
+    "showMonthSummary": "Monatsrückblick",
     "stealEnabled": "BadgesCoin-Stehlen auf meinem Profil erlauben",
     "stealPrice": "Versuchspreis (BadgesCoins)",
     "stealMax": "Max-Beute pro Überfall",
@@ -1403,7 +1408,8 @@
         "title": "Ökonomie-Alarme",
         "winRate": "Siegquote {rate}% über {rounds} Runden",
         "wagerSpike": "hat diese Woche {thisWeek} eingesetzt ({factor}× die Vorwoche)",
-        "note": "Vom nächtlichen Scan erfasst — erst untersuchen, dann handeln; eine Glückssträhne ist kein Beweis."
+        "note": "Vom nächtlichen Scan erfasst — erst untersuchen, dann handeln; eine Glückssträhne ist kein Beweis.",
+        "series": "Alarme pro Nacht:"
       },
       "kpi": {
         "online": "Jetzt online",

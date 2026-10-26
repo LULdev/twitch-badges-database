@@ -112,7 +112,7 @@
     "heroF2Title": "Indice di rarità TBRI",
     "heroF2Desc": "Un punteggio 0–100 costruito da scarsità, diffusione e slancio — scopri quali badge sono davvero rari prima di ottenerli.",
     "heroF3Title": "Gioca mentre collezioni",
-    "heroF3Desc": "14 giochi arcade, XP, livelli, monete e 135 obiettivi — più una ruota quotidiana con un jackpot Twitch Turbo a probabilità reali di 1 su 100.000.000.",
+    "heroF3Desc": "14 giochi arcade, XP, livelli, monete e 136 obiettivi — più una ruota quotidiana con un jackpot Twitch Turbo a probabilità reali di 1 su 100.000.000.",
     "heroF4Title": "Il tuo profilo da collezionista",
     "heroF4Desc": "Accedi con Twitch per sincronizzare i badge che già possiedi, creare una vetrina e scalare le classifiche mondiali — in 11 lingue."
   },
@@ -342,7 +342,11 @@
     "shareTitle": "{name} — collezione di badge",
     "greeting": "Benvenuto nella collezione di badge di {name}",
     "socialTwitterLabel": "Profilo Twitter/X",
-    "socialDiscordLabel": "Profilo Discord"
+    "socialDiscordLabel": "Profilo Discord",
+    "statToNext": "al #{rank}",
+    "monthSummaryUp": "Questo mese: {wagered} monete puntate in {rounds} round ({wins} vinti) — netto +{net}.",
+    "monthSummaryDown": "Questo mese: {wagered} monete puntate in {rounds} round ({wins} vinti) — netto −{net}.",
+    "monthSummaryFlat": "Questo mese: {wagered} monete puntate in {rounds} round ({wins} vinti) — netto in pari."
   },
   "inventory": {
     "title": "I miei badge",
@@ -1026,6 +1030,7 @@
     "showStatRobbed": "Volte derubato",
     "showStatLoginStreak": "Migliore serie di accessi",
     "showStatAchievements": "Obiettivi",
+    "showMonthSummary": "Riepilogo del mese",
     "stealEnabled": "Consenti il furto di monete sul mio profilo",
     "stealPrice": "Prezzo del tentativo (BadgesCoins)",
     "stealMax": "Bottino massimo per colpo",
@@ -1403,7 +1408,8 @@
         "title": "Avvisi economia",
         "winRate": "percentuale vittorie {rate}% su {rounds} round",
         "wagerSpike": "ha puntato {thisWeek} questa settimana ({factor}× la precedente)",
-        "note": "Registrato dallo scan notturno — indaga prima di agire; una serie fortunata non è una prova."
+        "note": "Registrato dallo scan notturno — indaga prima di agire; una serie fortunata non è una prova.",
+        "series": "Avvisi a notte:"
       },
       "kpi": {
         "online": "Online ora",

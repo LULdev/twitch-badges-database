@@ -31,6 +31,7 @@ interface Payload extends AnalyticsBundle {
   system?: Record<string, number | string | null>;
   playerEconomy?: EconomyRow[];
   economyAlerts?: EconomyAlert[];
+  economyAlertNights?: Array<{ day: string; count: number }>;
 }
 
 interface EconomyAlert {
@@ -146,6 +147,25 @@ export default function StatsPanel({ locale }: { locale: string }) {
               </li>
             ))}
           </ul>
+          {(data?.economyAlertNights?.length ?? 0) > 0 && (
+            <p className="mt-2 flex items-center gap-2 text-xs text-muted">
+              {t("alerts.series")}
+              <span className="flex items-center gap-1" dir="ltr">
+                {data!.economyAlertNights!.map((night) => (
+                  <span
+                    key={night.day}
+                    title={night.day}
+                    className={
+                      "inline-grid size-5 place-items-center rounded text-[0.5625rem] font-bold tabular-nums " +
+                      (night.count > 0 ? "bg-warning/20 text-warning" : "bg-surface-3 text-muted")
+                    }
+                  >
+                    {night.count}
+                  </span>
+                ))}
+              </span>
+            </p>
+          )}
           <p className="mt-2 text-xs text-muted">{t("alerts.note")}</p>
         </div>
       )}

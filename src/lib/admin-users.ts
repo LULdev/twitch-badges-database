@@ -111,6 +111,38 @@ export async function getAdminEconomyAlerts(): Promise<AdminEconomyAlert[]> {
   }));
 }
 
+export interface AdminAlertNight {
+  day: string;
+  count: number;
+}
+
+/**
+ * Alerts per night for the last 7 UTC nights (0075): read the window's rows
+ * (day is a real stored column) and group in JS — PostgREST cannot group.
+ * Zero-filled on the client so the strip always shows seven boxes.
+ */
+export async function getAdminEconomyAlertNights(): Promise<AdminAlertNight[]> {
+  const supabase = createAdminClient();
+  const since = new Date(Date.now() - 6 * 86_400_000);
+  since.setUTCHours(0, 0, 0, 0);
+  const { data, error } = await supabase
+    .from("economy_alerts")
+    .select("day")
+    .gte("day", since.toISOString().slice(0, 10));
+  if (error) throw error;
+  const byDay = new Map<string, number>();
+  for (const row of (data ?? []) as Array<{ day: string }>) {
+    const key = String(row.day).slice(0, 10);
+    byDay.set(key, (byDay.get(key) ?? 0) + 1);
+  }
+  const nights: AdminAlertNight[] = [];
+  for (let i = 6; i >= 0; i -= 1) {
+    const d = new Date(Date.now() - i * 86_400_000).toISOString().slice(0, 10);
+    nights.push({ day: d, count: byDay.get(d) ?? 0 });
+  }
+  return nights;
+}
+
 export async function getAdminPlayerEconomy(): Promise<AdminPlayerEconomyRow[]> {
   const supabase = createAdminClient();
   const { data, error } = await supabase

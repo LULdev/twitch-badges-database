@@ -112,7 +112,7 @@
     "heroF2Title": "Índice de raridade TBRI",
     "heroF2Desc": "Uma pontuação de 0 a 100 baseada em escassez, adoção e momento — saiba quais emblemas são realmente raros antes de resgatá-los.",
     "heroF3Title": "Jogue enquanto coleciona",
-    "heroF3Desc": "14 jogos de fliperama, XP, níveis, moedas e 135 conquistas — mais uma roleta diária com um jackpot de Twitch Turbo com chances reais de 1 em 100.000.000.",
+    "heroF3Desc": "14 jogos de fliperama, XP, níveis, moedas e 136 conquistas — mais uma roleta diária com um jackpot de Twitch Turbo com chances reais de 1 em 100.000.000.",
     "heroF4Title": "Seu perfil de coleção",
     "heroF4Desc": "Entre com a Twitch para sincronizar os emblemas que já possui, montar uma vitrine e subir nos rankings mundiais — em 11 idiomas."
   },
@@ -342,7 +342,11 @@
     "shareTitle": "{name} — coleção de selos",
     "greeting": "Bem-vindo à coleção de selos de {name}",
     "socialTwitterLabel": "Perfil no Twitter/X",
-    "socialDiscordLabel": "Perfil no Discord"
+    "socialDiscordLabel": "Perfil no Discord",
+    "statToNext": "até #{rank}",
+    "monthSummaryUp": "Este mês: {wagered} moedas apostadas em {rounds} rodadas ({wins} ganhas) — saldo +{net}.",
+    "monthSummaryDown": "Este mês: {wagered} moedas apostadas em {rounds} rodadas ({wins} ganhas) — saldo −{net}.",
+    "monthSummaryFlat": "Este mês: {wagered} moedas apostadas em {rounds} rodadas ({wins} ganhas) — saldo estável."
   },
   "inventory": {
     "title": "Minhas insígnias",
@@ -1026,6 +1030,7 @@
     "showStatRobbed": "Vezes roubado",
     "showStatLoginStreak": "Melhor sequência de login",
     "showStatAchievements": "Conquistas",
+    "showMonthSummary": "Resumo do mês",
     "stealEnabled": "Permitir roubo de moedas no meu perfil",
     "stealPrice": "Preço da tentativa (BadgesCoins)",
     "stealMax": "Saque máximo por assalto",
@@ -1403,7 +1408,8 @@
         "title": "Alertas da economia",
         "winRate": "taxa de vitória {rate}% em {rounds} rodadas",
         "wagerSpike": "apostou {thisWeek} esta semana ({factor}× a semana anterior)",
-        "note": "Registrado pela verificação noturna — investigue antes de agir; uma sequência de sorte não é prova."
+        "note": "Registrado pela verificação noturna — investigue antes de agir; uma sequência de sorte não é prova.",
+        "series": "Alertas por noite:"
       },
       "kpi": {
         "online": "Online agora",

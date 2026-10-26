@@ -69,6 +69,8 @@ interface Customization {
   showStatRobbed: boolean;
   showStatLoginStreak: boolean;
   showStatAchievements: boolean;
+  // The month-summary sentence above the tiles.
+  showMonthSummary: boolean;
 }
 
 const DEFAULTS: Customization = {
@@ -90,6 +92,7 @@ const DEFAULTS: Customization = {
   showStatBestRound: true, showStatJackpots: true, showStatWheel: true,
   showStatSteals: true, showStatRobbed: true, showStatLoginStreak: true,
   showStatAchievements: true,
+  showMonthSummary: true,
 };
 
 type Field =
@@ -161,6 +164,7 @@ const STATS_FIELDS: Field[] = [
   { key: "showStatRobbed", kind: "toggle", label: "showStatRobbed" },
   { key: "showStatLoginStreak", kind: "toggle", label: "showStatLoginStreak" },
   { key: "showStatAchievements", kind: "toggle", label: "showStatAchievements" },
+  { key: "showMonthSummary", kind: "toggle", label: "showMonthSummary" },
 ];
 
 export default function ProfileCustomizer({

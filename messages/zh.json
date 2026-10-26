@@ -112,7 +112,7 @@
     "heroF2Title": "TBRI 稀有度指数",
     "heroF2Desc": "基于稀缺度、持有量和涨势的 0–100 评分——在领取之前就知道哪些徽章真正稀有。",
     "heroF3Title": "边收集边玩",
-    "heroF3Desc": "14 款街机游戏、XP、等级、硬币和 135 个成就——还有每日幸运转盘，Twitch Turbo 大奖真实概率为亿分之一。",
+    "heroF3Desc": "14 款街机游戏、XP、等级、硬币和 136 个成就——还有每日幸运转盘，Twitch Turbo 大奖真实概率为亿分之一。",
     "heroF4Title": "你的收藏主页",
     "heroF4Desc": "使用 Twitch 登录，同步你已有的徽章、搭建展示柜并在全球排行榜上攀升——支持 11 种语言。"
   },
@@ -342,7 +342,11 @@
     "shareTitle": "{name} — 徽章收藏",
     "greeting": "欢迎来到 {name} 的徽章收藏",
     "socialTwitterLabel": "Twitter/X 主页",
-    "socialDiscordLabel": "Discord 主页"
+    "socialDiscordLabel": "Discord 主页",
+    "statToNext": "升至 ##{rank}",
+    "monthSummaryUp": "本月：投注 {wagered} 硬币，共 {rounds} 局（赢 {wins} 局）——净收入 +{net}。",
+    "monthSummaryDown": "本月：投注 {wagered} 硬币，共 {rounds} 局（赢 {wins} 局）——净亏损 −{net}。",
+    "monthSummaryFlat": "本月：投注 {wagered} 硬币，共 {rounds} 局（赢 {wins} 局）——净收支持平。"
   },
   "inventory": {
     "title": "我的徽章",
@@ -1026,6 +1030,7 @@
     "showStatRobbed": "被劫次数",
     "showStatLoginStreak": "最长连续登录",
     "showStatAchievements": "成就数",
+    "showMonthSummary": "本月概要",
     "stealEnabled": "允许在我的主页偷取硬币",
     "stealPrice": "尝试价格（BadgesCoins）",
     "stealMax": "单次偷取最大收获",
@@ -1403,7 +1408,8 @@
         "title": "经济警报",
         "winRate": "在 {rounds} 局中胜率 {rate}%",
         "wagerSpike": "本周投注 {thisWeek}（是上周的 {factor} 倍）",
-        "note": "由每夜扫描记录——先调查再行动；幸运连胜不是证据。"
+        "note": "由每夜扫描记录——先调查再行动；幸运连胜不是证据。",
+        "series": "每晚警报："
       },
       "kpi": {
         "online": "当前在线",

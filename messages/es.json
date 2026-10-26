@@ -112,7 +112,7 @@
     "heroF2Title": "Índice de rareza TBRI",
     "heroF2Desc": "Una puntuación de 0 a 100 basada en escasez, difusión y momentum — sabe qué insignias son realmente raras antes de conseguirlas.",
     "heroF3Title": "Juega mientras coleccionas",
-    "heroF3Desc": "14 juegos arcade, XP, niveles, monedas y 135 logros — más una ruleta diaria con un jackpot de Twitch Turbo con probabilidades reales de 1 entre 100.000.000.",
+    "heroF3Desc": "14 juegos arcade, XP, niveles, monedas y 136 logros — más una ruleta diaria con un jackpot de Twitch Turbo con probabilidades reales de 1 entre 100.000.000.",
     "heroF4Title": "Tu perfil de colección",
     "heroF4Desc": "Inicia sesión con Twitch para sincronizar las insignias que ya tienes, montar una vitrina y escalar en las clasificaciones mundiales — en 11 idiomas."
   },
@@ -342,7 +342,11 @@
     "shareTitle": "{name} — colección de insignias",
     "greeting": "Bienvenido a la colección de insignias de {name}",
     "socialTwitterLabel": "Perfil de Twitter/X",
-    "socialDiscordLabel": "Perfil de Discord"
+    "socialDiscordLabel": "Perfil de Discord",
+    "statToNext": "hasta #{rank}",
+    "monthSummaryUp": "Este mes: {wagered} monedas apostadas en {rounds} rondas ({wins} ganadas) — neto +{net}.",
+    "monthSummaryDown": "Este mes: {wagered} monedas apostadas en {rounds} rondas ({wins} ganadas) — neto −{net}.",
+    "monthSummaryFlat": "Este mes: {wagered} monedas apostadas en {rounds} rondas ({wins} ganadas) — neto estable."
   },
   "inventory": {
     "title": "Mis insignias",
@@ -1026,6 +1030,7 @@
     "showStatRobbed": "Veces robado",
     "showStatLoginStreak": "Mejor racha de sesiones",
     "showStatAchievements": "Logros",
+    "showMonthSummary": "Resumen del mes",
     "stealEnabled": "Permitir robar monedas en mi perfil",
     "stealPrice": "Precio del intento (BadgesCoins)",
     "stealMax": "Botín máximo por golpe",
@@ -1403,7 +1408,8 @@
         "title": "Alertas de economía",
         "winRate": "porcentaje de victorias {rate}% en {rounds} rondas",
         "wagerSpike": "apostó {thisWeek} esta semana ({factor}× la semana anterior)",
-        "note": "Registrado por el escaneo nocturno — investiga antes de actuar; una racha de suerte no es prueba."
+        "note": "Registrado por el escaneo nocturno — investiga antes de actuar; una racha de suerte no es prueba.",
+        "series": "Alertas por noche:"
       },
       "kpi": {
         "online": "En línea ahora",

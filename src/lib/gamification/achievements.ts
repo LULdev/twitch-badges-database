@@ -71,6 +71,9 @@ export interface AchStats {
   isTopCoinHolder: boolean;
   /** Whether the user's username sits in ANY game's all-time big-win top 3. */
   podiumFinish: boolean;
+  /** #1 in ANY player ranking (wagered / won / rounds / best streak) with a
+   *  non-zero own value — the k_rank_one signal. */
+  rankOne: boolean;
   twitchBirthday: boolean;
   recentPerfectFlags: Record<string, boolean>;
   recentResults: Array<{ game: string; won: boolean; bet: number; payout: number; hour: number; at: number; flags: Record<string, number | boolean> }>;
@@ -168,7 +171,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   COMMON("c_robbed_first", "It Happens", "Someone tried to steal from you.", (s) => s.progress.times_robbed >= 1),
   COMMON("c_feed_first", "On the Record", "Appear in the live activity feed.", (s) => s.activityCount >= 1),
 
-  // ---------- 52 creative ----------
+  // ---------- 53 creative ----------
   // Both read the hour of the member's LATEST daily claim. They used to read the
   // clock at evaluation time and ignore their stats argument, so any award between
   // 00:00 and 07:00 UTC unlocked "claimed a daily bonus at that hour" without a
@@ -261,6 +264,10 @@ export const ACHIEVEMENTS: Achievement[] = [
   // Progressive jackpots (0069): any pot — a game pot or the Mega one. The
   // count comes from jackpot_wins, written by the payout's own transaction.
   CREATIVE("k_jackpot_winner", "Jackpot Winner", "Hit any progressive jackpot.", (s) => s.jackpotWins >= 1, 1000, 500),
+  // #1 on the board: overtaken members lose nothing (achievements never
+  // revoke) — like s_top_percent, a spot someone ELSE's play changes is a
+  // known deferral, announced on the member's own next evaluation.
+  CREATIVE("k_rank_one", "Top of the Board", "Hold the #1 spot on any player ranking: most coins wagered, most won, most rounds played or best game streak.", (s) => s.rankOne, 1500, 750),
 
   // ---------- 29 special (unexpected) ----------
   SPECIAL("s_turbo_winner", "One in a Hundred Million", "Win the Twitch Turbo subscription jackpot on the wheel.", (s) => s.turboWins >= 1, 5000, 50000),
@@ -636,7 +643,7 @@ async function buildStats(userId: string): Promise<AchStats> {
 
   const [badgesRes, gamesRes, roundsRes, todayRoundsRes, wheelRes, turboRes, jackpotRes, megaRes, profileRes,
     rainRes, stealRes, reactRes, visitsRes, usersRes, topCoinsRes, podiumRes, achRes, visitorsRes,
-    maxBetRes, lastDailyRes] =
+    maxBetRes, lastDailyRes, wageredAboveRes, wonAboveRes, roundsAboveRes, streakAboveRes] =
     await Promise.all([
       // Paged: PostgREST caps one response at 1000 rows and these grow without
       // bound (a collector's inventory; wheel spins; coin-rain events), so an
@@ -769,6 +776,15 @@ async function buildStats(userId: string): Promise<AchStats> {
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle(),
+      // k_rank_one: #1 in a ranking when NO user_progress row has a higher
+      // value — four head-counts, each with a non-zero own-value guard so a
+      // member with 0 rounds is not trivially "first at nothing". user_id is
+      // selected because user_progress has NO id column (the PGRST204 trap:
+      // a wrong column silently nulls the count and makes this unearnable).
+      supabase.from("user_progress").select("user_id", { count: "exact", head: true }).gt("coins_wagered", progress.coins_wagered),
+      supabase.from("user_progress").select("user_id", { count: "exact", head: true }).gt("coins_won", progress.coins_won),
+      supabase.from("user_progress").select("user_id", { count: "exact", head: true }).gt("games_played", progress.games_played),
+      supabase.from("user_progress").select("user_id", { count: "exact", head: true }).gt("best_game_streak", progress.best_game_streak),
     ]);
 
   const badges = ((badgesRes.data ?? []) as Array<Record<string, unknown>>).map((b) => b.badges as Record<string, unknown>).filter(Boolean);
@@ -945,6 +961,11 @@ async function buildStats(userId: string): Promise<AchStats> {
       }
       return false;
     })(),
+    rankOne:
+      (progress.coins_wagered > 0 && (wageredAboveRes.count ?? 1) === 0) ||
+      (progress.coins_won > 0 && (wonAboveRes.count ?? 1) === 0) ||
+      (progress.games_played > 0 && (roundsAboveRes.count ?? 1) === 0) ||
+      (progress.best_game_streak > 0 && (streakAboveRes.count ?? 1) === 0),
     twitchBirthday,
     recentPerfectFlags: {},
     recentResults: recentRounds,

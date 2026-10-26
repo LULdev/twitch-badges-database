@@ -264,6 +264,8 @@ export default async function ProfilePage({ params }: PageProps) {
   const showStatRobbed = flag("showStatRobbed", true);
   const showStatLoginStreak = flag("showStatLoginStreak", true);
   const showStatAchievements = flag("showStatAchievements", true);
+  // The month-summary sentence above the tiles (hideable like every tile).
+  const showMonthSummary = flag("showMonthSummary", true);
   // Only a comma-separated list of hex colours is accepted, so the value cannot
   // smuggle arbitrary CSS into a style attribute.
   const nameGradientRaw = text("nameGradient");
@@ -371,14 +373,22 @@ export default async function ProfilePage({ params }: PageProps) {
   let jackpotWins: Array<{ kind: string; amount: number }> = [];
   let achievementCount = 0;
   // 7-day trend inputs (the grid's delta chips).
-  let weekRounds: Array<{ bet: number; payout: number }> = [];
+  let weekRounds: Array<{ bet: number; payout: number; created_at: string }> = [];
   let weekJackpotWins = 0;
   // Owner-only rank chips: rank per metric (1 + players with a HIGHER value)
   // and the player total. Null when progress is missing or the counts fail.
-  let statRanks: Record<"wagered" | "won" | "rounds" | "streak", { rank: number; total: number }> | null = null;
+  let statRanks: Record<
+    "wagered" | "won" | "rounds" | "streak",
+    { rank: number; total: number; toNext: number | null }
+  > | null = null;
   if (profile) {
     const admin = createAdminClient();
-    // 7-day trend window cutoff, computed once for both trend queries.
+    // 30-day activity window (the tile mini strips); the 7-day trend cutoff
+    // derives from it in JS.
+    const monthCutoff = new Date(
+      // eslint-disable-next-line react-hooks/purity
+      Date.now() - 30 * 86_400_000,
+    ).toISOString();
     const weekCutoff = new Date(
       // eslint-disable-next-line react-hooks/purity
       Date.now() - 7 * 86_400_000,
@@ -445,9 +455,9 @@ export default async function ProfilePage({ params }: PageProps) {
       // 1000-row PostgREST cap for any realistic player.
       admin
         .from("game_rounds")
-        .select("bet,payout")
+        .select("bet,payout,created_at")
         .eq("user_id", profile.id)
-        .gte("created_at", weekCutoff)
+        .gte("created_at", monthCutoff)
         .limit(1000),
       admin
         .from("jackpot_wins")
@@ -478,9 +488,15 @@ export default async function ProfilePage({ params }: PageProps) {
       (row) => ({ kind: row.kind, amount: Number(row.amount ?? 0) }),
     );
     achievementCount = achCountRes.count ?? 0;
-    weekRounds = ((weekRoundsRes.data ?? []) as Array<{ bet: string | number; payout: string | number }>).map(
-      (row) => ({ bet: Number(row.bet ?? 0), payout: Number(row.payout ?? 0) }),
-    );
+    weekRounds = ((weekRoundsRes.data ?? []) as Array<{
+      bet: string | number;
+      payout: string | number;
+      created_at: string;
+    }>).map((row) => ({
+      bet: Number(row.bet ?? 0),
+      payout: Number(row.payout ?? 0),
+      created_at: row.created_at,
+    }));
     weekJackpotWins = weekJackpotRes.count ?? 0;
     // Rank chips (fetched for every visitor, rendered isOwn only): four
     // indexed head-counts over public-read user_progress + the player total.
@@ -491,16 +507,43 @@ export default async function ProfilePage({ params }: PageProps) {
         admin.from("user_progress").select("user_id", { count: "exact", head: true }).gt("games_played", progressRow.games_played),
         admin.from("user_progress").select("user_id", { count: "exact", head: true }).gt("best_game_streak", progressRow.best_game_streak),
         admin.from("user_progress").select("user_id", { count: "exact", head: true }),
-      ] as PromiseLike<{ count: number | null }>[])
-        .then((rs) => rs.map((r) => (r as { count: number | null }).count ?? 0))
+        // Next-rank values (the smallest value above mine, one read per
+        // ranked metric) — powers the '+N to #rank-1' hint. Null when the
+        // member already tops the metric.
+        admin.from("user_progress").select("coins_wagered").gt("coins_wagered", progressRow.coins_wagered).order("coins_wagered", { ascending: true }).limit(1).maybeSingle(),
+        admin.from("user_progress").select("coins_won").gt("coins_won", progressRow.coins_won).order("coins_won", { ascending: true }).limit(1).maybeSingle(),
+        admin.from("user_progress").select("games_played").gt("games_played", progressRow.games_played).order("games_played", { ascending: true }).limit(1).maybeSingle(),
+        admin.from("user_progress").select("best_game_streak").gt("best_game_streak", progressRow.best_game_streak).order("best_game_streak", { ascending: true }).limit(1).maybeSingle(),
+      ] as PromiseLike<{ count: number | null } | { [k: string]: number | string | null }>[])
+        .then((rs) => rs.map((r) => {
+          // Every member resolves to the RESULT OBJECT (the supabase-js v2
+          // await shape): count queries carry .count; maybeSingle carries
+          // .data (the row) or null when no row matched.
+          const res = r as { count?: number | null; data?: Record<string, unknown> | null };
+          if (typeof res.count === "number") return res.count;
+          if (res.count === null || res.count === undefined) {
+            const row = res.data;
+            if (!row) return null;
+            const value = Object.values(row)[0];
+            return value === null || value === undefined ? null : Number(value);
+          }
+          return null;
+        }))
         .catch(() => null);
-      const [aboveWagered, aboveWon, aboveRounds, aboveStreak, totalPlayers] = rankRes ?? [];
+      const [aboveWagered, aboveWon, aboveRounds, aboveStreak, totalPlayers, nextWagered, nextWon, nextRounds, nextStreak] = rankRes ?? [];
       if (rankRes != null) {
+        const toNext = (mine: number, next: number | null | undefined) =>
+          typeof next === "number" && Number.isFinite(next) && next > mine
+            ? Math.ceil(next - mine)
+            : null;
+        // The mapped wave mixes counts (number) and maybeSingle values
+        // (number | null); coerce the four counts + total defensively.
+        const nz = (v: number | null | undefined) => Number(v ?? 0);
         statRanks = {
-          wagered: { rank: aboveWagered + 1, total: totalPlayers },
-          won: { rank: aboveWon + 1, total: totalPlayers },
-          rounds: { rank: aboveRounds + 1, total: totalPlayers },
-          streak: { rank: aboveStreak + 1, total: totalPlayers },
+          wagered: { rank: nz(aboveWagered) + 1, total: nz(totalPlayers), toNext: toNext(progressRow.coins_wagered, nextWagered) },
+          won: { rank: nz(aboveWon) + 1, total: nz(totalPlayers), toNext: toNext(progressRow.coins_won, nextWon) },
+          rounds: { rank: nz(aboveRounds) + 1, total: nz(totalPlayers), toNext: toNext(progressRow.games_played, nextRounds) },
+          streak: { rank: nz(aboveStreak) + 1, total: nz(totalPlayers), toNext: toNext(progressRow.best_game_streak, nextStreak) },
         };
       }
     }
@@ -526,24 +569,96 @@ export default async function ProfilePage({ params }: PageProps) {
       (progress.times_robbed ?? 0) > 0 ||
       jackpotWins.length > 0);
   const fmtNum = (value: number) => value.toLocaleString(locale);
+  // The trend read now covers 30 days (the tile strips): re-derive the
+  // 7-day window from created_at before computing the delta chips.
+  // Local re-derivation: weekCutoff lives inside the if(profile) block above.
+  const week7Start = new Date(
+    // eslint-disable-next-line react-hooks/purity
+    Date.now() - 7 * 86_400_000,
+  ).toISOString();
+  const weekRounds7 = weekRounds.filter((r) => r.created_at >= week7Start);
   // 7-day deltas for the trend chips: coins wagered = sum of the week's
   // stakes, won/lost = the signed halves of the week's nets (the same split
   // the lifetime counters use), rounds = count, wins = positive nets.
-  const weekWagered = weekRounds.reduce((sum, r) => sum + r.bet, 0);
-  const weekWon = weekRounds.reduce((sum, r) => sum + Math.max(0, r.payout - r.bet), 0);
-  const weekLost = weekRounds.reduce((sum, r) => sum + Math.max(0, r.bet - r.payout), 0);
+  const weekWagered = weekRounds7.reduce((sum, r) => sum + r.bet, 0);
+  const weekWon = weekRounds7.reduce((sum, r) => sum + Math.max(0, r.payout - r.bet), 0);
+  const weekLost = weekRounds7.reduce((sum, r) => sum + Math.max(0, r.bet - r.payout), 0);
   const weekNet = weekWon - weekLost;
-  const weekRoundsCount = weekRounds.length;
-  const weekWinsCount = weekRounds.filter((r) => r.payout > r.bet).length;
+  const weekRoundsCount = weekRounds7.length;
+  const weekWinsCount = weekRounds7.filter((r) => r.payout > r.bet).length;
+  // 30-day daily activity series for the tile strips (zero-fill is CORRECT
+  // for flows: a day with no rounds is 0 activity). One bucket per UTC day,
+  // oldest first, capped at 30 entries.
+  const dayBuckets = new Map<string, { wagered: number; won: number; lost: number; rounds: number }>();
+  for (let i = 29; i >= 0; i -= 1) {
+    const d = new Date(
+      // eslint-disable-next-line react-hooks/purity
+      Date.now() - i * 86_400_000,
+    ).toISOString().slice(0, 10);
+    dayBuckets.set(d, { wagered: 0, won: 0, lost: 0, rounds: 0 });
+  }
+  for (const r of weekRounds) {
+    const key = r.created_at.slice(0, 10);
+    const b = dayBuckets.get(key);
+    if (!b) continue;
+    b.wagered += r.bet;
+    b.won += Math.max(0, r.payout - r.bet);
+    b.lost += Math.max(0, r.bet - r.payout);
+    b.rounds += 1;
+  }
+  const strip = (key: "wagered" | "won" | "lost" | "rounds") =>
+    [...dayBuckets.values()].map((b) => b[key]);
+  // Month summary (the "Saisonrueckblick" sentence): the same 30-day window
+  // the strips draw from, folded into four numbers. The card hides when the
+  // month was quiet (false-zeros doctrine applied to time — an all-zero
+  // month is no month worth summarizing).
+  const monthWagered = weekRounds.reduce((sum, r) => sum + r.bet, 0);
+  const monthWon = weekRounds.reduce((sum, r) => sum + Math.max(0, r.payout - r.bet), 0);
+  const monthLost = weekRounds.reduce((sum, r) => sum + Math.max(0, r.bet - r.payout), 0);
+  const monthNet = monthWon - monthLost;
+  const monthRounds = weekRounds.length;
+  const monthWins = weekRounds.filter((r) => r.payout > r.bet).length;
+  const monthActive = monthRounds > 0;
   // The per-tile delta chip: '+N this week' in green when the week moved the
   // number up, hidden when the week was quiet (a zero delta is noise, not a
   // trend — the false-zeros doctrine applied to time).
   // '#N of M' chip for the owner's own view; rendered inside the tiles that
   // have a rank and are visible.
+  // 30-day activity mini strip under a tile: 30 bars, heights normalized to
+  // the series max, tinted by direction where the metric has one. aria-hidden
+  // decoration — the trend chip above carries the information.
+  const miniStrip = (key: "wagered" | "won" | "lost" | "rounds") => {
+    const series = strip(key);
+    if (series.every((v) => v === 0)) return null;
+    const max = Math.max(1, ...series);
+    const dir = key === "won" ? "in" : key === "lost" ? "out" : undefined;
+    return (
+      <span className="coin-flow-bars coin-flow-bars-sm" aria-hidden="true">
+        {series.map((value, i) => {
+          const pct = value === 0 ? 0 : Math.max(8, Math.round((value / max) * 100));
+          return (
+            <span
+              key={i}
+              className="coin-flow-bar"
+              data-dir={dir}
+              style={{ height: pct + "%" }}
+            />
+          );
+        })}
+      </span>
+    );
+  };
   const rankChip = (key: keyof NonNullable<typeof statRanks>) =>
     isOwn && statRanks && statRanks[key].rank <= statRanks[key].total ? (
-      <span className="chip pointer-events-none mt-1 text-[0.5625rem]">
-        #{statRanks[key].rank} / {fmtNum(statRanks[key].total)}
+      <span className="chip pointer-events-none mt-1 flex-col items-center text-[0.5625rem]">
+        <span>
+          #{statRanks[key].rank} / {fmtNum(statRanks[key].total)}
+        </span>
+        {statRanks[key].rank > 1 && statRanks[key].toNext !== null ? (
+          <span className="text-muted">
+            +{fmtNum(statRanks[key].toNext as number)} {t("statToNext", { rank: statRanks[key].rank - 1 })}
+          </span>
+        ) : null}
       </span>
     ) : null;
   const trendChip = (value: number) =>
@@ -845,6 +960,25 @@ export default async function ProfilePage({ params }: PageProps) {
           >
             {t("arcadeStats")}
           </h2>
+          {monthActive && showMonthSummary && (
+            <p
+              className="rounded-[var(--radius-input)] border border-line bg-surface-2 px-4 py-2.5 text-sm"
+            >
+              {t(
+                monthNet > 0
+                  ? "monthSummaryUp"
+                  : monthNet < 0
+                    ? "monthSummaryDown"
+                    : "monthSummaryFlat",
+                {
+                  wagered: fmtNum(monthWagered),
+                  rounds: fmtNum(monthRounds),
+                  wins: fmtNum(monthWins),
+                  net: fmtNum(Math.abs(monthNet)),
+                },
+              )}
+            </p>
+          )}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {showStatWagered && played > 0 && (
               <div className="card stat-tile">
@@ -854,6 +988,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 {trendChip(weekWagered)}
                 {rankChip("wagered")}
                 <dt className="stat-label">{t("statWagered")}</dt>
+                {miniStrip("wagered")}
               </div>
             )}
             {showStatWon && played > 0 && (
@@ -864,6 +999,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 {trendChip(weekWon)}
                 {rankChip("won")}
                 <dt className="stat-label">{t("statWon")}</dt>
+                {miniStrip("won")}
               </div>
             )}
             {showStatLost && played > 0 && (
@@ -877,6 +1013,7 @@ export default async function ProfilePage({ params }: PageProps) {
                   </span>
                 ) : null}
                 <dt className="stat-label">{t("statLost")}</dt>
+                {miniStrip("lost")}
               </div>
             )}
             {showStatNet && played > 0 && (
@@ -904,6 +1041,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 {trendChip(weekRoundsCount)}
                 {rankChip("rounds")}
                 <dt className="stat-label">{t("statRounds")}</dt>
+                {miniStrip("rounds")}
               </div>
             )}
             {showStatWins && played > 0 && (
