@@ -38,12 +38,18 @@ export default async function JackpotEconomy({
     today.setUTCHours(0, 0, 0, 0);
     return Math.max(0, Math.round((today.getTime() - last) / 86_400_000) - 1);
   })();
-  const chartData = history.map((point) => {
+  const chartData = history.map((point, index) => {
     const [, month, day] = point.day.split("-");
+    // Day-over-day deltas for the tooltip — adjacency-based, i.e. "vs the
+    // previous SNAPSHOT" (a missed cron night spans two days, which the
+    // staleness line below flags). The first point has no predecessor.
+    const prev = index > 0 ? history[index - 1] : null;
     return {
       label: `${Number(day)}.${Number(month)}.`,
       mega: point.mega,
       total: point.total,
+      megaDelta: prev ? point.mega - prev.mega : null,
+      totalDelta: prev ? point.total - prev.total : null,
     };
   });
 
@@ -102,6 +108,8 @@ export default async function JackpotEconomy({
             ]}
             ariaLabel={t("jackpotHistoryTitle")}
             height={140}
+            deltaKeys={["mega", "total"]}
+            deltaLabel={t("jackpotHistoryDelta")}
           />
         </div>
       ) : (

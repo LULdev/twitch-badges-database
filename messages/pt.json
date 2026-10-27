@@ -359,6 +359,8 @@
     "monthBestHit": "Melhor acerto do mês: +{n} ({game}, {date})",
     "monthShare": "{share}% das moedas apostadas pela comunidade neste mês vieram de você.",
     "monthBestWeek": "Melhores 7 dias: +{n}",
+    "monthRankChip": "#{rank} do mês",
+    "monthShareTitle": "O mês de arcade de {name}",
     "dayDetailTitle": "{date} — {n} rodadas",
     "dayDetailEmpty": "Nenhuma rodada neste dia."
   },
@@ -649,7 +651,8 @@
     "jackpotHistoryMega": "Mega Jackpot",
     "jackpotHistoryTotal": "Todos os potes juntos",
     "jackpotHistoryHint": "O gráfico de crescimento é construído a partir dos registros diários dos potes — volte em alguns dias.",
-    "jackpotHistoryStale": "Última foto dos potes: há {n} dias"
+    "jackpotHistoryStale": "Última foto dos potes: há {n} dias",
+    "jackpotHistoryDelta": "em relação ao snapshot anterior"
   },
   "notifications": {
     "title": "Notificações",

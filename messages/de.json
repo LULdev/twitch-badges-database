@@ -359,6 +359,8 @@
     "monthBestHit": "Bester Monatstreffer: +{n} ({game}, {date})",
     "monthShare": "{share}% der in diesem Monat von der Community umgesetzten Coins stammen von dir.",
     "monthBestWeek": "Beste 7 Tage: +{n}",
+    "monthRankChip": "#{rank} des Monats",
+    "monthShareTitle": "{name}s Arcade-Monat",
     "dayDetailTitle": "{date} — {n} Runden",
     "dayDetailEmpty": "Keine Runden an diesem Tag."
   },
@@ -649,7 +651,8 @@
     "jackpotHistoryMega": "Mega-Jackpot",
     "jackpotHistoryTotal": "Alle Jackpots zusammen",
     "jackpotHistoryHint": "Das Wachstumsdiagramm entsteht aus den nächtlichen Pot-Aufzeichnungen — schau in ein paar Tagen wieder vorbei.",
-    "jackpotHistoryStale": "Letzte Pot-Aufzeichnung: vor {n} Tagen"
+    "jackpotHistoryStale": "Letzte Pot-Aufzeichnung: vor {n} Tagen",
+    "jackpotHistoryDelta": "gegenüber dem vorherigen Snapshot"
   },
   "notifications": {
     "title": "Benachrichtigungen",

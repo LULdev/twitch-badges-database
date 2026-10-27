@@ -359,6 +359,8 @@
     "monthBestHit": "이번 달 최고 적중: +{n} ({game}, {date})",
     "monthShare": "이번 달 커뮤니티가 베팅한 코인의 {share}%는 당신의 것입니다.",
     "monthBestWeek": "최고의 7일: +{n}",
+    "monthRankChip": "이달 #{rank}위",
+    "monthShareTitle": "{name}의 아케이드 이번 달",
     "dayDetailTitle": "{date} — {n}라운드",
     "dayDetailEmpty": "이 날에는 라운드가 없습니다."
   },
@@ -649,7 +651,8 @@
     "jackpotHistoryMega": "메가 잭팟",
     "jackpotHistoryTotal": "모든 잭팟 합계",
     "jackpotHistoryHint": "성장 차트는 매일 밤의 잭팟 스냅샷으로 만들어집니다 — 며칠 후 다시 확인해 보세요.",
-    "jackpotHistoryStale": "마지막 잭팟 기록: {n}일 전"
+    "jackpotHistoryStale": "마지막 잭팟 기록: {n}일 전",
+    "jackpotHistoryDelta": "이전 스냅샷 대비"
   },
   "notifications": {
     "title": "알림",

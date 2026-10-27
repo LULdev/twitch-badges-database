@@ -35,11 +35,19 @@ export default function TrendChart({
   series,
   ariaLabel,
   height = 260,
+  deltaKeys,
+  deltaLabel,
 }: {
   data: TrendPoint[];
   series: TrendSeries[];
   ariaLabel: string;
   height?: number;
+  /** Series keys whose tooltip row appends "±N <deltaLabel>" — the payload
+   *  carries a `${key}Delta` field (null/absent on the first point = no
+   *  suffix). Opt-in so the shared chart's other call sites are unchanged. */
+  deltaKeys?: string[];
+  /** Label after the signed delta, e.g. "vs the previous snapshot". */
+  deltaLabel?: string;
 }) {
   const theme = useChartTheme();
   const locale = useLocale();
@@ -93,12 +101,26 @@ export default function TrendChart({
               color: theme.foreground,
             }}
             labelStyle={{ color: theme.foreground, fontWeight: 600 }}
-            formatter={(value, name) => {
+            formatter={(value, name, item) => {
               const label =
                 series.find((entry) => entry.key === String(name))?.label ??
                 String(name);
+              const point = item?.payload as Record<
+                string,
+                number | string | null | undefined
+              > | undefined;
+              let delta = "";
+              if (deltaKeys?.includes(String(name)) && deltaLabel) {
+                const d = Number(point?.[`${String(name)}Delta`] ?? Number.NaN);
+                // First point has no previous snapshot; a zero delta is quiet.
+                if (Number.isFinite(d) && d !== 0) {
+                  delta = ` (${d > 0 ? "+" : "−"}${new Intl.NumberFormat(
+                    locale,
+                  ).format(Math.abs(d))} ${deltaLabel})`;
+                }
+              }
               return [
-                new Intl.NumberFormat(locale).format(Number(value ?? 0)),
+                new Intl.NumberFormat(locale).format(Number(value ?? 0)) + delta,
                 label,
               ];
             }}

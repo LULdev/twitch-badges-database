@@ -359,6 +359,8 @@
     "monthBestHit": "月度最佳一击：+{n}（{game}，{date}）",
     "monthShare": "本月社区投注硬币的 {share}% 来自你。",
     "monthBestWeek": "最佳 7 天：+{n}",
+    "monthRankChip": "本月 #{rank}",
+    "monthShareTitle": "{name} 的街机月报",
     "dayDetailTitle": "{date} — {n} 局",
     "dayDetailEmpty": "当天没有对局。"
   },
@@ -649,7 +651,8 @@
     "jackpotHistoryMega": "超级大奖",
     "jackpotHistoryTotal": "所有奖池合计",
     "jackpotHistoryHint": "增长图表由每晚的奖池快照生成——几天后再来看看。",
-    "jackpotHistoryStale": "上次奖池快照：{n} 天前"
+    "jackpotHistoryStale": "上次奖池快照：{n} 天前",
+    "jackpotHistoryDelta": "较上次快照"
   },
   "notifications": {
     "title": "通知",

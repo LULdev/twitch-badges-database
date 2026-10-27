@@ -359,6 +359,8 @@
     "monthBestHit": "今月のベストヒット: +{n}（{game}、{date}）",
     "monthShare": "今月コミュニティがベットしたコインの {share}% はあなたのものです。",
     "monthBestWeek": "ベスト7日間: +{n}",
+    "monthRankChip": "月間 #{rank}位",
+    "monthShareTitle": "{name}のアーケード月間",
     "dayDetailTitle": "{date} — {n} ラウンド",
     "dayDetailEmpty": "この日のラウンドはありません。"
   },
@@ -649,7 +651,8 @@
     "jackpotHistoryMega": "メガジャックポット",
     "jackpotHistoryTotal": "全ポット合計",
     "jackpotHistoryHint": "成長グラフは毎晩のポット記録から作られます — 数日後にもう一度ご覧ください。",
-    "jackpotHistoryStale": "最後のポット記録: {n} 日前"
+    "jackpotHistoryStale": "最後のポット記録: {n} 日前",
+    "jackpotHistoryDelta": "前回のスナップショット比"
   },
   "notifications": {
     "title": "通知",

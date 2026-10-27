@@ -359,6 +359,8 @@
     "monthBestHit": "Лучший удар месяца: +{n} ({game}, {date})",
     "monthShare": "{share}% монет, поставленных сообществом в этом месяце, пришлись на тебя.",
     "monthBestWeek": "Лучшие 7 дней: +{n}",
+    "monthRankChip": "#{rank} месяца",
+    "monthShareTitle": "Аркадный месяц {name}",
     "dayDetailTitle": "{date} — {n} раундов",
     "dayDetailEmpty": "В этот день раундов не было."
   },
@@ -649,7 +651,8 @@
     "jackpotHistoryMega": "Мега-джекпот",
     "jackpotHistoryTotal": "Все банки вместе",
     "jackpotHistoryHint": "График роста строится из ночных снимков банков — загляните через несколько дней.",
-    "jackpotHistoryStale": "Последний снимок банков: {n} дн. назад"
+    "jackpotHistoryStale": "Последний снимок банков: {n} дн. назад",
+    "jackpotHistoryDelta": "к предыдущему снимку"
   },
   "notifications": {
     "title": "Уведомления",

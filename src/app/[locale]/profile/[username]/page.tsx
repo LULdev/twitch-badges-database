@@ -48,10 +48,15 @@ import { localeAlternates } from "@/lib/seo";
 
 interface PageProps {
   params: Promise<{ locale: string; username: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: PageProps): Promise<Metadata> {
   const { locale, username } = await params;
+  const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "meta" });
   const title = t("profileTitle", { username });
   const description = t("profileDescription", { username });
@@ -68,7 +73,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       images: [
         {
-          url: `/api/og/profile?u=${encodeURIComponent(username)}&locale=${locale}`,
+          // ?month=1 unfurls the member's arcade-month share card instead of
+          // the badge-collection card — the month card's share row uses it.
+          url:
+            sp.month === "1"
+              ? `/api/og/month?u=${encodeURIComponent(username)}&locale=${locale}`
+              : `/api/og/profile?u=${encodeURIComponent(username)}&locale=${locale}`,
         },
       ],
     },
@@ -379,6 +389,7 @@ export default async function ProfilePage({ params }: PageProps) {
   let weekJackpotWins = 0;
   // The community's rolling-month wagered total (the share clause).
   let communityWagered = 0;
+  let monthRank = 0;
   // Owner-only rank chips: rank per metric (1 + players with a HIGHER value)
   // and the player total. Null when progress is missing or the counts fail.
   let statRanks: Record<
@@ -401,7 +412,7 @@ export default async function ProfilePage({ params }: PageProps) {
     ).toISOString();
     // 30 rendered UTC days starting today-29 (the card strip's window).
     const since = coinFlowSince();
-    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes, coinsRes, bestRes, historyRes, jackpotRes, achCountRes, weekRoundsRes, weekJackpotRes, communityMonthRes] = await Promise.all([
+    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes, coinsRes, bestRes, historyRes, jackpotRes, achCountRes, weekRoundsRes, weekJackpotRes, communityMonthRes, monthTopRes] = await Promise.all([
       readProgress(profile.id).catch(() => null),
       admin
         .from("user_achievements")
@@ -473,6 +484,9 @@ export default async function ProfilePage({ params }: PageProps) {
       // The community's rolling month (0076/0077 public view) for the
       // share-of-community clause — anon-granted; admin works too.
       admin.from("stats_arcade_month").select("wagered_30d").maybeSingle(),
+      // Hall of the month (0078/0079, top 10): the member's rank for the
+      // "#X of the month" chip — anon-granted; admin works too.
+      admin.from("stats_arcade_month_top").select("username"),
     ]);
     const achievementRows = (achievementRes.data ?? []) as Array<{
       achievement_id: string;
@@ -512,6 +526,11 @@ export default async function ProfilePage({ params }: PageProps) {
     communityWagered = Number(
       ((communityMonthRes.data as { wagered_30d?: string | number } | null) ?? {})?.wagered_30d ?? 0,
     );
+    // Month rank from the top-10 view (0079): 0 = not ranked this month.
+    monthRank =
+      ((monthTopRes.data ?? []) as Array<{ username: string }>)
+        .map((row) => row.username)
+        .indexOf(profile.username) + 1;
     // Rank chips (fetched for every visitor, rendered isOwn only): four
     // indexed head-counts over public-read user_progress + the player total.
     if (progressRow) {
@@ -1101,6 +1120,29 @@ export default async function ProfilePage({ params }: PageProps) {
                   {t("monthBestWeek", { n: fmtNum(bestWeekNet) })}
                 </p>
               )}
+              {monthRank > 0 && (
+                <span className="chip pointer-events-none mt-1 w-fit text-accent">
+                  {t("monthRankChip", { rank: monthRank })}
+                </span>
+              )}
+              {/* Share card (round 14): the member's month as an OG image —
+                  previewed here; the ?month=1 link swaps the profile's
+                  og:image so the shared link unfurls THIS card. */}
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/api/og/month?u=${encodeURIComponent(profile.username)}&locale=${locale}`}
+                  alt={t("monthShareTitle", { name: profile.username })}
+                  width={288}
+                  height={151}
+                  loading="lazy"
+                  className="w-48 rounded-[var(--radius-input)] border border-line"
+                />
+                <ShareButtons
+                  path={`/${locale}/profile/${profile.username}?month=1`}
+                  title={t("monthShareTitle", { name: profile.username })}
+                />
+              </div>
             </div>
           )}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

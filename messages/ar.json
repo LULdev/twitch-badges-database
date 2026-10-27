@@ -359,6 +359,8 @@
     "monthBestHit": "أفضل ضربة في الشهر: +{n} ({game}، {date})",
     "monthShare": "{share}% من العملات التي راهنها المجتمع هذا الشهر جاءت منك.",
     "monthBestWeek": "أفضل 7 أيام: +{n}",
+    "monthRankChip": "#{rank} هذا الشهر",
+    "monthShareTitle": "شهر {name} في الأركيد",
     "dayDetailTitle": "{date} — {n} جولة",
     "dayDetailEmpty": "لا جولات في هذا اليوم."
   },
@@ -649,7 +651,8 @@
     "jackpotHistoryMega": "ميجا جاكبوت",
     "jackpotHistoryTotal": "كل الجاكبوتات معًا",
     "jackpotHistoryHint": "يُبنى مخطط النمو من لقطات الجاكبوتات الليلية — عد بعد بضعة أيام.",
-    "jackpotHistoryStale": "آخر لقطة للجاكبوتات: قبل {n} يومًا"
+    "jackpotHistoryStale": "آخر لقطة للجاكبوتات: قبل {n} يومًا",
+    "jackpotHistoryDelta": "مقارنة باللقطة السابقة"
   },
   "notifications": {
     "title": "الإشعارات",

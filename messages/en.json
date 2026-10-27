@@ -359,6 +359,8 @@
     "monthBestHit": "Month's best hit: +{n} ({game}, {date})",
     "monthShare": "{share}% of the community's wagered coins this month came from you.",
     "monthBestWeek": "Best 7 days: +{n}",
+    "monthRankChip": "#{rank} of the month",
+    "monthShareTitle": "{name}'s arcade month",
     "dayDetailTitle": "{date} — {n} rounds",
     "dayDetailEmpty": "No rounds on this day."
   },
@@ -649,7 +651,8 @@
     "jackpotHistoryMega": "Mega Jackpot",
     "jackpotHistoryTotal": "All pots combined",
     "jackpotHistoryHint": "The growth chart builds from the nightly pot snapshots — check back after a few days.",
-    "jackpotHistoryStale": "Last pot snapshot: {n} days ago"
+    "jackpotHistoryStale": "Last pot snapshot: {n} days ago",
+    "jackpotHistoryDelta": "vs the previous snapshot"
   },
   "notifications": {
     "title": "Notifications",
