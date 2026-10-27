@@ -4291,3 +4291,50 @@ html {
   gap: 1px;
   margin-top: 0.5rem;
 }
+
+/* 30-day activity heatmap (profile arcade section) — the .uptime-grid /
+   .bl-day-cell doctrine: accent color-mix steps over surface-3, one cell per
+   UTC day, oldest first (left to right stays calendar order in RTL via
+   direction:ltr). */
+.activity-heat {
+  display: grid;
+  grid-template-columns: repeat(30, 1fr);
+  gap: 0.1875rem;
+  direction: ltr;
+}
+/* ACP twin (user-detail drawer): the 60-day horizon — same cells, twice the
+   columns; the per-cell title tooltips carry the daily numbers. */
+.activity-heat-60 {
+  grid-template-columns: repeat(60, 1fr);
+}
+.activity-heat-cell {
+  aspect-ratio: 1;
+  min-height: 0.5rem;
+  border-radius: 0.1875rem;
+  background: var(--surface-3);
+}
+.activity-heat-cell[data-level="1"] {
+  background: color-mix(in srgb, var(--accent) 25%, var(--surface-3));
+}
+.activity-heat-cell[data-level="2"] {
+  background: color-mix(in srgb, var(--accent) 50%, var(--surface-3));
+}
+.activity-heat-cell[data-level="3"] {
+  background: color-mix(in srgb, var(--accent) 75%, var(--surface-3));
+}
+.activity-heat-cell[data-level="max"] {
+  background: var(--accent);
+}
+/* Interactive (profile) cells: the heatmap grid is a row of buttons — the
+   selected day carries an accent ring, keyboard focus stays visible. The ACP
+   twin keeps plain spans (read-only) and is unaffected. */
+button.activity-heat-cell {
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+button.activity-heat-cell:focus-visible,
+button.activity-heat-cell[data-selected="true"] {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}

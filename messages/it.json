@@ -251,6 +251,10 @@
     "streakTitle": "Migliori serie di gioco",
     "streakDesc": "Membri con le serie di gioco più lunghe del sito",
     "streakUnit": "giorni",
+    "loginStreakTitle": "Serie di accesso più lunghe",
+    "loginStreakDesc": "Chi si è presentato più giorni di fila",
+    "youStreakRank": "Il tuo record: {n} giorni — #{rank}",
+    "youStreakToFirst": "{n} giorni al primo posto",
     "rank": "Posizione",
     "collector": "Collezionista",
     "badges": "Badge",
@@ -344,9 +348,19 @@
     "socialTwitterLabel": "Profilo Twitter/X",
     "socialDiscordLabel": "Profilo Discord",
     "statToNext": "al #{rank}",
-    "monthSummaryUp": "Questo mese: {wagered} monete puntate in {rounds} round ({wins} vinti) — netto +{net}.",
-    "monthSummaryDown": "Questo mese: {wagered} monete puntate in {rounds} round ({wins} vinti) — netto −{net}.",
-    "monthSummaryFlat": "Questo mese: {wagered} monete puntate in {rounds} round ({wins} vinti) — netto in pari."
+    "monthSummaryUp": "{who}: {wagered} monete puntate in {rounds} round ({wins} vinti) — netto +{net}.",
+    "monthSummaryDown": "{who}: {wagered} monete puntate in {rounds} round ({wins} vinti) — netto −{net}.",
+    "monthSummaryFlat": "{who}: {wagered} monete puntate in {rounds} round ({wins} vinti) — netto in pari.",
+    "monthWhoYou": "Questo mese",
+    "monthWhoName": "Mese di {name}",
+    "monthCompareUp": "{pct}% in più del mese scorso",
+    "monthCompareDown": "{pct}% in meno del mese scorso",
+    "monthCompareFlat": "in linea con il mese scorso",
+    "monthBestHit": "Miglior colpo del mese: +{n} ({game}, {date})",
+    "monthShare": "Il {share}% delle monete puntate dalla community questo mese è arrivato da te.",
+    "monthBestWeek": "Migliori 7 giorni: +{n}",
+    "dayDetailTitle": "{date} — {n} round",
+    "dayDetailEmpty": "Nessun round in questa giornata."
   },
   "inventory": {
     "title": "I miei badge",
@@ -851,7 +865,14 @@
     "jackpotWinners": "Ultime vincite del jackpot",
     "jackpotHofTitle": "Le più grandi vincite jackpot di sempre",
     "jackpotLastMega": "Ultimo Mega Jackpot: {name} +{n}",
-    "jackpotChipLast": "Ultimo: {name} +{n} · {date}"
+    "jackpotChipLast": "Ultimo: {name} +{n} · {date}",
+    "communityMonth": "Mese della community: {rounds} round · {wagered} monete puntate · {players} giocatori attivi",
+    "communityTrendUp": "puntate +{pct}% rispetto al mese scorso",
+    "communityTrendDown": "puntate −{pct}% rispetto al mese scorso",
+    "communityTrendFlat": "puntate in linea con il mese scorso",
+    "jackpotPotDelta": "{n} da ieri",
+    "monthPodiumTitle": "I migliori del mese",
+    "monthPodiumLine": "{rounds} round · {wagered} monete puntate"
   },
   "wheel": {
     "title": "Ruota della fortuna",
@@ -1212,6 +1233,9 @@
         "revoke": "Rimuovi",
         "granted": "Obiettivo assegnato.",
         "revoked": "Obiettivo rimosso."
+      },
+      "activity": {
+        "title": "Attività · 60 giorni"
       },
       "danger": {
         "title": "Zona pericolosa",

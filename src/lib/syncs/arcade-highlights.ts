@@ -3,6 +3,7 @@ import { GAMES } from "@/lib/gamification/games";
 import { logChange } from "@/lib/changelog";
 import {
   buildArcadeHighlightsArticle,
+  buildArcadeMonthlyArticle,
   buildArcadeWeeklyArticle,
   createFeaturePost,
   isoWeekLabel,
@@ -18,6 +19,8 @@ export interface ArcadeHighlightsSummary {
   biggestWinUsername: string | null;
   /** Live pots snapshot + windowed hits feeding the recap's jackpot line. */
   jackpot: ArcadeJackpotStats | null;
+  /** Busiest player of the trailing 30 days (the recap's pace-setter line). */
+  monthTop: { username: string; rounds: number } | null;
   published: boolean;
   skipped: boolean;
   /** Present on Mondays (or forced): the weekly recap outcome. */
@@ -27,6 +30,20 @@ export interface ArcadeHighlightsSummary {
     totalRounds: number;
     priorWeekTotal: number | null;
     topGame: string | null;
+    jackpot: ArcadeJackpotStats | null;
+    published: boolean;
+    skipped: boolean;
+    failed: boolean;
+    error?: string;
+  };
+  /** Present on the 1st of a UTC month (or forced): the monthly recap outcome. */
+  monthly?: {
+    month: string;
+    slug: string;
+    totalRounds: number;
+    priorMonthTotal: number | null;
+    topGame: string | null;
+    monthTop: { username: string; rounds: number } | null;
     jackpot: ArcadeJackpotStats | null;
     published: boolean;
     skipped: boolean;
@@ -179,25 +196,77 @@ async function biggestWin(
   };
 }
 
+/** Busiest player in [start, end) — the rolling-30d pace-setter for the
+ *  daily recap and the calendar-month champion for the monthly recap. PostgREST cannot GROUP BY,
+ *  so the window's user_id rows are read and counted in JS, paged
+ *  defensively like countCoinFlow (1000-row response cap; the volume today
+ *  is well under 500 rows/month). Gated at >= 10 rounds so a quiet month
+ *  never crowns a two-round "champion", and null on any error or unnamed
+ *  winner — the recap sentence is omitted rather than wrong. */
+async function monthTop(
+  supabase: ReturnType<typeof createAdminClient>,
+  start: Date,
+  end: Date,
+): Promise<{ username: string; rounds: number } | null> {
+  try {
+    const perUser = new Map<string, number>();
+    for (let offset = 0; ; offset += 1000) {
+      const { data, error } = await supabase
+        .from("game_rounds")
+        .select("user_id")
+        .gte("created_at", start.toISOString())
+        .lt("created_at", end.toISOString())
+        .order("id")
+        .range(offset, offset + 999);
+      if (error) throw error;
+      const page = (data ?? []) as Array<{ user_id: string }>;
+      for (const row of page) {
+        perUser.set(row.user_id, (perUser.get(row.user_id) ?? 0) + 1);
+      }
+      if (page.length < 1000) break;
+    }
+    let topUserId = "";
+    let topRounds = 0;
+    for (const [userId, rounds] of perUser) {
+      if (rounds > topRounds) {
+        topUserId = userId;
+        topRounds = rounds;
+      }
+    }
+    if (!topUserId || topRounds < 10) return null;
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", topUserId)
+      .maybeSingle();
+    const username = (profile as { username: string | null } | null)?.username;
+    if (!username) return null;
+    return { username, rounds: topRounds };
+  } catch {
+    return null;
+  }
+}
+
 /**
- * Daily arcade recap (+ weekly recap on Mondays), one auto blog post per UTC
- * calendar day / ISO week. The daily post covers the PREVIOUS day (the 06:00
+ * Daily arcade recap (+ weekly on Mondays, + monthly on the 1st), one auto
+ * blog post per UTC calendar day / ISO week / calendar month. The daily post covers the PREVIOUS day (the 06:00
  * UTC global cron calls this, so "yesterday" has fully closed); the weekly
  * post covers the previous ISO week Mon–Sun and only fires on Mondays —
  * both idempotent through their date-stamped slugs (createFeaturePost's
  * onConflict ignoreDuplicates), so re-runs are silent no-ops.
  *
- * The weekly branch is folded into the SAME heartbeat unit deliberately: a
+ * The weekly and monthly branches are folded into the SAME heartbeat unit
+ * deliberately: a
  * separate weekly unit would pin the public status verdict "degraded" for up
  * to seven days on one thrown error (stats.ts reads last_status per source),
- * while this unit self-heals with the next daily run. The weekly branch
- * therefore catches internally and never fails the daily half.
+ * while this unit self-heals with the next daily run. Both side branches
+ * therefore catch internally and never fail the daily half.
  *
  * A day/week with zero rounds is SKIPPED, not posted — and the skip is
  * recorded (logChange), never silently returned.
  */
 export async function runArcadeHighlights(
-  opts: { push?: boolean; forceWeekly?: boolean } = {},
+  opts: { push?: boolean; forceWeekly?: boolean; forceMonthly?: boolean } = {},
 ): Promise<ArcadeHighlightsSummary> {
   const push = opts.push ?? true;
   const supabase = createAdminClient();
@@ -220,20 +289,23 @@ export async function runArcadeHighlights(
     topGame: null,
     biggestWinUsername: null,
     jackpot: null,
+    monthTop: null,
     published: false,
     skipped: false,
   };
 
   const counts = await countRounds(supabase, start, end);
   summary.totalRounds = counts.reduce((sum, g) => sum + g.rounds, 0);
-  const [win, daySaves, dayCoinFlow, dayJackpot] = await Promise.all([
+  const [win, daySaves, dayCoinFlow, dayJackpot, dayMonthTop] = await Promise.all([
     biggestWin(supabase, start, end),
     countStreakSaves(supabase, start, end),
     countCoinFlow(supabase, start, end),
     jackpotStats(supabase, start, end),
+    monthTop(supabase, new Date(end.getTime() - 30 * 86_400_000), end),
   ]);
   summary.biggestWinUsername = win?.username ?? null;
   summary.jackpot = dayJackpot;
+  summary.monthTop = dayMonthTop;
 
   const played = counts.filter((g) => g.rounds > 0);
   const top = played.length
@@ -260,6 +332,7 @@ export async function runArcadeHighlights(
       streakSaves: daySaves,
       coinFlow: dayCoinFlow,
       jackpot: dayJackpot,
+      monthTop: dayMonthTop,
     });
     summary.published = await createFeaturePost({
       slug,
@@ -299,7 +372,7 @@ export async function runArcadeHighlights(
           ? `Arcade highlights published for ${day}`
           : `Arcade highlights already recorded for ${day}`,
         body: summary.published
-          ? `Daily arcade recap for ${day}: ${summary.totalRounds} settled rounds${summary.topGame ? `, most played: ${summary.topGame}` : ""}${summary.biggestWinUsername ? `, biggest win by ${summary.biggestWinUsername}` : ""}. Post published at /blog/${slug}${top ? ` with the ${top.game} cover` : ""}.`
+          ? `Daily arcade recap for ${day}: ${summary.totalRounds} settled rounds${summary.topGame ? `, most played: ${summary.topGame}` : ""}${summary.biggestWinUsername ? `, biggest win by ${summary.biggestWinUsername}` : ""}${dayMonthTop ? `, month pace-setter ${dayMonthTop.username} (${dayMonthTop.rounds} rounds)` : ""}. Post published at /blog/${slug}${top ? ` with the ${top.game} cover` : ""}.`
           : `The recap post for ${day} already existed (idempotent re-run); no duplicate was created.`,
         payload: {
           ranAt: new Date().toISOString(),
@@ -314,6 +387,8 @@ export async function runArcadeHighlights(
           jackpotPaid: dayJackpot?.paid ?? 0,
           jackpotPotsTotal: dayJackpot?.potsTotal ?? null,
           jackpotMegaPot: dayJackpot?.megaPot ?? null,
+          monthTopUser: dayMonthTop?.username ?? null,
+          monthTopRounds: dayMonthTop?.rounds ?? 0,
         },
       },
       supabase,
@@ -471,6 +546,159 @@ export async function runArcadeHighlights(
         error: error instanceof Error ? error.message : "failed",
       };
       console.warn("[arcade-highlights] weekly branch failed:", error);
+    }
+  }
+
+  /* ----- monthly: previous calendar month, 1st of month (or forced) ----- */
+  const isMonthStart = now.getUTCDate() === 1;
+  if (isMonthStart || opts.forceMonthly) {
+    try {
+      // Calendar-month snap: Date.UTC normalizes month underflow, so a
+      // January run (getUTCMonth() - 1 = -1) correctly covers December of
+      // the PRIOR year — the same arithmetic class the daily branch relies
+      // on with getUTCDate() - 1. A forced off-monthday run covers the last
+      // FULL calendar month, never "the last 30 days".
+      const mStart = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1),
+      );
+      const mEnd = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
+      );
+      const pStart = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 2, 1),
+      );
+      const month = mStart.toISOString().slice(0, 7);
+      const mSlug = `arcade-monthly-${month}`;
+
+      const [mCounts, pMonthCounts, mWin, mSaves, mCoinFlow, mJackpot, mTop] =
+        await Promise.all([
+          countRounds(supabase, mStart, mEnd),
+          countRounds(supabase, pStart, mStart),
+          biggestWin(supabase, mStart, mEnd),
+          countStreakSaves(supabase, mStart, mEnd),
+          countCoinFlow(supabase, mStart, mEnd),
+          jackpotStats(supabase, mStart, mEnd),
+          monthTop(supabase, mStart, mEnd),
+        ]);
+      const mTotal = mCounts.reduce((sum, g) => sum + g.rounds, 0);
+      const pMonthTotal = pMonthCounts.reduce((sum, g) => sum + g.rounds, 0);
+      const mPlayed = mCounts.filter((g) => g.rounds > 0);
+      const mTopGame = mPlayed.length
+        ? [...mPlayed].sort((a, b) => b.rounds - a.rounds)[0]
+        : null;
+
+      const monthly: NonNullable<ArcadeHighlightsSummary["monthly"]> = {
+        month,
+        slug: mSlug,
+        totalRounds: mTotal,
+        priorMonthTotal: pMonthTotal,
+        topGame: mTopGame?.game ?? null,
+        monthTop: mTop,
+        jackpot: mJackpot,
+        published: false,
+        skipped: false,
+        failed: false,
+      };
+      summary.monthly = monthly;
+
+      if (mTotal === 0) {
+        monthly.skipped = true;
+        await logChange(
+          {
+            kind: "data_sync",
+            title: `Arcade monthly skipped — no rounds in ${month}`,
+            body: `No game rounds were settled in ${month}, so no monthly recap post was published.`,
+            payload: { ranAt: new Date().toISOString(), month, skipped: true },
+          },
+          supabase,
+        );
+      } else {
+        const mArticle = buildArcadeMonthlyArticle({
+          month,
+          monthStart: mStart.toISOString().slice(0, 10),
+          monthEnd: new Date(mEnd.getTime() - 1).toISOString().slice(0, 10),
+          roundsByGame: mCounts,
+          priorMonthTotal: pMonthTotal,
+          biggestWin: mWin,
+          streakSaves: mSaves,
+          coinFlow: mCoinFlow,
+          jackpot: mJackpot,
+          monthTop: mTop,
+        });
+        monthly.published = await createFeaturePost({
+          slug: mSlug,
+          title: mArticle.title,
+          excerpt: mArticle.excerpt,
+          content: mArticle.content,
+          cover: mTopGame ? `/games/art/${mTopGame.id}.svg` : null,
+          tags: ["arcade", "monthly"],
+        });
+
+        if (monthly.published && push) {
+          // Own collapse tag: the monthly push must not replace the daily or
+          // weekly one in the notification tray.
+          const url = `/blog/${mSlug}`;
+          recordNotification({
+            kind: "blog",
+            title: mArticle.title,
+            body: mArticle.excerpt,
+            url,
+            tag: "arcade-monthly",
+          }).catch(() => undefined);
+          sendPushToAll(
+            { title: mArticle.title, body: mArticle.excerpt, url, tag: "arcade-monthly" },
+            { recapOnly: true },
+          ).catch(() => undefined);
+        }
+
+        await logChange(
+          {
+            kind: "data_sync",
+            title: monthly.published
+              ? `Arcade monthly published for ${month}`
+              : `Arcade monthly already recorded for ${month}`,
+            body: monthly.published
+              ? `Monthly arcade recap for ${month}: ${mTotal} settled rounds${mTopGame ? `, game of the month: ${mTopGame.game}` : ""}${mTop ? `, player of the month: ${mTop.username} (${mTop.rounds} rounds)` : ""}${pMonthTotal > 0 ? `, ${mTotal >= pMonthTotal ? "up" : "down"} on the prior month's ${pMonthTotal}` : ""}. Post at /blog/${mSlug}.`
+              : `The monthly recap for ${month} already existed (idempotent re-run).`,
+            payload: {
+              ranAt: new Date().toISOString(),
+              month,
+              published: monthly.published,
+              totalRounds: mTotal,
+              priorMonthTotal: pMonthTotal,
+              topGame: monthly.topGame,
+              monthTopUser: mTop?.username ?? null,
+              monthTopRounds: mTop?.rounds ?? 0,
+              chars: mArticle.content.length,
+              streakSaves: mSaves,
+              coinFlow: mCoinFlow,
+              jackpotHits: mJackpot?.hits ?? 0,
+              jackpotPaid: mJackpot?.paid ?? 0,
+              jackpotPotsTotal: mJackpot?.potsTotal ?? null,
+              jackpotMegaPot: mJackpot?.megaPot ?? null,
+            },
+          },
+          supabase,
+        );
+      }
+    } catch (error) {
+      // Never fail the daily half: record and move on (weekly doctrine).
+      summary.monthly = {
+        ...(summary.monthly ?? {
+          month: "unknown",
+          slug: "unknown",
+          totalRounds: 0,
+          priorMonthTotal: null,
+          topGame: null,
+          monthTop: null,
+          jackpot: null,
+          published: false,
+          skipped: false,
+        }),
+        failed: true,
+        error: error instanceof Error ? error.message : "failed",
+      };
+      console.warn("[arcade-highlights] monthly branch failed:", error);
     }
   }
 

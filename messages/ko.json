@@ -251,6 +251,10 @@
     "streakTitle": "최고 게임 연속 기록",
     "streakDesc": "사이트에서 가장 긴 게임 연속 기록을 가진 멤버",
     "streakUnit": "일",
+    "loginStreakTitle": "최장 로그인 연속 기록",
+    "loginStreakDesc": "가장 많이 연속 접속한 멤버",
+    "youStreakRank": "당신의 최고 기록: {n}일 — #{rank}",
+    "youStreakToFirst": "1위까지 {n}일",
     "rank": "순위",
     "collector": "수집가",
     "badges": "배지",
@@ -344,9 +348,19 @@
     "socialTwitterLabel": "Twitter/X 프로필",
     "socialDiscordLabel": "Discord 프로필",
     "statToNext": "#{rank}위까지",
-    "monthSummaryUp": "이번 달: {rounds} 라운드에 {wagered} 코인 베팅 ({wins}승) — 순수 +{net}.",
-    "monthSummaryDown": "이번 달: {rounds} 라운드에 {wagered} 코인 베팅 ({wins}승) — 순수 −{net}.",
-    "monthSummaryFlat": "이번 달: {rounds} 라운드에 {wagered} 코인 베팅 ({wins}승) — 순수 변동 없음."
+    "monthSummaryUp": "{who}: {rounds} 라운드에 {wagered} 코인 베팅 ({wins}승) — 순수 +{net}.",
+    "monthSummaryDown": "{who}: {rounds} 라운드에 {wagered} 코인 베팅 ({wins}승) — 순수 −{net}.",
+    "monthSummaryFlat": "{who}: {rounds} 라운드에 {wagered} 코인 베팅 ({wins}승) — 순수 변동 없음.",
+    "monthWhoYou": "이번 달",
+    "monthWhoName": "{name}의 이번 달",
+    "monthCompareUp": "전월보다 {pct}% 많음",
+    "monthCompareDown": "전월보다 {pct}% 적음",
+    "monthCompareFlat": "전월과 비슷함",
+    "monthBestHit": "이번 달 최고 적중: +{n} ({game}, {date})",
+    "monthShare": "이번 달 커뮤니티가 베팅한 코인의 {share}%는 당신의 것입니다.",
+    "monthBestWeek": "최고의 7일: +{n}",
+    "dayDetailTitle": "{date} — {n}라운드",
+    "dayDetailEmpty": "이 날에는 라운드가 없습니다."
   },
   "inventory": {
     "title": "내 배지",
@@ -851,7 +865,14 @@
     "jackpotWinners": "최근 잭팟 당첨",
     "jackpotHofTitle": "역대 최고 잭팟 당첨",
     "jackpotLastMega": "최근 메가 잭팟: {name} +{n}",
-    "jackpotChipLast": "최근: {name} +{n} · {date}"
+    "jackpotChipLast": "최근: {name} +{n} · {date}",
+    "communityMonth": "커뮤니티 이번 달: {rounds}라운드 · {wagered}코인 베팅 · {players}명 활동 중",
+    "communityTrendUp": "베팅액 전월 대비 +{pct}%",
+    "communityTrendDown": "베팅액 전월 대비 −{pct}%",
+    "communityTrendFlat": "베팅액 전월과 비슷함",
+    "jackpotPotDelta": "어제보다 {n}",
+    "monthPodiumTitle": "이달의 베스트",
+    "monthPodiumLine": "{rounds}라운드 · {wagered}코인 베팅"
   },
   "wheel": {
     "title": "운명의 수레바퀴",
@@ -1212,6 +1233,9 @@
         "revoke": "회수",
         "granted": "업적을 부여했습니다.",
         "revoked": "업적을 회수했습니다."
+      },
+      "activity": {
+        "title": "활동 · 60일"
       },
       "danger": {
         "title": "위험 구역",

@@ -251,6 +251,10 @@
     "streakTitle": "最高ゲーム連続記録",
     "streakDesc": "サイトで最長のゲーム連続記録を持つメンバー",
     "streakUnit": "日",
+    "loginStreakTitle": "最長ログイン連続記録",
+    "loginStreakDesc": "連続でログインした日数が最も多いメンバー",
+    "youStreakRank": "あなたのベスト: {n}日 — #{rank}",
+    "youStreakToFirst": "1位まであと{n}日",
     "rank": "順位",
     "collector": "コレクター",
     "badges": "バッジ数",
@@ -344,9 +348,19 @@
     "socialTwitterLabel": "Twitter/X プロフィール",
     "socialDiscordLabel": "Discord プロフィール",
     "statToNext": "あと#{rank}位へ",
-    "monthSummaryUp": "今月: {rounds} ラウンドで {wagered} コインをベット（{wins} 勝利）— 収支 +{net}。",
-    "monthSummaryDown": "今月: {rounds} ラウンドで {wagered} コインをベット（{wins} 勝利）— 収支 −{net}。",
-    "monthSummaryFlat": "今月: {rounds} ラウンドで {wagered} コインをベット（{wins} 勝利）— 収支は横ばい。"
+    "monthSummaryUp": "{who}: {rounds} ラウンドで {wagered} コインをベット（{wins} 勝利）— 収支 +{net}。",
+    "monthSummaryDown": "{who}: {rounds} ラウンドで {wagered} コインをベット（{wins} 勝利）— 収支 −{net}。",
+    "monthSummaryFlat": "{who}: {rounds} ラウンドで {wagered} コインをベット（{wins} 勝利）— 収支は横ばい。",
+    "monthWhoYou": "今月",
+    "monthWhoName": "{name}の今月",
+    "monthCompareUp": "前月比 +{pct}%",
+    "monthCompareDown": "前月比 −{pct}%",
+    "monthCompareFlat": "前月と同水準",
+    "monthBestHit": "今月のベストヒット: +{n}（{game}、{date}）",
+    "monthShare": "今月コミュニティがベットしたコインの {share}% はあなたのものです。",
+    "monthBestWeek": "ベスト7日間: +{n}",
+    "dayDetailTitle": "{date} — {n} ラウンド",
+    "dayDetailEmpty": "この日のラウンドはありません。"
   },
   "inventory": {
     "title": "マイバッジ",
@@ -851,7 +865,14 @@
     "jackpotWinners": "最新のジャックポット獲得",
     "jackpotHofTitle": "歴代最大のジャックポット獲得",
     "jackpotLastMega": "最新のメガジャックポット: {name} +{n}",
-    "jackpotChipLast": "最新: {name} +{n} · {date}"
+    "jackpotChipLast": "最新: {name} +{n} · {date}",
+    "communityMonth": "コミュニティ今月: {rounds} ラウンド · {wagered} コインベット · {players} 人のアクティブプレイヤー",
+    "communityTrendUp": "ベット額は前月比 +{pct}%",
+    "communityTrendDown": "ベット額は前月比 −{pct}%",
+    "communityTrendFlat": "ベット額は前月と同水準",
+    "jackpotPotDelta": "昨日から {n}",
+    "monthPodiumTitle": "今月のベスト",
+    "monthPodiumLine": "{rounds} ラウンド · {wagered} コインベット"
   },
   "wheel": {
     "title": "フォーチュンホイール",
@@ -1212,6 +1233,9 @@
         "revoke": "取消",
         "granted": "実績を付与しました。",
         "revoked": "実績を取り消しました。"
+      },
+      "activity": {
+        "title": "アクティビティ · 60日"
       },
       "danger": {
         "title": "危険な操作",

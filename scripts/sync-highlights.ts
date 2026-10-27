@@ -7,6 +7,7 @@
  *   npm run sync:highlights -- --no-push   # publish without push/notification
  *   npm run sync:highlights -- --dry       # aggregate + print, write nothing
  *   npm run sync:highlights -- --weekly    # force the weekly branch (any day)
+ *   npm run sync:highlights -- --monthly   # force the monthly branch (any day)
  */
 import { config } from "dotenv";
 
@@ -17,6 +18,7 @@ async function main(): Promise<void> {
   const dry = args.includes("--dry");
   const noPush = args.includes("--no-push");
   const weekly = args.includes("--weekly");
+  const monthly = args.includes("--monthly");
 
   if (dry) {
     // Dry mode imports the pieces directly so nothing is written: no post,
@@ -122,6 +124,45 @@ async function main(): Promise<void> {
               0,
             ),
           };
+    // Trailing-30-day pace-setter, same shape as the engine's monthTop
+    // (duplicated for the same documented reason as the jackpot block: the
+    // dry branch imports the pieces, not the engine).
+    const perUser = new Map<string, number>();
+    for (let offset = 0; ; offset += 1000) {
+      const { data: topPage, error: topError } = await supabase
+        .from("game_rounds")
+        .select("user_id")
+        .gte("created_at", new Date(end.getTime() - 30 * 86_400_000).toISOString())
+        .lt("created_at", end.toISOString())
+        .order("id")
+        .range(offset, offset + 999);
+      if (topError) throw topError;
+      const page = (topPage ?? []) as Array<{ user_id: string }>;
+      for (const row of page) {
+        perUser.set(row.user_id, (perUser.get(row.user_id) ?? 0) + 1);
+      }
+      if (page.length < 1000) break;
+    }
+    let monthTop: { username: string; rounds: number } | null = null;
+    {
+      let topUserId = "";
+      let topRounds = 0;
+      for (const [userId, rounds] of perUser) {
+        if (rounds > topRounds) {
+          topUserId = userId;
+          topRounds = rounds;
+        }
+      }
+      if (topUserId && topRounds >= 10) {
+        const { data: topProfile } = await supabase
+          .from("profiles")
+          .select("username")
+          .eq("id", topUserId)
+          .maybeSingle();
+        const username = (topProfile as { username: string | null } | null)?.username;
+        if (username) monthTop = { username, rounds: topRounds };
+      }
+    }
     const article = buildArcadeHighlightsArticle({
       day: start.toISOString().slice(0, 10),
       roundsByGame: counts,
@@ -129,6 +170,7 @@ async function main(): Promise<void> {
       streakSaves,
       coinFlow,
       jackpot,
+      monthTop,
     });
     console.log("=== DRY — nothing written ===");
     console.log("title:", article.title);
@@ -136,6 +178,7 @@ async function main(): Promise<void> {
     console.log("content chars:", article.content.length, "(floor 600)");
     console.log("streak saves:", streakSaves, "| coin flow:", coinFlow, "| sentences:", article.content.includes("Streak Freeze"), article.content.includes("BadgesCoins moved"), article.content.includes("Mega Jackpot"));
     console.log("jackpot:", JSON.stringify(jackpot));
+    console.log("monthTop:", JSON.stringify(monthTop));
     console.log(counts.filter((c) => c.rounds > 0));
     if (biggestWin) console.log("biggest win:", biggestWin);
     return;
@@ -144,7 +187,7 @@ async function main(): Promise<void> {
   const { runArcadeHighlights } = await import("@/lib/syncs/arcade-highlights");
   const { withHeartbeat } = await import("@/lib/health");
   const summary = await withHeartbeat("manual/arcade-highlights", () =>
-    runArcadeHighlights({ push: !noPush, forceWeekly: weekly }),
+    runArcadeHighlights({ push: !noPush, forceWeekly: weekly, forceMonthly: monthly }),
   );
   console.log(summary);
 }

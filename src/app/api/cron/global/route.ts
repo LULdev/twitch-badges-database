@@ -165,9 +165,16 @@ export async function GET(request: Request) {
       () => runArcadeHighlights(),
       (result) => result as unknown as Record<string, unknown>,
       (result) => {
-        const r = result as { skipped?: boolean; weekly?: { failed?: boolean } };
+        const r = result as {
+          skipped?: boolean;
+          weekly?: { failed?: boolean };
+          monthly?: { failed?: boolean };
+        };
         if (r?.weekly?.failed) {
           return { status: "degraded", message: "weekly recap failed" };
+        }
+        if (r?.monthly?.failed) {
+          return { status: "degraded", message: "monthly recap failed" };
         }
         return r?.skipped
           ? { status: "degraded", message: "no rounds — recap skipped" }

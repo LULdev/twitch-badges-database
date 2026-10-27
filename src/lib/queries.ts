@@ -689,6 +689,33 @@ export async function getJackpots(): Promise<JackpotPot[]> {
   }
 }
 
+/**
+ * Yesterday's pot snapshots (0072) as a scope→pot map — the baseline for the
+ * "since yesterday" growth chips. The nightly cron writes one row per pot per
+ * UTC day (first write wins at 06:00 UTC), so this is yesterday-morning's
+ * state, not yesterday-midnight's; a pot that hit since then shows a NEGATIVE
+ * delta until the next snapshot, which is correct information (the pot paid
+ * out). A scope with no row yet (young pot, missed night) simply has no
+ * baseline and the chip stays hidden. The whole table is 15 rows/day.
+ */
+export async function getJackpotPotsYesterday(): Promise<Record<string, number>> {
+  const supabase = await createClient();
+  try {
+    const day = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+    const { data } = await supabase
+      .from("jackpot_pot_history")
+      .select("scope,pot")
+      .eq("day", day);
+    const map: Record<string, number> = {};
+    for (const row of (data ?? []) as Array<{ scope: string; pot: string | number }>) {
+      map[row.scope] = Number(row.pot ?? 0);
+    }
+    return map;
+  } catch {
+    return {};
+  }
+}
+
 export interface JackpotWinEntry {
   id: number;
   username: string | null;
@@ -1039,6 +1066,32 @@ export async function getWageredLeaderboard(): Promise<
   }>).map((row) => ({
     user_id: row.user_id,
     coins_wagered: Number(row.coins_wagered ?? 0),
+    profile: Array.isArray(row.profile) ? row.profile[0] : row.profile,
+  }));
+}
+
+/**
+ * Longest LOGIN streaks, top 10 — the sibling of getStreakLeaderboard with
+ * the column swapped to best_login_streak (maintained by claim_daily_gate's
+ * high-water update, 0007). Same shape, same public-read path.
+ */
+export async function getLoginStreakLeaderboard(): Promise<
+  Array<{ user_id: string; best_login_streak: number; profile: { username: string; avatar_url: string | null } | null }>
+> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("user_progress")
+    .select("user_id, best_login_streak, profile:profiles(username, avatar_url)")
+    .gt("best_login_streak", 0)
+    .order("best_login_streak", { ascending: false })
+    .limit(10);
+  return ((data ?? []) as unknown as Array<{
+    user_id: string;
+    best_login_streak: number;
+    profile: { username: string; avatar_url: string | null } | null;
+  }>).map((row) => ({
+    user_id: row.user_id,
+    best_login_streak: row.best_login_streak,
     profile: Array.isArray(row.profile) ? row.profile[0] : row.profile,
   }));
 }

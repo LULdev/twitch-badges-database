@@ -15,6 +15,16 @@
  *  C) catalog parity: the flattened key set is identical across locales.
  *  D) every game id in GAMES carries Title/Desc/Hint in all locales — the
  *     game pages build those keys dynamically, so Check B cannot see them.
+ *  E) ICU placeholder parity: every key's argument-name set must match en.
+ *     A locale that drops {pct} renders a sentence with a hole — silently,
+ *     because next-intl never throws. Plural/select/selectordinal branch
+ *     interiors are skipped (CJK legitimately drops plurals, so interiors
+ *     cannot be compared cross-locale); typed args ({price, number}) count
+ *     by NAME (en ships plain {price} today).
+ *  F) content blocklist: known-bad strings from the twice-burned Korean
+ *     incident class (wrong syllable 룈 U+B8C8 vs 번 U+BC88, the 코뮤니티
+ *     misspelling) and lone UTF-16 surrogates from malformed \uXXXX escapes.
+ *  G) double ASCII spaces inside values (copy-paste debris).
  *
  * Dynamic keys (t(`x.${v}`), t(map[k] ?? "fallback")) are warn-only.
  */
@@ -39,6 +49,84 @@ function flatten(value: unknown, prefix = "", out: Flat = new Set()): Flat {
   return out;
 }
 
+/** Same walk, but keeps the VALUES — Checks E/F/G inspect message text. */
+type FlatValues = Map<string, string>;
+function flattenValues(
+  value: unknown,
+  prefix = "",
+  out: FlatValues = new Map(),
+): FlatValues {
+  if (value && typeof value === "object") {
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      flattenValues(v, prefix ? `${prefix}.${k}` : k, out);
+    }
+  } else {
+    out.set(prefix, typeof value === "string" ? value : String(value));
+  }
+  return out;
+}
+
+/**
+ * Top-level ICU argument NAMES of a message. plural/select/selectordinal
+ * blocks are skipped WHOLE after recording their argument name: their branch
+ * interiors may legitimately differ per locale (CJK drops plurals), so nested
+ * placeholders inside branches cannot be compared cross-locale — a naive
+ * {…} regex over the catalogs produces ~99 false mismatches from exactly
+ * those interiors. Typed simple args ({price, number}) count by NAME.
+ */
+function icuArgNames(value: string): Set<string> {
+  const names = new Set<string>();
+  let i = 0;
+  const skipBalanced = () => {
+    // Consumes up to and including the closing brace matching an already
+    // consumed '{' (depth starts at 1).
+    let depth = 1;
+    while (i < value.length && depth > 0) {
+      if (value[i] === "{") depth++;
+      else if (value[i] === "}") depth--;
+      i++;
+    }
+  };
+  while (i < value.length) {
+    if (value[i] !== "{") {
+      i++;
+      continue;
+    }
+    i++; // past '{'
+    let name = "";
+    while (i < value.length && value[i] !== "," && value[i] !== "}") {
+      name += value[i];
+      i++;
+    }
+    name = name.trim();
+    if (i >= value.length) break;
+    if (value[i] === "}") {
+      i++;
+      if (name) names.add(name);
+      continue;
+    }
+    i++; // past ','
+    while (i < value.length && value[i] === " ") i++;
+    let fn = "";
+    while (i < value.length && /[a-zA-Z]/.test(value[i])) {
+      fn += value[i];
+      i++;
+    }
+    if (fn === "plural" || fn === "select" || fn === "selectordinal") {
+      // The branch argument itself IS a message argument; the interiors are
+      // not comparable cross-locale and are skipped whole.
+      if (name) names.add(name);
+      skipBalanced();
+    } else {
+      // Typed simple arg ({price, number}) or unknown function: record the
+      // name, consume to the closing brace defensively.
+      if (name) names.add(name);
+      skipBalanced();
+    }
+  }
+  return names;
+}
+
 function walk(dir: string, files: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
     if (entry === "node_modules" || entry === ".next" || entry.startsWith(".")) continue;
@@ -51,11 +139,13 @@ function walk(dir: string, files: string[] = []): string[] {
 
 /* ---------- catalogs ---------- */
 const catalogs = new Map<string, Flat>();
+const valueCatalogs = new Map<string, FlatValues>();
 for (const locale of LOCALES) {
-  catalogs.set(
-    locale,
-    flatten(JSON.parse(readFileSync(path.join(ROOT, "messages", `${locale}.json`), "utf8"))),
+  const parsed = JSON.parse(
+    readFileSync(path.join(ROOT, "messages", `${locale}.json`), "utf8"),
   );
+  catalogs.set(locale, flatten(parsed));
+  valueCatalogs.set(locale, flattenValues(parsed));
 }
 
 /* ---------- client namespace subset from the layout ---------- */
@@ -212,6 +302,69 @@ if (gamesArrayStart < 0 || gamesArrayEnd <= gamesArrayStart) {
           errors.push(`games: messages/${locale}.json is missing "${key}" (every game id needs Title/Desc/Hint)`);
         }
       }
+    }
+  }
+}
+
+/* ---------- Check E: ICU placeholder parity (en is the reference) ---------- */
+{
+  const ref = valueCatalogs.get("en")!;
+  for (const locale of LOCALES.slice(1)) {
+    const vals = valueCatalogs.get(locale)!;
+    for (const [key, refValue] of ref) {
+      const value = vals.get(key);
+      if (value === undefined) continue; // Check C owns missing keys
+      const a = [...icuArgNames(refValue)].sort().join(",");
+      const b = [...icuArgNames(value)].sort().join(",");
+      if (a !== b) {
+        errors.push(
+          `placeholders: messages/${locale}.json "${key}" uses {${b || "none"}} but en uses {${a || "none"}}`,
+        );
+      }
+    }
+  }
+}
+
+/* ---------- Check F: known-bad content blocklist + lone surrogates ----------
+ * The twice-burned Korean incident class: a hand-typed \uXXXX escape shipped
+ * the wrong syllable (룈 U+B8C8 where 번 U+BC88 was meant) and a misspelling
+ * (코뮤니티 for 커뮤니티) into the live catalog — invisible to every other
+ * check because the keys and placeholders were perfectly fine. */
+{
+  const BLOCKLIST = ["룈", "이룈", "코뮤니티"];
+  for (const [locale, vals] of valueCatalogs) {
+    for (const [key, value] of vals) {
+      for (const bad of BLOCKLIST) {
+        if (value.includes(bad)) {
+          errors.push(
+            `blocklist: messages/${locale}.json "${key}" contains known-bad "${bad}"`,
+          );
+        }
+      }
+      for (let i = 0; i < value.length; i++) {
+        const code = value.charCodeAt(i);
+        if (code >= 0xd800 && code <= 0xdbff) {
+          const next = i + 1 < value.length ? value.charCodeAt(i + 1) : 0;
+          if (next >= 0xdc00 && next <= 0xdfff) i++; // valid surrogate pair
+          else
+            errors.push(
+              `blocklist: messages/${locale}.json "${key}" contains a lone high surrogate (malformed \\uXXXX escape?)`,
+            );
+        } else if (code >= 0xdc00 && code <= 0xdfff) {
+          errors.push(
+            `blocklist: messages/${locale}.json "${key}" contains a lone low surrogate (malformed \\uXXXX escape?)`,
+          );
+        }
+      }
+    }
+  }
+}
+
+/* ---------- Check G: double ASCII spaces inside values ---------- */
+for (const [locale, vals] of valueCatalogs) {
+  for (const [key, value] of vals) {
+    if (value.includes("  ")) {
+      errors.push(`style: messages/${locale}.json "${key}" contains a double space`);
     }
   }
 }

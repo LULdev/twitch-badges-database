@@ -26,6 +26,8 @@ interface LivePot {
   last_won_at: string | null;
   last_winner: string | null;
   last_win_amount: number | null;
+  /** Live pot − yesterday's 06:00 UTC snapshot (0072); null = no baseline. */
+  delta_day?: number | null;
 }
 
 const POLL_MS = 15_000;
@@ -102,6 +104,23 @@ export default function JackpotPotsLive({
               <Coin size={20} variant="b" className="bcoin-lg" />
             </p>
           )}
+          {mega && mega.delta_day != null && mega.delta_day !== 0 && (
+            /* Since-yesterday growth (or the drop a hit leaves behind) — the
+               snapshot baseline is 06:00 UTC, so a payout shows negative
+               until the next night. That is information, not a bug. */
+            <p
+              className={`text-xs font-bold tabular-nums ${
+                mega.delta_day > 0 ? "text-success" : "text-danger"
+              }`}
+              dir="ltr"
+            >
+              {t("jackpotPotDelta", {
+                n: `${mega.delta_day > 0 ? "+" : "−"}${Math.abs(
+                  mega.delta_day,
+                ).toLocaleString(locale)}`,
+              })}
+            </p>
+          )}
           <p className="jackpot-last">
             {mega?.last_winner
               ? t("jackpotLastWin", {
@@ -144,6 +163,17 @@ export default function JackpotPotsLive({
             <span className="jackpot-chip-pot" dir="ltr">
               {pot.pot.toLocaleString(locale)} <Coin size={11} />
             </span>
+            {pot.delta_day != null && pot.delta_day !== 0 && (
+              <span
+                className={`text-[10px] font-bold tabular-nums ${
+                  pot.delta_day > 0 ? "text-success" : "text-danger"
+                }`}
+                dir="ltr"
+              >
+                {pot.delta_day > 0 ? "+" : "−"}
+                {Math.abs(pot.delta_day).toLocaleString(locale)}
+              </span>
+            )}
           </Link>
         ))}
       </div>

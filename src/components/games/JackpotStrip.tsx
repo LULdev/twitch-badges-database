@@ -19,11 +19,14 @@ export default async function JackpotStrip({
   wins,
   hallOfFame,
   locale,
+  yesterdayPots,
 }: {
   jackpots: JackpotPot[];
   wins: JackpotWinEntry[];
   hallOfFame: JackpotWinEntry[];
   locale: string;
+  /** Yesterday's 06:00 UTC snapshots (0072) — scope → pot, for delta_day. */
+  yesterdayPots: Record<string, number>;
 }) {
   const t = await getTranslations("games");
   const mega = jackpots.find((j) => j.kind === "mega");
@@ -32,7 +35,10 @@ export default async function JackpotStrip({
   // The house short-date pattern (game page / BestRoundsCard).
   const winDate = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short" });
   // The live component needs only the pot fields — the winners rows below
-  // stay server-rendered (they change with a hit, not with a tick).
+  // stay server-rendered (they change with a hit, not with a tick). delta_day
+  // (live pot − yesterday's snapshot) is computed here for the first paint;
+  // the poll payload carries it too, so the chip stays truthful between
+  // page loads.
   const livePots = jackpots.map((pot) => ({
     scope: pot.scope,
     kind: pot.kind,
@@ -40,6 +46,9 @@ export default async function JackpotStrip({
     last_won_at: pot.last_won_at,
     last_winner: pot.last_winner,
     last_win_amount: pot.last_win_amount,
+    delta_day: Object.prototype.hasOwnProperty.call(yesterdayPots, pot.scope)
+      ? pot.pot - yesterdayPots[pot.scope]
+      : null,
   }));
   // Hall-of-fame medal tints — the .rank-row podium tokens (dark + light).
   const medals = ["var(--rank-gold)", "var(--rank-silver)", "var(--rank-bronze)"];

@@ -184,6 +184,9 @@ export interface ArcadeHighlightsInput {
   coinFlow: number;
   /** Progressive-jackpot snapshot + hits in the covered day (0069). */
   jackpot: ArcadeJackpotStats | null;
+  /** Busiest player of the trailing 30 days at build time — the recap's
+   *  pace-setter line. Null when the window has no clear leader. */
+  monthTop: { username: string; rounds: number } | null;
 }
 
 /** Weekly recap inputs: one ISO week (Mon–Sun UTC) plus the prior week's
@@ -249,12 +252,19 @@ export function buildArcadeHighlightsArticle(input: ArcadeHighlightsInput): {
     ? `${input.jackpot.hits > 0 ? ` **${input.jackpot.hits} progressive jackpot ${input.jackpot.hits === 1 ? "hit" : "hits"}** paid out **${input.jackpot.paid.toLocaleString("en-US")} BadgesCoins**, and ` : ""}the pots left the day holding **${input.jackpot.potsTotal.toLocaleString("en-US")} BadgesCoins** (${input.jackpot.megaPot.toLocaleString("en-US")} of them in the cross-game [Mega Jackpot](/en/games)).`
     : "";
 
+  // The month's pace-setter (trailing 30 days at build time): a "who's hot"
+  // anchor no single-day number can give. Only present when the sync-side
+  // gate found a clear leader; the sentence is simply omitted otherwise.
+  const monthTopSentence = input.monthTop
+    ? ` The 30-day board also has a pace-setter: **${input.monthTop.username}** leads the month with **${input.monthTop.rounds.toLocaleString("en-US")} rounds** — the full ranking is on the [leaderboards](/en/leaderboards).`
+    : "";
+
   const lines: string[] = [
     `## The day in the Badge Arcade`,
     "",
     totalRounds > 0
-      ? `On ${dateLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 14 games`}. Every round was server-authoritative, capped at the house stake, and graded by the same engine that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` The same ledger also recorded **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** spent — ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} bridged through a missed day instead of resetting.` : ""}${input.coinFlow > 0 ? ` The ledger logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — logged movements only, since regular arcade rounds move coins without a ledger entry.` : ""}${jackpotSentence}`
-      : `On ${dateLabel} the arcade floors stayed quiet — not a single round was settled. The boards are always open: pick a game on the [arcade overview](/en/games), set a stake between the posted limits, and the next recap could carry your name.${jackpotSentence ? ` ${jackpotSentence.trim()}` : ""}`,
+      ? `On ${dateLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 14 games`}. Every round was server-authoritative, capped at the house stake, and graded by the same engine that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` The same ledger also recorded **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** spent — ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} bridged through a missed day instead of resetting.` : ""}${input.coinFlow > 0 ? ` The ledger logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — logged movements only, since regular arcade rounds move coins without a ledger entry.` : ""}${jackpotSentence}${monthTopSentence}`
+      : `On ${dateLabel} the arcade floors stayed quiet — not a single round was settled. The boards are always open: pick a game on the [arcade overview](/en/games), set a stake between the posted limits, and the next recap could carry your name.${jackpotSentence ? ` ${jackpotSentence.trim()}` : ""}${monthTopSentence}`,
     "",
   ];
 
@@ -296,7 +306,7 @@ export function buildArcadeHighlightsArticle(input: ArcadeHighlightsInput): {
   const title = `Arcade highlights — ${dateLabel}`;
   const excerpt =
     totalRounds > 0
-      ? `${dateLabel} in the Badge Arcade: ${totalRounds.toLocaleString("en-US")} settled rounds, ${top ? `${top.game} on top` : "a quiet board"}${input.biggestWin ? `, and the day's biggest win of +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} spent` : ""}${input.coinFlow > 0 ? `, ${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved` : ""}${input.jackpot && input.jackpot.hits > 0 ? `, ${input.jackpot.hits} jackpot ${input.jackpot.hits === 1 ? "hit" : "hits"}` : ""}.`
+      ? `${dateLabel} in the Badge Arcade: ${totalRounds.toLocaleString("en-US")} settled rounds, ${top ? `${top.game} on top` : "a quiet board"}${input.biggestWin ? `, and the day's biggest win of +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} spent` : ""}${input.coinFlow > 0 ? `, ${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved` : ""}${input.monthTop ? `, ${input.monthTop.username} topping the month with ${input.monthTop.rounds.toLocaleString("en-US")} rounds` : ""}${input.jackpot && input.jackpot.hits > 0 ? `, ${input.jackpot.hits} jackpot ${input.jackpot.hits === 1 ? "hit" : "hits"}` : ""}.`
       : `${dateLabel} in the Badge Arcade: a quiet day with no settled rounds — the boards stay open for the next player.`;
 
   return { content, excerpt, title };
@@ -381,6 +391,127 @@ export function buildArcadeWeeklyArticle(
     totalRounds > 0
       ? `Week ${input.isoWeek} (${startLabel}–${endLabel}): ${totalRounds.toLocaleString("en-US")} settled rounds${top ? `, ${top.game} as game of the week` : ""}${input.biggestWin ? `, biggest win +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.streakSaves > 0 ? `, ${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"} bridged missed days` : ""}${input.coinFlow > 0 ? `, ${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved` : ""}${input.jackpot && input.jackpot.hits > 0 ? `, ${input.jackpot.hits} jackpot ${input.jackpot.hits === 1 ? "hit" : "hits"}` : ""}.`
       : `Week ${input.isoWeek} (${startLabel}–${endLabel}): a silent week with no settled rounds.`;
+
+  return { content, excerpt, title };
+}
+
+export interface ArcadeMonthlyInput {
+  /** Calendar month label for the slug and title (e.g. "2026-09"). */
+  month: string;
+  /** Inclusive first day of the covered month (YYYY-MM-DD). */
+  monthStart: string;
+  /** Inclusive last day of the covered month (YYYY-MM-DD). */
+  monthEnd: string;
+  roundsByGame: Array<{ id: string; game: string; rounds: number }>;
+  /** Total settled rounds in the month BEFORE — null when unknowable. */
+  priorMonthTotal: number | null;
+  biggestWin: {
+    id: string;
+    game: string;
+    bet: number;
+    payout: number;
+    username: string | null;
+  } | null;
+  /** Streak Freeze saves in the covered month (kind='streak_freeze' rows). */
+  streakSaves: number;
+  /** Logged coin movement in the covered month (sum of |coins_amount| rows). */
+  coinFlow: number;
+  /** Progressive-jackpot snapshot + hits in the covered month (0069). */
+  jackpot: ArcadeJackpotStats | null;
+  /** The calendar month's busiest player (>= 10 rounds gate upstream). */
+  monthTop: { username: string; rounds: number } | null;
+}
+
+/** Pure builder for the monthly arcade recap article (>= MIN_CONTENT_CHARS,
+ *  GENERIC_CONTEXT_BLOCK as the backstop) — the weekly builder's shape with
+ *  calendar-month bounds and a Player-of-the-month section. */
+export function buildArcadeMonthlyArticle(
+  input: ArcadeMonthlyInput,
+): { content: string; excerpt: string; title: string } {
+  const totalRounds = input.roundsByGame.reduce((sum, g) => sum + g.rounds, 0);
+  const played = input.roundsByGame.filter((g) => g.rounds > 0);
+  const sorted = [...played].sort((a, b) => b.rounds - a.rounds);
+  const top = sorted[0] ?? null;
+  const runnerUp = sorted[1] ?? null;
+  const [y, m] = input.month.split("-");
+  const monthLabel = new Date(Date.UTC(Number(y), Number(m) - 1, 1))
+    .toLocaleDateString("en-US", { timeZone: "UTC", month: "long", year: "numeric" });
+  const [sy, sm, sd] = input.monthStart.split("-");
+  const startLabel = new Date(Date.UTC(Number(sy), Number(sm) - 1, Number(sd)))
+    .toLocaleDateString("en-US", { timeZone: "UTC", month: "long", day: "numeric" });
+  const [ey, em, ed] = input.monthEnd.split("-");
+  const endLabel = new Date(Date.UTC(Number(ey), Number(em) - 1, Number(ed)))
+    .toLocaleDateString("en-US", { timeZone: "UTC", month: "long", day: "numeric", year: "numeric" });
+
+  const priorLabel =
+    input.priorMonthTotal === null
+      ? null
+      : `${input.priorMonthTotal.toLocaleString("en-US")} ${input.priorMonthTotal === 1 ? "round" : "rounds"}`;
+  const trend =
+    input.priorMonthTotal === null
+      ? null
+      : input.priorMonthTotal === 0
+        ? "up from a silent month before"
+        : totalRounds >= input.priorMonthTotal
+          ? `up ${Math.round(((totalRounds - input.priorMonthTotal) / input.priorMonthTotal) * 100)}% on the month before (${priorLabel})`
+          : `down ${Math.round(((input.priorMonthTotal - totalRounds) / input.priorMonthTotal) * 100)}% on the month before (${priorLabel})`;
+
+  const lines: string[] = [
+    "## The month in the Badge Arcade",
+    "",
+    totalRounds > 0
+      ? `From ${startLabel} to ${endLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 14 games`}${trend ? ` — ${trend}` : ""}. One post per month, computed from the same server-authoritative ledger that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` Across the month, **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** bridged missed days.` : ""}${input.coinFlow > 0 ? ` The ledger logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — logged movements only, since regular arcade rounds move coins without a ledger entry.` : ""}${input.jackpot ? ` ${input.jackpot.hits > 0 ? `**${input.jackpot.hits} progressive jackpot ${input.jackpot.hits === 1 ? "hit" : "hits"}** paid out **${input.jackpot.paid.toLocaleString("en-US")} BadgesCoins**${input.jackpot.hits === 1 ? "" : " combined"} over the month, and ` : ""}the pots closed the month holding **${input.jackpot.potsTotal.toLocaleString("en-US")} BadgesCoins** (${input.jackpot.megaPot.toLocaleString("en-US")} of them in the cross-game [Mega Jackpot](/en/games)).` : ""}`
+      : `From ${startLabel} to ${endLabel} the arcade floors stayed completely quiet — not a single settled round all month. The boards never close: pick a game on the [arcade overview](/en/games), and next month's recap could open with your name.${input.jackpot ? ` Even so, the progressive jackpots hold **${input.jackpot.potsTotal.toLocaleString("en-US")} BadgesCoins** (${input.jackpot.megaPot.toLocaleString("en-US")} in the [Mega Jackpot](/en/games)).` : ""}`,
+    "",
+  ];
+
+  if (input.monthTop) {
+    lines.push(
+      "## Player of the month",
+      "",
+      `**${input.monthTop.username}** set the pace with **${input.monthTop.rounds.toLocaleString("en-US")} settled ${input.monthTop.rounds === 1 ? "round" : "rounds"}** — the busiest month on the boards. The [leaderboards](/en/leaderboards) carry the full ranking, and every settled round rolled the progressive pots.`,
+      "",
+    );
+  }
+
+  if (top) {
+    lines.push(
+      "## Game of the month",
+      "",
+      `**[${top.game}](/en/games/${top.id}?ref=recap)** drew the crowd with **${top.rounds.toLocaleString("en-US")} ${top.rounds === 1 ? "round" : "rounds"}**.`,
+      runnerUp
+        ? `[${runnerUp.game}](/en/games/${runnerUp.id}?ref=recap) followed at ${runnerUp.rounds.toLocaleString("en-US")} rounds.`
+        : "No other table saw action, making it a clean sweep for the month.",
+      "",
+      "The full board:",
+      "",
+      ...sorted.map((g) => `- [${g.game}](/en/games/${g.id}?ref=recap): ${g.rounds.toLocaleString("en-US")} ${g.rounds === 1 ? "round" : "rounds"}`),
+      "",
+    );
+  }
+
+  if (input.biggestWin) {
+    const net = input.biggestWin.payout - input.biggestWin.bet;
+    lines.push(
+      "## Biggest win of the month",
+      "",
+      input.biggestWin.username
+        ? `**${input.biggestWin.username}** took the month's largest payout on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id}?ref=recap)** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`
+        : `The month's largest payout landed on **[${input.biggestWin.game}](/en/games/${input.biggestWin.id}?ref=recap)** — a staked ${input.biggestWin.bet.toLocaleString("en-US")} BadgesCoins returning ${input.biggestWin.payout.toLocaleString("en-US")}, for a net of **+${net.toLocaleString("en-US")} BadgesCoins**.`,
+      "",
+    );
+  }
+
+  let content = lines.join("\n");
+  if (content.length < MIN_CONTENT_CHARS) {
+    content += (content.endsWith("\n") ? "" : "\n") + "\n" + GENERIC_CONTEXT_BLOCK;
+  }
+
+  const title = `Arcade monthly — ${monthLabel}`;
+  const excerpt =
+    totalRounds > 0
+      ? `${monthLabel} in the Badge Arcade: ${totalRounds.toLocaleString("en-US")} settled rounds, ${top ? `${top.game} on top` : "a quiet board"}${input.monthTop ? `, ${input.monthTop.username} as player of the month` : ""}${input.biggestWin ? `, and the month's biggest win of +${(input.biggestWin.payout - input.biggestWin.bet).toLocaleString("en-US")} BadgesCoins` : ""}${input.jackpot && input.jackpot.hits > 0 ? `, ${input.jackpot.hits} jackpot ${input.jackpot.hits === 1 ? "hit" : "hits"}` : ""}.`
+      : `${monthLabel} in the Badge Arcade: a quiet month with no settled rounds — the boards stay open for the next player.`;
 
   return { content, excerpt, title };
 }

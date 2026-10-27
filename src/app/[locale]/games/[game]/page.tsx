@@ -9,7 +9,7 @@ import Coin from "@/components/Coin";
 import { createClient } from "@/lib/supabase/server";
 import { authUserId } from "@/lib/gamification/session";
 import { getFeatures, getGames } from "@/lib/settings";
-import { getJackpots } from "@/lib/queries";
+import { getJackpots, getJackpotPotsYesterday } from "@/lib/queries";
 import TwitchLoginButton from "@/components/TwitchLoginButton";
 import RpsGame from "@/components/games/RpsGame";
 import CoinflipGame from "@/components/games/CoinflipGame";
@@ -203,6 +203,16 @@ export default async function GamePage({ params }: PageProps) {
   const mega = jackpots.find((j) => j.kind === "mega") ?? null;
   const megaPot = mega?.pot ?? null;
 
+  // Since-yesterday pot growth (0072 snapshots): this game's pot vs
+  // yesterday's 06:00 UTC baseline — the urgency line under the hero chips.
+  // A hit since the snapshot shows negative (the pot paid out); a pot with
+  // no baseline row yet shows nothing.
+  const yesterdayPots = await getJackpotPotsYesterday();
+  const gameDelta =
+    gamePot !== null && Object.prototype.hasOwnProperty.call(yesterdayPots, game)
+      ? gamePot - yesterdayPots[game]
+      : null;
+
   // One hero shell for EVERY state (playable, login wall, arcade off): the
   // game art makes the page recognizable even before login. `stats` is the
   // state-specific chip (last-round result) that only the playable state has.
@@ -243,6 +253,20 @@ export default async function GamePage({ params }: PageProps) {
           )}
           {stats}
         </div>
+        {gameDelta !== null && gameDelta !== 0 && (
+          <p
+            className={`mt-1 text-xs font-bold tabular-nums ${
+              gameDelta > 0 ? "text-success" : "text-danger"
+            }`}
+            dir="ltr"
+          >
+            {t("jackpotPotDelta", {
+              n: `${gameDelta > 0 ? "+" : "−"}${Math.abs(
+                gameDelta,
+              ).toLocaleString(locale)}`,
+            })}
+          </p>
+        )}
         {mega?.last_winner && mega.last_won_at && (
           // The last Mega Jackpot hit — the rarest moment of the arcade,
           // visible on every game page until the next one lands.

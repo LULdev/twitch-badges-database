@@ -251,6 +251,10 @@
     "streakTitle": "Mejores rachas de juegos",
     "streakDesc": "Miembros con las rachas de juego más largas del sitio",
     "streakUnit": "días",
+    "loginStreakTitle": "Rachas de inicio de sesión más largas",
+    "loginStreakDesc": "Miembros que aparecieron más días seguidos",
+    "youStreakRank": "Tu mejor racha: {n} días — #{rank}",
+    "youStreakToFirst": "{n} días para el primer puesto",
     "rank": "Puesto",
     "collector": "Coleccionista",
     "badges": "Insignias",
@@ -344,9 +348,19 @@
     "socialTwitterLabel": "Perfil de Twitter/X",
     "socialDiscordLabel": "Perfil de Discord",
     "statToNext": "hasta #{rank}",
-    "monthSummaryUp": "Este mes: {wagered} monedas apostadas en {rounds} rondas ({wins} ganadas) — neto +{net}.",
-    "monthSummaryDown": "Este mes: {wagered} monedas apostadas en {rounds} rondas ({wins} ganadas) — neto −{net}.",
-    "monthSummaryFlat": "Este mes: {wagered} monedas apostadas en {rounds} rondas ({wins} ganadas) — neto estable."
+    "monthSummaryUp": "{who}: {wagered} monedas apostadas en {rounds} rondas ({wins} ganadas) — neto +{net}.",
+    "monthSummaryDown": "{who}: {wagered} monedas apostadas en {rounds} rondas ({wins} ganadas) — neto −{net}.",
+    "monthSummaryFlat": "{who}: {wagered} monedas apostadas en {rounds} rondas ({wins} ganadas) — neto estable.",
+    "monthWhoYou": "Este mes",
+    "monthWhoName": "Mes de {name}",
+    "monthCompareUp": "{pct}% más que el mes anterior",
+    "monthCompareDown": "{pct}% menos que el mes anterior",
+    "monthCompareFlat": "al nivel del mes anterior",
+    "monthBestHit": "Mejor golpe del mes: +{n} ({game}, {date})",
+    "monthShare": "El {share}% de las monedas apostadas por la comunidad este mes vinieron de ti.",
+    "monthBestWeek": "Mejores 7 días: +{n}",
+    "dayDetailTitle": "{date} — {n} rondas",
+    "dayDetailEmpty": "No hubo rondas ese día."
   },
   "inventory": {
     "title": "Mis insignias",
@@ -851,7 +865,14 @@
     "jackpotWinners": "Últimos premios de jackpot",
     "jackpotHofTitle": "Mayores premios de jackpot de la historia",
     "jackpotLastMega": "Último Mega Jackpot: {name} +{n}",
-    "jackpotChipLast": "Último: {name} +{n} · {date}"
+    "jackpotChipLast": "Último: {name} +{n} · {date}",
+    "communityMonth": "Mes de la comunidad: {rounds} rondas · {wagered} monedas apostadas · {players} jugadores activos",
+    "communityTrendUp": "apuestas +{pct}% frente al mes anterior",
+    "communityTrendDown": "apuestas −{pct}% frente al mes anterior",
+    "communityTrendFlat": "apuestas al nivel del mes anterior",
+    "jackpotPotDelta": "{n} desde ayer",
+    "monthPodiumTitle": "Los mejores del mes",
+    "monthPodiumLine": "{rounds} rondas · {wagered} monedas apostadas"
   },
   "wheel": {
     "title": "Ruleta de la fortuna",
@@ -1212,6 +1233,9 @@
         "revoke": "Retirar",
         "granted": "Logro otorgado.",
         "revoked": "Logro retirado."
+      },
+      "activity": {
+        "title": "Actividad · 60 días"
       },
       "danger": {
         "title": "Zona de peligro",

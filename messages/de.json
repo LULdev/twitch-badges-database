@@ -251,6 +251,10 @@
     "streakTitle": "Beste Spiel-Serien",
     "streakDesc": "Mitglieder mit den längsten Spiel-Serien der Seite",
     "streakUnit": "Tage",
+    "loginStreakTitle": "Längste Login-Serien",
+    "loginStreakDesc": "Mitglieder, die die meisten Tage am Stück da waren",
+    "youStreakRank": "Dein bester Streak: {n} Tage — #{rank}",
+    "youStreakToFirst": "{n} Tage bis Platz 1",
     "rank": "Rang",
     "collector": "Sammler",
     "badges": "Badges",
@@ -344,9 +348,19 @@
     "socialTwitterLabel": "Twitter/X-Profil",
     "socialDiscordLabel": "Discord-Profil",
     "statToNext": "bis #{rank}",
-    "monthSummaryUp": "Diesen Monat: {wagered} Coins umgesetzt in {rounds} Runden ({wins} gewonnen) — netto +{net}.",
-    "monthSummaryDown": "Diesen Monat: {wagered} Coins umgesetzt in {rounds} Runden ({wins} gewonnen) — netto −{net}.",
-    "monthSummaryFlat": "Diesen Monat: {wagered} Coins umgesetzt in {rounds} Runden ({wins} gewonnen) — netto ausgeglichen."
+    "monthSummaryUp": "{who}: {wagered} Coins umgesetzt in {rounds} Runden ({wins} gewonnen) — netto +{net}.",
+    "monthSummaryDown": "{who}: {wagered} Coins umgesetzt in {rounds} Runden ({wins} gewonnen) — netto −{net}.",
+    "monthSummaryFlat": "{who}: {wagered} Coins umgesetzt in {rounds} Runden ({wins} gewonnen) — netto ausgeglichen.",
+    "monthWhoYou": "Diesen Monat",
+    "monthWhoName": "{name}s Monat",
+    "monthCompareUp": "{pct}% mehr als im Vormonat",
+    "monthCompareDown": "{pct}% weniger als im Vormonat",
+    "monthCompareFlat": "auf Vormonatsniveau",
+    "monthBestHit": "Bester Monatstreffer: +{n} ({game}, {date})",
+    "monthShare": "{share}% der in diesem Monat von der Community umgesetzten Coins stammen von dir.",
+    "monthBestWeek": "Beste 7 Tage: +{n}",
+    "dayDetailTitle": "{date} — {n} Runden",
+    "dayDetailEmpty": "Keine Runden an diesem Tag."
   },
   "inventory": {
     "title": "Meine Badges",
@@ -851,7 +865,14 @@
     "jackpotWinners": "Neueste Jackpot-Gewinne",
     "jackpotHofTitle": "Die größten Jackpot-Gewinne aller Zeiten",
     "jackpotLastMega": "Letzter Mega-Jackpot: {name} +{n}",
-    "jackpotChipLast": "Zuletzt: {name} +{n} · {date}"
+    "jackpotChipLast": "Zuletzt: {name} +{n} · {date}",
+    "communityMonth": "Community-Monat: {rounds} Runden · {wagered} Coins umgesetzt · {players} aktive Spieler",
+    "communityTrendUp": "Umsatz +{pct}% gegenüber dem Vormonat",
+    "communityTrendDown": "Umsatz −{pct}% gegenüber dem Vormonat",
+    "communityTrendFlat": "Umsatz auf Vormonatsniveau",
+    "jackpotPotDelta": "{n} seit gestern",
+    "monthPodiumTitle": "Die Besten des Monats",
+    "monthPodiumLine": "{rounds} Runden · {wagered} Coins umgesetzt"
   },
   "wheel": {
     "title": "Glücksrad",
@@ -1212,6 +1233,9 @@
         "revoke": "Entziehen",
         "granted": "Errungenschaft vergeben.",
         "revoked": "Errungenschaft entzogen."
+      },
+      "activity": {
+        "title": "Aktivität · 60 Tage"
       },
       "danger": {
         "title": "Gefahrenzone",

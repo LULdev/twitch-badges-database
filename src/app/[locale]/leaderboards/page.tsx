@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
+  getLoginStreakLeaderboard,
   getMostOwnedBadges,
   getRarestBadges,
   getSiteLeaderboard,
@@ -16,6 +17,8 @@ import { BadgeImage } from "@/components/badges/BadgeImage";
 import RarityChip from "@/components/badges/RarityChip";
 import { formatCompact } from "@/components/badges/BadgeCard";
 import { localeAlternates } from "@/lib/seo";
+import { createClient } from "@/lib/supabase/server";
+import { readProgress } from "@/lib/gamification/xp";
 
 // Live data (potat leaderboards, rankings) — never prerender. With a loading
 // boundary in the segment the build actually executes this page's fetches
@@ -65,15 +68,64 @@ export default async function LeaderboardsPage({
   const t = await getTranslations("leaderboards");
   const tc = await getTranslations("common");
 
-  const [potat, badgesblog, mostOwned, rarest, site, streaks, wagered] = await Promise.all([
-    fetchOwnedLeaderboard(2).catch(() => []),
-    fetchBadgesBlogRanking().catch(() => []),
-    getMostOwnedBadges(10).catch(() => []),
-    getRarestBadges(10).catch(() => []),
-    getSiteLeaderboard(25).catch(() => []),
-    getStreakLeaderboard().catch(() => []),
-    getWageredLeaderboard().catch(() => []),
-  ]);
+  const [potat, badgesblog, mostOwned, rarest, site, streaks, loginStreaks, wagered] =
+    await Promise.all([
+      fetchOwnedLeaderboard(2).catch(() => []),
+      fetchBadgesBlogRanking().catch(() => []),
+      getMostOwnedBadges(10).catch(() => []),
+      getRarestBadges(10).catch(() => []),
+      getSiteLeaderboard(25).catch(() => []),
+      getStreakLeaderboard().catch(() => []),
+      getLoginStreakLeaderboard().catch(() => []),
+      getWageredLeaderboard().catch(() => []),
+    ]);
+
+  // The viewer's own streak standing — the profile rankChip pattern (head
+  // count above me + the next value ahead), shown under the streak boards
+  // for logged-in members with a non-zero best. Anonymous visits skip all
+  // of it (readProgress never creates a row, and no chip renders).
+  const streakYou: {
+    game: { mine: number; rank: number; toFirst: number } | null;
+    login: { mine: number; rank: number; toFirst: number } | null;
+  } = { game: null, login: null };
+  {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      const progress = await readProgress(user.id).catch(() => null);
+      if (progress) {
+        const chip = async (
+          col: "best_game_streak" | "best_login_streak",
+          mine: number,
+        ): Promise<{ mine: number; rank: number; toFirst: number } | null> => {
+          if (mine <= 0) return null;
+          const [{ count }, { data: next }] = await Promise.all([
+            supabase
+              .from("user_progress")
+              .select("user_id", { count: "exact", head: true })
+              .gt(col, mine),
+            supabase
+              .from("user_progress")
+              .select(col)
+              .gt(col, mine)
+              .order(col, { ascending: true })
+              .limit(1)
+              .maybeSingle(),
+          ]);
+          const nextVal = Number(
+            (next as Record<string, unknown> | null)?.[col] ?? 0,
+          );
+          return { mine, rank: (count ?? 0) + 1, toFirst: Math.max(0, nextVal - mine) };
+        };
+        streakYou.game = await chip("best_game_streak", progress.best_game_streak ?? 0);
+        streakYou.login = await chip("best_login_streak", progress.best_login_streak ?? 0);
+      }
+    }
+  }
+
+  const fmtInt = new Intl.NumberFormat(locale);
 
   return (
     <div className="space-y-10">
@@ -372,6 +424,75 @@ export default async function LeaderboardsPage({
             </table>
           ) : (
             <p className="p-6 text-sm text-muted">{t("empty")}</p>
+          )}
+          {streakYou.game && (
+            <p className="border-t border-line px-5 py-2 text-xs text-muted">
+              {t("youStreakRank", {
+                n: fmtInt.format(streakYou.game.mine),
+                rank: streakYou.game.rank,
+              })}
+              {streakYou.game.toFirst > 0
+                ? " · " +
+                  t("youStreakToFirst", { n: fmtInt.format(streakYou.game.toFirst) })
+                : ""}
+            </p>
+          )}
+        </section>
+
+        {/* Longest login streaks — the game-streak board's sibling with the
+            column swapped to best_login_streak (0007's high-water mark). */}
+        <section aria-labelledby="best-login-streaks" className="card overflow-hidden">
+          <div className="border-b border-line px-5 py-4">
+            <h2 id="best-login-streaks" className="font-bold">{t("loginStreakTitle")}</h2>
+            <p className="mt-0.5 text-xs text-muted">{t("loginStreakDesc")}</p>
+          </div>
+          {loginStreaks.length > 0 ? (
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th className="w-14">{t("rank")}</th>
+                  <th>{t("collector")}</th>
+                  <th className="text-end">{t("streakUnit")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loginStreaks.map((entry, index) => (
+                  <tr key={entry.user_id} className="hover:bg-surface-2">
+                    <td className="font-bold tabular-nums text-muted">#{index + 1}</td>
+                    <td>
+                      {entry.profile ? (
+                        <Link
+                          href={`/profile/${entry.profile.username}`}
+                          className="flex items-center gap-2.5 font-semibold hover:text-accent"
+                        >
+                          <Avatar src={entry.profile.avatar_url} name={entry.profile.username} />
+                          {entry.profile.username}
+                        </Link>
+                      ) : (
+                        <span className="text-muted">—</span>
+                      )}
+                    </td>
+                    <td className="text-end font-semibold tabular-nums">
+                      {new Intl.NumberFormat(locale).format(entry.best_login_streak)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="p-6 text-sm text-muted">{t("empty")}</p>
+          )}
+          {streakYou.login && (
+            <p className="border-t border-line px-5 py-2 text-xs text-muted">
+              {t("youStreakRank", {
+                n: fmtInt.format(streakYou.login.mine),
+                rank: streakYou.login.rank,
+              })}
+              {streakYou.login.toFirst > 0
+                ? " · " +
+                  t("youStreakToFirst", { n: fmtInt.format(streakYou.login.toFirst) })
+                : ""}
+            </p>
           )}
         </section>
       </div>

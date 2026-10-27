@@ -251,6 +251,10 @@
     "streakTitle": "最高游戏连击",
     "streakDesc": "本站游戏连击最长的成员",
     "streakUnit": "天",
+    "loginStreakTitle": "最长连续登录",
+    "loginStreakDesc": "连续到访天数最多的成员",
+    "youStreakRank": "你的最佳：{n} 天 — #{rank}",
+    "youStreakToFirst": "距第一名还差 {n} 天",
     "rank": "排名",
     "collector": "收藏家",
     "badges": "徽章数",
@@ -344,9 +348,19 @@
     "socialTwitterLabel": "Twitter/X 主页",
     "socialDiscordLabel": "Discord 主页",
     "statToNext": "升至 ##{rank}",
-    "monthSummaryUp": "本月：投注 {wagered} 硬币，共 {rounds} 局（赢 {wins} 局）——净收入 +{net}。",
-    "monthSummaryDown": "本月：投注 {wagered} 硬币，共 {rounds} 局（赢 {wins} 局）——净亏损 −{net}。",
-    "monthSummaryFlat": "本月：投注 {wagered} 硬币，共 {rounds} 局（赢 {wins} 局）——净收支持平。"
+    "monthSummaryUp": "{who}：投注 {wagered} 硬币，共 {rounds} 局（赢 {wins} 局）——净收入 +{net}。",
+    "monthSummaryDown": "{who}：投注 {wagered} 硬币，共 {rounds} 局（赢 {wins} 局）——净亏损 −{net}。",
+    "monthSummaryFlat": "{who}：投注 {wagered} 硬币，共 {rounds} 局（赢 {wins} 局）——净收支持平。",
+    "monthWhoYou": "本月",
+    "monthWhoName": "{name} 的本月",
+    "monthCompareUp": "比上月多 {pct}%",
+    "monthCompareDown": "比上月少 {pct}%",
+    "monthCompareFlat": "与上月持平",
+    "monthBestHit": "月度最佳一击：+{n}（{game}，{date}）",
+    "monthShare": "本月社区投注硬币的 {share}% 来自你。",
+    "monthBestWeek": "最佳 7 天：+{n}",
+    "dayDetailTitle": "{date} — {n} 局",
+    "dayDetailEmpty": "当天没有对局。"
   },
   "inventory": {
     "title": "我的徽章",
@@ -851,7 +865,14 @@
     "jackpotWinners": "最新大奖记录",
     "jackpotHofTitle": "史上最大的奖池中奖",
     "jackpotLastMega": "最近超级大奖：{name} +{n}",
-    "jackpotChipLast": "最近：{name} +{n} · {date}"
+    "jackpotChipLast": "最近：{name} +{n} · {date}",
+    "communityMonth": "社区本月：{rounds} 局 · 投注 {wagered} 硬币 · {players} 位活跃玩家",
+    "communityTrendUp": "投注额较上月 +{pct}%",
+    "communityTrendDown": "投注额较上月 −{pct}%",
+    "communityTrendFlat": "投注额与上月持平",
+    "jackpotPotDelta": "较昨日 {n}",
+    "monthPodiumTitle": "本月最佳",
+    "monthPodiumLine": "{rounds} 局 · 投注 {wagered} 硬币"
   },
   "wheel": {
     "title": "命运转盘",
@@ -1212,6 +1233,9 @@
         "revoke": "撤销",
         "granted": "已授予成就。",
         "revoked": "已撤销成就。"
+      },
+      "activity": {
+        "title": "活跃度 · 60 天"
       },
       "danger": {
         "title": "危险区域",

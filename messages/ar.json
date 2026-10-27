@@ -251,6 +251,10 @@
     "streakTitle": "أفضل سلاسل اللعب",
     "streakDesc": "الأعضاء الأصحاب أطول سلاسل اللعب على الموقع",
     "streakUnit": "أيام",
+    "loginStreakTitle": "أطول سلاسل تسجيل الدخول",
+    "loginStreakDesc": "الأعضاء الذين حضروا أكبر عدد من الأيام المتتالية",
+    "youStreakRank": "أفضل سلسلة لديك: {n} يومًا — #{rank}",
+    "youStreakToFirst": "{n} يومًا للمركز الأول",
     "rank": "المرتبة",
     "collector": "هاوي الجمع",
     "badges": "الشارات",
@@ -344,9 +348,19 @@
     "socialTwitterLabel": "ملف Twitter/X",
     "socialDiscordLabel": "ملف Discord",
     "statToNext": "للوصول إلى #{rank}",
-    "monthSummaryUp": "هذا الشهر: {wagered} عملة مراهنة في {rounds} جولة ({wins} مكسوبة) — الصافي +{net}.",
-    "monthSummaryDown": "هذا الشهر: {wagered} عملة مراهنة في {rounds} جولة ({wins} مكسوبة) — الصافي −{net}.",
-    "monthSummaryFlat": "هذا الشهر: {wagered} عملة مراهنة في {rounds} جولة ({wins} مكسوبة) — الصافي متعادل."
+    "monthSummaryUp": "{who}: {wagered} عملة مراهنة في {rounds} جولة ({wins} مكسوبة) — الصافي +{net}.",
+    "monthSummaryDown": "{who}: {wagered} عملة مراهنة في {rounds} جولة ({wins} مكسوبة) — الصافي −{net}.",
+    "monthSummaryFlat": "{who}: {wagered} عملة مراهنة في {rounds} جولة ({wins} مكسوبة) — الصافي متعادل.",
+    "monthWhoYou": "هذا الشهر",
+    "monthWhoName": "شهر {name}",
+    "monthCompareUp": "بنسبة {pct}% أكثر من الشهر الماضي",
+    "monthCompareDown": "بنسبة {pct}% أقل من الشهر الماضي",
+    "monthCompareFlat": "على مستوى الشهر الماضي",
+    "monthBestHit": "أفضل ضربة في الشهر: +{n} ({game}، {date})",
+    "monthShare": "{share}% من العملات التي راهنها المجتمع هذا الشهر جاءت منك.",
+    "monthBestWeek": "أفضل 7 أيام: +{n}",
+    "dayDetailTitle": "{date} — {n} جولة",
+    "dayDetailEmpty": "لا جولات في هذا اليوم."
   },
   "inventory": {
     "title": "شاراتي",
@@ -851,7 +865,14 @@
     "jackpotWinners": "آخر الفوز بالجاكبوت",
     "jackpotHofTitle": "أكبر مكاسب الجاكبوت على الإطلاق",
     "jackpotLastMega": "آخر ميجا جاكبوت: {name} +{n}",
-    "jackpotChipLast": "الأخير: {name} +{n} · {date}"
+    "jackpotChipLast": "الأخير: {name} +{n} · {date}",
+    "communityMonth": "شهر المجتمع: {rounds} جولة · {wagered} عملة مراهنة · {players} لاعبًا نشطًا",
+    "communityTrendUp": "الرهانات أعلى بنسبة {pct}% من الشهر الماضي",
+    "communityTrendDown": "الرهانات أقل بنسبة {pct}% من الشهر الماضي",
+    "communityTrendFlat": "الرهانات على مستوى الشهر الماضي",
+    "jackpotPotDelta": "{n} منذ أمس",
+    "monthPodiumTitle": "نخبة الشهر",
+    "monthPodiumLine": "{rounds} جولة · {wagered} عملة مراهنة"
   },
   "wheel": {
     "title": "عجلة الحظ",
@@ -1212,6 +1233,9 @@
         "revoke": "سحب",
         "granted": "تم منح الإنجاز.",
         "revoked": "تم سحب الإنجاز."
+      },
+      "activity": {
+        "title": "النشاط · 60 يومًا"
       },
       "danger": {
         "title": "منطقة الخطر",

@@ -251,6 +251,10 @@
     "streakTitle": "Meilleures séries de jeux",
     "streakDesc": "Membres avec les plus longues séries de jeux du site",
     "streakUnit": "jours",
+    "loginStreakTitle": "Plus longues séries de connexion",
+    "loginStreakDesc": "Les membres présents le plus de jours d'affilée",
+    "youStreakRank": "Ta meilleure série : {n} jours — #{rank}",
+    "youStreakToFirst": "{n} jours jusqu'à la première place",
     "rank": "Rang",
     "collector": "Collectionneur",
     "badges": "Badges",
@@ -344,9 +348,19 @@
     "socialTwitterLabel": "Profil Twitter/X",
     "socialDiscordLabel": "Profil Discord",
     "statToNext": "jusqu'au #{rank}",
-    "monthSummaryUp": "Ce mois-ci : {wagered} pièces misées sur {rounds} manches ({wins} gagnées) — net +{net}.",
-    "monthSummaryDown": "Ce mois-ci : {wagered} pièces misées sur {rounds} manches ({wins} gagnées) — net −{net}.",
-    "monthSummaryFlat": "Ce mois-ci : {wagered} pièces misées sur {rounds} manches ({wins} gagnées) — net équilibré."
+    "monthSummaryUp": "{who} : {wagered} pièces misées sur {rounds} manches ({wins} gagnées) — net +{net}.",
+    "monthSummaryDown": "{who} : {wagered} pièces misées sur {rounds} manches ({wins} gagnées) — net −{net}.",
+    "monthSummaryFlat": "{who} : {wagered} pièces misées sur {rounds} manches ({wins} gagnées) — net équilibré.",
+    "monthWhoYou": "Ce mois-ci",
+    "monthWhoName": "Mois de {name}",
+    "monthCompareUp": "{pct}% de plus que le mois précédent",
+    "monthCompareDown": "{pct}% de moins que le mois précédent",
+    "monthCompareFlat": "au niveau du mois précédent",
+    "monthBestHit": "Meilleur coup du mois : +{n} ({game}, {date})",
+    "monthShare": "{share}% des pièces misées par la communauté ce mois-ci venaient de toi.",
+    "monthBestWeek": "Meilleurs 7 jours : +{n}",
+    "dayDetailTitle": "{date} — {n} manches",
+    "dayDetailEmpty": "Aucune manche ce jour-là."
   },
   "inventory": {
     "title": "Mes badges",
@@ -851,7 +865,14 @@
     "jackpotWinners": "Derniers gains de jackpot",
     "jackpotHofTitle": "Plus gros gains de jackpot de tous les temps",
     "jackpotLastMega": "Dernier Méga Jackpot : {name} +{n}",
-    "jackpotChipLast": "Dernier : {name} +{n} · {date}"
+    "jackpotChipLast": "Dernier : {name} +{n} · {date}",
+    "communityMonth": "Mois de la communauté : {rounds} manches · {wagered} pièces misées · {players} joueurs actifs",
+    "communityTrendUp": "mises en hausse de {pct}% par rapport au mois précédent",
+    "communityTrendDown": "mises en baisse de {pct}% par rapport au mois précédent",
+    "communityTrendFlat": "mises au niveau du mois précédent",
+    "jackpotPotDelta": "{n} depuis hier",
+    "monthPodiumTitle": "Les meilleurs du mois",
+    "monthPodiumLine": "{rounds} manches · {wagered} pièces misées"
   },
   "wheel": {
     "title": "Roue de la fortune",
@@ -1212,6 +1233,9 @@
         "revoke": "Retirer",
         "granted": "Succès accordé.",
         "revoked": "Succès retiré."
+      },
+      "activity": {
+        "title": "Activité · 60 jours"
       },
       "danger": {
         "title": "Zone de danger",

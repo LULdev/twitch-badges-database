@@ -16,10 +16,29 @@ import GameIcon from "@/components/GameIcon";
 import GameArt, { GAME_COLORS } from "@/components/games/GameArt";
 import JackpotStrip from "@/components/games/JackpotStrip";
 import Reveal from "@/components/stats/Reveal";
-import { getJackpots, getRecentJackpotWins, getTopJackpotWins } from "@/lib/queries";
+import { getJackpots, getJackpotPotsYesterday, getRecentJackpotWins, getTopJackpotWins } from "@/lib/queries";
+import { getArcadeMonth, getArcadeMonthTop } from "@/lib/stats";
 import { localeAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+// Podium medal tints — the .rank-row tokens, same source as the jackpot
+// hall of fame and the leaderboards wagered board.
+const MEDALS = ["var(--rank-gold)", "var(--rank-silver)", "var(--rank-bronze)"];
+
+function Avatar({ src, name }: { src: string | null; name: string }) {
+  if (src) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={src} alt={name} width={28} height={28} className="rounded-full" loading="lazy" />
+    );
+  }
+  return (
+    <span className="grid size-7 place-items-center rounded-full bg-accent-soft text-[0.625rem] font-bold text-accent">
+      {name.slice(0, 2).toUpperCase()}
+    </span>
+  );
+}
 
 export async function generateMetadata({
   params,
@@ -129,12 +148,19 @@ export default async function GamesHubPage({
   // Progressive jackpots (0069): the Mega pot plus every game pot, one anon
   // read, the newest winners for the recency row and the biggest ever for the
   // hall-of-fame row. An empty result (unreachable table) hides the strip —
-  // the arcade must not depend on the jackpot surface existing.
-  const [jackpots, jackpotWins, jackpotHall] = await Promise.all([
-    getJackpots(),
-    getRecentJackpotWins(3),
-    getTopJackpotWins(3),
-  ]);
+  // the arcade must not depend on the jackpot surface existing. The
+  // yesterday-snapshot map (0072) feeds the strip's since-yesterday chips;
+  // the month-top read (0078) feeds the Hall-of-the-month podium below the
+  // community banner.
+  const [jackpots, jackpotWins, jackpotHall, arcadeMonth, yesterdayPots, monthTop3] =
+    await Promise.all([
+      getJackpots(),
+      getRecentJackpotWins(3),
+      getTopJackpotWins(3),
+      getArcadeMonth(),
+      getJackpotPotsYesterday(),
+      getArcadeMonthTop(),
+    ]);
 
   return (
     <div className="space-y-8">
@@ -166,12 +192,94 @@ export default async function GamesHubPage({
         </div>
       </header>
 
+      {/* Community month (0076): the rolling 30-day totals as a one-line
+          banner — the "we together" companion to every profile's own month
+          summary. Hidden when the view is unreachable or the month was quiet. */}
+      {arcadeMonth && arcadeMonth.rounds > 0 && (
+        <div className="card flex flex-wrap items-center gap-x-3 gap-y-1 p-4 text-sm text-muted">
+          <span
+            className="size-2 rounded-full"
+            style={{ background: "var(--accent)" }}
+            aria-hidden="true"
+          />
+          {t("communityMonth", {
+            rounds: arcadeMonth.rounds.toLocaleString(locale),
+            wagered: arcadeMonth.wagered.toLocaleString(locale),
+            players: arcadeMonth.players.toLocaleString(locale),
+          })}
+          {arcadeMonth.wageredPrior >= 100 && arcadeMonth.wagered > 0 && (
+            <span className="text-accent">
+              {(() => {
+                const pct = Math.round(
+                  ((arcadeMonth.wagered - arcadeMonth.wageredPrior) /
+                    arcadeMonth.wageredPrior) * 100,
+                );
+                if (Math.abs(pct) < 5) return t("communityTrendFlat");
+                return t(
+                  pct > 0 ? "communityTrendUp" : "communityTrendDown",
+                  { pct: Math.abs(pct).toLocaleString(locale) },
+                );
+              })()}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Hall of the month (0078): the trailing-30-day top 3 by settled
+          rounds — the community banner's numbers given faces. Mounts only
+          when the view has rows (a quiet month shows the banner alone). */}
+      {monthTop3.length > 0 && (
+        <section className="card p-4" aria-labelledby="month-podium-head">
+          <h2
+            id="month-podium-head"
+            className="text-sm font-bold uppercase tracking-[0.08em] text-muted"
+          >
+            {t("monthPodiumTitle")}
+          </h2>
+          <ol className="mt-3 grid gap-2 sm:grid-cols-3">
+            {monthTop3.map((entry, index) => (
+              <li
+                key={entry.username}
+                className="flex items-center gap-3 rounded-[var(--radius-input)] border p-3"
+                style={{
+                  borderColor: `color-mix(in srgb, ${MEDALS[index]} 45%, var(--line))`,
+                }}
+              >
+                <span
+                  className="jackpot-hof-rank"
+                  style={{ color: MEDALS[index] }}
+                  aria-hidden="true"
+                >
+                  {index + 1}
+                </span>
+                <Avatar src={entry.avatarUrl} name={entry.username} />
+                <Link
+                  href={`/profile/${entry.username}`}
+                  className="min-w-0 flex-1 hover:text-accent"
+                >
+                  <span className="block truncate text-sm font-bold">
+                    {entry.username}
+                  </span>
+                  <span className="block text-xs text-muted" dir="ltr">
+                    {t("monthPodiumLine", {
+                      rounds: entry.rounds.toLocaleString(locale),
+                      wagered: entry.wagered.toLocaleString(locale),
+                    })}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
       {jackpots.length > 0 && (
         <JackpotStrip
           jackpots={jackpots}
           wins={jackpotWins}
           hallOfFame={jackpotHall}
           locale={locale}
+          yesterdayPots={yesterdayPots}
         />
       )}
 

@@ -251,6 +251,10 @@
     "streakTitle": "Best game streaks",
     "streakDesc": "Members with the longest game streaks on the site",
     "streakUnit": "days",
+    "loginStreakTitle": "Longest login streaks",
+    "loginStreakDesc": "Members who showed up the most days in a row",
+    "youStreakRank": "Your best: {n} days — #{rank}",
+    "youStreakToFirst": "{n} days to first place",
     "rank": "Rank",
     "collector": "Collector",
     "badges": "Badges",
@@ -344,9 +348,19 @@
     "socialTwitterLabel": "Twitter/X profile",
     "socialDiscordLabel": "Discord profile",
     "statToNext": "to #{rank}",
-    "monthSummaryUp": "This month: {wagered} coins wagered across {rounds} rounds ({wins} won) — net +{net}.",
-    "monthSummaryDown": "This month: {wagered} coins wagered across {rounds} rounds ({wins} won) — net −{net}.",
-    "monthSummaryFlat": "This month: {wagered} coins wagered across {rounds} rounds ({wins} won) — net level."
+    "monthSummaryUp": "{who}: {wagered} coins wagered across {rounds} rounds ({wins} won) — net +{net}.",
+    "monthSummaryDown": "{who}: {wagered} coins wagered across {rounds} rounds ({wins} won) — net −{net}.",
+    "monthSummaryFlat": "{who}: {wagered} coins wagered across {rounds} rounds ({wins} won) — net level.",
+    "monthWhoYou": "This month",
+    "monthWhoName": "{name}'s month",
+    "monthCompareUp": "{pct}% more than the prior month",
+    "monthCompareDown": "{pct}% less than the prior month",
+    "monthCompareFlat": "level with the prior month",
+    "monthBestHit": "Month's best hit: +{n} ({game}, {date})",
+    "monthShare": "{share}% of the community's wagered coins this month came from you.",
+    "monthBestWeek": "Best 7 days: +{n}",
+    "dayDetailTitle": "{date} — {n} rounds",
+    "dayDetailEmpty": "No rounds on this day."
   },
   "inventory": {
     "title": "My badges",
@@ -851,7 +865,14 @@
     "jackpotWinners": "Latest jackpot wins",
     "jackpotHofTitle": "Biggest jackpot wins ever",
     "jackpotLastMega": "Last Mega Jackpot: {name} +{n}",
-    "jackpotChipLast": "Last: {name} +{n} · {date}"
+    "jackpotChipLast": "Last: {name} +{n} · {date}",
+    "communityMonth": "Community month: {rounds} rounds · {wagered} coins wagered · {players} active players",
+    "communityTrendUp": "wagering up {pct}% on the prior month",
+    "communityTrendDown": "wagering down {pct}% on the prior month",
+    "communityTrendFlat": "wagering level with the prior month",
+    "jackpotPotDelta": "{n} since yesterday",
+    "monthPodiumTitle": "Hall of the month",
+    "monthPodiumLine": "{rounds} rounds · {wagered} coins wagered"
   },
   "wheel": {
     "title": "Wheel of Fortune",
@@ -1212,6 +1233,9 @@
         "revoke": "Revoke",
         "granted": "Achievement granted.",
         "revoked": "Achievement revoked."
+      },
+      "activity": {
+        "title": "Activity · 60 days"
       },
       "danger": {
         "title": "Danger zone",

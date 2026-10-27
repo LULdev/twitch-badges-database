@@ -251,6 +251,10 @@
     "streakTitle": "Лучшие игровые серии",
     "streakDesc": "Участники с самыми длинными игровыми сериями на сайте",
     "streakUnit": "дней",
+    "loginStreakTitle": "Самые длинные серии входов",
+    "loginStreakDesc": "Участники, заходившие больше дней подряд",
+    "youStreakRank": "Твой рекорд: {n} дней — #{rank}",
+    "youStreakToFirst": "{n} дней до первого места",
     "rank": "Место",
     "collector": "Коллекционер",
     "badges": "Значки",
@@ -344,9 +348,19 @@
     "socialTwitterLabel": "Профиль Twitter/X",
     "socialDiscordLabel": "Профиль Discord",
     "statToNext": "до #{rank}",
-    "monthSummaryUp": "Этот месяц: {wagered} монет поставлено в {rounds} раундах ({wins} выиграно) — чистыми +{net}.",
-    "monthSummaryDown": "Этот месяц: {wagered} монет поставлено в {rounds} раундах ({wins} выиграно) — чистыми −{net}.",
-    "monthSummaryFlat": "Этот месяц: {wagered} монет поставлено в {rounds} раундах ({wins} выиграно) — чистыми в ноль."
+    "monthSummaryUp": "{who}: {wagered} монет поставлено в {rounds} раундах ({wins} выиграно) — чистыми +{net}.",
+    "monthSummaryDown": "{who}: {wagered} монет поставлено в {rounds} раундах ({wins} выиграно) — чистыми −{net}.",
+    "monthSummaryFlat": "{who}: {wagered} монет поставлено в {rounds} раундах ({wins} выиграно) — чистыми в ноль.",
+    "monthWhoYou": "Этот месяц",
+    "monthWhoName": "Месяц {name}",
+    "monthCompareUp": "на {pct}% больше, чем в прошлом месяце",
+    "monthCompareDown": "на {pct}% меньше, чем в прошлом месяце",
+    "monthCompareFlat": "на уровне прошлого месяца",
+    "monthBestHit": "Лучший удар месяца: +{n} ({game}, {date})",
+    "monthShare": "{share}% монет, поставленных сообществом в этом месяце, пришлись на тебя.",
+    "monthBestWeek": "Лучшие 7 дней: +{n}",
+    "dayDetailTitle": "{date} — {n} раундов",
+    "dayDetailEmpty": "В этот день раундов не было."
   },
   "inventory": {
     "title": "Мои значки",
@@ -851,7 +865,14 @@
     "jackpotWinners": "Последние джекпоты",
     "jackpotHofTitle": "Крупнейшие выигрыши джекпотов за всё время",
     "jackpotLastMega": "Последний Мега-джекпот: {name} +{n}",
-    "jackpotChipLast": "Последний: {name} +{n} · {date}"
+    "jackpotChipLast": "Последний: {name} +{n} · {date}",
+    "communityMonth": "Месяц сообщества: {rounds} раундов · {wagered} монет ставки · {players} активных игроков",
+    "communityTrendUp": "ставки на {pct}% больше, чем в прошлом месяце",
+    "communityTrendDown": "ставки на {pct}% меньше, чем в прошлом месяце",
+    "communityTrendFlat": "ставки на уровне прошлого месяца",
+    "jackpotPotDelta": "{n} со вчерашнего дня",
+    "monthPodiumTitle": "Лучшие за месяц",
+    "monthPodiumLine": "{rounds} раундов · {wagered} монет ставки"
   },
   "wheel": {
     "title": "Колесо фортуны",
@@ -1212,6 +1233,9 @@
         "revoke": "Отозвать",
         "granted": "Достижение выдано.",
         "revoked": "Достижение отозвано."
+      },
+      "activity": {
+        "title": "Активность · 60 дней"
       },
       "danger": {
         "title": "Опасная зона",

@@ -283,7 +283,13 @@ async function listUsersPage(
 /** Every editable field plus progress, for the detail drawer. */
 export async function getUserDetail(id: string) {
   const supabase = createAdminClient();
-  const [{ data: profile, error }, { data: progress }, { data: achievements }, { data: ban }] =
+  const [
+    { data: profile, error },
+    { data: progress },
+    { data: achievements },
+    { data: ban },
+    { data: activityRows },
+  ] =
     await Promise.all([
       supabase.from("profiles").select(PROFILE_SELECT).eq("id", id).maybeSingle(),
       supabase
@@ -296,12 +302,38 @@ export async function getUserDetail(id: string) {
         .select("achievement_id, unlocked_at")
         .eq("user_id", id),
       supabase.from("bans").select("reason, banned_by, banned_until, created_at").eq("profile_id", id).maybeSingle(),
+      // 60-day activity for the drawer heatmap: raw created_at rows, bucketed
+      // in JS (PostgREST cannot group — the getAdminEconomyAlertNights split).
+      supabase
+        .from("game_rounds")
+        .select("created_at")
+        .eq("user_id", id)
+        .gte(
+          "created_at",
+          new Date(Date.now() - 60 * 86_400_000).toISOString(),
+        )
+        .limit(2000),
     ]);
   if (error) throw error;
   if (!profile) return null;
   // The list view already reports an expired ban as inactive; the drawer showed
      // "banned: <reason>" for it, so the two halves of the panel disagreed.
     const banUntil = (ban?.banned_until as string | null) ?? null;
+    // Zero-filled 60 buckets, oldest first (the profile heatmap's shape at
+    // twice the horizon — enough to see a ban-worthy burst or a dead month).
+    const activity = (() => {
+      const buckets: Array<{ day: string; rounds: number }> = [];
+      const byDay = new Map<string, number>();
+      for (const row of (activityRows ?? []) as Array<{ created_at: string }>) {
+        const key = String(row.created_at).slice(0, 10);
+        byDay.set(key, (byDay.get(key) ?? 0) + 1);
+      }
+      for (let i = 59; i >= 0; i -= 1) {
+        const d = new Date(Date.now() - i * 86_400_000).toISOString().slice(0, 10);
+        buckets.push({ day: d, rounds: byDay.get(d) ?? 0 });
+      }
+      return buckets;
+    })();
     return {
       profile,
       progress: progress ?? null,
@@ -309,6 +341,7 @@ export async function getUserDetail(id: string) {
       ban: ban
         ? { ...ban, active: !banUntil || new Date(banUntil) > new Date() }
         : null,
+      activity,
     };
 }
 

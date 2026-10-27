@@ -779,6 +779,82 @@ export async function getJackpotEconomy(): Promise<JackpotEconomyData | null> {
   }
 }
 
+export interface ArcadeMonthData {
+  rounds: number;
+  wagered: number;
+  net: number;
+  wonRounds: number;
+  players: number;
+  roundsPrior: number;
+  wageredPrior: number;
+}
+
+/**
+ * The community's rolling 30-day arcade totals (0076) for the games hub's
+ * banner — one public aggregate row. Null on a missing/failed view so the
+ * hub renders without the banner (the getJackpotEconomy contract).
+ */
+export async function getArcadeMonth(): Promise<ArcadeMonthData | null> {
+  const supabase = await createClient();
+  try {
+    const { data, error } = await supabase
+      .from("stats_arcade_month")
+      .select("*")
+      .maybeSingle();
+    if (error || !data) return null;
+    const row = data as Record<string, string | number | null>;
+    const num = (key: string) => Number(row[key] ?? 0);
+    return {
+      rounds: num("rounds_30d"),
+      wagered: num("wagered_30d"),
+      net: num("net_30d"),
+      wonRounds: num("won_rounds_30d"),
+      players: num("players_30d"),
+      roundsPrior: num("rounds_prior_30d"),
+      wageredPrior: num("wagered_prior_30d"),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export interface ArcadeMonthTopEntry {
+  username: string;
+  avatarUrl: string | null;
+  rounds: number;
+  wagered: number;
+}
+
+/**
+ * Hall of the month (0078): the trailing-30-day top 3 by settled rounds from
+ * the public view stats_arcade_month_top — the games hub podium under the
+ * community banner. [] on a missing/failed view (the podium hides, the hub
+ * still renders).
+ */
+export async function getArcadeMonthTop(): Promise<ArcadeMonthTopEntry[]> {
+  const supabase = await createClient();
+  try {
+    const { data, error } = await supabase
+      .from("stats_arcade_month_top")
+      .select("username,avatar_url,rounds_30d,wagered_30d")
+      .limit(3);
+    if (error) return [];
+    return ((data ?? []) as Array<{
+      username: string;
+      avatar_url: string | null;
+      rounds_30d: string | number;
+      wagered_30d: string | number;
+    }>).map((row) => ({
+      username: row.username,
+      avatarUrl: row.avatar_url ?? null,
+      rounds: Number(row.rounds_30d ?? 0),
+      wagered: Number(row.wagered_30d ?? 0),
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export interface JackpotHistoryPoint {
   day: string;
   mega: number;

@@ -57,6 +57,7 @@ interface Detail {
   progress: Progress | null;
   achievements: Array<{ achievement_id: string; unlocked_at: string }>;
   ban: { reason: string; banned_until: string | null; created_at: string } | null;
+  activity?: Array<{ day: string; rounds: number }>;
 }
 
 interface CatalogEntry {
@@ -389,6 +390,9 @@ function UserForm({
   const [banDays, setBanDays] = useState<number>(7);
 
   const unlocked = new Set(detail.achievements.map((a) => a.achievement_id));
+  // Peak day for the activity heatmap's intensity scale (>=1 so a single
+  // one-round day scales to level 1, not max).
+  const maxActivity = Math.max(1, ...(detail.activity?.map((c) => c.rounds) ?? [0]));
   const id = detail.profile.id;
 
   return (
@@ -553,6 +557,34 @@ function UserForm({
           {t("progress.save")}
         </button>
       </section>
+
+      {/* Activity — 60-day heatmap (read-only; the profile heatmap's twin at
+          twice the horizon, for ban/farming decisions at a glance). */}
+      {(detail.activity?.length ?? 0) > 0 && maxActivity > 0 && (
+        <section className="space-y-2">
+          <h3 className="text-sm font-bold">{t("activity.title")}</h3>
+          <div className="activity-heat activity-heat-60" aria-hidden="true">
+            {detail.activity!.map((cell) => (
+              <span
+                key={cell.day}
+                className="activity-heat-cell"
+                data-level={
+                  cell.rounds === 0
+                    ? "0"
+                    : cell.rounds >= maxActivity
+                      ? "max"
+                      : cell.rounds === 1
+                        ? "1"
+                        : cell.rounds <= 3
+                          ? "2"
+                          : "3"
+                }
+                title={`${cell.day}: ${cell.rounds}`}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Role */}
       <section className="space-y-2">

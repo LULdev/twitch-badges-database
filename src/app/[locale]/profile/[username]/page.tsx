@@ -32,6 +32,7 @@ import CoinFlowCard, {
   fetchCoinRows,
   type CoinFlowRow,
 } from "@/components/profile/CoinFlowCard";
+import ActivityHeatmap from "@/components/profile/ActivityHeatmap";
 import BestRoundsCard, {
   type BestRoundRow,
   type RecordHistoryEntry,
@@ -98,6 +99,7 @@ export default async function ProfilePage({ params }: PageProps) {
   setRequestLocale(locale);
   const t = await getTranslations("profile");
   const ti = await getTranslations("inventory");
+  const tg = await getTranslations("games");
   // The steal panel advertises the price the server will charge. The fallback for a
   // victim who never set their own must be the panel's configured economy, not a
   // hardcoded 100/250 — and with the same clamps `attemptSteal` applies.
@@ -373,8 +375,10 @@ export default async function ProfilePage({ params }: PageProps) {
   let jackpotWins: Array<{ kind: string; amount: number }> = [];
   let achievementCount = 0;
   // 7-day trend inputs (the grid's delta chips).
-  let weekRounds: Array<{ bet: number; payout: number; created_at: string }> = [];
+  let weekRounds: Array<{ bet: number; payout: number; created_at: string; game: string }> = [];
   let weekJackpotWins = 0;
+  // The community's rolling-month wagered total (the share clause).
+  let communityWagered = 0;
   // Owner-only rank chips: rank per metric (1 + players with a HIGHER value)
   // and the player total. Null when progress is missing or the counts fail.
   let statRanks: Record<
@@ -383,11 +387,13 @@ export default async function ProfilePage({ params }: PageProps) {
   > | null = null;
   if (profile) {
     const admin = createAdminClient();
-    // 30-day activity window (the tile mini strips); the 7-day trend cutoff
-    // derives from it in JS.
-    const monthCutoff = new Date(
+    // Activity window: 60 days so the month summary can compare against the
+    // prior month; the strips (30d) and the trend chips (7d) slice their own
+    // sub-windows in JS. A heavy player's 60 days stays under the 1000-row
+    // PostgREST cap at this site's scale.
+    const windowCutoff = new Date(
       // eslint-disable-next-line react-hooks/purity
-      Date.now() - 30 * 86_400_000,
+      Date.now() - 60 * 86_400_000,
     ).toISOString();
     const weekCutoff = new Date(
       // eslint-disable-next-line react-hooks/purity
@@ -395,7 +401,7 @@ export default async function ProfilePage({ params }: PageProps) {
     ).toISOString();
     // 30 rendered UTC days starting today-29 (the card strip's window).
     const since = coinFlowSince();
-    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes, coinsRes, bestRes, historyRes, jackpotRes, achCountRes, weekRoundsRes, weekJackpotRes] = await Promise.all([
+    const [progressRow, achievementRes, itemsRes, rescuesRes, rescuesCountRes, coinsRes, bestRes, historyRes, jackpotRes, achCountRes, weekRoundsRes, weekJackpotRes, communityMonthRes] = await Promise.all([
       readProgress(profile.id).catch(() => null),
       admin
         .from("user_achievements")
@@ -455,15 +461,18 @@ export default async function ProfilePage({ params }: PageProps) {
       // 1000-row PostgREST cap for any realistic player.
       admin
         .from("game_rounds")
-        .select("bet,payout,created_at")
+        .select("bet,payout,created_at,game")
         .eq("user_id", profile.id)
-        .gte("created_at", monthCutoff)
+        .gte("created_at", windowCutoff)
         .limit(1000),
       admin
         .from("jackpot_wins")
         .select("id", { count: "exact", head: true })
         .eq("user_id", profile.id)
         .gte("created_at", weekCutoff),
+      // The community's rolling month (0076/0077 public view) for the
+      // share-of-community clause — anon-granted; admin works too.
+      admin.from("stats_arcade_month").select("wagered_30d").maybeSingle(),
     ]);
     const achievementRows = (achievementRes.data ?? []) as Array<{
       achievement_id: string;
@@ -492,12 +501,17 @@ export default async function ProfilePage({ params }: PageProps) {
       bet: string | number;
       payout: string | number;
       created_at: string;
+      game: string;
     }>).map((row) => ({
       bet: Number(row.bet ?? 0),
       payout: Number(row.payout ?? 0),
       created_at: row.created_at,
+      game: row.game,
     }));
     weekJackpotWins = weekJackpotRes.count ?? 0;
+    communityWagered = Number(
+      ((communityMonthRes.data as { wagered_30d?: string | number } | null) ?? {})?.wagered_30d ?? 0,
+    );
     // Rank chips (fetched for every visitor, rendered isOwn only): four
     // indexed head-counts over public-read user_progress + the player total.
     if (progressRow) {
@@ -550,23 +564,23 @@ export default async function ProfilePage({ params }: PageProps) {
   }
 
 
-  // Arcade-statistics inputs (0073): played/wagered read from progress, best
-  // single round from the already-fetched per-game view rows. arcadeActive
-  // keeps a never-played member's grid hidden entirely (false-zeros doctrine);
-  // inside the grid, tiles still hide individually when their activity is 0.
-  const played = progress?.games_played ?? 0;
-  const wagered = progress?.coins_wagered ?? 0;
-  const wonTotal = progress?.coins_won ?? 0;
-  const lostTotal = progress?.coins_lost ?? 0;
-  const netTotal = wonTotal - lostTotal;
-  const bestNet = Math.max(0, ...bestRows.map((row) => Number(row.best_net ?? 0)));
-  const stealAttempts = (progress?.steals_successful ?? 0) + (progress?.steals_failed ?? 0);
-  const arcadeActive =
-    !!progress &&
-    (played > 0 ||
-      (progress.wheel_spins ?? 0) > 0 ||
-      stealAttempts > 0 ||
-      (progress.times_robbed ?? 0) > 0 ||
+  // Arcade-statistics inputs (0073): played/wagered read from progress, best
+  // single round from the already-fetched per-game view rows. arcadeActive
+  // keeps a never-played member's grid hidden entirely (false-zeros doctrine);
+  // inside the grid, tiles still hide individually when their activity is 0.
+  const played = progress?.games_played ?? 0;
+  const wagered = progress?.coins_wagered ?? 0;
+  const wonTotal = progress?.coins_won ?? 0;
+  const lostTotal = progress?.coins_lost ?? 0;
+  const netTotal = wonTotal - lostTotal;
+  const bestNet = Math.max(0, ...bestRows.map((row) => Number(row.best_net ?? 0)));
+  const stealAttempts = (progress?.steals_successful ?? 0) + (progress?.steals_failed ?? 0);
+  const arcadeActive =
+    !!progress &&
+    (played > 0 ||
+      (progress.wheel_spins ?? 0) > 0 ||
+      stealAttempts > 0 ||
+      (progress.times_robbed ?? 0) > 0 ||
       jackpotWins.length > 0);
   const fmtNum = (value: number) => value.toLocaleString(locale);
   // The trend read now covers 30 days (the tile strips): re-derive the
@@ -589,13 +603,16 @@ export default async function ProfilePage({ params }: PageProps) {
   // 30-day daily activity series for the tile strips (zero-fill is CORRECT
   // for flows: a day with no rounds is 0 activity). One bucket per UTC day,
   // oldest first, capped at 30 entries.
-  const dayBuckets = new Map<string, { wagered: number; won: number; lost: number; rounds: number }>();
+  const dayBuckets = new Map<
+    string,
+    { wagered: number; won: number; lost: number; rounds: number; best: number }
+  >();
   for (let i = 29; i >= 0; i -= 1) {
     const d = new Date(
       // eslint-disable-next-line react-hooks/purity
       Date.now() - i * 86_400_000,
     ).toISOString().slice(0, 10);
-    dayBuckets.set(d, { wagered: 0, won: 0, lost: 0, rounds: 0 });
+    dayBuckets.set(d, { wagered: 0, won: 0, lost: 0, rounds: 0, best: 0 });
   }
   for (const r of weekRounds) {
     const key = r.created_at.slice(0, 10);
@@ -605,20 +622,93 @@ export default async function ProfilePage({ params }: PageProps) {
     b.won += Math.max(0, r.payout - r.bet);
     b.lost += Math.max(0, r.bet - r.payout);
     b.rounds += 1;
+    b.best = Math.max(b.best, r.payout - r.bet);
   }
   const strip = (key: "wagered" | "won" | "lost" | "rounds") =>
     [...dayBuckets.values()].map((b) => b[key]);
-  // Month summary (the "Saisonrueckblick" sentence): the same 30-day window
-  // the strips draw from, folded into four numbers. The card hides when the
-  // month was quiet (false-zeros doctrine applied to time — an all-zero
-  // month is no month worth summarizing).
-  const monthWagered = weekRounds.reduce((sum, r) => sum + r.bet, 0);
-  const monthWon = weekRounds.reduce((sum, r) => sum + Math.max(0, r.payout - r.bet), 0);
-  const monthLost = weekRounds.reduce((sum, r) => sum + Math.max(0, r.bet - r.payout), 0);
+  // Month summary (the "Saisonrueckblick" sentence). monthStart is a local
+  // re-derivation (the if-block's cutoffs are block-scoped): the current
+  // month is the 30d slice of the 60d read, the prior month the rest.
+  const monthStart = new Date(
+    // eslint-disable-next-line react-hooks/purity
+    Date.now() - 30 * 86_400_000,
+  ).toISOString();
+  const monthRounds = weekRounds.filter((r) => r.created_at >= monthStart);
+  const priorRounds = weekRounds.filter((r) => r.created_at < monthStart);
+  const monthWagered = monthRounds.reduce((sum, r) => sum + r.bet, 0);
+  const monthWon = monthRounds.reduce((sum, r) => sum + Math.max(0, r.payout - r.bet), 0);
+  const monthLost = monthRounds.reduce((sum, r) => sum + Math.max(0, r.bet - r.payout), 0);
   const monthNet = monthWon - monthLost;
-  const monthRounds = weekRounds.length;
-  const monthWins = weekRounds.filter((r) => r.payout > r.bet).length;
-  const monthActive = monthRounds > 0;
+  const monthWins = monthRounds.filter((r) => r.payout > r.bet).length;
+  const monthActive = monthRounds.length > 0;
+  // Prior-month comparison: only when the prior month had real volume (a
+  // first active month is a beginning, not a spike); |pct| < 5 reads flat.
+  const priorWagered = priorRounds.reduce((sum, r) => sum + r.bet, 0);
+  const monthCompare = (() => {
+    if (priorWagered < 100 || monthWagered <= 0) return null;
+    const pct = Math.round(((monthWagered - priorWagered) / priorWagered) * 100);
+    if (Math.abs(pct) < 5) return { kind: "flat" as const, pct };
+    return pct > 0
+      ? { kind: "up" as const, pct }
+      : { kind: "down" as const, pct: -pct };
+  })();
+  // Best round of the month (the emotional peak, not a sum).
+  const monthBest = monthRounds.reduce<(typeof monthRounds)[number] | null>((best, r) => {
+    const net = r.payout - r.bet;
+    return net > 0 && (!best || net > best.payout - best.bet) ? r : best;
+  }, null);
+  // Heatmap intensity over the same 30 buckets the strips read.
+  // Best rolling 7-day window (net): sort the month's rounds by time and
+  // slide a 7-day window — the "best week" the monthly net can hide.
+  const monthSorted = [...monthRounds].sort(
+    (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at),
+  );
+  let bestWeekNet = 0;
+  for (let i = 0; i < monthSorted.length; i += 1) {
+    let windowNet = 0;
+    for (let j = i; j < monthSorted.length &&
+      Date.parse(monthSorted[j].created_at) - Date.parse(monthSorted[i].created_at) < 7 * 86_400_000; j += 1) {
+      windowNet += monthSorted[j].payout - monthSorted[j].bet;
+    }
+    bestWeekNet = Math.max(bestWeekNet, windowNet);
+  }
+  // Share of the community's wagered month: only when both sides have real
+  // volume and the share is at least half a percent (a 0.1% is noise).
+  const monthShare =
+    communityWagered >= 1000 && monthWagered >= 100 && monthWagered / communityWagered >= 0.005
+      ? monthWagered / communityWagered
+      : null;
+  const heatMax = Math.max(1, ...[...dayBuckets.values()].map((b) => b.rounds));
+  const heatLevel = (n: number) =>
+    n === 0 ? "0" : n >= heatMax ? "max" : n === 1 ? "1" : n <= 3 ? "2" : "3";
+  // The heatmap island's payload: precomputed cells (level + accessible
+  // label) and the month's rounds grouped by UTC day with SERVER-localized
+  // game titles — the client island must not import GAMES (service-role
+  // boundary), so titles ship as props (the StealPanel doctrine).
+  const heatCells = [...dayBuckets.entries()].map(([day, b]) => ({
+    day,
+    rounds: b.rounds,
+    level: heatLevel(b.rounds),
+    label:
+      b.rounds === 0
+        ? `${day}: 0`
+        : `${day}: ${b.rounds} · ${
+            b.won - b.lost >= 0 ? "+" : "−"
+          }${fmtNum(Math.abs(b.won - b.lost))} · best +${fmtNum(b.best)}`,
+  }));
+  const heatDays: Record<
+    string,
+    Array<{ title: string; bet: number; payout: number }>
+  > = {};
+  for (const r of monthRounds) {
+    const key = r.created_at.slice(0, 10);
+    if (!dayBuckets.has(key)) continue;
+    (heatDays[key] ??= []).push({
+      title: tg(`${r.game}Title`),
+      bet: r.bet,
+      payout: r.payout,
+    });
+  }
   // The per-tile delta chip: '+N this week' in green when the week moved the
   // number up, hidden when the week was quiet (a zero delta is noise, not a
   // trend — the false-zeros doctrine applied to time).
@@ -666,7 +756,7 @@ export default async function ProfilePage({ params }: PageProps) {
       <span dir="ltr" className="stat-trend text-success">
         +{fmtNum(value)} {t("statThisWeek")}
       </span>
-    ) : null;
+    ) : null;
 
   return (
     <div
@@ -961,23 +1051,57 @@ export default async function ProfilePage({ params }: PageProps) {
             {t("arcadeStats")}
           </h2>
           {monthActive && showMonthSummary && (
-            <p
-              className="rounded-[var(--radius-input)] border border-line bg-surface-2 px-4 py-2.5 text-sm"
-            >
-              {t(
-                monthNet > 0
-                  ? "monthSummaryUp"
-                  : monthNet < 0
-                    ? "monthSummaryDown"
-                    : "monthSummaryFlat",
-                {
-                  wagered: fmtNum(monthWagered),
-                  rounds: fmtNum(monthRounds),
-                  wins: fmtNum(monthWins),
-                  net: fmtNum(Math.abs(monthNet)),
-                },
+            <div className="rounded-[var(--radius-input)] border border-line bg-surface-2 px-4 py-2.5 text-sm">
+              <p>
+                {t(
+                  monthNet > 0
+                    ? "monthSummaryUp"
+                    : monthNet < 0
+                      ? "monthSummaryDown"
+                      : "monthSummaryFlat",
+                  {
+                    who: isOwn
+                      ? t("monthWhoYou")
+                      : t("monthWhoName", { name: profile.username }),
+                    wagered: fmtNum(monthWagered),
+                    rounds: fmtNum(monthRounds.length),
+                    wins: fmtNum(monthWins),
+                    net: fmtNum(Math.abs(monthNet)),
+                  },
+                )}{" "}
+                {monthCompare &&
+                  t(
+                    monthCompare.kind === "up"
+                      ? "monthCompareUp"
+                      : monthCompare.kind === "down"
+                        ? "monthCompareDown"
+                        : "monthCompareFlat",
+                    { pct: fmtNum(monthCompare.pct) },
+                  )}
+                {monthShare !== null &&
+                  " " +
+                    t("monthShare", {
+                      share: (monthShare * 100).toFixed(1),
+                    })}
+              </p>
+              {monthBest && (
+                <p className="mt-1 text-xs text-muted">
+                  {t("monthBestHit", {
+                    n: monthBest.payout - monthBest.bet,
+                    game: tg(`${monthBest.game}Title`),
+                    date: new Intl.DateTimeFormat(locale, {
+                      day: "2-digit",
+                      month: "short",
+                    }).format(new Date(monthBest.created_at)),
+                  })}
+                </p>
               )}
-            </p>
+              {bestWeekNet > 0 && (
+                <p className="mt-1 text-xs text-muted">
+                  {t("monthBestWeek", { n: fmtNum(bestWeekNet) })}
+                </p>
+              )}
+            </div>
           )}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {showStatWagered && played > 0 && (
@@ -1107,6 +1231,14 @@ export default async function ProfilePage({ params }: PageProps) {
               </div>
             )}
           </div>
+          {/* 30-day activity heatmap (GitHub-style), clickable: intensity =
+              rounds per UTC day; picking a day expands its rounds below
+              (client island — see ActivityHeatmap for the boundary notes).
+              Rides the showMonthSummary flag: it is the month surface's
+              visual half. */}
+          {showMonthSummary && monthActive && (
+            <ActivityHeatmap cells={heatCells} days={heatDays} />
+          )}
         </section>
       )}
       {/* Coin flow — the shared card, also rendered on /stats for the owner. */}
