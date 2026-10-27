@@ -27,6 +27,7 @@ export const GAME_COLORS: Record<string, string> = {
   tower: "#818cf8",
   catcher: "#a3e635",
   pingu: "#7dd3fc",
+  crash: "#f97316",
 };
 
 const ART: Record<string, ReactNode> = {
@@ -198,6 +199,22 @@ const ART: Record<string, ReactNode> = {
       <path d="M64 52l-8 4M88 58l7 5" opacity="0.7" />
       <path d="M30 84h76" strokeDasharray="4 6" opacity="0.45" />
       <path d="M58 88v-4M84 88v-4" opacity="0.5" />
+    </>
+  ),
+  /* crash — Badge Rocket on its exponential climb, moon in reach */
+  crash: (
+    <>
+      <path d="M14 76C46 74 68 58 74 26" />
+      <path d="M10 76h12" strokeWidth="4" />
+      <g transform="rotate(40 78 26)">
+        <path d="M78 6C84 12 85 18 85 22C85 26 82 31 78 35C74 31 71 26 71 22C71 18 72 12 78 6Z" />
+        <circle cx="78" cy="19" r="2.6" opacity="0.6" />
+        <path d="M71 28 66 36 72 32ZM85 28 90 36 84 32Z" opacity="0.85" />
+        <path d="M74 35 78 43 82 35" opacity="0.6" />
+      </g>
+      <circle cx="102" cy="12" r="7" />
+      <path d="M99 10h2M104 14h2" opacity="0.5" />
+      <path d="M30 22v4M28 24h4M50 12v4M48 14h4M92 44v4M90 46h4" opacity="0.55" />
     </>
   ),
   /* fallback — neutral badge orbit */

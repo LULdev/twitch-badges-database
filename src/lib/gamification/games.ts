@@ -8,11 +8,17 @@ import { recordNotification, sendPushToAll } from "@/lib/push";
 import { simulateThrow } from "@/lib/games/pingu-sim";
 
 /**
- * The arcade: 14 badge-themed games, all server-authoritative.
+ * The arcade: 15 badge-themed games, all server-authoritative.
  * Luck games roll on the server; skill games accept a score report with
  * sanity caps. Every round lands in game_rounds and the live feed. A share
  * of every LOST round feeds this game's progressive jackpot and the global
  * Mega Jackpot (0069); every settled round rolls a hit chance per pot.
+ *
+ * The one exception to "one call, one round" is crash (Badge Rocket): its
+ * flight starts with a bet, hides the crash point server-side and settles
+ * through a server-graded cash-out. That machinery lives in
+ * `src/lib/gamification/crash.ts` (0080) and deliberately never enters this
+ * instant-resolve path.
  */
 
 export interface GameMeta {
@@ -38,6 +44,7 @@ export const GAMES: GameMeta[] = [
   { id: "tower", title: "Tower of Badges", type: "luck", minBet: 10, maxBet: 2000 },
   { id: "catcher", title: "Drops Catcher", type: "skill", minBet: 10, maxBet: 2000 },
   { id: "pingu", title: "Pingu Throw", type: "skill", minBet: 10, maxBet: 2000 },
+  { id: "crash", title: "Badge Rocket", type: "luck", minBet: 10, maxBet: 1000 },
 ];
 
 export const GAME_IDS = GAMES.map((g) => g.id);
@@ -92,6 +99,10 @@ export async function playGame(
 ): Promise<PlayResult> {
   const meta = GAMES.find((g) => g.id === gameId);
   if (!meta) return fail("Unknown game.");
+  // Crash is interactive, not instant: routing it here would "resolve" a
+  // flight that never flew (a fabricated loss with a real debit). Its rounds
+  // only ever start and settle through src/lib/gamification/crash.ts.
+  if (gameId === "crash") return fail("Badge Rocket flights launch on the crash board.");
 
   const supabase = createAdminClient();
 
@@ -652,7 +663,7 @@ function fail(message: string): PlayResult {
  * it. The task itself is responsible for swallowing its own errors; this only
  * guarantees it does not block or throw.
  */
-function afterResponse(task: () => Promise<unknown>): void {
+export function afterResponse(task: () => Promise<unknown>): void {
   try {
     after(task);
   } catch {
@@ -667,7 +678,7 @@ function afterResponse(task: () => Promise<unknown>): void {
  * after the round settled; the winner's username is fetched here because
  * playGame only ever handles the id. The whole task swallows its own errors.
  */
-async function sendJackpotAlert(
+export async function sendJackpotAlert(
   supabase: ReturnType<typeof createAdminClient>,
   userId: string,
   gameId: string,

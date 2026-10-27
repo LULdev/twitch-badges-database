@@ -6,6 +6,7 @@ import { runArcadeHighlights } from "@/lib/syncs/arcade-highlights";
 import { pruneHeartbeats, recordHeartbeat, withHeartbeat } from "@/lib/health";
 import { prunedCoinRainGate } from "@/lib/gamification/daily";
 import { scanEconomyAlerts, snapshotJackpotPots } from "@/lib/gamification/jackpot";
+import { sweepCrashRounds } from "@/lib/gamification/crash";
 import { runBadgeStatsRollup } from "@/lib/syncs/badge-stats-rollup";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -135,6 +136,23 @@ export async function GET(request: Request) {
     economyScanError = error instanceof Error ? error.message : "failed";
   }
 
+  // Nightly Badge Rocket sweep (0080): every orphaned crash flight — the
+  // player closed the tab mid-climb, or a settlement tail died — settles
+  // from its frozen row. The bet was debited at launch; this only makes the
+  // ledger tell the truth. A quiet night (0 swept) is a zero, not an error,
+  // and the in-game poll/next-bet paths usually settle flights long before
+  // this runs, so this is the safety net, not the primary settler.
+  let crashSweep: { swept: number } | null = null;
+  let crashSweepFailed = false;
+  let crashSweepError: string | null = null;
+  try {
+    crashSweep = await withHeartbeat("sync/crash-sweep", () => sweepCrashRounds());
+  } catch (error) {
+    console.error("[cron/global] crash sweep", error);
+    crashSweepFailed = true;
+    crashSweepError = error instanceof Error ? error.message : "failed";
+  }
+
   // Ledger-growth probe. steal_attempts is the victim-side coin ledger (the
   // inventory transaction list reads it all-time), NOT gate state like
   // coin_rain_gate — it must never be bulk-pruned, or victims lose their theft
@@ -226,6 +244,8 @@ export async function GET(request: Request) {
       jackpotSnapshotFailed,
       economyAlerts: economyScan?.alerts ?? 0,
       economyScanFailed,
+      crashSwept: crashSweep?.swept ?? 0,
+      crashSweepFailed,
       stealAttempts,
       globalFailed,
       badgebaseFailed,
@@ -264,6 +284,9 @@ export async function GET(request: Request) {
       economyScan,
       economyScanFailed,
       economyScanError,
+      crashSweep,
+      crashSweepFailed,
+      crashSweepError,
       stealAttempts,
     },
     { status },

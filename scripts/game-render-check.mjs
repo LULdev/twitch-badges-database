@@ -113,6 +113,18 @@ if (mode === "seed") {
   await page.screenshot({ path: "docs/screenshots/24-pingu-authenticated.png", fullPage: true });
   console.log("pingu: canvas", pinguCanvas.length, "| meters HUD", pinguHud);
 
+  // Crash: a canvas board too — idle state must render the canvas plus the
+  // full-width Launch pill (the cash-out button only exists mid-flight, so
+  // the render check pins the idle board).
+  await page.goto(`${base}/en/games/crash`, { waitUntil: "networkidle" });
+  const crashCanvas = await page.$$("canvas");
+  const crashButtons = await page.$$eval(".btn-lg", (els) => els.map((e) => ({ c: e.className, t: e.textContent.trim() })));
+  const crashBtn = crashButtons.find((b) => b.c.includes("btn-primary") && b.c.includes("w-full"));
+  if (crashCanvas.length === 0) failures.push("crash: no canvas rendered");
+  if (!crashBtn || !/Launch/i.test(crashBtn.t)) failures.push(`crash launch: ${JSON.stringify(crashButtons)}`);
+  await page.screenshot({ path: "docs/screenshots/25-crash-authenticated.png", fullPage: true });
+  console.log("crash: canvas", crashCanvas.length, "| launch", JSON.stringify(crashBtn ?? null));
+
   // The wall itself renders for logged-out users — run post-deploy ("wall" mode).
   await browser.close();
   if (failures.length) {

@@ -37,12 +37,17 @@ Read `README.md` for data sources and setup; read this file before editing.
   changelog.ts, inventory.ts, push.ts, markdown.ts, seo.ts, health.ts
   (heartbeats), stats.ts (reads the `stats_*` views for `/stats`),
   admin-users.ts (ACP user management + the member-economy Top 20)
-- `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 136
-  achievements / 134 active (achievements.ts, self-evaluating), games.ts
-  (14 server-authoritative games), wheel.ts (daily wheel + Turbo jackpot
+- `src/lib/gamification/` — XP/coins/levels (xp.ts, levels.ts), 140
+  achievements / 138 active (achievements.ts, self-evaluating), games.ts
+  (15 server-authoritative games), wheel.ts (daily wheel + Turbo jackpot
   1:1e8 + Mega Jackpot roll), daily.ts (login bonus, heists, coin rain),
   visits.ts (5-min-IP-dedup view counters), session.ts, jackpot.ts (Mega
-  auto post + pot snapshots).
+  auto post + pot snapshots), crash.ts (Badge Rocket — the one
+  INTERACTIVE game: bet starts a flight with a server-hidden crash point
+  in `crash_rounds` (0080), `/api/games/crash` grades cash-outs from the
+  server clock, its `active` poll settles the crash the instant the curve
+  crosses, and the nightly cron sweep + next-bet lazy settle catch
+  abandoned flights; it never enters `playGame`).
   **Progressive jackpots (0069)**: a share of every LOST round feeds the
   game's own pot AND the global Mega pot (`jackpot_round` RPC — one
   transaction: contributions, row-locked claim, payout, `jackpot_win` feed

@@ -5,6 +5,7 @@ export type HeartbeatSource =
   | "sync/badgebase"
   | "sync/potat"
   | "sync/arcade-highlights"
+  | "sync/crash-sweep"
   | "sync/archive"
   | "cron/global"
   | "cron/potat"

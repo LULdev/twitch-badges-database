@@ -100,7 +100,7 @@ const SPECIAL: Ctor = (id, title, description, check, xp = 2500, coins = 1000) =
 
 const GAME_IDS = [
   "rps", "slots", "shoot", "memory", "quiz", "coinflip", "hilo",
-  "roulette", "blackjack", "vault", "scratch", "tower", "catcher", "pingu",
+  "roulette", "blackjack", "vault", "scratch", "tower", "catcher", "pingu", "crash",
 ];
 
 /** The showcase has six slots (`showcase_slots` is capped at 6 when written). */
@@ -111,7 +111,7 @@ function hasFlag(s: AchStats, game: string, flag: string): boolean {
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
-  // ---------- 54 common ----------
+  // ---------- 55 common ----------
   COMMON("c_first_login", "Welcome Aboard", "Log in with Twitch for the first time.", () => true),
   COMMON("c_daily_1", "First Steps", "Claim your first daily login bonus.", (s) => s.dailyCount >= 1),
   COMMON("c_daily_7", "Regular", "7-day login streak.", (s) => s.progress.best_login_streak >= 7),
@@ -166,12 +166,13 @@ export const ACHIEVEMENTS: Achievement[] = [
   COMMON("c_rps_first", "Rock Solid", "Play Rock-Paper-Scissors.", (s) => (s.gamesByType["rps"]?.played ?? 0) >= 1),
   COMMON("c_slots_first", "Reel Curious", "Play Badges of Ra.", (s) => (s.gamesByType["slots"]?.played ?? 0) >= 1),
   COMMON("c_pingu_first", "First Flight", "Send the penguin flying in Pingu Throw.", (s) => (s.gamesByType["pingu"]?.played ?? 0) >= 1),
+  COMMON("c_crash_first", "Liftoff", "Launch a Badge Rocket flight.", (s) => (s.gamesByType["crash"]?.played ?? 0) >= 1),
   COMMON("c_quiz_first", "Quiz Time", "Play Badge Quiz.", (s) => (s.gamesByType["quiz"]?.played ?? 0) >= 1),
   COMMON("c_steal_first", "First Heist", "Attempt your first coin steal.", (s) => s.progress.steals_successful + s.progress.steals_failed >= 1),
   COMMON("c_robbed_first", "It Happens", "Someone tried to steal from you.", (s) => s.progress.times_robbed >= 1),
   COMMON("c_feed_first", "On the Record", "Appear in the live activity feed.", (s) => s.activityCount >= 1),
 
-  // ---------- 53 creative ----------
+  // ---------- 55 creative ----------
   // Both read the hour of the member's LATEST daily claim. They used to read the
   // clock at evaluation time and ignore their stats argument, so any award between
   // 00:00 and 07:00 UTC unlocked "claimed a daily bonus at that hour" without a
@@ -210,6 +211,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   CREATIVE("k_vault_master", "Vault Cracker", "Crack the vault three times.",
     (s) => (s.gamesByType["vault"]?.won ?? 0) >= 3),
   CREATIVE("k_scratch_jackpot", "Golden Scratch", "Win a 10× payout on a scratch card.", (s) => hasFlag(s, "scratch", "jackpot")),
+  CREATIVE("k_crash_moon", "To the Moon", "Cash out a Badge Rocket flight at 10× or higher.", (s) => hasFlag(s, "crash", "moon")),
+  CREATIVE("k_crash_nerve", "Nerve of Steel", "Cash out within 0.10× of the crash point on Badge Rocket.", (s) => hasFlag(s, "crash", "near")),
   CREATIVE("k_quiz_10", "Badge Professor", "Win 10 rounds of Badge Quiz.",
     (s) => (s.gamesByType["quiz"]?.won ?? 0) >= 10),
   CREATIVE("k_hilo_10", "Rarity Sense", "Predict 10 higher/lower rounds in a row.", (s) => hasFlag(s, "hilo", "streak10")),
@@ -269,7 +272,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   // known deferral, announced on the member's own next evaluation.
   CREATIVE("k_rank_one", "Top of the Board", "Hold the #1 spot on any player ranking: most coins wagered, most won, most rounds played or best game streak.", (s) => s.rankOne, 1500, 750),
 
-  // ---------- 29 special (unexpected) ----------
+  // ---------- 30 special (unexpected) ----------
   SPECIAL("s_turbo_winner", "One in a Hundred Million", "Win the Twitch Turbo subscription jackpot on the wheel.", (s) => s.turboWins >= 1, 5000, 50000),
   SPECIAL("s_midas", "Midas Touch", "Win 10 games in a row.", (s) => s.winStreak >= 10),
   SPECIAL("s_cursed", "Properly Cursed", "Lose 20 games in a row.", (s) => s.lossStreak >= 20, 1000, 500),
@@ -295,6 +298,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   SPECIAL("s_sniper", "Sniper", "Steal 200+ coins in a single successful heist.", (s) => s.bestStealAmount >= 200),
   SPECIAL("s_slots_jackpot", "Ra's Jackpot", "Win 5,000+ coins in a single Badges of Ra spin.", (s) => s.recentResults.some((r) => r.game === "slots" && r.payout >= 5000)),
   SPECIAL("s_pingu_jackpot", "Crown of the Ice", "Hit the 10x Pingu Throw jackpot.", (s) => hasFlag(s, "pingu", "jackpot")),
+  SPECIAL("s_crash_escape", "Escape Velocity", "Cash out a Badge Rocket flight at 50× or higher.", (s) => hasFlag(s, "crash", "escape")),
   // The rarest thing in the arcade: 1-in-10,000 per settled round, fed by
   // every game and the wheel. Rewards sit above the ordinary SPECIAL tier
   // (and below the 1:1e8 turbo) — the moment already pays five figures.
@@ -734,7 +738,7 @@ async function buildStats(userId: string): Promise<AchStats> {
         .order("coins", { ascending: false })
         .limit(3),
       // All-time big-win podium per game: the global top-100 payouts contain
-      // every game's top-3 (14 games × 3 places = 42 ≤ 100), so ONE ordered
+      // every game's top-3 (15 games × 3 places = 45 ≤ 100), so ONE ordered
       // read answers "is this username on ANY podium". Rows arrive payout desc.
       supabase
         .from("stats_game_big_wins")

@@ -112,6 +112,40 @@ async function main() {
     );
   }
 
+  // Badge Rocket (crash): the only game with NO client-supplied outcome path
+  // — the cash-out carries no payload at all and the engine grades it from
+  // the server clock, so there is no forged input to simulate. The attack
+  // surface is the DISTRIBUTION, so that is what gets asserted: every fixed
+  // target strategy, from the near-instant 1.5x to the 250x cap ceiling,
+  // must return the designed 96% RTP and never reach 1. (A clairvoyant
+  // player who KNEW the crash point would beat any distribution — which is
+  // exactly why the rolled point never appears in any response before the
+  // flight has ended.)
+  {
+    const { rollCrashX100 } = await import("@/lib/games/crash-sim");
+    const CRASH_BET = 100;
+    // 249.99, not 250: a win needs crash > target, and the roll caps AT
+    // 250.00x — an exact-250 target can never win by construction (the cap
+    // bucket equals it), so the ceiling row tests the highest winnable rung.
+    // 500k samples per rung: the 50x/100x rows sit at ~2%/1% win probability
+    // and 200k left them a genuine 3σ flake away from the bound.
+    for (const target of [1.5, 2, 3, 5, 10, 50, 100, 249.99]) {
+      const sample = 500_000;
+      let total = 0;
+      for (let i = 0; i < sample; i += 1) {
+        const crash = rollCrashX100() / 100;
+        if (crash > target) total += Math.floor(CRASH_BET * target);
+      }
+      const ratio = total / (sample * CRASH_BET);
+      const ok = ratio < 1;
+      if (!ok) failures += 1;
+      console.log(
+        `crash@${target}x`.padEnd(11) + String(sample).padStart(8) + ratio.toFixed(4).padStart(15) + "  " +
+        `${ok ? "ok" : "EXPLOITABLE"}  (target-strategy RTP)`,
+      );
+    }
+  }
+
   console.log(
     `\nworst game: ${worst.game} at ${worst.ratio.toFixed(4)} — ` +
       (failures === 0

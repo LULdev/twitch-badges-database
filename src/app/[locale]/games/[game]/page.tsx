@@ -25,6 +25,7 @@ import MemoryGame from "@/components/games/MemoryGame";
 import QuizGame from "@/components/games/QuizGame";
 import CatcherGame from "@/components/games/CatcherGame";
 import PinguGame from "@/components/games/PinguGame";
+import CrashGame from "@/components/games/CrashGame";
 import { localeAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -505,6 +506,7 @@ export default async function GamePage({ params }: PageProps) {
         ))}
       {game === "catcher" && <CatcherGame />}
       {game === "pingu" && <PinguGame />}
+      {game === "crash" && <CrashGame />}
       {bigWinsSection}
     </div>
   );
