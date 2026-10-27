@@ -262,7 +262,10 @@
     "empty": "لا توجد بيانات متاحة بعد.",
     "wageredTitle": "أكثر العملات المراهنة",
     "wageredDesc": "إجمالي حجم المراهنات — لوحة النشاط: المهم أن تلعب كثيرًا، لا أن تكدّس.",
-    "wageredUnit": "العملات المراهنة"
+    "wageredUnit": "العملات المراهنة",
+    "crashTopTitle": "أعلى سحب في Rocket",
+    "crashTopDesc": "أفضل مضاعف محقَّق في رحلة واحدة من Badge Rocket — أعصاب، لا حجم.",
+    "crashTopUnit": "أفضل سحب"
   },
   "compare": {
     "title": "مقارنة هواة الجمع",
@@ -361,6 +364,8 @@
     "monthBestWeek": "أفضل 7 أيام: +{n}",
     "monthRankChip": "#{rank} هذا الشهر",
     "monthShareTitle": "شهر {name} في الأركيد",
+    "crashBestLine": "أفضل سحب في Badge Rocket: {mult}× (+{n} عملة)",
+    "crashShareTitle": "أفضل رحلة لـ {name} في Badge Rocket",
     "dayDetailTitle": "{date} — {n} جولة",
     "dayDetailEmpty": "لا جولات في هذا اليوم."
   },
@@ -806,6 +811,13 @@
     "crashCrashedAt": "انفجر عند {mult}×",
     "crashCashedAt": "تم السحب عند {mult}×",
     "crashHistory": "آخر الرحلات",
+    "crashLive": "{n} صواريخ في الجو · الأعلى {mult}×",
+    "crashFairTitle": "عدالة قابلة للإثبات",
+    "crashFairBody": "نقطة انفجار كل رحلة تُحدَّد قبل الإطلاق: HMAC-SHA256(server seed, flight id) تُنتج رقمًا موزّعًا بانتظام u (أول 13 خانة hex مقسومة على 2^52)، والنقطة هي 0.96 / (1 − u)، محصورة بين 1.00×–250.00×. يُنشر الـ seed مع كل رحلة محسومة أدناه — احسب الهاش بنفسك وأعد الحسابات.",
+    "crashFairRow": "انفجار عند {crash}× · سحب عند {cashed}×",
+    "crashFairRowLoss": "انفجار عند {crash}×",
+    "crashFairSeed": "seed",
+    "crashAutoCustom": "مخصص",
     "rank1": "وجبة ثلجية",
     "rank2": "قفزة قصيرة",
     "rank3": "قافز الجليد",

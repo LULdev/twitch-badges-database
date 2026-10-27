@@ -262,7 +262,10 @@
     "empty": "No data available yet.",
     "wageredTitle": "Most coins wagered",
     "wageredDesc": "Lifetime stake volume — the activity board: playing hard counts, not hoarding.",
-    "wageredUnit": "Coins wagered"
+    "wageredUnit": "Coins wagered",
+    "crashTopTitle": "Highest Rocket Cash-Out",
+    "crashTopDesc": "The best banked multiplier on a single Badge Rocket flight — nerve, not volume.",
+    "crashTopUnit": "Best cash-out"
   },
   "compare": {
     "title": "Compare collectors",
@@ -361,6 +364,8 @@
     "monthBestWeek": "Best 7 days: +{n}",
     "monthRankChip": "#{rank} of the month",
     "monthShareTitle": "{name}'s arcade month",
+    "crashBestLine": "Best Badge Rocket cash-out: {mult}× (+{n} coins)",
+    "crashShareTitle": "{name}'s best Badge Rocket flight",
     "dayDetailTitle": "{date} — {n} rounds",
     "dayDetailEmpty": "No rounds on this day."
   },
@@ -806,6 +811,13 @@
     "crashCrashedAt": "Crashed at {mult}×",
     "crashCashedAt": "Cashed out at {mult}×",
     "crashHistory": "Last flights",
+    "crashLive": "{n} rockets airborne · top {mult}×",
+    "crashFairTitle": "Provably fair",
+    "crashFairBody": "Every flight's crash point is fixed before launch: HMAC-SHA256(server seed, flight id) yields a uniform number u (the first 13 hex digits over 2^52), and the point is 0.96 / (1 − u), clamped to 1.00×–250.00×. The seed publishes with every settled flight below — hash it yourself and replay the math.",
+    "crashFairRow": "crash {crash}× · cashed {cashed}×",
+    "crashFairRowLoss": "crash {crash}×",
+    "crashFairSeed": "seed",
+    "crashAutoCustom": "Custom",
     "rank1": "Snow snack",
     "rank2": "Short hop",
     "rank3": "Ice hopper",

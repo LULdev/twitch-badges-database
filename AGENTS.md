@@ -43,11 +43,18 @@ Read `README.md` for data sources and setup; read this file before editing.
   1:1e8 + Mega Jackpot roll), daily.ts (login bonus, heists, coin rain),
   visits.ts (5-min-IP-dedup view counters), session.ts, jackpot.ts (Mega
   auto post + pot snapshots), crash.ts (Badge Rocket — the one
-  INTERACTIVE game: bet starts a flight with a server-hidden crash point
-  in `crash_rounds` (0080), `/api/games/crash` grades cash-outs from the
-  server clock, its `active` poll settles the crash the instant the curve
-  crosses, and the nightly cron sweep + next-bet lazy settle catch
-  abandoned flights; it never enters `playGame`).
+  INTERACTIVE game: bet starts a flight whose crash point is DERIVED from
+  HMAC-SHA256(server seed, flight id) and stays hidden in `crash_rounds`
+  (0080/0081 — the seed publishes with the settled round, provably fair),
+  `/api/games/crash` grades cash-outs from the server clock, its `active`
+  poll settles the crash the instant the curve crosses, and the nightly
+  cron sweep + next-bet lazy settle catch abandoned flights; it never
+  enters `playGame`. 0081 also adds the public `stats_crash_top_cash`
+  (per-user best banked multiplier — leaderboards board + profile
+  `?crash=1` OG card via `/api/og/crash`) and `stats_crash_live`
+  (airborne count + top climb, rides `/api/jackpots` for the hub strip's
+  rocket line; the weekly recap crowns the week's first 10x+ moon
+  landing).
   **Progressive jackpots (0069)**: a share of every LOST round feeds the
   game's own pot AND the global Mega pot (`jackpot_round` RPC — one
   transaction: contributions, row-locked claim, payout, `jackpot_win` feed

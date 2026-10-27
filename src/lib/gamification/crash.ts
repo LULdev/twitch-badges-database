@@ -1,3 +1,4 @@
+import { createHmac, randomBytes } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { award, bumpCoins, getProgress, logActivity } from "./xp";
 import { evaluateAchievements } from "./achievements";
@@ -53,6 +54,7 @@ interface CrashRow {
   payout: number | string | null;
   won: boolean | null;
   client_nonce: string | null;
+  server_seed: string | null;
   started_at: string;
   cashed_at: string | null;
   settled_at: string | null;
@@ -103,11 +105,25 @@ function crashResult(row: CrashRow): Record<string, unknown> {
     ...(cashed != null && { cashed }),
     ...(row.auto_x100 != null && { auto: x100ToMult(row.auto_x100) }),
     won,
+    // The provably-fair disclosure (0081): flight id + seed publish with
+    // the settled row. crash x100 = clamp(round(0.96 / (1 − u))) where u =
+    // int(HMAC-SHA256(seed, flight)[0..13]) / 2^52 — see the game page.
+    ...(row.server_seed && { flight: row.id, seed: row.server_seed }),
     // Achievement flags (hasFlag reads recentResults.flags):
     moon: won && (row.cashed_x100 ?? 0) >= 1000,
     near: won && row.crash_x100 - (row.cashed_x100 ?? 0) <= 10,
     escape: won && (row.cashed_x100 ?? 0) >= 5000,
   };
+}
+
+/**
+ * The provably-fair uniform: the first 13 hex digits of
+ * HMAC-SHA256(serverSeed, flightId) as an integer over 2^52 — a uniform
+ * draw in [0, 1) that anyone can recompute from the published seed.
+ */
+function hmacUniform(serverSeed: string, flightId: string): number {
+  const digest = createHmac("sha256", serverSeed).update(flightId).digest("hex");
+  return parseInt(digest.slice(0, 13), 16) / 2 ** 52;
 }
 
 // ── Launch ──────────────────────────────────────────────────────────────────
@@ -196,14 +212,22 @@ export async function startCrashRound(
     if (!settled) return failStart("A flight is already in progress.");
   }
 
-  const crashX100 = rollCrashX100();
+  // Provably fair (0081): the crash point is DERIVED, not just rolled — the
+  // flight id and a fresh server seed fix it BEFORE launch, and the seed
+  // publishes with the settled round so anyone can replay the math. The
+  // seed stays inside this service-only row while the flight is live.
+  const flightId = crypto.randomUUID();
+  const serverSeed = randomBytes(16).toString("hex");
+  const crashX100 = rollCrashX100(() => hmacUniform(serverSeed, flightId));
   const { data: inserted, error: insertError } = await supabase
     .from("crash_rounds")
     .insert({
+      id: flightId,
       user_id: userId,
       bet: wager,
       crash_x100: crashX100,
       auto_x100: autoX100,
+      server_seed: serverSeed,
       client_nonce: nonce ?? null,
     })
     .select("*")

@@ -31,6 +31,9 @@ export interface ArcadeHighlightsSummary {
     priorWeekTotal: number | null;
     topGame: string | null;
     jackpot: ArcadeJackpotStats | null;
+    /** The week's FIRST moon landing (0081): earliest 10x+ Badge Rocket
+     *  cash-out — the recap's nerve-of-the-week line. */
+    moonFirst: { username: string; mult: number } | null;
     published: boolean;
     skipped: boolean;
     failed: boolean;
@@ -247,6 +250,43 @@ async function monthTop(
   }
 }
 
+/** The week's first moon landing: the earliest 10x+ banked Badge Rocket
+ *  cash-out in [start, end) — the weekly recap's nerve line (0081). The
+ *  moon flag is written by the settlement tail, so this reads SETTLED wins
+ *  only; null on no landing / any error (the sentence is simply omitted). */
+async function firstMoonLanding(
+  supabase: ReturnType<typeof createAdminClient>,
+  start: Date,
+  end: Date,
+): Promise<{ username: string; mult: number } | null> {
+  try {
+    const { data } = await supabase
+      .from("game_rounds")
+      .select("user_id,payout,result,profile:profiles(username)")
+      .eq("game", "crash")
+      .eq("won", true)
+      .contains("result", { moon: true })
+      .gte("created_at", start.toISOString())
+      .lt("created_at", end.toISOString())
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (!data) return null;
+    const row = data as unknown as {
+      user_id: string;
+      payout: number | string;
+      result: Record<string, unknown>;
+      profile: { username: string } | null | Array<{ username: string }>;
+    };
+    const username = Array.isArray(row.profile) ? row.profile[0]?.username : row.profile?.username;
+    const mult = Number(row.result.cashed ?? 0);
+    if (!username || !Number.isFinite(mult) || mult < 10) return null;
+    return { username, mult };
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Daily arcade recap (+ weekly on Mondays, + monthly on the 1st), one auto
  * blog post per UTC calendar day / ISO week / calendar month. The daily post covers the PREVIOUS day (the 06:00
@@ -415,13 +455,14 @@ export async function runArcadeHighlights(
       const isoWeek = isoWeekLabel(wStart);
       const wSlug = `arcade-weekly-${isoWeek}`;
 
-      const [wCounts, pCounts, wWin, wSaves, wCoinFlow, wJackpot] = await Promise.all([
+      const [wCounts, pCounts, wWin, wSaves, wCoinFlow, wJackpot, wMoon] = await Promise.all([
         countRounds(supabase, wStart, wEnd),
         countRounds(supabase, pStart, wStart),
         biggestWin(supabase, wStart, wEnd),
         countStreakSaves(supabase, wStart, wEnd),
         countCoinFlow(supabase, wStart, wEnd),
         jackpotStats(supabase, wStart, wEnd),
+        firstMoonLanding(supabase, wStart, wEnd),
       ]);
       const wTotal = wCounts.reduce((sum, g) => sum + g.rounds, 0);
       const pTotal = pCounts.reduce((sum, g) => sum + g.rounds, 0);
@@ -437,6 +478,7 @@ export async function runArcadeHighlights(
         priorWeekTotal: pTotal,
         topGame: wTop?.game ?? null,
         jackpot: wJackpot,
+        moonFirst: wMoon,
         published: false,
         skipped: false,
         failed: false,
@@ -469,6 +511,7 @@ export async function runArcadeHighlights(
           streakSaves: wSaves,
           coinFlow: wCoinFlow,
           jackpot: wJackpot,
+          moonFirst: wMoon,
         });
         weekly.published = await createFeaturePost({
           slug: wSlug,
@@ -539,6 +582,7 @@ export async function runArcadeHighlights(
           priorWeekTotal: null,
           topGame: null,
           jackpot: null,
+          moonFirst: null,
           published: false,
           skipped: false,
         }),

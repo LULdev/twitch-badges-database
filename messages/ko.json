@@ -262,7 +262,10 @@
     "empty": "아직 사용 가능한 데이터가 없습니다.",
     "wageredTitle": "가장 많이 베팅한 코인",
     "wageredDesc": "누적 베팅량 — 활동 보드: 쌓아두는 것이 아니라 많이 플레이한 것이 순위에 반영됩니다.",
-    "wageredUnit": "베팅 코인"
+    "wageredUnit": "베팅 코인",
+    "crashTopTitle": "로켓 최고 캐시아웃",
+    "crashTopDesc": "단 한 번의 Badge Rocket 플라이트에서 확정한 최고 배율 — 횟수가 아닌 담력의 승부입니다.",
+    "crashTopUnit": "최고 캐시아웃"
   },
   "compare": {
     "title": "수집가 비교",
@@ -361,6 +364,8 @@
     "monthBestWeek": "최고의 7일: +{n}",
     "monthRankChip": "이달 #{rank}위",
     "monthShareTitle": "{name}의 아케이드 이번 달",
+    "crashBestLine": "Badge Rocket 최고 캐시아웃: {mult}× (+{n} 코인)",
+    "crashShareTitle": "{name}의 베스트 Badge Rocket 플라이트",
     "dayDetailTitle": "{date} — {n}라운드",
     "dayDetailEmpty": "이 날에는 라운드가 없습니다."
   },
@@ -806,6 +811,13 @@
     "crashCrashedAt": "{mult}×에서 폭발",
     "crashCashedAt": "{mult}×에서 캐시아웃",
     "crashHistory": "최근 비행",
+    "crashLive": "로켓 {n}기 비행 중 · 최고 {mult}×",
+    "crashFairTitle": "공정성 증명 (Provably Fair)",
+    "crashFairBody": "모든 플라이트의 크래시 지점은 발사 전에 확정됩니다. HMAC-SHA256(server seed, flight id)가 균등한 수 u(처음 13자리 hex / 2^52)를 생성하고, 지점은 0.96 / (1 − u)로 계산되어 1.00×–250.00× 범위로 클램프됩니다. 시드는 아래의 확정된 플라이트마다 함께 공개됩니다 — 직접 해시해서 계산을 재현해 보세요.",
+    "crashFairRow": "크래시 {crash}× · 캐시아웃 {cashed}×",
+    "crashFairRowLoss": "크래시 {crash}×",
+    "crashFairSeed": "시드",
+    "crashAutoCustom": "커스텀",
     "rank1": "눈 위 간식",
     "rank2": "짧은 홉",
     "rank3": "얼음 도약자",

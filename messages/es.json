@@ -262,7 +262,10 @@
     "empty": "Aún no hay datos disponibles.",
     "wageredTitle": "Monedas más apostadas",
     "wageredDesc": "Volumen total apostado — el tablero de actividad: jugar mucho cuenta, no acumular.",
-    "wageredUnit": "Monedas apostadas"
+    "wageredUnit": "Monedas apostadas",
+    "crashTopTitle": "Mayor cobro del cohete",
+    "crashTopDesc": "El mejor multiplicador asegurado en un solo vuelo de Badge Rocket — nervio, no volumen.",
+    "crashTopUnit": "Mejor cobro"
   },
   "compare": {
     "title": "Comparar coleccionistas",
@@ -361,6 +364,8 @@
     "monthBestWeek": "Mejores 7 días: +{n}",
     "monthRankChip": "#{rank} del mes",
     "monthShareTitle": "El mes de arcade de {name}",
+    "crashBestLine": "Mejor cobro en Badge Rocket: {mult}× (+{n} monedas)",
+    "crashShareTitle": "El mejor vuelo de {name} en Badge Rocket",
     "dayDetailTitle": "{date} — {n} rondas",
     "dayDetailEmpty": "No hubo rondas ese día."
   },
@@ -806,6 +811,13 @@
     "crashCrashedAt": "Explotó en {mult}×",
     "crashCashedAt": "Retirado en {mult}×",
     "crashHistory": "Últimos vuelos",
+    "crashLive": "{n} cohetes en vuelo · top {mult}×",
+    "crashFairTitle": "Demostrablemente justo",
+    "crashFairBody": "El punto de crash de cada vuelo se fija antes del despegue: HMAC-SHA256(server seed, flight id) genera un número uniforme u (los primeros 13 dígitos hex sobre 2^52), y el punto es 0.96 / (1 − u), acotado a 1.00×–250.00×. La semilla se publica con cada vuelo resuelto aquí abajo — calcula el hash tú mismo y repite el cálculo.",
+    "crashFairRow": "crash {crash}× · cobrado {cashed}×",
+    "crashFairRowLoss": "crash {crash}×",
+    "crashFairSeed": "semilla",
+    "crashAutoCustom": "Personalizado",
     "rank1": "Bocadillo helado",
     "rank2": "Salto corto",
     "rank3": "Saltador de hielo",

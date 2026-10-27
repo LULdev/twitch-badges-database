@@ -262,7 +262,10 @@
     "empty": "暂无可用数据。",
     "wageredTitle": "投入硬币最多",
     "wageredDesc": "累计投注量——活跃榜：拼的是游玩量，不是囤积。",
-    "wageredUnit": "投入硬币"
+    "wageredUnit": "投入硬币",
+    "crashTopTitle": "火箭最高兑现",
+    "crashTopDesc": "单次 Badge Rocket 飞行兑现的最高倍数——拼的是胆量，不是次数。",
+    "crashTopUnit": "最高兑现"
   },
   "compare": {
     "title": "收藏家对比",
@@ -361,6 +364,8 @@
     "monthBestWeek": "最佳 7 天：+{n}",
     "monthRankChip": "本月 #{rank}",
     "monthShareTitle": "{name} 的街机月报",
+    "crashBestLine": "Badge Rocket 最高兑现：{mult}×（+{n} 金币）",
+    "crashShareTitle": "{name} 的最佳 Badge Rocket 飞行",
     "dayDetailTitle": "{date} — {n} 局",
     "dayDetailEmpty": "当天没有对局。"
   },
@@ -806,6 +811,13 @@
     "crashCrashedAt": "爆于 {mult}×",
     "crashCashedAt": "兑现于 {mult}×",
     "crashHistory": "近期飞行",
+    "crashLive": "{n} 枚火箭飞行中 · 最高 {mult}×",
+    "crashFairTitle": "公平性证明 (Provably Fair)",
+    "crashFairBody": "每次飞行的坠机点在发射前就已确定：HMAC-SHA256(server seed, flight id) 生成均匀数 u（前 13 位 hex / 2^52），坠机点为 0.96 / (1 − u)，并被限制在 1.00×–250.00× 之间。种子会随下方每局已结算的飞行一同公布——你可以自己哈希并复现计算。",
+    "crashFairRow": "坠机 {crash}× · 兑现 {cashed}×",
+    "crashFairRowLoss": "坠机 {crash}×",
+    "crashFairSeed": "种子",
+    "crashAutoCustom": "自定义",
     "rank1": "雪点心",
     "rank2": "小跳步",
     "rank3": "冰面跳跃者",

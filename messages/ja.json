@@ -262,7 +262,10 @@
     "empty": "利用可能なデータはまだありません。",
     "wageredTitle": "最多ベットコイン",
     "wageredDesc": "累計ベット額 — アクティブボード：貯めるよりたくさん遊んだ者が上位。",
-    "wageredUnit": "ベットコイン"
+    "wageredUnit": "ベットコイン",
+    "crashTopTitle": "ロケット最高キャッシュアウト",
+    "crashTopDesc": "1 回の Badge Rocket フライトで確定させた最高倍率 — 回数ではなく度胸の勝負。",
+    "crashTopUnit": "最高キャッシュアウト"
   },
   "compare": {
     "title": "コレクター比較",
@@ -361,6 +364,8 @@
     "monthBestWeek": "ベスト7日間: +{n}",
     "monthRankChip": "月間 #{rank}位",
     "monthShareTitle": "{name}のアーケード月間",
+    "crashBestLine": "Badge Rocket の最高キャッシュアウト：{mult}×（+{n} コイン）",
+    "crashShareTitle": "{name} のベスト Badge Rocket フライト",
     "dayDetailTitle": "{date} — {n} ラウンド",
     "dayDetailEmpty": "この日のラウンドはありません。"
   },
@@ -806,6 +811,13 @@
     "crashCrashedAt": "{mult}×で爆発",
     "crashCashedAt": "{mult}×でキャッシュアウト",
     "crashHistory": "最近のフライト",
+    "crashLive": "ロケット {n} 機が飛行中 · 最高 {mult}×",
+    "crashFairTitle": "公平性証明（Provably Fair）",
+    "crashFairBody": "すべてのフライトのクラッシュポイントは打ち上げ前に確定しています。HMAC-SHA256(server seed, flight id) から一様な数値 u（先頭 13 桁の hex / 2^52）が得られ、ポイントは 0.96 / (1 − u) として算出され、1.00×–250.00× の範囲にクランプされます。シードは下の確定済みフライトごとに公開されるので、自分でハッシュして計算を再現できます。",
+    "crashFairRow": "クラッシュ {crash}× · キャッシュアウト {cashed}×",
+    "crashFairRowLoss": "クラッシュ {crash}×",
+    "crashFairSeed": "シード",
+    "crashAutoCustom": "カスタム",
     "rank1": "雪のおやつ",
     "rank2": "ショートホップ",
     "rank3": "アイスホッパー",

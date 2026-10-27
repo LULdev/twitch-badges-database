@@ -262,7 +262,10 @@
     "empty": "Noch keine Daten verfügbar.",
     "wageredTitle": "Meiste Coins im Einsatz",
     "wageredDesc": "Gesamtes Einsatzvolumen — das Aktivitätsboard: viel spielen zählt, nicht horten.",
-    "wageredUnit": "Eingesetzte Coins"
+    "wageredUnit": "Eingesetzte Coins",
+    "crashTopTitle": "Höchster Raketen-Cashout",
+    "crashTopDesc": "Der beste gesicherte Multiplikator in einem einzigen Flug von Badge Rocket — Nerven, nicht Masse.",
+    "crashTopUnit": "Bester Cashout"
   },
   "compare": {
     "title": "Sammler vergleichen",
@@ -361,6 +364,8 @@
     "monthBestWeek": "Beste 7 Tage: +{n}",
     "monthRankChip": "#{rank} des Monats",
     "monthShareTitle": "{name}s Arcade-Monat",
+    "crashBestLine": "Bester Badge Rocket Cashout: {mult}× (+{n} Coins)",
+    "crashShareTitle": "Der beste Badge Rocket Flug von {name}",
     "dayDetailTitle": "{date} — {n} Runden",
     "dayDetailEmpty": "Keine Runden an diesem Tag."
   },
@@ -806,6 +811,13 @@
     "crashCrashedAt": "Abgestürzt bei {mult}×",
     "crashCashedAt": "Ausgezahlt bei {mult}×",
     "crashHistory": "Letzte Flüge",
+    "crashLive": "{n} Raketen in der Luft · Top {mult}×",
+    "crashFairTitle": "Provably Fair",
+    "crashFairBody": "Der Crash-Punkt jedes Fluges steht vor dem Start fest: HMAC-SHA256(server seed, flight id) liefert eine gleichverteilte Zahl u (die ersten 13 Hex-Ziffern über 2^52), und der Punkt ist 0.96 / (1 − u), begrenzt auf 1.00×–250.00×. Der Seed wird zu jedem abgeschlossenen Flug unten veröffentlicht — hash ihn selbst und rechne die Mathematik nach.",
+    "crashFairRow": "Crash {crash}× · Cashout {cashed}×",
+    "crashFairRowLoss": "Crash {crash}×",
+    "crashFairSeed": "Seed",
+    "crashAutoCustom": "Benutzerdefiniert",
     "rank1": "Frostsnack",
     "rank2": "Kurzer Hüpfer",
     "rank3": "Eis-Hüpfer",

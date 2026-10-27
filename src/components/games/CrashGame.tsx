@@ -75,6 +75,7 @@ export default function CrashGame() {
   const [balance, setBalance] = useState<number | null>(null);
   const [bet, setBet] = useState(50);
   const [autoPick, setAutoPick] = useState<number | null>(null);
+  const [autoDraft, setAutoDraft] = useState<string | null>(null);
   const [phase, setPhase] = useState<CrashPhase>("idle");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -202,6 +203,17 @@ export default function CrashGame() {
     reduceRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const audio = createAudio();
     audioRef.current = audio;
+    // Mute persists across visits (0081 round 2): a stored "1" restores the
+    // last session's choice. The setState rides a rAF — the React Compiler
+    // rule (no synchronous setState inside an effect body).
+    try {
+      if (localStorage.getItem("crash-sound-muted") === "1") {
+        audio.setMuted(true);
+        requestAnimationFrame(() => setMuted(true));
+      }
+    } catch {
+      /* storage blocked — start unmuted */
+    }
 
     const root = document.documentElement;
     const applyTheme = () => {
@@ -533,6 +545,11 @@ export default function CrashGame() {
               const next = !audioRef.current?.muted();
               audioRef.current?.setMuted(next ?? false);
               setMuted(next ?? false);
+              try {
+                localStorage.setItem("crash-sound-muted", next ? "1" : "0");
+              } catch {
+                /* storage blocked — the toggle still works for this visit */
+              }
             }}
           >
             <MuteIcon muted={muted} />
@@ -564,6 +581,41 @@ export default function CrashGame() {
               {preset.toFixed(1)}×
             </button>
           ))}
+          {/* A free auto target (1.01×–250×) — the BetBar draft pattern: the
+              value only commits on blur/Enter, so typing is never fought by
+              clamping. An emptied field switches auto OFF. */}
+          <input
+            type="number"
+            className="input w-24 py-1.5 text-sm tabular-nums"
+            min={1.01}
+            max={250}
+            step={0.01}
+            placeholder={t("crashAutoCustom")}
+            value={
+              autoDraft ??
+              (autoPick != null && !AUTO_PRESETS.includes(autoPick)
+                ? autoPick.toFixed(2)
+                : "")
+            }
+            onFocus={() => setAutoDraft(autoPick != null ? autoPick.toFixed(2) : "")}
+            onChange={(event) => setAutoDraft(event.target.value)}
+            onBlur={() => {
+              if (autoDraft === null) return;
+              const parsed = Number(autoDraft);
+              if (autoDraft.trim() !== "" && Number.isFinite(parsed)) {
+                setAutoPick(Math.min(250, Math.max(1.01, Math.round(parsed * 100) / 100)));
+              } else {
+                setAutoPick(null);
+              }
+              setAutoDraft(null);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") event.currentTarget.blur();
+            }}
+            disabled={phase !== "idle" || busy}
+            aria-label={t("crashAutoCustom")}
+            data-ui
+          />
         </div>
       )}
 

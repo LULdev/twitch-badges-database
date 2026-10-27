@@ -75,10 +75,13 @@ export async function generateMetadata({
         {
           // ?month=1 unfurls the member's arcade-month share card instead of
           // the badge-collection card — the month card's share row uses it.
+          // ?crash=1 (0081) swaps to the best Badge Rocket flight card.
           url:
             sp.month === "1"
               ? `/api/og/month?u=${encodeURIComponent(username)}&locale=${locale}`
-              : `/api/og/profile?u=${encodeURIComponent(username)}&locale=${locale}`,
+              : sp.crash === "1"
+                ? `/api/og/crash?u=${encodeURIComponent(username)}`
+                : `/api/og/profile?u=${encodeURIComponent(username)}&locale=${locale}`,
         },
       ],
     },
@@ -691,6 +694,27 @@ export default async function ProfilePage({ params }: PageProps) {
     }
     bestWeekNet = Math.max(bestWeekNet, windowNet);
   }
+  // Best banked Badge Rocket cash-out (0081 view): feeds the crash share row
+  // — previewed only at 10x+ (moon altitude), shareable at 25x+ (the OG card
+  // spec). Public aggregate, anon-granted; a quiet pilot simply hides it.
+  let crashBest: { mult: number; payout: number } | null = null;
+  if (profile?.username) {
+    try {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from("stats_crash_top_cash")
+        .select("best_mult,best_payout")
+        .eq("username", profile.username)
+        .maybeSingle();
+      if (data) {
+        const mult = Number((data as Record<string, unknown>).best_mult ?? 0);
+        const payout = Number((data as Record<string, unknown>).best_payout ?? 0);
+        if (mult >= 10) crashBest = { mult, payout };
+      }
+    } catch {
+      crashBest = null;
+    }
+  }
   // Share of the community's wagered month: only when both sides have real
   // volume and the share is at least half a percent (a 0.1% is noise).
   const monthShare =
@@ -1143,6 +1167,34 @@ export default async function ProfilePage({ params }: PageProps) {
                   title={t("monthShareTitle", { name: profile.username })}
                 />
               </div>
+              {crashBest && crashBest.mult >= 25 && (
+                /* The 25x+ Badge Rocket share card (0081): previewed here;
+                   the ?crash=1 link swaps the profile's og:image so the
+                   shared link unfurls THIS card — the month-card doctrine. */
+                <div className="mt-2 flex flex-wrap items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/api/og/crash?u=${encodeURIComponent(profile.username)}`}
+                    alt={t("crashShareTitle", { name: profile.username })}
+                    width={288}
+                    height={151}
+                    loading="lazy"
+                    className="w-48 rounded-[var(--radius-input)] border border-line"
+                  />
+                  <div className="flex min-w-0 flex-col items-start gap-1.5">
+                    <span className="text-xs font-bold text-warning" dir="ltr">
+                      {t("crashBestLine", {
+                        mult: crashBest.mult.toFixed(2),
+                        n: crashBest.payout,
+                      })}
+                    </span>
+                    <ShareButtons
+                      path={`/${locale}/profile/${profile.username}?crash=1`}
+                      title={t("crashShareTitle", { name: profile.username })}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           )}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

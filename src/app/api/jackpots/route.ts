@@ -1,4 +1,4 @@
-import { getJackpots, getJackpotPotsYesterday } from "@/lib/queries";
+import { getCrashLive, getJackpots, getJackpotPotsYesterday } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -13,13 +13,18 @@ export const dynamic = "force-dynamic";
  * replaces its whole state on every poll, so a server-computed prop would go
  * stale 15 seconds in.
  *
+ * `crashLive` (0081) rides the same poll: airborne Badge Rocket flights and
+ * the highest current climb, straight from the stats_crash_live view — the
+ * hub strip's "rockets airborne" line ticks with the pots for free.
+ *
  * Deliberately unpaged and uncached (no-store): the whole table is 15 rows,
  * and the point is freshness between polls.
  */
 export async function GET() {
-  const [jackpots, yesterday] = await Promise.all([
+  const [jackpots, yesterday, crashLive] = await Promise.all([
     getJackpots(),
     getJackpotPotsYesterday(),
+    getCrashLive(),
   ]);
   const feed = jackpots.map((pot) => ({
     ...pot,
@@ -28,7 +33,7 @@ export async function GET() {
       : null,
   }));
   return Response.json(
-    { jackpots: feed, at: new Date().toISOString() },
+    { jackpots: feed, crashLive, at: new Date().toISOString() },
     { headers: { "cache-control": "no-store" } },
   );
 }

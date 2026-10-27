@@ -214,6 +214,9 @@ export interface ArcadeWeeklyInput {
   coinFlow: number;
   /** Progressive-jackpot snapshot + hits in the covered week (0069). */
   jackpot: ArcadeJackpotStats | null;
+  /** The week's FIRST moon landing (0081): earliest 10x+ banked Badge
+   *  Rocket cash-out — renders the recap's nerve-of-the-week line. */
+  moonFirst: { username: string; mult: number } | null;
 }
 
 /** ISO week label ("2026-W39") from a UTC date inside that week, via the
@@ -341,11 +344,16 @@ export function buildArcadeWeeklyArticle(
           ? `up ${Math.round(((totalRounds - input.priorWeekTotal) / input.priorWeekTotal) * 100)}% on the week before (${priorLabel})`
           : `down ${Math.round(((input.priorWeekTotal - totalRounds) / input.priorWeekTotal) * 100)}% on the week before (${priorLabel})`;
 
+  // The week's nerve line (0081): the FIRST 10x+ banked Badge Rocket flight.
+  const moonFirstSentence = input.moonFirst
+    ? ` The week's first moon landing belongs to **${input.moonFirst.username}**, who banked a **${input.moonFirst.mult.toLocaleString("en-US")}×** [Badge Rocket](/en/games/crash) flight before anyone else dared.`
+    : "";
+
   const lines: string[] = [
     "## The week in the Badge Arcade",
     "",
     totalRounds > 0
-      ? `From Monday ${startLabel} to Sunday ${endLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 15 games`}${trend ? ` — ${trend}` : ""}. One post per week, computed from the same server-authoritative ledger that powers the [statistics dashboard](/en/stats).${input.streakSaves > 0 ? ` Across the week, **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** bridged missed days and kept ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} alive.` : ""}${input.coinFlow > 0 ? ` The ledger logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — logged movements only, since regular arcade rounds move coins without a ledger entry.` : ""}${input.jackpot ? ` ${input.jackpot.hits > 0 ? `**${input.jackpot.hits} progressive jackpot ${input.jackpot.hits === 1 ? "hit" : "hits"}** paid out **${input.jackpot.paid.toLocaleString("en-US")} BadgesCoins**${input.jackpot.hits === 1 ? "" : " combined"} over the week, and ` : ""}the pots closed the week holding **${input.jackpot.potsTotal.toLocaleString("en-US")} BadgesCoins** (${input.jackpot.megaPot.toLocaleString("en-US")} of them in the cross-game [Mega Jackpot](/en/games)).` : ""}`
+      ? `From Monday ${startLabel} to Sunday ${endLabel} the community settled **${totalRounds.toLocaleString("en-US")} rounds** across ${played.length === 1 ? "one game" : `${played.length} of 15 games`}${trend ? ` — ${trend}` : ""}. One post per week, computed from the same server-authoritative ledger that powers the [statistics dashboard](/en/stats).${moonFirstSentence}${input.streakSaves > 0 ? ` Across the week, **${input.streakSaves} Streak ${input.streakSaves === 1 ? "Freeze" : "Freezes"}** bridged missed days and kept ${input.streakSaves === 1 ? "a game streak" : `${input.streakSaves} game streaks`} alive.` : ""}${input.coinFlow > 0 ? ` The ledger logged **${input.coinFlow.toLocaleString("en-US")} BadgesCoins moved** — logged movements only, since regular arcade rounds move coins without a ledger entry.` : ""}${input.jackpot ? ` ${input.jackpot.hits > 0 ? `**${input.jackpot.hits} progressive jackpot ${input.jackpot.hits === 1 ? "hit" : "hits"}** paid out **${input.jackpot.paid.toLocaleString("en-US")} BadgesCoins**${input.jackpot.hits === 1 ? "" : " combined"} over the week, and ` : ""}the pots closed the week holding **${input.jackpot.potsTotal.toLocaleString("en-US")} BadgesCoins** (${input.jackpot.megaPot.toLocaleString("en-US")} of them in the cross-game [Mega Jackpot](/en/games)).` : ""}`
       : `From Monday ${startLabel} to Sunday ${endLabel} the arcade floors stayed completely quiet — not a single settled round in seven days. The boards never close: pick a game on the [arcade overview](/en/games), and next week's recap could open with your name.${input.jackpot ? ` Even so, the progressive jackpots hold **${input.jackpot.potsTotal.toLocaleString("en-US")} BadgesCoins** (${input.jackpot.megaPot.toLocaleString("en-US")} in the [Mega Jackpot](/en/games)).` : ""}`,
     "",
   ];

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
+  getCrashTopCash,
   getLoginStreakLeaderboard,
   getMostOwnedBadges,
   getRarestBadges,
@@ -68,7 +69,7 @@ export default async function LeaderboardsPage({
   const t = await getTranslations("leaderboards");
   const tc = await getTranslations("common");
 
-  const [potat, badgesblog, mostOwned, rarest, site, streaks, loginStreaks, wagered] =
+  const [potat, badgesblog, mostOwned, rarest, site, streaks, loginStreaks, wagered, crashTop] =
     await Promise.all([
       fetchOwnedLeaderboard(2).catch(() => []),
       fetchBadgesBlogRanking().catch(() => []),
@@ -78,6 +79,7 @@ export default async function LeaderboardsPage({
       getStreakLeaderboard().catch(() => []),
       getLoginStreakLeaderboard().catch(() => []),
       getWageredLeaderboard().catch(() => []),
+      getCrashTopCash().catch(() => []),
     ]);
 
   // The viewer's own streak standing — the profile rankChip pattern (head
@@ -373,6 +375,58 @@ export default async function LeaderboardsPage({
                     </td>
                     <td dir="ltr" className="text-end font-semibold tabular-nums">
                       {new Intl.NumberFormat(locale).format(entry.coins_wagered)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="p-6 text-sm text-muted">{t("empty")}</p>
+          )}
+        </section>
+
+        {/* Highest Badge Rocket cash-out — nerve, not volume (0081 view) */}
+        <section aria-labelledby="crash-top" className="card overflow-hidden">
+          <div className="border-b border-line px-5 py-4">
+            <h2 id="crash-top" className="font-bold">{t("crashTopTitle")}</h2>
+            <p className="mt-0.5 text-xs text-muted">{t("crashTopDesc")}</p>
+          </div>
+          {crashTop.length > 0 ? (
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th className="w-14">{t("rank")}</th>
+                  <th>{t("collector")}</th>
+                  <th className="text-end">{t("crashTopUnit")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {crashTop.map((entry, index) => (
+                  <tr key={entry.user_id} className="hover:bg-surface-2">
+                    <td className="font-bold tabular-nums text-muted">
+                      {index < 3 ? (
+                        <span
+                          className="jackpot-hof-rank"
+                          style={{ color: MEDALS[index] }}
+                          aria-hidden="true"
+                        >
+                          {index + 1}
+                        </span>
+                      ) : (
+                        <>#{index + 1}</>
+                      )}
+                    </td>
+                    <td>
+                      <Link
+                        href={`/profile/${entry.username}`}
+                        className="flex items-center gap-2.5 font-semibold hover:text-accent"
+                      >
+                        <Avatar src={entry.avatar_url} name={entry.username} />
+                        {entry.username}
+                      </Link>
+                    </td>
+                    <td dir="ltr" className="text-end font-semibold tabular-nums text-warning">
+                      {entry.best_mult.toFixed(2)}×
                     </td>
                   </tr>
                 ))}

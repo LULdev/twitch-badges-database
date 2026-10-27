@@ -262,7 +262,10 @@
     "empty": "Данные пока недоступны.",
     "wageredTitle": "Больше всех поставлено",
     "wageredDesc": "Общий объём ставок — таблица активности: важно много играть, а не копить.",
-    "wageredUnit": "Монет поставлено"
+    "wageredUnit": "Монет поставлено",
+    "crashTopTitle": "Наибольший кэшаут в Rocket",
+    "crashTopDesc": "Лучший зафиксированный множитель за один полёт в Badge Rocket — нервы, а не объём.",
+    "crashTopUnit": "Лучший кэшаут"
   },
   "compare": {
     "title": "Сравнение коллекционеров",
@@ -361,6 +364,8 @@
     "monthBestWeek": "Лучшие 7 дней: +{n}",
     "monthRankChip": "#{rank} месяца",
     "monthShareTitle": "Аркадный месяц {name}",
+    "crashBestLine": "Лучший кэшаут в Badge Rocket: {mult}× (+{n} монет)",
+    "crashShareTitle": "Лучший полёт {name} в Badge Rocket",
     "dayDetailTitle": "{date} — {n} раундов",
     "dayDetailEmpty": "В этот день раундов не было."
   },
@@ -806,6 +811,13 @@
     "crashCrashedAt": "Взрыв на {mult}×",
     "crashCashedAt": "Забрано на {mult}×",
     "crashHistory": "Последние полёты",
+    "crashLive": "{n} ракет в воздухе · макс. {mult}×",
+    "crashFairTitle": "Доказуемо честная игра",
+    "crashFairBody": "Точка краша каждого полёта фиксируется до запуска: HMAC-SHA256(server seed, flight id) даёт равномерно распределённое число u (первые 13 hex-цифр, делённых на 2^52), а точка равна 0.96 / (1 − u) и ограничена диапазоном 1.00×–250.00×. Seed публикуется с каждым завершённым полётом ниже — посчитайте хеш сами и перепроверьте математику.",
+    "crashFairRow": "краш {crash}× · кэшаут {cashed}×",
+    "crashFairRowLoss": "краш {crash}×",
+    "crashFairSeed": "seed",
+    "crashAutoCustom": "Своё",
     "rank1": "Ледяной перекус",
     "rank2": "Короткий прыжок",
     "rank3": "Прыгун по льду",

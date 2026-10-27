@@ -425,6 +425,42 @@ export default async function GamePage({ params }: PageProps) {
       .filter((row) => row.image);
   }
 
+  // Provably-fair disclosure (0081): the newest SETTLED Badge Rocket flights
+  // with their published seeds — the reader can hash HMAC-SHA256(seed,
+  // flight) and replay the crash point. Public read, settled rows only.
+  let fairRounds: Array<{
+    id: number | string;
+    created_at: string;
+    crash: number;
+    cashed: number | null;
+    seed: string | null;
+  }> = [];
+  if (game === "crash") {
+    const supabase = await createClient();
+    try {
+      const { data } = await supabase
+        .from("game_rounds")
+        .select("id,created_at,result")
+        .eq("game", "crash")
+        .order("created_at", { ascending: false })
+        .limit(6);
+      fairRounds = ((data ?? []) as Array<{
+        id: number | string;
+        created_at: string;
+        result: Record<string, unknown> | null;
+      }>).map((row) => ({
+        id: row.id,
+        created_at: row.created_at,
+        crash: Number(row.result?.crash ?? 0),
+        cashed:
+          row.result && typeof row.result.cashed === "number" ? row.result.cashed : null,
+        seed: row.result && typeof row.result.seed === "string" ? row.result.seed : null,
+      }));
+    } catch {
+      fairRounds = [];
+    }
+  }
+
   // The visitor's most recent settled rounds on THIS game, for the hero chip:
   // the last one as a signed amount plus a five-dot win/loss streak.
   // game_rounds is public-read under RLS, so the anon server client suffices
@@ -507,6 +543,49 @@ export default async function GamePage({ params }: PageProps) {
       {game === "catcher" && <CatcherGame />}
       {game === "pingu" && <PinguGame />}
       {game === "crash" && <CrashGame />}
+      {game === "crash" && (
+        <section className="card p-5" aria-labelledby="crash-fair-head">
+          <details>
+            <summary
+              id="crash-fair-head"
+              className="cursor-pointer text-sm font-bold"
+            >
+              {t("crashFairTitle")}
+            </summary>
+            <p className="mt-3 text-xs leading-relaxed text-muted">
+              {t("crashFairBody")}
+            </p>
+            {fairRounds.length > 0 ? (
+              <ul className="mt-3 space-y-1.5">
+                {fairRounds.map((row) => (
+                  <li
+                    key={String(row.id)}
+                    className="flex flex-wrap items-baseline gap-x-2 text-xs text-muted"
+                    dir="ltr"
+                  >
+                    <time dateTime={row.created_at}>
+                      {winsDate.format(new Date(row.created_at))}
+                    </time>
+                    <span className="font-semibold text-foreground">
+                      {row.cashed != null
+                        ? t("crashFairRow", {
+                            crash: row.crash.toFixed(2),
+                            cashed: row.cashed.toFixed(2),
+                          })
+                        : t("crashFairRowLoss", { crash: row.crash.toFixed(2) })}
+                    </span>
+                    {row.seed && (
+                      <span className="break-all font-mono text-[0.6875rem]">
+                        {t("crashFairSeed")} {row.seed.slice(0, 16)}…
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </details>
+        </section>
+      )}
       {bigWinsSection}
     </div>
   );

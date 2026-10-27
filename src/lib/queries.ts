@@ -1096,6 +1096,69 @@ export async function getLoginStreakLeaderboard(): Promise<
   }));
 }
 
+/**
+ * Highest banked Badge Rocket cash-out per player (0081 view) — the
+ * leaderboards board and the profile/OG best-flight card. numeric/bigint
+ * arrive as strings; ordered here because the view is one row per user and
+ * PostgREST orders the projection, not the distinct-on inside it.
+ */
+export async function getCrashTopCash(): Promise<
+  Array<{
+    user_id: string;
+    username: string;
+    avatar_url: string | null;
+    best_mult: number;
+    best_payout: number;
+    achieved_at: string;
+  }>
+> {
+  const supabase = await createClient();
+  try {
+    const { data } = await supabase
+      .from("stats_crash_top_cash")
+      .select("user_id,username,avatar_url,best_mult,best_payout,achieved_at")
+      .order("best_mult", { ascending: false })
+      .order("achieved_at", { ascending: true })
+      .limit(10);
+    return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+      user_id: String(row.user_id),
+      username: String(row.username),
+      avatar_url: (row.avatar_url as string | null) ?? null,
+      best_mult: Number(row.best_mult ?? 0),
+      best_payout: Number(row.best_payout ?? 0),
+      achieved_at: String(row.achieved_at ?? ""),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * The live-flight snapshot for the hub strip (0081 view): how many rockets
+ * are airborne right now and the highest current climb (capped at the
+ * public 250× ceiling). Aggregates only — no crash points, no usernames.
+ * Null on any read failure so the strip simply hides the line.
+ */
+export async function getCrashLive(): Promise<{
+  flights: number;
+  topMult: number;
+} | null> {
+  const supabase = await createClient();
+  try {
+    const { data } = await supabase
+      .from("stats_crash_live")
+      .select("flights,top_mult")
+      .maybeSingle();
+    if (!data) return null;
+    return {
+      flights: Number((data as Record<string, unknown>).flights ?? 0),
+      topMult: Number((data as Record<string, unknown>).top_mult ?? 1),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function listPosts(publishedOnly = true): Promise<BlogPostRow[]> {
   const supabase = await createClient();
   let query = supabase

@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import Coin from "@/components/Coin";
 import { GAME_COLORS } from "@/components/games/GameArt";
 import type { JackpotPot, JackpotWinEntry } from "@/lib/queries";
+import { getCrashLive } from "@/lib/queries";
 import { GAMES } from "@/lib/gamification/games";
 import JackpotPotsLive from "@/components/games/JackpotPotsLive";
 
@@ -31,6 +32,10 @@ export default async function JackpotStrip({
   const t = await getTranslations("games");
   const mega = jackpots.find((j) => j.kind === "mega");
   if (!mega) return null;
+
+  // The airborne-rocket SSR snapshot (0081) — the poll keeps it fresh, this
+  // is only the first paint. Null (read failure / no flights) hides the line.
+  const crashLive = await getCrashLive();
 
   // The house short-date pattern (game page / BestRoundsCard).
   const winDate = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short" });
@@ -65,7 +70,11 @@ export default async function JackpotStrip({
           rendered from the server snapshot, then polled every 15s so the
           pots tick between page loads (display:contents keeps the strip's
           flex layout untouched). */}
-      <JackpotPotsLive initialJackpots={livePots} gameOrder={GAMES.map((meta) => meta.id)} />
+      <JackpotPotsLive
+        initialJackpots={livePots}
+        gameOrder={GAMES.map((meta) => meta.id)}
+        initialCrashLive={crashLive}
+      />
 
       {wins.length > 0 && (
         <div className="jackpot-winners">

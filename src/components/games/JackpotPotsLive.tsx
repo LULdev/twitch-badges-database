@@ -35,6 +35,7 @@ const POLL_MS = 15_000;
 export default function JackpotPotsLive({
   initialJackpots,
   gameOrder,
+  initialCrashLive = null,
 }: {
   /** Server-read snapshot — the first paint, and the fallback on poll failure. */
   initialJackpots: LivePot[];
@@ -42,10 +43,15 @@ export default function JackpotPotsLive({
    *  in the server-side game engine (importing it here would pull the
    *  service-role client into the browser bundle). */
   gameOrder: string[];
+  /** SSR snapshot of the airborne-rocket line (0081) — null hides it. */
+  initialCrashLive?: { flights: number; topMult: number } | null;
 }) {
   const t = useTranslations("games");
   const locale = useLocale();
   const [jackpots, setJackpots] = useState<LivePot[]>(initialJackpots);
+  const [crashLive, setCrashLive] = useState<{ flights: number; topMult: number } | null>(
+    initialCrashLive,
+  );
   const mounted = useRef(true);
 
   const poll = useCallback(async () => {
@@ -53,9 +59,17 @@ export default function JackpotPotsLive({
     try {
       const res = await fetch("/api/jackpots", { cache: "no-store" });
       if (!res.ok) return;
-      const data = (await res.json()) as { jackpots?: LivePot[] };
+      const data = (await res.json()) as {
+        jackpots?: LivePot[];
+        crashLive?: { flights: number; topMult: number } | null;
+      };
       if (mounted.current && Array.isArray(data.jackpots) && data.jackpots.length > 0) {
         setJackpots(data.jackpots);
+      }
+      // The rocket line: replaced only when the payload carries it — a poll
+      // from an older deploy (or a failed read) keeps the last known state.
+      if (mounted.current && data.crashLive) {
+        setCrashLive(data.crashLive);
       }
     } catch {
       // A failed poll keeps the last known pots — the next one retries.
@@ -139,6 +153,23 @@ export default function JackpotPotsLive({
           </p>
         </div>
       </div>
+
+      {crashLive && crashLive.flights > 0 && (
+        /* The airborne-rocket line (0081): pure FOMO fuel on the hub strip —
+           how many Badge Rocket flights are live and the highest climb
+           right now (a value that can explode a second later, which is the
+           point). Numbers only, dir="ltr" island. */
+        <p
+          className="flex items-center gap-1.5 self-center text-xs font-bold text-warning"
+          dir="ltr"
+        >
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+            <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+          </svg>
+          {t("crashLive", { n: crashLive.flights, mult: crashLive.topMult.toFixed(2) })}
+        </p>
+      )}
 
       <div className="jackpot-games">
         {ordered.map((pot) => (

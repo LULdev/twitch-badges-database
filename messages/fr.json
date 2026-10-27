@@ -262,7 +262,10 @@
     "empty": "Aucune donnée disponible pour le moment.",
     "wageredTitle": "Pièces les plus misées",
     "wageredDesc": "Volume total misé — le tableau d'activité : jouer beaucoup compte, pas thésauriser.",
-    "wageredUnit": "Pièces misées"
+    "wageredUnit": "Pièces misées",
+    "crashTopTitle": "Plus haut cash-out de fusée",
+    "crashTopDesc": "Le meilleur multiplicateur encaissé sur un seul vol de Badge Rocket — des nerfs, pas du volume.",
+    "crashTopUnit": "Meilleur cash-out"
   },
   "compare": {
     "title": "Comparer des collectionneurs",
@@ -361,6 +364,8 @@
     "monthBestWeek": "Meilleurs 7 jours : +{n}",
     "monthRankChip": "#{rank} du mois",
     "monthShareTitle": "Le mois d'arcade de {name}",
+    "crashBestLine": "Meilleur cash-out sur Badge Rocket : {mult}× (+{n} coins)",
+    "crashShareTitle": "Le meilleur vol de {name} sur Badge Rocket",
     "dayDetailTitle": "{date} — {n} manches",
     "dayDetailEmpty": "Aucune manche ce jour-là."
   },
@@ -806,6 +811,13 @@
     "crashCrashedAt": "A explosé à {mult}×",
     "crashCashedAt": "Encaissé à {mult}×",
     "crashHistory": "Derniers vols",
+    "crashLive": "{n} fusées en vol · top {mult}×",
+    "crashFairTitle": "Équité prouvable",
+    "crashFairBody": "Le point de crash de chaque vol est fixé avant le lancement : HMAC-SHA256(server seed, flight id) donne un nombre uniforme u (les 13 premiers chiffres hex sur 2^52), et le point est 0.96 / (1 − u), borné à 1.00×–250.00×. La seed est publiée avec chaque vol terminé ci-dessous — hashez-la vous-même et refaites le calcul.",
+    "crashFairRow": "crash {crash}× · encaissé {cashed}×",
+    "crashFairRowLoss": "crash {crash}×",
+    "crashFairSeed": "seed",
+    "crashAutoCustom": "Personnalisé",
     "rank1": "Collation glacée",
     "rank2": "Petit bond",
     "rank3": "Sauteur des glaces",

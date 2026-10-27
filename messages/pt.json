@@ -262,7 +262,10 @@
     "empty": "Ainda não há dados disponíveis.",
     "wageredTitle": "Mais moedas apostadas",
     "wageredDesc": "Volume total de apostas — o quadro de atividade: jogar muito conta, não acumular.",
-    "wageredUnit": "Moedas apostadas"
+    "wageredUnit": "Moedas apostadas",
+    "crashTopTitle": "Maior saque do Rocket",
+    "crashTopDesc": "O melhor multiplicador garantido em um único voo de Badge Rocket — nervo, não volume.",
+    "crashTopUnit": "Melhor saque"
   },
   "compare": {
     "title": "Comparar colecionadores",
@@ -361,6 +364,8 @@
     "monthBestWeek": "Melhores 7 dias: +{n}",
     "monthRankChip": "#{rank} do mês",
     "monthShareTitle": "O mês de arcade de {name}",
+    "crashBestLine": "Melhor saque no Badge Rocket: {mult}× (+{n} moedas)",
+    "crashShareTitle": "Melhor voo de {name} no Badge Rocket",
     "dayDetailTitle": "{date} — {n} rodadas",
     "dayDetailEmpty": "Nenhuma rodada neste dia."
   },
@@ -806,6 +811,13 @@
     "crashCrashedAt": "Explodiu em {mult}×",
     "crashCashedAt": "Sacou em {mult}×",
     "crashHistory": "Últimos voos",
+    "crashLive": "{n} foguetes no ar · top {mult}×",
+    "crashFairTitle": "Comprovadamente justo",
+    "crashFairBody": "O ponto de crash de cada voo é definido antes do lançamento: HMAC-SHA256(server seed, flight id) gera um número uniforme u (os primeiros 13 dígitos hex divididos por 2^52), e o ponto é 0.96 / (1 − u), limitado ao intervalo 1.00×–250.00×. A seed é publicada com cada voo encerrado abaixo — faça o hash você mesmo e refaça os cálculos.",
+    "crashFairRow": "crash em {crash}× · saque em {cashed}×",
+    "crashFairRowLoss": "crash em {crash}×",
+    "crashFairSeed": "seed",
+    "crashAutoCustom": "Personalizado",
     "rank1": "Lanche gelado",
     "rank2": "Pulinho curto",
     "rank3": "Saltador do gelo",
